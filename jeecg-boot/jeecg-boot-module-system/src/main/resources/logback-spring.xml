@@ -78,6 +78,24 @@
 	</appender>
 	<!-- 每天生成一个html格式的日志结束 -->
 
+	<!--api 日志-->
+	<appender name="file_api" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<!--滚动策略-->
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!--路径-->
+			<fileNamePattern>${log.path}/api/api.%d{yyyy-MM-dd}.log</fileNamePattern>
+		</rollingPolicy>
+		<encoder>
+			<pattern>${log.pattern}</pattern>
+		</encoder>
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<!--设置过滤级别-->
+			<level>INFO</level>
+			<onMatch>ACCEPT</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter>
+	</appender>
+
 	<!--myibatis log configure -->
 	<logger name="com.apache.ibatis" level="TRACE" />
 	<logger name="java.sql.Connection" level="DEBUG" />
@@ -90,6 +108,11 @@
 		<appender-ref ref="FILE" />
 		<appender-ref ref="HTML" />
 		<appender-ref ref="FILE_HTML" />
+		<appender-ref ref="file_api" />
 	</root>
+
+	<logger name="org.jeecg.modules.api.aspect.ApiLogAspect" level="info" additivity="false">
+		<appender-ref ref="file_api" />
+	</logger>
 
 </configuration>
