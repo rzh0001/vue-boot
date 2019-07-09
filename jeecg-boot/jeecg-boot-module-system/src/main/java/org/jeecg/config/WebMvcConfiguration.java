@@ -1,14 +1,14 @@
 package org.jeecg.config;
 
+import org.jeecg.interceptor.LogInterceptor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.*;
 
 /**
  * Spring Boot 2.0 解决跨域问题
@@ -25,7 +25,11 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 	private String webAppPath;
 	@Value("${spring.resource.static-locations}")
 	private String staticLocations;
-
+	
+	@Autowired
+	private LogInterceptor logInterceptor;
+	
+	
 	@Bean
 	public CorsFilter corsFilter() {
 		final UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource = new UrlBasedCorsConfigurationSource();
@@ -58,5 +62,11 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 	@Override
 	public void addViewControllers(ViewControllerRegistry registry) {
 		registry.addViewController("/").setViewName("index.html");
+	}
+	
+	@Override
+	public void addInterceptors(InterceptorRegistry registry) {
+		registry.addInterceptor(logInterceptor);
+		WebMvcConfigurer.super.addInterceptors(registry);
 	}
 }
