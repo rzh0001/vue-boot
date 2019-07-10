@@ -17,6 +17,7 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
+
   mail:
     host: smtp.163.com
     username: jeecgos@163.com
@@ -92,7 +93,7 @@ spring:
         connectionProperties: druid.stat.mergeSql\=true;druid.stat.slowSqlMillis\=5000
       datasource:
         master:
-          url: jdbc:mysql://127.0.0.1:3306/jeecg-boot?characterEncoding=UTF-8&useUnicode=true&useSSL=false
+          url: jdbc:mysql://127.0.0.1:3306/jeecgboot?characterEncoding=UTF-8&useUnicode=true&useSSL=false
           username: root
           password: root
           driver-class-name: com.mysql.jdbc.Driver
