@@ -1,4 +1,4 @@
-package org.jeecg.modules.api.aspect;
+package org.jeecg.aspect;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
