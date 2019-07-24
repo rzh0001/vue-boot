@@ -2,15 +2,19 @@ package org.jeecg.modules.pay.service;
 
 import com.alibaba.fastjson.JSONObject;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
+import com.baomidou.mybatisplus.extension.service.IService;
 import org.jeecg.modules.util.R;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
- * @title:
- * @Description:
- * @author: wangjb
- * @create: 2019-07-22 10:35
+ * @Description: 订单信息
+ * @Author: jeecg-boot
+ * @Date:   2019-07-24
+ * @Version: V1.0
  */
-public interface IOrderInfoService {
+public interface IOrderInfoEntityService extends IService<OrderInfoEntity> {
+    R createOrder(JSONObject reqobj);
     /**
      * 查询订单信息
      * @param reqobj
@@ -22,7 +26,7 @@ public interface IOrderInfoService {
      * @param reqobj
      * @return
      */
-    R callback(JSONObject reqobj);
+    R callback(JSONObject reqobj, HttpServletRequest req);
 
     OrderInfoEntity queryOrderInfoByOrderId(String orderId);
 }

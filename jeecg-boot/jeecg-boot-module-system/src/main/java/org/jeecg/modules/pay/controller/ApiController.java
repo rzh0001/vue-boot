@@ -1,11 +1,12 @@
 package org.jeecg.modules.pay.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import org.jeecg.modules.pay.service.IOrderInfoService;
+import org.jeecg.modules.pay.service.IOrderInfoEntityService;
 import org.jeecg.modules.util.R;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 /**
@@ -15,7 +16,8 @@ import java.util.Map;
  * @create: 2019-06-20 10:38
  */
 public class ApiController {
-
+    @Autowired
+    private IOrderInfoEntityService orderInfoService;
     /**
      * 订单创建：入参
      * pay_memberid 商户ID
@@ -38,19 +40,20 @@ public class ApiController {
      * @param reqobj
      * @return
      */
-    @PostMapping("callback")
-    public R callback(@RequestParam JSONObject reqobj){
-        return null;
+    @PostMapping("/callback")
+    @ResponseBody
+    public R callback(@RequestParam JSONObject reqobj, HttpServletRequest req){
+        return orderInfoService.callback(reqobj,req);
     }
 
-    @Autowired
-    private IOrderInfoService orderInfoService;
+
     /**
      * 订单查询（AES）
      * @param reqobj
      * @return
      */
-    @PostMapping("queryOrder")
+    @PostMapping("/queryOrder")
+    @ResponseBody
     public R queryOrder(@RequestBody JSONObject reqobj){
         return orderInfoService.queryOrderInfo(reqobj);
     }

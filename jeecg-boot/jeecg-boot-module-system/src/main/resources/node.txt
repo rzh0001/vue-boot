@@ -1,0 +1,17 @@
+1、订单查询
+    入参：
+        username:用户名
+        timestamp:时间戳
+        data:数据，json字符串（"orderId":"123456789" 采用BASE64加密）
+        sign:签名（username+timestamp+data使用MD5进行加密）
+
+2、订单创建
+    入参：
+        outer_order_id:外部订单号
+        business_code：商户编号
+        submit_amount：申请金额
+        pay_type：支付通道
+
+
+
+
