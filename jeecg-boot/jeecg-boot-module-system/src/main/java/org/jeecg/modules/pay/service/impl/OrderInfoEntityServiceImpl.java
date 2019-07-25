@@ -7,8 +7,13 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jeecg.common.system.vo.DictModel;
 import org.jeecg.common.util.DateUtils;
+import org.jeecg.modules.exception.RRException;
+import org.jeecg.modules.pay.entity.ChannelEntity;
+import org.jeecg.modules.pay.entity.ChannelUserEntity;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import org.jeecg.modules.pay.mapper.OrderInfoEntityMapper;
+import org.jeecg.modules.pay.service.IChannelEntityService;
+import org.jeecg.modules.pay.service.IChannelUserEntityService;
 import org.jeecg.modules.pay.service.IOrderInfoEntityService;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.service.ISysDictService;
@@ -40,7 +45,18 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     private ISysDictService dictService;
     @Autowired
     private IOrderInfoEntityService orderInfoEntityService;
-
+    @Autowired
+    private IChannelEntityService chnannelDao;
+    @Autowired
+    private IChannelUserEntityService channelUserDao;
+    /**
+     * pay_memberid：商户id
+     * pay_amount： 支付金额
+     * pay_bankcode：通道
+     * pay_orderid：外部订单号
+     * @param reqobj
+     * @return
+     */
     @Override
     public R createOrder(JSONObject reqobj) {
         try {
@@ -122,6 +138,9 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         String businessCode = (String) checkParam.get(BaseConstant.BUSINESS_CODE);
         String submitAmount = (String) checkParam.get(BaseConstant.SUBMIT_AMOUNT);
         String payType = (String) checkParam.get(BaseConstant.PAY_TYPE);
+        if(channelIsOpen(payType,businessCode)){
+            throw new RRException("通道未定义，或用户无此通道权限");
+        }
         String orderId = generateOrderId();
         OrderInfoEntity order = new OrderInfoEntity();
         order.setOrderId(orderId);
@@ -136,6 +155,23 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         countOrderRate(order);
     }
 
+    /**
+     * 校验通道是否是开启的
+     * @param channelCode
+     * @param businessId
+     * @return
+     */
+    private boolean channelIsOpen(String channelCode,String businessId){
+        ChannelEntity channel = chnannelDao.queryChannelByCode(channelCode);
+        if(channel == null){
+            return false;
+        }
+        ChannelUserEntity channelUser = channelUserDao.queryChannelAndUser(channelCode,businessId);
+        if(channelUser == null){
+            return false;
+        }
+        return true;
+    }
     /**
      * 计算订单汇率
      */
@@ -157,7 +193,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * @return
      */
     private String sign(String key,OrderInfoEntity order){
-        
+
         return null;
     }
     /**
