@@ -4,9 +4,9 @@ import org.jeecg.modules.pay.entity.ChannelEntity;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
- * @Description: 通道信息
+ * @Description: 通道设置
  * @Author: jeecg-boot
- * @Date:   2019-07-25
+ * @Date:   2019-07-26
  * @Version: V1.0
  */
 public interface IChannelEntityService extends IService<ChannelEntity> {

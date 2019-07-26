@@ -12,8 +12,8 @@ import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.aspect.annotation.AutoLog;
 import org.jeecg.common.util.oConvertUtils;
-import org.jeecg.modules.pay.entity.ChannelEntity;
-import org.jeecg.modules.pay.service.IChannelEntityService;
+import org.jeecg.modules.pay.entity.UserRateEntity;
+import org.jeecg.modules.pay.service.IUserRateEntityService;
 import java.util.Date;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -36,38 +36,38 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
  /**
- * @Description: 通道设置
+ * @Description: 用户在指定通道下的费率
  * @Author: jeecg-boot
  * @Date:   2019-07-26
  * @Version: V1.0
  */
 @Slf4j
-@Api(tags="通道设置")
+@Api(tags="用户在指定通道下的费率")
 @RestController
-@RequestMapping("/pay/channelEntity")
-public class ChannelEntityController {
+@RequestMapping("/pay/userRateEntity")
+public class UserRateEntityController {
 	@Autowired
-	private IChannelEntityService channelEntityService;
+	private IUserRateEntityService userRateEntityService;
 	
 	/**
 	  * 分页列表查询
-	 * @param channelEntity
+	 * @param userRateEntity
 	 * @param pageNo
 	 * @param pageSize
 	 * @param req
 	 * @return
 	 */
-	@AutoLog(value = "通道设置-分页列表查询")
-	@ApiOperation(value="通道设置-分页列表查询", notes="通道设置-分页列表查询")
+	@AutoLog(value = "用户在指定通道下的费率-分页列表查询")
+	@ApiOperation(value="用户在指定通道下的费率-分页列表查询", notes="用户在指定通道下的费率-分页列表查询")
 	@GetMapping(value = "/list")
-	public Result<IPage<ChannelEntity>> queryPageList(ChannelEntity channelEntity,
+	public Result<IPage<UserRateEntity>> queryPageList(UserRateEntity userRateEntity,
 									  @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
 									  @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 									  HttpServletRequest req) {
-		Result<IPage<ChannelEntity>> result = new Result<IPage<ChannelEntity>>();
-		QueryWrapper<ChannelEntity> queryWrapper = QueryGenerator.initQueryWrapper(channelEntity, req.getParameterMap());
-		Page<ChannelEntity> page = new Page<ChannelEntity>(pageNo, pageSize);
-		IPage<ChannelEntity> pageList = channelEntityService.page(page, queryWrapper);
+		Result<IPage<UserRateEntity>> result = new Result<IPage<UserRateEntity>>();
+		QueryWrapper<UserRateEntity> queryWrapper = QueryGenerator.initQueryWrapper(userRateEntity, req.getParameterMap());
+		Page<UserRateEntity> page = new Page<UserRateEntity>(pageNo, pageSize);
+		IPage<UserRateEntity> pageList = userRateEntityService.page(page, queryWrapper);
 		result.setSuccess(true);
 		result.setResult(pageList);
 		return result;
@@ -75,16 +75,16 @@ public class ChannelEntityController {
 	
 	/**
 	  *   添加
-	 * @param channelEntity
+	 * @param userRateEntity
 	 * @return
 	 */
-	@AutoLog(value = "通道设置-添加")
-	@ApiOperation(value="通道设置-添加", notes="通道设置-添加")
+	@AutoLog(value = "用户在指定通道下的费率-添加")
+	@ApiOperation(value="用户在指定通道下的费率-添加", notes="用户在指定通道下的费率-添加")
 	@PostMapping(value = "/add")
-	public Result<ChannelEntity> add(@RequestBody ChannelEntity channelEntity) {
-		Result<ChannelEntity> result = new Result<ChannelEntity>();
+	public Result<UserRateEntity> add(@RequestBody UserRateEntity userRateEntity) {
+		Result<UserRateEntity> result = new Result<UserRateEntity>();
 		try {
-			channelEntityService.save(channelEntity);
+			userRateEntityService.save(userRateEntity);
 			result.success("添加成功！");
 		} catch (Exception e) {
 			log.error(e.getMessage(),e);
@@ -95,19 +95,19 @@ public class ChannelEntityController {
 	
 	/**
 	  *  编辑
-	 * @param channelEntity
+	 * @param userRateEntity
 	 * @return
 	 */
-	@AutoLog(value = "通道设置-编辑")
-	@ApiOperation(value="通道设置-编辑", notes="通道设置-编辑")
+	@AutoLog(value = "用户在指定通道下的费率-编辑")
+	@ApiOperation(value="用户在指定通道下的费率-编辑", notes="用户在指定通道下的费率-编辑")
 	@PutMapping(value = "/edit")
-	public Result<ChannelEntity> edit(@RequestBody ChannelEntity channelEntity) {
-		Result<ChannelEntity> result = new Result<ChannelEntity>();
-		ChannelEntity channelEntityEntity = channelEntityService.getById(channelEntity.getId());
-		if(channelEntityEntity==null) {
+	public Result<UserRateEntity> edit(@RequestBody UserRateEntity userRateEntity) {
+		Result<UserRateEntity> result = new Result<UserRateEntity>();
+		UserRateEntity userRateEntityEntity = userRateEntityService.getById(userRateEntity.getId());
+		if(userRateEntityEntity==null) {
 			result.error500("未找到对应实体");
 		}else {
-			boolean ok = channelEntityService.updateById(channelEntity);
+			boolean ok = userRateEntityService.updateById(userRateEntity);
 			//TODO 返回false说明什么？
 			if(ok) {
 				result.success("修改成功!");
@@ -122,12 +122,12 @@ public class ChannelEntityController {
 	 * @param id
 	 * @return
 	 */
-	@AutoLog(value = "通道设置-通过id删除")
-	@ApiOperation(value="通道设置-通过id删除", notes="通道设置-通过id删除")
+	@AutoLog(value = "用户在指定通道下的费率-通过id删除")
+	@ApiOperation(value="用户在指定通道下的费率-通过id删除", notes="用户在指定通道下的费率-通过id删除")
 	@DeleteMapping(value = "/delete")
 	public Result<?> delete(@RequestParam(name="id",required=true) String id) {
 		try {
-			channelEntityService.removeById(id);
+			userRateEntityService.removeById(id);
 		} catch (Exception e) {
 			log.error("删除失败",e.getMessage());
 			return Result.error("删除失败!");
@@ -140,15 +140,15 @@ public class ChannelEntityController {
 	 * @param ids
 	 * @return
 	 */
-	@AutoLog(value = "通道设置-批量删除")
-	@ApiOperation(value="通道设置-批量删除", notes="通道设置-批量删除")
+	@AutoLog(value = "用户在指定通道下的费率-批量删除")
+	@ApiOperation(value="用户在指定通道下的费率-批量删除", notes="用户在指定通道下的费率-批量删除")
 	@DeleteMapping(value = "/deleteBatch")
-	public Result<ChannelEntity> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
-		Result<ChannelEntity> result = new Result<ChannelEntity>();
+	public Result<UserRateEntity> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
+		Result<UserRateEntity> result = new Result<UserRateEntity>();
 		if(ids==null || "".equals(ids.trim())) {
 			result.error500("参数不识别！");
 		}else {
-			this.channelEntityService.removeByIds(Arrays.asList(ids.split(",")));
+			this.userRateEntityService.removeByIds(Arrays.asList(ids.split(",")));
 			result.success("删除成功!");
 		}
 		return result;
@@ -159,16 +159,16 @@ public class ChannelEntityController {
 	 * @param id
 	 * @return
 	 */
-	@AutoLog(value = "通道设置-通过id查询")
-	@ApiOperation(value="通道设置-通过id查询", notes="通道设置-通过id查询")
+	@AutoLog(value = "用户在指定通道下的费率-通过id查询")
+	@ApiOperation(value="用户在指定通道下的费率-通过id查询", notes="用户在指定通道下的费率-通过id查询")
 	@GetMapping(value = "/queryById")
-	public Result<ChannelEntity> queryById(@RequestParam(name="id",required=true) String id) {
-		Result<ChannelEntity> result = new Result<ChannelEntity>();
-		ChannelEntity channelEntity = channelEntityService.getById(id);
-		if(channelEntity==null) {
+	public Result<UserRateEntity> queryById(@RequestParam(name="id",required=true) String id) {
+		Result<UserRateEntity> result = new Result<UserRateEntity>();
+		UserRateEntity userRateEntity = userRateEntityService.getById(id);
+		if(userRateEntity==null) {
 			result.error500("未找到对应实体");
 		}else {
-			result.setResult(channelEntity);
+			result.setResult(userRateEntity);
 			result.setSuccess(true);
 		}
 		return result;
@@ -183,13 +183,13 @@ public class ChannelEntityController {
   @RequestMapping(value = "/exportXls")
   public ModelAndView exportXls(HttpServletRequest request, HttpServletResponse response) {
       // Step.1 组装查询条件
-      QueryWrapper<ChannelEntity> queryWrapper = null;
+      QueryWrapper<UserRateEntity> queryWrapper = null;
       try {
           String paramsStr = request.getParameter("paramsStr");
           if (oConvertUtils.isNotEmpty(paramsStr)) {
               String deString = URLDecoder.decode(paramsStr, "UTF-8");
-              ChannelEntity channelEntity = JSON.parseObject(deString, ChannelEntity.class);
-              queryWrapper = QueryGenerator.initQueryWrapper(channelEntity, request.getParameterMap());
+              UserRateEntity userRateEntity = JSON.parseObject(deString, UserRateEntity.class);
+              queryWrapper = QueryGenerator.initQueryWrapper(userRateEntity, request.getParameterMap());
           }
       } catch (UnsupportedEncodingException e) {
           e.printStackTrace();
@@ -197,11 +197,11 @@ public class ChannelEntityController {
 
       //Step.2 AutoPoi 导出Excel
       ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
-      List<ChannelEntity> pageList = channelEntityService.list(queryWrapper);
+      List<UserRateEntity> pageList = userRateEntityService.list(queryWrapper);
       //导出文件名称
-      mv.addObject(NormalExcelConstants.FILE_NAME, "通道设置列表");
-      mv.addObject(NormalExcelConstants.CLASS, ChannelEntity.class);
-      mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("通道设置列表数据", "导出人:Jeecg", "导出信息"));
+      mv.addObject(NormalExcelConstants.FILE_NAME, "用户在指定通道下的费率列表");
+      mv.addObject(NormalExcelConstants.CLASS, UserRateEntity.class);
+      mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("用户在指定通道下的费率列表数据", "导出人:Jeecg", "导出信息"));
       mv.addObject(NormalExcelConstants.DATA_LIST, pageList);
       return mv;
   }
@@ -224,9 +224,9 @@ public class ChannelEntityController {
           params.setHeadRows(1);
           params.setNeedSave(true);
           try {
-              List<ChannelEntity> listChannelEntitys = ExcelImportUtil.importExcel(file.getInputStream(), ChannelEntity.class, params);
-              channelEntityService.saveBatch(listChannelEntitys);
-              return Result.ok("文件导入成功！数据行数:" + listChannelEntitys.size());
+              List<UserRateEntity> listUserRateEntitys = ExcelImportUtil.importExcel(file.getInputStream(), UserRateEntity.class, params);
+              userRateEntityService.saveBatch(listUserRateEntitys);
+              return Result.ok("文件导入成功！数据行数:" + listUserRateEntitys.size());
           } catch (Exception e) {
               log.error(e.getMessage(),e);
               return Result.error("文件导入失败:"+e.getMessage());

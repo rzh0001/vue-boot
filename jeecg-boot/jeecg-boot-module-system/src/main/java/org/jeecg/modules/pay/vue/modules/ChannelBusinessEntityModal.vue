@@ -14,80 +14,38 @@
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
-          label="四方系统订单号">
-          <a-input placeholder="请输入四方系统订单号" v-decorator="['orderId', {}]" />
+          label="通道code">
+          <a-input placeholder="请输入通道code" v-decorator="['channelCode', {}]" />
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
-          label="外部订单号">
-          <a-input placeholder="请输入外部订单号" v-decorator="['outerOrderId', {}]" />
+          label="加密密钥">
+          <a-input placeholder="请输入加密密钥" v-decorator="['apiKey', {}]" />
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
-          label="用户id">
-          <a-input placeholder="请输入用户id" v-decorator="['userId', validatorRules.userId ]" />
+          label="商户code">
+          <a-input placeholder="请输入商户code" v-decorator="['businessCcode', {}]" />
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
-          label="上级用户id">
-          <a-input placeholder="请输入上级用户id" v-decorator="['parentUser', validatorRules.parentUser ]" />
+          label="删除状态，1删除状态">
+          <a-input-number v-decorator="[ 'delFlag', {}]" />
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
-          label="商户编号">
-          <a-input placeholder="请输入商户编号" v-decorator="['businessCode', {}]" />
+          label="创建人">
+          <a-input placeholder="请输入创建人" v-decorator="['createUser', {}]" />
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
-          label="申请金额">
-          <a-input-number v-decorator="[ 'submitAmount', {}]" />
-        </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="手续费">
-          <a-input-number v-decorator="[ 'poundage', {}]" />
-        </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="实际金额">
-          <a-input-number v-decorator="[ 'actualAmount', {}]" />
-        </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="状态：-1:无效  0:未支付 1:成功，未返回 2:成功，已返回">
-          <a-input-number v-decorator="[ 'status', {}]" />
-        </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="支付通道">
-          <a-input placeholder="请输入支付通道" v-decorator="['payType', {}]" />
-        </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="成功回调地址">
-          <a-input placeholder="请输入成功回调地址" v-decorator="['successCallbackUrl', {}]" />
-        </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="失败回调地址">
-          <a-input placeholder="请输入失败回调地址" v-decorator="['errCallbackUrl', {}]" />
-        </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="可用金额，即可提现额度">
-          <a-input-number v-decorator="[ 'availableAmount', {}]" />
+          label="更新人">
+          <a-input placeholder="请输入更新人" v-decorator="['updateUser', {}]" />
         </a-form-item>
 		
       </a-form>
@@ -101,7 +59,7 @@
   import moment from "moment"
 
   export default {
-    name: "OrderInfoEntityModal",
+    name: "ChannelBusinessEntityModal",
     data () {
       return {
         title:"操作",
@@ -119,12 +77,10 @@
         confirmLoading: false,
         form: this.$form.createForm(this),
         validatorRules:{
-        userId:{rules: [{ required: true, message: '请输入用户id!' }]},
-        parentUser:{rules: [{ required: true, message: '请输入上级用户id!' }]},
         },
         url: {
-          add: "/pay/orderInfoEntity/add",
-          edit: "/pay/orderInfoEntity/edit",
+          add: "/pay/channelBusinessEntity/add",
+          edit: "/pay/channelBusinessEntity/edit",
         },
       }
     },
@@ -139,7 +95,7 @@
         this.model = Object.assign({}, record);
         this.visible = true;
         this.$nextTick(() => {
-          this.form.setFieldsValue(pick(this.model,'orderId','outerOrderId','userId','parentUser','businessCode','submitAmount','poundage','actualAmount','status','payType','successCallbackUrl','errCallbackUrl','availableAmount'))
+          this.form.setFieldsValue(pick(this.model,'channelCode','apiKey','businessCcode','delFlag','createUser','updateUser'))
 		  //时间格式化
         });
 

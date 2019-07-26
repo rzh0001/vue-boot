@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * @Description: 订单信息
  * @Author: jeecg-boot
- * @Date:   2019-07-24
+ * @Date:   2019-07-26
  * @Version: V1.0
  */
 public interface IOrderInfoEntityService extends IService<OrderInfoEntity> {

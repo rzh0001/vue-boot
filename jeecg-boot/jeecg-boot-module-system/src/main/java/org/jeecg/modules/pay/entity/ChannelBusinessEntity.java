@@ -16,34 +16,34 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.jeecgframework.poi.excel.annotation.Excel;
 
 /**
- * @Description: 通道设置
+ * @Description: 通道关联商户
  * @Author: jeecg-boot
  * @Date:   2019-07-26
  * @Version: V1.0
  */
 @Data
-@TableName("sys_channel")
+@TableName("sys_channel_businesss")
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value="sys_channel对象", description="通道设置")
-public class ChannelEntity {
+@ApiModel(value="sys_channel_businesss对象", description="通道关联商户")
+public class ChannelBusinessEntity {
     
 	/**id*/
 	@TableId(type = IdType.UUID)
     @ApiModelProperty(value = "id")
 	private java.lang.String id;
-	/**通道名称*/
-	@Excel(name = "通道名称", width = 15)
-    @ApiModelProperty(value = "通道名称")
-	private java.lang.String channelName;
-	/**通道代码*/
-	@Excel(name = "通道代码", width = 15)
-    @ApiModelProperty(value = "通道代码")
+	/**通道code*/
+	@Excel(name = "通道code", width = 15)
+    @ApiModelProperty(value = "通道code")
 	private java.lang.String channelCode;
-	/**状态 0：关闭；1：开启*/
-	@Excel(name = "状态 0：关闭；1：开启", width = 15)
-    @ApiModelProperty(value = "状态 0：关闭；1：开启")
-	private java.lang.Integer status;
+	/**加密密钥*/
+	@Excel(name = "加密密钥", width = 15)
+    @ApiModelProperty(value = "加密密钥")
+	private java.lang.String apiKey;
+	/**商户code*/
+	@Excel(name = "商户code", width = 15)
+    @ApiModelProperty(value = "商户code")
+	private java.lang.String businessCcode;
 	/**删除状态，1删除状态*/
 	@Excel(name = "删除状态，1删除状态", width = 15)
     @ApiModelProperty(value = "删除状态，1删除状态")

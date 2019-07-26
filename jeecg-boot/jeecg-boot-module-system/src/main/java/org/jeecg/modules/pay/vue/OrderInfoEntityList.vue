@@ -18,18 +18,18 @@
           </a-col>
         <template v-if="toggleSearchStatus">
         <a-col :md="6" :sm="8">
+            <a-form-item label="用户id">
+              <a-input placeholder="请输入用户id" v-model="queryParam.userId"></a-input>
+            </a-form-item>
+          </a-col>
+          <a-col :md="6" :sm="8">
+            <a-form-item label="上级用户id">
+              <a-input placeholder="请输入上级用户id" v-model="queryParam.parentUser"></a-input>
+            </a-form-item>
+          </a-col>
+          <a-col :md="6" :sm="8">
             <a-form-item label="商户编号">
               <a-input placeholder="请输入商户编号" v-model="queryParam.businessCode"></a-input>
-            </a-form-item>
-          </a-col>
-          <a-col :md="6" :sm="8">
-            <a-form-item label="商户名称">
-              <a-input placeholder="请输入商户名称" v-model="queryParam.businessName"></a-input>
-            </a-form-item>
-          </a-col>
-          <a-col :md="6" :sm="8">
-            <a-form-item label="申请金额">
-              <a-input placeholder="请输入申请金额" v-model="queryParam.submitAmount"></a-input>
             </a-form-item>
           </a-col>
           </template>
@@ -143,14 +143,19 @@
             dataIndex: 'outerOrderId'
            },
 		   {
+            title: '用户id',
+            align:"center",
+            dataIndex: 'userId'
+           },
+		   {
+            title: '上级用户id',
+            align:"center",
+            dataIndex: 'parentUser'
+           },
+		   {
             title: '商户编号',
             align:"center",
             dataIndex: 'businessCode'
-           },
-		   {
-            title: '商户名称',
-            align:"center",
-            dataIndex: 'businessName'
            },
 		   {
             title: '申请金额',
@@ -165,7 +170,7 @@
 		   {
             title: '实际金额',
             align:"center",
-            dataIndex: 'actual-amount'
+            dataIndex: 'actualAmount'
            },
 		   {
             title: '状态：-1:无效  0:未支付 1:成功，未返回 2:成功，已返回',
@@ -178,9 +183,14 @@
             dataIndex: 'payType'
            },
 		   {
-            title: '回调地址',
+            title: '成功回调地址',
             align:"center",
-            dataIndex: 'callbackUrl'
+            dataIndex: 'successCallbackUrl'
+           },
+		   {
+            title: '失败回调地址',
+            align:"center",
+            dataIndex: 'errCallbackUrl'
            },
 		   {
             title: '可用金额，即可提现额度',

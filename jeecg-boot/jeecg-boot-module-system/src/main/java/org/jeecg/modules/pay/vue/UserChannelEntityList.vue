@@ -7,29 +7,29 @@
         <a-row :gutter="24">
 
           <a-col :md="6" :sm="8">
-            <a-form-item label="通道名称">
-              <a-input placeholder="请输入通道名称" v-model="queryParam.channelName"></a-input>
+            <a-form-item label="用户id">
+              <a-input placeholder="请输入用户id" v-model="queryParam.userId"></a-input>
             </a-form-item>
           </a-col>
           <a-col :md="6" :sm="8">
-            <a-form-item label="通道代码">
-              <a-input placeholder="请输入通道代码" v-model="queryParam.channelCode"></a-input>
+            <a-form-item label="用户名">
+              <a-input placeholder="请输入用户名" v-model="queryParam.userName"></a-input>
             </a-form-item>
           </a-col>
         <template v-if="toggleSearchStatus">
         <a-col :md="6" :sm="8">
-            <a-form-item label="状态 0：关闭；1：开启">
-              <a-input placeholder="请输入状态 0：关闭；1：开启" v-model="queryParam.status"></a-input>
+            <a-form-item label="通道id">
+              <a-input placeholder="请输入通道id" v-model="queryParam.channelId"></a-input>
+            </a-form-item>
+          </a-col>
+          <a-col :md="6" :sm="8">
+            <a-form-item label="通道code">
+              <a-input placeholder="请输入通道code" v-model="queryParam.channelCode"></a-input>
             </a-form-item>
           </a-col>
           <a-col :md="6" :sm="8">
             <a-form-item label="删除状态，1删除状态">
               <a-input placeholder="请输入删除状态，1删除状态" v-model="queryParam.delFlag"></a-input>
-            </a-form-item>
-          </a-col>
-          <a-col :md="6" :sm="8">
-            <a-form-item label="创建人">
-              <a-input placeholder="请输入创建人" v-model="queryParam.createUser"></a-input>
             </a-form-item>
           </a-col>
           </template>
@@ -51,7 +51,7 @@
     <!-- 操作按钮区域 -->
     <div class="table-operator">
       <a-button @click="handleAdd" type="primary" icon="plus">新增</a-button>
-      <a-button type="primary" icon="download" @click="handleExportXls('通道设置')">导出</a-button>
+      <a-button type="primary" icon="download" @click="handleExportXls('用户关联通道')">导出</a-button>
       <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl" @change="handleImportExcel">
         <a-button type="primary" icon="import">导入</a-button>
       </a-upload>
@@ -103,23 +103,23 @@
     <!-- table区域-end -->
 
     <!-- 表单区域 -->
-    <channelEntity-modal ref="modalForm" @ok="modalFormOk"></channelEntity-modal>
+    <userChannelEntity-modal ref="modalForm" @ok="modalFormOk"></userChannelEntity-modal>
   </a-card>
 </template>
 
 <script>
-  import ChannelEntityModal from './modules/ChannelEntityModal'
+  import UserChannelEntityModal from './modules/UserChannelEntityModal'
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
 
   export default {
-    name: "ChannelEntityList",
+    name: "UserChannelEntityList",
     mixins:[JeecgListMixin],
     components: {
-      ChannelEntityModal
+      UserChannelEntityModal
     },
     data () {
       return {
-        description: '通道设置管理页面',
+        description: '用户关联通道管理页面',
         // 表头
         columns: [
           {
@@ -133,19 +133,24 @@
             }
            },
 		   {
-            title: '通道名称',
+            title: '用户id',
             align:"center",
-            dataIndex: 'channelName'
+            dataIndex: 'userId'
            },
 		   {
-            title: '通道代码',
+            title: '用户名',
+            align:"center",
+            dataIndex: 'userName'
+           },
+		   {
+            title: '通道id',
+            align:"center",
+            dataIndex: 'channelId'
+           },
+		   {
+            title: '通道code',
             align:"center",
             dataIndex: 'channelCode'
-           },
-		   {
-            title: '状态 0：关闭；1：开启',
-            align:"center",
-            dataIndex: 'status'
            },
 		   {
             title: '删除状态，1删除状态',
@@ -170,11 +175,11 @@
           }
         ],
 		url: {
-          list: "/pay/channelEntity/list",
-          delete: "/pay/channelEntity/delete",
-          deleteBatch: "/pay/channelEntity/deleteBatch",
-          exportXlsUrl: "pay/channelEntity/exportXls",
-          importExcelUrl: "pay/channelEntity/importExcel",
+          list: "/pay/userChannelEntity/list",
+          delete: "/pay/userChannelEntity/delete",
+          deleteBatch: "/pay/userChannelEntity/deleteBatch",
+          exportXlsUrl: "pay/userChannelEntity/exportXls",
+          importExcelUrl: "pay/userChannelEntity/importExcel",
        },
     }
   },

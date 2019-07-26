@@ -12,8 +12,8 @@ import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.aspect.annotation.AutoLog;
 import org.jeecg.common.util.oConvertUtils;
-import org.jeecg.modules.pay.entity.ChannelUserEntity;
-import org.jeecg.modules.pay.service.IChannelUserEntityService;
+import org.jeecg.modules.pay.entity.ChannelBusinessEntity;
+import org.jeecg.modules.pay.service.IChannelBusinessEntityService;
 import java.util.Date;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -36,38 +36,38 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
  /**
- * @Description: 用户关联通道信息
+ * @Description: 通道关联商户
  * @Author: jeecg-boot
- * @Date:   2019-07-25
+ * @Date:   2019-07-26
  * @Version: V1.0
  */
 @Slf4j
-@Api(tags="用户关联通道信息")
+@Api(tags="通道关联商户")
 @RestController
-@RequestMapping("/pay/channelUserEntity")
-public class ChannelUserEntityController {
+@RequestMapping("/pay/channelBusinessEntity")
+public class ChannelBusinessEntityController {
 	@Autowired
-	private IChannelUserEntityService channelUserEntityService;
+	private IChannelBusinessEntityService channelBusinessEntityService;
 	
 	/**
 	  * 分页列表查询
-	 * @param channelUserEntity
+	 * @param channelBusinessEntity
 	 * @param pageNo
 	 * @param pageSize
 	 * @param req
 	 * @return
 	 */
-	@AutoLog(value = "用户关联通道信息-分页列表查询")
-	@ApiOperation(value="用户关联通道信息-分页列表查询", notes="用户关联通道信息-分页列表查询")
+	@AutoLog(value = "通道关联商户-分页列表查询")
+	@ApiOperation(value="通道关联商户-分页列表查询", notes="通道关联商户-分页列表查询")
 	@GetMapping(value = "/list")
-	public Result<IPage<ChannelUserEntity>> queryPageList(ChannelUserEntity channelUserEntity,
+	public Result<IPage<ChannelBusinessEntity>> queryPageList(ChannelBusinessEntity channelBusinessEntity,
 									  @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
 									  @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 									  HttpServletRequest req) {
-		Result<IPage<ChannelUserEntity>> result = new Result<IPage<ChannelUserEntity>>();
-		QueryWrapper<ChannelUserEntity> queryWrapper = QueryGenerator.initQueryWrapper(channelUserEntity, req.getParameterMap());
-		Page<ChannelUserEntity> page = new Page<ChannelUserEntity>(pageNo, pageSize);
-		IPage<ChannelUserEntity> pageList = channelUserEntityService.page(page, queryWrapper);
+		Result<IPage<ChannelBusinessEntity>> result = new Result<IPage<ChannelBusinessEntity>>();
+		QueryWrapper<ChannelBusinessEntity> queryWrapper = QueryGenerator.initQueryWrapper(channelBusinessEntity, req.getParameterMap());
+		Page<ChannelBusinessEntity> page = new Page<ChannelBusinessEntity>(pageNo, pageSize);
+		IPage<ChannelBusinessEntity> pageList = channelBusinessEntityService.page(page, queryWrapper);
 		result.setSuccess(true);
 		result.setResult(pageList);
 		return result;
@@ -75,16 +75,16 @@ public class ChannelUserEntityController {
 	
 	/**
 	  *   添加
-	 * @param channelUserEntity
+	 * @param channelBusinessEntity
 	 * @return
 	 */
-	@AutoLog(value = "用户关联通道信息-添加")
-	@ApiOperation(value="用户关联通道信息-添加", notes="用户关联通道信息-添加")
+	@AutoLog(value = "通道关联商户-添加")
+	@ApiOperation(value="通道关联商户-添加", notes="通道关联商户-添加")
 	@PostMapping(value = "/add")
-	public Result<ChannelUserEntity> add(@RequestBody ChannelUserEntity channelUserEntity) {
-		Result<ChannelUserEntity> result = new Result<ChannelUserEntity>();
+	public Result<ChannelBusinessEntity> add(@RequestBody ChannelBusinessEntity channelBusinessEntity) {
+		Result<ChannelBusinessEntity> result = new Result<ChannelBusinessEntity>();
 		try {
-			channelUserEntityService.save(channelUserEntity);
+			channelBusinessEntityService.save(channelBusinessEntity);
 			result.success("添加成功！");
 		} catch (Exception e) {
 			log.error(e.getMessage(),e);
@@ -95,19 +95,19 @@ public class ChannelUserEntityController {
 	
 	/**
 	  *  编辑
-	 * @param channelUserEntity
+	 * @param channelBusinessEntity
 	 * @return
 	 */
-	@AutoLog(value = "用户关联通道信息-编辑")
-	@ApiOperation(value="用户关联通道信息-编辑", notes="用户关联通道信息-编辑")
+	@AutoLog(value = "通道关联商户-编辑")
+	@ApiOperation(value="通道关联商户-编辑", notes="通道关联商户-编辑")
 	@PutMapping(value = "/edit")
-	public Result<ChannelUserEntity> edit(@RequestBody ChannelUserEntity channelUserEntity) {
-		Result<ChannelUserEntity> result = new Result<ChannelUserEntity>();
-		ChannelUserEntity channelUserEntityEntity = channelUserEntityService.getById(channelUserEntity.getId());
-		if(channelUserEntityEntity==null) {
+	public Result<ChannelBusinessEntity> edit(@RequestBody ChannelBusinessEntity channelBusinessEntity) {
+		Result<ChannelBusinessEntity> result = new Result<ChannelBusinessEntity>();
+		ChannelBusinessEntity channelBusinessEntityEntity = channelBusinessEntityService.getById(channelBusinessEntity.getId());
+		if(channelBusinessEntityEntity==null) {
 			result.error500("未找到对应实体");
 		}else {
-			boolean ok = channelUserEntityService.updateById(channelUserEntity);
+			boolean ok = channelBusinessEntityService.updateById(channelBusinessEntity);
 			//TODO 返回false说明什么？
 			if(ok) {
 				result.success("修改成功!");
@@ -122,12 +122,12 @@ public class ChannelUserEntityController {
 	 * @param id
 	 * @return
 	 */
-	@AutoLog(value = "用户关联通道信息-通过id删除")
-	@ApiOperation(value="用户关联通道信息-通过id删除", notes="用户关联通道信息-通过id删除")
+	@AutoLog(value = "通道关联商户-通过id删除")
+	@ApiOperation(value="通道关联商户-通过id删除", notes="通道关联商户-通过id删除")
 	@DeleteMapping(value = "/delete")
 	public Result<?> delete(@RequestParam(name="id",required=true) String id) {
 		try {
-			channelUserEntityService.removeById(id);
+			channelBusinessEntityService.removeById(id);
 		} catch (Exception e) {
 			log.error("删除失败",e.getMessage());
 			return Result.error("删除失败!");
@@ -140,15 +140,15 @@ public class ChannelUserEntityController {
 	 * @param ids
 	 * @return
 	 */
-	@AutoLog(value = "用户关联通道信息-批量删除")
-	@ApiOperation(value="用户关联通道信息-批量删除", notes="用户关联通道信息-批量删除")
+	@AutoLog(value = "通道关联商户-批量删除")
+	@ApiOperation(value="通道关联商户-批量删除", notes="通道关联商户-批量删除")
 	@DeleteMapping(value = "/deleteBatch")
-	public Result<ChannelUserEntity> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
-		Result<ChannelUserEntity> result = new Result<ChannelUserEntity>();
+	public Result<ChannelBusinessEntity> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
+		Result<ChannelBusinessEntity> result = new Result<ChannelBusinessEntity>();
 		if(ids==null || "".equals(ids.trim())) {
 			result.error500("参数不识别！");
 		}else {
-			this.channelUserEntityService.removeByIds(Arrays.asList(ids.split(",")));
+			this.channelBusinessEntityService.removeByIds(Arrays.asList(ids.split(",")));
 			result.success("删除成功!");
 		}
 		return result;
@@ -159,16 +159,16 @@ public class ChannelUserEntityController {
 	 * @param id
 	 * @return
 	 */
-	@AutoLog(value = "用户关联通道信息-通过id查询")
-	@ApiOperation(value="用户关联通道信息-通过id查询", notes="用户关联通道信息-通过id查询")
+	@AutoLog(value = "通道关联商户-通过id查询")
+	@ApiOperation(value="通道关联商户-通过id查询", notes="通道关联商户-通过id查询")
 	@GetMapping(value = "/queryById")
-	public Result<ChannelUserEntity> queryById(@RequestParam(name="id",required=true) String id) {
-		Result<ChannelUserEntity> result = new Result<ChannelUserEntity>();
-		ChannelUserEntity channelUserEntity = channelUserEntityService.getById(id);
-		if(channelUserEntity==null) {
+	public Result<ChannelBusinessEntity> queryById(@RequestParam(name="id",required=true) String id) {
+		Result<ChannelBusinessEntity> result = new Result<ChannelBusinessEntity>();
+		ChannelBusinessEntity channelBusinessEntity = channelBusinessEntityService.getById(id);
+		if(channelBusinessEntity==null) {
 			result.error500("未找到对应实体");
 		}else {
-			result.setResult(channelUserEntity);
+			result.setResult(channelBusinessEntity);
 			result.setSuccess(true);
 		}
 		return result;
@@ -183,13 +183,13 @@ public class ChannelUserEntityController {
   @RequestMapping(value = "/exportXls")
   public ModelAndView exportXls(HttpServletRequest request, HttpServletResponse response) {
       // Step.1 组装查询条件
-      QueryWrapper<ChannelUserEntity> queryWrapper = null;
+      QueryWrapper<ChannelBusinessEntity> queryWrapper = null;
       try {
           String paramsStr = request.getParameter("paramsStr");
           if (oConvertUtils.isNotEmpty(paramsStr)) {
               String deString = URLDecoder.decode(paramsStr, "UTF-8");
-              ChannelUserEntity channelUserEntity = JSON.parseObject(deString, ChannelUserEntity.class);
-              queryWrapper = QueryGenerator.initQueryWrapper(channelUserEntity, request.getParameterMap());
+              ChannelBusinessEntity channelBusinessEntity = JSON.parseObject(deString, ChannelBusinessEntity.class);
+              queryWrapper = QueryGenerator.initQueryWrapper(channelBusinessEntity, request.getParameterMap());
           }
       } catch (UnsupportedEncodingException e) {
           e.printStackTrace();
@@ -197,11 +197,11 @@ public class ChannelUserEntityController {
 
       //Step.2 AutoPoi 导出Excel
       ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
-      List<ChannelUserEntity> pageList = channelUserEntityService.list(queryWrapper);
+      List<ChannelBusinessEntity> pageList = channelBusinessEntityService.list(queryWrapper);
       //导出文件名称
-      mv.addObject(NormalExcelConstants.FILE_NAME, "用户关联通道信息列表");
-      mv.addObject(NormalExcelConstants.CLASS, ChannelUserEntity.class);
-      mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("用户关联通道信息列表数据", "导出人:Jeecg", "导出信息"));
+      mv.addObject(NormalExcelConstants.FILE_NAME, "通道关联商户列表");
+      mv.addObject(NormalExcelConstants.CLASS, ChannelBusinessEntity.class);
+      mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("通道关联商户列表数据", "导出人:Jeecg", "导出信息"));
       mv.addObject(NormalExcelConstants.DATA_LIST, pageList);
       return mv;
   }
@@ -224,9 +224,9 @@ public class ChannelUserEntityController {
           params.setHeadRows(1);
           params.setNeedSave(true);
           try {
-              List<ChannelUserEntity> listChannelUserEntitys = ExcelImportUtil.importExcel(file.getInputStream(), ChannelUserEntity.class, params);
-              channelUserEntityService.saveBatch(listChannelUserEntitys);
-              return Result.ok("文件导入成功！数据行数:" + listChannelUserEntitys.size());
+              List<ChannelBusinessEntity> listChannelBusinessEntitys = ExcelImportUtil.importExcel(file.getInputStream(), ChannelBusinessEntity.class, params);
+              channelBusinessEntityService.saveBatch(listChannelBusinessEntitys);
+              return Result.ok("文件导入成功！数据行数:" + listChannelBusinessEntitys.size());
           } catch (Exception e) {
               log.error(e.getMessage(),e);
               return Result.error("文件导入失败:"+e.getMessage());

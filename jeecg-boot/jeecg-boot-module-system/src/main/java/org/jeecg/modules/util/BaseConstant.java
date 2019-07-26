@@ -7,7 +7,7 @@ package org.jeecg.modules.util;
  * @create: 2019-07-22 10:45
  */
 public class BaseConstant {
-    public static final String BUSINESS_CODE = "business_code";
+    public static final String USER_ID = "userId";
     public static final String USER_NAME="username";
     public static final String TIMESTAMP="timestamp";
     public static final String SIGN="sign";
@@ -20,8 +20,8 @@ public class BaseConstant {
     public static final String OUTER_ORDER_ID= "outerOrderId";
 
     //创建订单的入参字段
-    public static final String SUBMIT_AMOUNT= "submit_amount";
-    public static final String  PAY_TYPE= "pay_type";
+    public static final String SUBMIT_AMOUNT= "submitAmount";
+    public static final String  PAY_TYPE= "payType";
 
     //支付通道
     public static final String PAY_CLOUD = "YSF";

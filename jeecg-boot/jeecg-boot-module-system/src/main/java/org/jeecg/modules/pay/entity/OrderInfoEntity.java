@@ -18,7 +18,7 @@ import org.jeecgframework.poi.excel.annotation.Excel;
 /**
  * @Description: 订单信息
  * @Author: jeecg-boot
- * @Date:   2019-07-24
+ * @Date:   2019-07-26
  * @Version: V1.0
  */
 @Data
@@ -40,14 +40,18 @@ public class OrderInfoEntity {
 	@Excel(name = "外部订单号", width = 15)
     @ApiModelProperty(value = "外部订单号")
 	private java.lang.String outerOrderId;
+	/**用户id*/
+	@Excel(name = "用户id", width = 15)
+    @ApiModelProperty(value = "用户id")
+	private java.lang.String userId;
+	/**上级用户id*/
+	@Excel(name = "上级用户id", width = 15)
+    @ApiModelProperty(value = "上级用户id")
+	private java.lang.String parentUser;
 	/**商户编号*/
 	@Excel(name = "商户编号", width = 15)
     @ApiModelProperty(value = "商户编号")
 	private java.lang.String businessCode;
-	/**商户名称*/
-	@Excel(name = "商户名称", width = 15)
-    @ApiModelProperty(value = "商户名称")
-	private java.lang.String businessName;
 	/**申请金额*/
 	@Excel(name = "申请金额", width = 15)
     @ApiModelProperty(value = "申请金额")
@@ -68,10 +72,14 @@ public class OrderInfoEntity {
 	@Excel(name = "支付通道", width = 15)
     @ApiModelProperty(value = "支付通道")
 	private java.lang.String payType;
-	/**回调地址*/
-	@Excel(name = "回调地址", width = 15)
-    @ApiModelProperty(value = "回调地址")
-	private java.lang.String callbackUrl;
+	/**成功回调地址*/
+	@Excel(name = "成功回调地址", width = 15)
+    @ApiModelProperty(value = "成功回调地址")
+	private java.lang.String successCallbackUrl;
+	/**失败回调地址*/
+	@Excel(name = "失败回调地址", width = 15)
+    @ApiModelProperty(value = "失败回调地址")
+	private java.lang.String errCallbackUrl;
 	/**可用金额，即可提现额度*/
 	@Excel(name = "可用金额，即可提现额度", width = 15)
     @ApiModelProperty(value = "可用金额，即可提现额度")

@@ -30,7 +30,7 @@ public class ApiController {
     @RequestMapping(value = "/create", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     @ResponseBody
     public R create(@RequestBody JSONObject reqobj){
-        return null;
+        return orderInfoService.createOrder(reqobj);
     }
 
     /**
@@ -40,7 +40,7 @@ public class ApiController {
      * @param reqobj
      * @return
      */
-    @PostMapping("/callback")
+    @PostMapping(value = "/callback",produces = "application/json;charset=UTF-8")
     @ResponseBody
     public R callback(@RequestParam JSONObject reqobj, HttpServletRequest req){
         return orderInfoService.callback(reqobj,req);

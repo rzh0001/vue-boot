@@ -9,12 +9,10 @@ import org.jeecg.common.system.vo.DictModel;
 import org.jeecg.common.util.DateUtils;
 import org.jeecg.modules.exception.RRException;
 import org.jeecg.modules.pay.entity.ChannelEntity;
-import org.jeecg.modules.pay.entity.ChannelUserEntity;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
+import org.jeecg.modules.pay.entity.UserChannelEntity;
 import org.jeecg.modules.pay.mapper.OrderInfoEntityMapper;
-import org.jeecg.modules.pay.service.IChannelEntityService;
-import org.jeecg.modules.pay.service.IChannelUserEntityService;
-import org.jeecg.modules.pay.service.IOrderInfoEntityService;
+import org.jeecg.modules.pay.service.*;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.service.ISysDictService;
 import org.jeecg.modules.system.service.ISysUserService;
@@ -48,12 +46,16 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     @Autowired
     private IChannelEntityService chnannelDao;
     @Autowired
-    private IChannelUserEntityService channelUserDao;
+    private IUserChannelEntityService channelUserDao;
+    @Autowired
+    private IUserBusinessEntityService businessEntityService;
+    @Autowired
+    private IUserRateEntityService rateEntityService;
     /**
-     * pay_memberid：商户id
-     * pay_amount： 支付金额
-     * pay_bankcode：通道
-     * pay_orderid：外部订单号
+     * userId：商户ID
+     * submitAmount： 支付金额
+     * payType：通道
+     * outerOrderId：外部订单号
      * @param reqobj
      * @return
      */
@@ -118,7 +120,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
                 }
                 //3
                 JSONObject callobj = encryptAESData(order,"");
-                HttpResult result= HttpUtils.doPostJson(order.getCallbackUrl(), callobj.toJSONString());
+                HttpResult result= HttpUtils.doPostJson(order.getSuccessCallbackUrl(), callobj.toJSONString());
                 return null;
             }else{
                 return checkParam;
@@ -129,60 +131,74 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         }
     }
 
+
     /**
      * 添加订单信息
      * @param checkParam
      */
     private void addOrder(R checkParam) throws Exception{
         String outerOrderId = (String) checkParam.get(BaseConstant.OUTER_ORDER_ID);
-        String businessCode = (String) checkParam.get(BaseConstant.BUSINESS_CODE);
+        String userId = (String) checkParam.get(BaseConstant.USER_ID);
         String submitAmount = (String) checkParam.get(BaseConstant.SUBMIT_AMOUNT);
         String payType = (String) checkParam.get(BaseConstant.PAY_TYPE);
-        if(channelIsOpen(payType,businessCode)){
+        //校验用户通道是否存在
+        if(channelIsOpen(payType,userId)){
             throw new RRException("通道未定义，或用户无此通道权限");
+        }
+        //查询用户对应的商户
+        String businessCode = businessEntityService.queryBusinessCodeByUserId(userId);
+        if(StringUtils.isBlank(businessCode)){
+            throw new RRException("该用户无对应商户信息");
         }
         String orderId = generateOrderId();
         OrderInfoEntity order = new OrderInfoEntity();
         order.setOrderId(orderId);
         order.setOuterOrderId(outerOrderId);
+        order.setUserId(userId);
         order.setBusinessCode(businessCode);
         order.setSubmitAmount(BigDecimal.valueOf(Long.valueOf(submitAmount)));
         order.setStatus(BaseConstant.ORDER_STATUS_NOT_PAY);
         order.setPayType(payType);
         order.setCreateTime(new Date());
         order.setCreateBy("api");
-        orderInfoEntityService.save(order);
+        //计算费率
         countOrderRate(order);
+        orderInfoEntityService.save(order);
+        submitOrderCallBack(order);
     }
 
     /**
      * 校验通道是否是开启的
      * @param channelCode
-     * @param businessId
+     * @param useriId
      * @return
      */
-    private boolean channelIsOpen(String channelCode,String businessId){
+    private boolean channelIsOpen(String channelCode,String useriId){
         ChannelEntity channel = chnannelDao.queryChannelByCode(channelCode);
         if(channel == null){
             return false;
         }
-        ChannelUserEntity channelUser = channelUserDao.queryChannelAndUser(channelCode,businessId);
+        UserChannelEntity channelUser = channelUserDao.queryChannelAndUser(channelCode,useriId);
         if(channelUser == null){
             return false;
         }
         return true;
     }
+
     /**
      * 计算订单汇率
      */
     private void countOrderRate(OrderInfoEntity order)throws Exception{
-
+        String userRate = rateEntityService.getUserRate(order.getUserId(),order.getPayType());
+        BigDecimal rate = new BigDecimal(Double.valueOf(userRate));
+        BigDecimal poundage = order.getSubmitAmount().multiply(rate);
+        order.setPoundage(poundage);
     }
 
     /**
      * 请求挂马后台，生成付款页面
      */
-    private void submitOrderCallBack(){
+    private void submitOrderCallBack(OrderInfoEntity order){
 
     }
 
@@ -241,8 +257,8 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
 
         String localSgin = null;
         if(createOrder){
-            Assert.isBlank(reqobj.getString(BaseConstant.BUSINESS_CODE), "商户名不能为空");
-            businessCode = reqobj.getString(BaseConstant.BUSINESS_CODE);
+            Assert.isBlank(reqobj.getString(BaseConstant.USER_ID), "商户名不能为空");
+            businessCode = reqobj.getString(BaseConstant.USER_ID);
             localSgin= DigestUtils.md5Hex(businessCode+timestamp+data);
         }else{
             Assert.isBlank(reqobj.getString(BaseConstant.USER_NAME), "username不能为空");
@@ -270,7 +286,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
                 return R.ok().put("orderId",dataobj.getString("orderId"));
             }
             return R.ok().put(BaseConstant.OUTER_ORDER_ID,dataobj.getString(BaseConstant.OUTER_ORDER_ID))
-                    .put(BaseConstant.BUSINESS_CODE,dataobj.getString(BaseConstant.BUSINESS_CODE))
+                    .put(BaseConstant.USER_ID,dataobj.getString(BaseConstant.USER_ID))
                     .put(BaseConstant.SUBMIT_AMOUNT,dataobj.getString(BaseConstant.SUBMIT_AMOUNT))
                     .put(BaseConstant.PAY_TYPE,dataobj.getString(BaseConstant.PAY_TYPE));
 

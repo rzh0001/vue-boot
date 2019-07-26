@@ -38,7 +38,7 @@ import io.swagger.annotations.ApiOperation;
  /**
  * @Description: 订单信息
  * @Author: jeecg-boot
- * @Date:   2019-07-24
+ * @Date:   2019-07-26
  * @Version: V1.0
  */
 @Slf4j
