@@ -8,9 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jeecg.common.system.vo.DictModel;
 import org.jeecg.common.util.DateUtils;
 import org.jeecg.modules.exception.RRException;
-import org.jeecg.modules.pay.entity.ChannelEntity;
-import org.jeecg.modules.pay.entity.OrderInfoEntity;
-import org.jeecg.modules.pay.entity.UserChannelEntity;
+import org.jeecg.modules.pay.entity.*;
 import org.jeecg.modules.pay.mapper.OrderInfoEntityMapper;
 import org.jeecg.modules.pay.service.*;
 import org.jeecg.modules.system.entity.SysUser;
@@ -51,6 +49,8 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     private IUserBusinessEntityService businessEntityService;
     @Autowired
     private IUserRateEntityService rateEntityService;
+    @Autowired
+    private IChannelBusinessEntityService channelBusinessEntityService;
     /**
      * userId：商户ID
      * submitAmount： 支付金额
@@ -164,7 +164,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         //计算费率
         countOrderRate(order);
         orderInfoEntityService.save(order);
-        submitOrderCallBack(order);
+        aliPayCallBack(order);
     }
 
     /**
@@ -198,19 +198,35 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     /**
      * 请求挂马后台，生成付款页面
      */
-    private void submitOrderCallBack(OrderInfoEntity order){
-
+    private void aliPayCallBack(OrderInfoEntity order) throws Exception{
+        AliPayCallBackParam param = new AliPayCallBackParam();
+        param.setSign(sign(order));
     }
+
 
     /**
      * 生成签名信息
-     * @param key
+     * businessCode+submitAmount+apiKey 进行MD5
      * @param order
      * @return
      */
-    private String sign(String key,OrderInfoEntity order){
+    private String sign(OrderInfoEntity order) throws Exception{
+        ChannelBusinessEntity channelBusiness = channelBusinessEntityService.queryChannelBusiness(order.getBusinessCode(),order.getPayType());
+        if(channelBusiness == null){
+            throw  new RRException("改用户对应的商户无此通道信息");
+        }
+        String apiKey = channelBusiness.getApiKey();
+        StringBuilder sign = new StringBuilder();
+        return DigestUtils.md5Hex(sign.append(order.getBusinessCode()).append(order.getSubmitAmount()).append(apiKey).toString());
+    }
 
-        return null;
+    /**
+     * 将字符串首字符转换为ASCII
+     * @param str
+     * @return
+     */
+    private int strToASCII(char str){
+        return (int) str;
     }
     /**
      * 生成四方系统的订单号

@@ -11,7 +11,7 @@ import java.io.Serializable;
  * @create: 2019-07-24 16:15
  */
 @Data
-public class OrderCallBackParam implements Serializable {
+public class AliPayCallBackParam implements Serializable {
     private String account_id;
     private String content_type;
     private String thoroughfare;

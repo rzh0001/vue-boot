@@ -16,4 +16,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 @Service
 public class ChannelBusinessEntityServiceImpl extends ServiceImpl<ChannelBusinessEntityMapper, ChannelBusinessEntity> implements IChannelBusinessEntityService {
 
+    @Override
+    public ChannelBusinessEntity queryChannelBusiness(String businessCode, String channelCode) {
+        return baseMapper.queryChannelBusiness(businessCode,channelCode);
+    }
 }

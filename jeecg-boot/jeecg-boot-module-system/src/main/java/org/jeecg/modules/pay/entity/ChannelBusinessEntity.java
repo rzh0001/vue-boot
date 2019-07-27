@@ -43,7 +43,7 @@ public class ChannelBusinessEntity {
 	/**商户code*/
 	@Excel(name = "商户code", width = 15)
     @ApiModelProperty(value = "商户code")
-	private java.lang.String businessCcode;
+	private java.lang.String businessCode;
 	/**删除状态，1删除状态*/
 	@Excel(name = "删除状态，1删除状态", width = 15)
     @ApiModelProperty(value = "删除状态，1删除状态")

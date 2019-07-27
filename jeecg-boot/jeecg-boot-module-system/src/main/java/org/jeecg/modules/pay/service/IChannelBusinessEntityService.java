@@ -10,5 +10,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @Version: V1.0
  */
 public interface IChannelBusinessEntityService extends IService<ChannelBusinessEntity> {
-
+    ChannelBusinessEntity queryChannelBusiness(String businessCode,String channelCode);
 }
