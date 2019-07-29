@@ -1,5 +1,6 @@
 package org.jeecg.modules.pay.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -20,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.util.CollectionUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
@@ -40,8 +42,6 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     @Autowired
     private ISysDictService dictService;
     @Autowired
-    private IOrderInfoEntityService orderInfoEntityService;
-    @Autowired
     private IChannelEntityService chnannelDao;
     @Autowired
     private IUserChannelEntityService channelUserDao;
@@ -56,6 +56,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * submitAmount： 支付金额
      * payType：通道
      * outerOrderId：外部订单号
+     * callbackUrl：url
      * @param reqobj
      * @return
      */
@@ -141,6 +142,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         String userId = (String) checkParam.get(BaseConstant.USER_ID);
         String submitAmount = (String) checkParam.get(BaseConstant.SUBMIT_AMOUNT);
         String payType = (String) checkParam.get(BaseConstant.PAY_TYPE);
+        String callbackUrl = (String) checkParam.get(BaseConstant.CALLBACK_URL);
         //校验用户通道是否存在
         if(channelIsOpen(payType,userId)){
             throw new RRException("通道未定义，或用户无此通道权限");
@@ -159,14 +161,28 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         order.setSubmitAmount(BigDecimal.valueOf(Long.valueOf(submitAmount)));
         order.setStatus(BaseConstant.ORDER_STATUS_NOT_PAY);
         order.setPayType(payType);
+        order.setSuccessCallbackUrl(callbackUrl);
         order.setCreateTime(new Date());
         order.setCreateBy("api");
         //计算费率
         countOrderRate(order);
-        orderInfoEntityService.save(order);
-        aliPayCallBack(order);
+        //保存订单信息
+        this.save(order);
+        //请求挂马平台
+        requestSupport(order);
     }
 
+    /**
+     * 请求挂马平台
+     * @param order
+     * @throws Exception
+     */
+    private void requestSupport(OrderInfoEntity order) throws Exception{
+        if(order.getPayType().equals(BaseConstant.ALI_PAY)){
+            aliPayCallBack(order);
+        }
+
+    }
     /**
      * 校验通道是否是开启的
      * @param channelCode
@@ -197,10 +213,30 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
 
     /**
      * 请求挂马后台，生成付款页面
+     * 回调挂马平台的地址，从数据字典中获取
      */
     private void aliPayCallBack(OrderInfoEntity order) throws Exception{
         AliPayCallBackParam param = new AliPayCallBackParam();
         param.setSign(sign(order));
+        //获取挂马平台的地址
+        List<DictModel> aliPayUrl =  dictService.queryDictItemsByCode(BaseConstant.ALIPAY_URL);
+        if(CollectionUtils.isEmpty(aliPayUrl)){
+            throw new RRException("未配置回调地址，请联系管理员配置回调地址");
+        }
+        String url = null;
+        for(DictModel dict : aliPayUrl){
+            url = dict.getValue();
+        }
+        if(StringUtils.isBlank(url)){
+            throw new RRException("未配置回调地址，请联系管理员配置回调地址");
+        }
+        log.info("四方回调挂马平台，url:{};param:{}",url,JSON.toJSONString(param));
+        HttpResult result = HttpUtils.doPostJson(url, JSON.toJSONString(param));
+        if(result.getCode() == BaseConstant.SUCCESS){
+
+        }else {
+            throw new RRException("四方回调挂马平台失败");
+        }
     }
 
 
@@ -213,7 +249,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     private String sign(OrderInfoEntity order) throws Exception{
         ChannelBusinessEntity channelBusiness = channelBusinessEntityService.queryChannelBusiness(order.getBusinessCode(),order.getPayType());
         if(channelBusiness == null){
-            throw  new RRException("改用户对应的商户无此通道信息");
+            throw  new RRException("用户对应的商户无此通道信息");
         }
         String apiKey = channelBusiness.getApiKey();
         StringBuilder sign = new StringBuilder();
@@ -221,16 +257,8 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     }
 
     /**
-     * 将字符串首字符转换为ASCII
-     * @param str
-     * @return
-     */
-    private int strToASCII(char str){
-        return (int) str;
-    }
-    /**
      * 生成四方系统的订单号
-     * 线程安全，保证每秒生成的订单不一致
+     * 线程安全，保证生成的订单不一致
      */
     private synchronized static String generateOrderId(){
         StringBuilder orderId = new StringBuilder();
@@ -257,6 +285,13 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     }
     /**
      * 参数校验
+     * data：使用AES加密
+     * md5：
+     *      订单创建：businessCode+timestamp+data
+     *      查询：userName+timestamp+data
+     * timestamp：时间戳
+     * userName：四方系统的用户
+     * businessCode：商户编码
      * @param reqobj
      * @return
      */
@@ -273,6 +308,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
 
         String localSgin = null;
         if(createOrder){
+            Assert.isBlank(reqobj.getString(BaseConstant.CALLBACK_URL), "回调地址不能为空");
             Assert.isBlank(reqobj.getString(BaseConstant.USER_ID), "商户名不能为空");
             businessCode = reqobj.getString(BaseConstant.USER_ID);
             localSgin= DigestUtils.md5Hex(businessCode+timestamp+data);
@@ -304,7 +340,8 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             return R.ok().put(BaseConstant.OUTER_ORDER_ID,dataobj.getString(BaseConstant.OUTER_ORDER_ID))
                     .put(BaseConstant.USER_ID,dataobj.getString(BaseConstant.USER_ID))
                     .put(BaseConstant.SUBMIT_AMOUNT,dataobj.getString(BaseConstant.SUBMIT_AMOUNT))
-                    .put(BaseConstant.PAY_TYPE,dataobj.getString(BaseConstant.PAY_TYPE));
+                    .put(BaseConstant.PAY_TYPE,dataobj.getString(BaseConstant.PAY_TYPE))
+                    .put(BaseConstant.CALLBACK_URL,dataobj.getString(BaseConstant.CALLBACK_URL));
 
         }catch (Exception e){
             log.info("参数解析异常，异常信息为:{}",e);

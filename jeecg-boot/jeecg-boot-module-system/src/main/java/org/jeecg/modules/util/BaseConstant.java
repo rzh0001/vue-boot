@@ -12,6 +12,7 @@ public class BaseConstant {
     public static final String TIMESTAMP="timestamp";
     public static final String SIGN="sign";
     public static final String DATA="data";
+    public static final String CALLBACK_URL = "callbackUrl";
 
     public static final String CHECK_PARAM_SUCCESS = "0";
     //订单查询返回字段
@@ -23,9 +24,6 @@ public class BaseConstant {
     public static final String SUBMIT_AMOUNT= "submitAmount";
     public static final String  PAY_TYPE= "payType";
 
-    //支付通道
-    public static final String PAY_CLOUD = "YSF";
-
     //订单状态
     //无效
     public static final int ORDER_STATUS_INVALID = -1;
@@ -35,4 +33,14 @@ public class BaseConstant {
     public static final int ORDER_STATUS_SUCCESS_NOT_RETURN = 1;
     //成功，已返回
     public static final int ORDER_STATUS_SUCCESS =2;
+
+    //数据字典配置的挂马平台的地址
+    public static final String ALIPAY_URL = "aliPayUrl";
+
+    //四方回调挂马平台的返回码
+    public static final int SUCCESS = 200;
+
+    //支付通道
+    public static final String ALI_PAY = "aliPay";
+    public static final String PAY_CLOUD = "YSF";
 }
