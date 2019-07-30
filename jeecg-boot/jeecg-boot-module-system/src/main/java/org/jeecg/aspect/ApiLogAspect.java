@@ -26,7 +26,7 @@ import java.util.Arrays;
 public class ApiLogAspect {
     private static final Logger log = LoggerFactory.getLogger(ApiLogAspect.class);
 
-    @Pointcut("execution(public * org.jeecg.modules.api.controller..*.*(..))")
+    @Pointcut("execution(public * org.jeecg.modules.pay.controller.ApiController.*(..))")
     public void apiLog(){
 
     }

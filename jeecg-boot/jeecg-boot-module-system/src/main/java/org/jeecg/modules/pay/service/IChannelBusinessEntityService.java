@@ -1,5 +1,6 @@
 package org.jeecg.modules.pay.service;
 
+import org.apache.ibatis.annotations.Param;
 import org.jeecg.modules.pay.entity.ChannelBusinessEntity;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -11,4 +12,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IChannelBusinessEntityService extends IService<ChannelBusinessEntity> {
     ChannelBusinessEntity queryChannelBusiness(String businessCode,String channelCode);
+    ChannelBusinessEntity queryChannelBusinessByUserId(@Param("userId") String userId);
 }

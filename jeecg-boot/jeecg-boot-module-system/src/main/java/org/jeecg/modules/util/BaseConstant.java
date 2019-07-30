@@ -15,6 +15,9 @@ public class BaseConstant {
     public static final String CALLBACK_URL = "callbackUrl";
 
     public static final String CHECK_PARAM_SUCCESS = "0";
+    public static final String CODE = "code";
+    public static final String DECRYPT_DATA = "dataObj";
+    public static final String ORDER_INFO = "orderInfo";
     //订单查询返回字段
     public static final String STATUS = "status";
     public static final String ORDER_ID = "orderId";

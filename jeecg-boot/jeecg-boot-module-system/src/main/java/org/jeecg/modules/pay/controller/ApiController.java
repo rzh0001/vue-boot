@@ -1,6 +1,7 @@
 package org.jeecg.modules.pay.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import lombok.extern.slf4j.Slf4j;
 import org.jeecg.modules.pay.service.IOrderInfoEntityService;
 import org.jeecg.modules.util.R;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,15 +16,19 @@ import java.util.Map;
  * @author: wangjb
  * @create: 2019-06-20 10:38
  */
+@RestController
+@RequestMapping("/api")
+@Slf4j
 public class ApiController {
     @Autowired
     private IOrderInfoEntityService orderInfoService;
     /**
      * 订单创建：入参
-     * pay_memberid 商户ID
-     * pay_orderid 订单号
-     * pay_amount  交易金额
-     * pay_bankcode 通道编码
+     * userId 商户ID
+     * outerOrderId 订单号
+     * callbackUrl 回调商户地址
+     * submitAmount  交易金额
+     * payType 通道编码
      * @param reqobj
      * @return
      */

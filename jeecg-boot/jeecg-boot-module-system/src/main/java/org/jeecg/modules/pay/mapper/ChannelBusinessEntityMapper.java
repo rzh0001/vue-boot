@@ -15,4 +15,6 @@ import org.jeecg.modules.pay.entity.ChannelEntity;
  */
 public interface ChannelBusinessEntityMapper extends BaseMapper<ChannelBusinessEntity> {
     ChannelBusinessEntity queryChannelBusiness(@Param("businessCode") String businessCode, @Param("channelCode")String channelCode);
+
+    ChannelBusinessEntity queryChannelBusinessByUserId(@Param("userId") String userId);
 }
