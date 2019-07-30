@@ -110,10 +110,11 @@
 		<!--滚动策略-->
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<!--路径-->
-			<fileNamePattern>${log.path}/api/api.%d{yyyy-MM-dd}.log</fileNamePattern>
+			<fileNamePattern>${LOG_HOME}/api/api.%d{yyyy-MM-dd}.log</fileNamePattern>
+			<maxHistory>7</maxHistory>
 		</rollingPolicy>
 		<encoder>
-			<pattern>${log.pattern}</pattern>
+			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50}:%L - %mdc{username} - %msg%n</pattern>
 		</encoder>
 		<filter class="ch.qos.logback.classic.filter.LevelFilter">
 			<!--设置过滤级别-->
@@ -139,7 +140,7 @@
 		<appender-ref ref="file_api" />
 	</root>
 
-	<logger name="org.jeecg.modules.api.aspect.ApiLogAspect" level="info" additivity="false">
+	<logger name="org.jeecg.aspect.ApiLogAspect" level="info" additivity="false">
 		<appender-ref ref="file_api" />
 	</logger>
 

@@ -39,6 +39,7 @@ public class BaseConstant {
 
     //数据字典配置的挂马平台的地址
     public static final String ALIPAY_URL = "aliPayUrl";
+    public static final String IP_WHITE_LIST= "ipWhiteList";
 
     //四方回调挂马平台的返回码
     public static final int SUCCESS = 200;

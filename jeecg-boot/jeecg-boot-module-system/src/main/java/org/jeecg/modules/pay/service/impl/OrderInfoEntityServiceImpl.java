@@ -281,12 +281,12 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
 
     /**
      * 校验IP是否合法
-     *
+     * IP白名单从数据字典中获取
      * @return
      */
     private boolean checkIp(HttpServletRequest req) {
         String ip = IPUtils.getIpAddr(req);
-        List<DictModel> ipWhiteList = dictService.queryDictItemsByCode("ipWhiteList");
+        List<DictModel> ipWhiteList = dictService.queryDictItemsByCode(BaseConstant.IP_WHITE_LIST);
         List<String> ips = new ArrayList<>();
         for (DictModel dictModel : ipWhiteList) {
             ips.add(dictModel.getValue());
