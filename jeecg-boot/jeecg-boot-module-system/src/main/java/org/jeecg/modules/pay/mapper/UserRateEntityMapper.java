@@ -14,5 +14,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface UserRateEntityMapper extends BaseMapper<UserRateEntity> {
 
-    String getUserRate(@Param("userId")String userId,@Param("channelCode")String channelCode);
+    String getUserRate(@Param("userId")String userId);
 }

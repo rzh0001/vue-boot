@@ -37,6 +37,14 @@ public class BaseConstant {
     //成功，已返回
     public static final int ORDER_STATUS_SUCCESS =2;
 
+    //用户类型
+    //1：代理
+    public static final String USER_AGENT = "1";
+    //3：商户
+    public static final String USER_MERCHANTS = "3";
+    // 2：介绍人
+    public static final String USER_REFERENCES = "2";
+
     //数据字典配置的挂马平台的地址
     public static final String ALIPAY_URL = "aliPayUrl";
     public static final String IP_WHITE_LIST= "ipWhiteList";

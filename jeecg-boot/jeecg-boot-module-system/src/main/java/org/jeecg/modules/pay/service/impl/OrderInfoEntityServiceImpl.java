@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -35,10 +36,9 @@ import java.util.*;
  */
 @Slf4j
 @Service
+@Transactional
 public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMapper, OrderInfoEntity> implements IOrderInfoEntityService {
 
-    @Autowired
-    private ISysUserService userService;
     @Autowired
     private ISysDictService dictService;
     @Autowired
@@ -51,6 +51,11 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     private IUserRateEntityService rateEntityService;
     @Autowired
     private IChannelBusinessEntityService channelBusinessEntityService;
+    @Autowired
+    private ISysUserService userService;
+    @Autowired
+    private IUserAmountEntityService amountService;
+
 
     /**
      * userId：商户ID
@@ -88,7 +93,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
                     map.put(BaseConstant.STATUS, order.getStatus());
                     map.put(BaseConstant.ORDER_ID, order.getOrderId());
                     map.put(BaseConstant.OUTER_ORDER_ID, order.getOuterOrderId());
-                    map.put(BaseConstant.SUBMIT_AMOUNT,order.getSubmitAmount());
+                    map.put(BaseConstant.SUBMIT_AMOUNT, order.getSubmitAmount());
                 } else {
                     return R.error("无订单信息");
                 }
@@ -124,7 +129,8 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
                     return R.error("订单查询异常，无此订单信息");
                 }
                 String userId = (String) checkParam.get(BaseConstant.USER_ID);
-                ChannelBusinessEntity channelBusiness = channelBusinessEntityService.queryChannelBusinessByUserId(userId);
+                ChannelBusinessEntity channelBusiness =
+                        channelBusinessEntityService.queryChannelBusinessByUserId(userId);
                 //3
                 JSONObject callobj = encryptAESData(order, channelBusiness.getApiKey());
                 HttpResult result = HttpUtils.doPostJson(order.getSuccessCallbackUrl(), callobj.toJSONString());
@@ -138,6 +144,58 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         }
     }
 
+
+
+    /**
+     *
+     *      * 校验商户信息
+     *      * 1、查看该商户的类型，是普通商户还是高级代理
+     *      * 高级代理
+     *      *
+     *      * 普通商户
+     *      * 是否有推荐人，如果有推荐人，则需要给推荐人返点
+     *      * 2、限额：
+     *      * 查看该用户提交金额，是否在限额范围内
+     *
+     * @param userName
+     * @param submitAmount
+     * @throws Exception
+     */
+    private void countAmount(String userName,String submitAmount) throws Exception {
+        SysUser user = userService.getUserByName(userName);
+        //验证金额是否符合上下线要求
+        if(Double.parseDouble(submitAmount)>user.getUpperLimit().doubleValue()){
+            throw new RRException("非法请求，申请金额超出申请上限");
+        }
+        if(Double.parseDouble(submitAmount) < user.getLowerLimit().doubleValue()){
+            throw new RRException("非法请求，申请金额低于申请下限");
+        }
+        //只有普通商户才有权限走单子
+        if (user.getMemberType().equals(BaseConstant.USER_MERCHANTS)) {
+            UserAmountEntity userAmount = amountService.getUserAmountByUserId(userName);
+            BigDecimal submit = new BigDecimal(submitAmount);
+            //商户
+            if (StringUtils.isBlank(user.getAgentId())) {
+                throw new RRException("非法请求，无对应的代理商户存在");
+            }else{
+                //统计这个商户走的量
+                userAmount.setAmount(submit.add(userAmount.getAmount()));
+                amountService.saveOrUpdate(userAmount);
+            }
+            if (!StringUtils.isBlank(user.getSalesmanId())) {
+                //存在介绍人,统计介绍人的返点
+                UserAmountEntity salesman = amountService.getUserAmountByUserId(user.getSalesmanId());
+                String rate = rateEntityService.getUserRate(user.getSalesmanId());
+                BigDecimal salesmanRate = new BigDecimal(rate);
+                //介绍人所得的手续费
+                BigDecimal referralFee = submit.multiply(salesmanRate);
+                salesman.setAmount(referralFee.add(salesman.getAmount()));
+                amountService.saveOrUpdate(salesman);
+            }
+        } else {
+            throw new RRException("非法请求，请求类型不是商户");
+        }
+    }
 
     /**
      * 添加订单信息
@@ -171,10 +229,10 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         order.setSuccessCallbackUrl(callbackUrl);
         order.setCreateTime(new Date());
         order.setCreateBy("api");
-        //计算费率
-        countOrderRate(order);
         //保存订单信息
         this.save(order);
+        //统计商户和介绍人的收入
+        countAmount(userId,submitAmount);
         //请求挂马平台
         requestSupport(order);
     }
@@ -211,15 +269,6 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         return true;
     }
 
-    /**
-     * 计算订单汇率
-     */
-    private void countOrderRate(OrderInfoEntity order) throws Exception {
-        String userRate = rateEntityService.getUserRate(order.getUserId(), order.getPayType());
-        BigDecimal rate = new BigDecimal(Double.valueOf(userRate));
-        BigDecimal poundage = order.getSubmitAmount().multiply(rate);
-        order.setPoundage(poundage);
-    }
 
     /**
      * 请求挂马后台，生成付款页面
@@ -282,6 +331,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     /**
      * 校验IP是否合法
      * IP白名单从数据字典中获取
+     *
      * @return
      */
     private boolean checkIp(HttpServletRequest req) {
@@ -322,25 +372,20 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         Assert.isBlank(timestamp, "时间戳不能为空");
         Assert.isBlank(userId, "商户不能为空");
 
-        try {
-            R decryptData = decryptData(data, userId, timestamp, sign);
-            if (BaseConstant.CHECK_PARAM_SUCCESS.equals(decryptData.get(BaseConstant.CODE).toString())) {
-                JSONObject dataObj = (JSONObject) decryptData.get(BaseConstant.DECRYPT_DATA);
-                if (!createOrder) {
-                    return R.ok().put(BaseConstant.ORDER_ID, dataObj.getString(BaseConstant.ORDER_ID))
-                            .put(BaseConstant.USER_ID, dataObj.getString(BaseConstant.USER_ID));
-                }
-                return R.ok().put(BaseConstant.OUTER_ORDER_ID, dataObj.getString(BaseConstant.OUTER_ORDER_ID))
-                        .put(BaseConstant.USER_ID, dataObj.getString(BaseConstant.USER_ID))
-                        .put(BaseConstant.SUBMIT_AMOUNT, dataObj.getString(BaseConstant.SUBMIT_AMOUNT))
-                        .put(BaseConstant.PAY_TYPE, dataObj.getString(BaseConstant.PAY_TYPE))
-                        .put(BaseConstant.CALLBACK_URL, dataObj.getString(BaseConstant.CALLBACK_URL));
-            } else {
-                return decryptData;
+        R decryptData = decryptData(data, userId, timestamp, sign);
+        if (BaseConstant.CHECK_PARAM_SUCCESS.equals(decryptData.get(BaseConstant.CODE).toString())) {
+            JSONObject dataObj = (JSONObject) decryptData.get(BaseConstant.DECRYPT_DATA);
+            if (!createOrder) {
+                return R.ok().put(BaseConstant.ORDER_ID, dataObj.getString(BaseConstant.ORDER_ID))
+                        .put(BaseConstant.USER_ID, dataObj.getString(BaseConstant.USER_ID));
             }
-        } catch (Exception e) {
-            log.info("参数解析异常，异常信息为:{}", e);
-            return R.error("参数解密出现异常");
+            return R.ok().put(BaseConstant.OUTER_ORDER_ID, dataObj.getString(BaseConstant.OUTER_ORDER_ID))
+                    .put(BaseConstant.USER_ID, dataObj.getString(BaseConstant.USER_ID))
+                    .put(BaseConstant.SUBMIT_AMOUNT, dataObj.getString(BaseConstant.SUBMIT_AMOUNT))
+                    .put(BaseConstant.PAY_TYPE, dataObj.getString(BaseConstant.PAY_TYPE))
+                    .put(BaseConstant.CALLBACK_URL, dataObj.getString(BaseConstant.CALLBACK_URL));
+        } else {
+            return decryptData;
         }
     }
 
@@ -380,10 +425,10 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     public JSONObject encryptAESData(OrderInfoEntity order, String aseKey) {
         JSONObject callobj = new JSONObject();
         Long timestamp = System.currentTimeMillis();
-        callobj.put(BaseConstant.ORDER_ID,order.getOrderId());
-        callobj.put(BaseConstant.OUTER_ORDER_ID,order.getOuterOrderId());
-        callobj.put(BaseConstant.SUBMIT_AMOUNT,order.getSubmitAmount());
-        callobj.put(BaseConstant.STATUS,order.getStatus());
+        callobj.put(BaseConstant.ORDER_ID, order.getOrderId());
+        callobj.put(BaseConstant.OUTER_ORDER_ID, order.getOuterOrderId());
+        callobj.put(BaseConstant.SUBMIT_AMOUNT, order.getSubmitAmount());
+        callobj.put(BaseConstant.STATUS, order.getStatus());
 
         log.info("====回调商户加密前数据====" + callobj.toJSONString());
         //加密数据
@@ -393,8 +438,8 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         //sign = orderID+outOrderId+submitAmount+timestamp
         sign.append(order.getOrderId()).append(order.getOuterOrderId()).append(order.getSubmitAmount()).append(timestamp);
         callbackjson.put(BaseConstant.SIGN, DigestUtils.md5Hex(sign.toString()));
-        callbackjson.put(BaseConstant.DATA,data);
-        callbackjson.put(BaseConstant.TIMESTAMP,timestamp);
+        callbackjson.put(BaseConstant.DATA, data);
+        callbackjson.put(BaseConstant.TIMESTAMP, timestamp);
         log.info("====回调商户加密后数据====" + callbackjson);
         return callbackjson;
     }

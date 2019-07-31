@@ -16,17 +16,17 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.jeecgframework.poi.excel.annotation.Excel;
 
 /**
- * @Description: 介绍人的费率
+ * @Description: 商户收入额度
  * @Author: jeecg-boot
- * @Date:   2019-07-26
+ * @Date:   2019-07-31
  * @Version: V1.0
  */
 @Data
-@TableName("sys_user_rate")
+@TableName("sys_user_amount")
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value="sys_user_rate对象", description="用户在指定通道下的费率")
-public class UserRateEntity {
+@ApiModel(value="sys_user_amount对象", description="商户收入额度")
+public class UserAmountEntity {
     
 	/**id*/
 	@TableId(type = IdType.UUID)
@@ -40,14 +40,10 @@ public class UserRateEntity {
 	@Excel(name = "用户名", width = 15)
     @ApiModelProperty(value = "用户名")
 	private java.lang.String userName;
-	/**费率*/
-	@Excel(name = "费率", width = 15)
-    @ApiModelProperty(value = "费率")
-	private java.lang.String userRate;
-	/**删除状态，1删除状态*/
-	@Excel(name = "删除状态，1删除状态", width = 15)
-    @ApiModelProperty(value = "删除状态，1删除状态")
-	private java.lang.Integer delFlag;
+	/**收入金额*/
+	@Excel(name = "收入金额", width = 15)
+    @ApiModelProperty(value = "收入金额")
+	private java.math.BigDecimal amount;
 	/**创建人*/
 	@Excel(name = "创建人", width = 15)
     @ApiModelProperty(value = "创建人")

@@ -87,3 +87,16 @@ CREATE TABLE `sys_user_rate` (
   `update_time` datetime DEFAULT NULL COMMENT '更新时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户在指定通道下的费率 ==》指定用户在不同通道下的费率';
+
+
+CREATE TABLE `sys_user_amount` (
+  `id` varchar(32) NOT NULL,
+  `user_id` varchar(32) NOT NULL COMMENT '用户id',
+  `user_name` varchar(32) DEFAULT NULL COMMENT '用户名',
+  `amount` decimal(10,2) DEFAULT NULL COMMENT '收入金额',
+  `create_user` varchar(32) DEFAULT NULL COMMENT '创建人',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_user` varchar(32) DEFAULT NULL COMMENT '更新人',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='商户额度';

@@ -17,7 +17,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 public class UserRateEntityServiceImpl extends ServiceImpl<UserRateEntityMapper, UserRateEntity> implements IUserRateEntityService {
 
     @Override
-    public String getUserRate(String userId, String channelCode) {
-        return baseMapper.getUserRate(userId,channelCode);
+    public String getUserRate(String userId) {
+        return baseMapper.getUserRate(userId);
     }
 }

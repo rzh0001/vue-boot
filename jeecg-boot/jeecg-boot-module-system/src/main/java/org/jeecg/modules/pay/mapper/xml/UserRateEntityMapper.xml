@@ -7,6 +7,6 @@
         FROM
             sys_user_rate
         WHERE
-            user_id = #{userId} AND channel_code = #{channelCode} AND del_flag IS NULL
+            user_id = #{userId} AND del_flag IS NULL
     </select>
 </mapper>
