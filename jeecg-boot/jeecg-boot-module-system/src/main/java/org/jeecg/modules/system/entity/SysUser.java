@@ -1,21 +1,19 @@
 package org.jeecg.modules.system.entity;
 
-import java.util.Date;
-
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
 import org.jeecg.common.aspect.annotation.Dict;
 import org.jeecgframework.poi.excel.annotation.Excel;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import java.io.Serializable;
-
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
+import java.util.Date;
 
 /**
  * <p>
@@ -135,6 +133,54 @@ public class SysUser implements Serializable {
      * 同步工作流引擎1同步0不同步
      */
     private String activitiSync;
-
+    
+    /**会员类型(1：代理  2：介绍人 3：商户）*/
+    @Excel(name = "会员类型(1：代理  2：介绍人 3：商户）", width = 15)
+    @ApiModelProperty(value = "会员类型(1：代理  2：介绍人 3：商户）")
+    private java.lang.String memberType;
+    /**单笔金额上限*/
+    @Excel(name = "单笔金额上限", width = 15)
+    @ApiModelProperty(value = "单笔金额上限")
+    private java.math.BigDecimal upperLimit;
+    /**单笔金额下限*/
+    @Excel(name = "单笔金额下限", width = 15)
+    @ApiModelProperty(value = "单笔金额下限")
+    private java.math.BigDecimal lowerLimit;
+    /**代理ID*/
+    @Excel(name = "代理ID", width = 15)
+    @ApiModelProperty(value = "代理ID")
+    private java.lang.String agentId;
+    /**代理帐号*/
+    @Excel(name = "代理帐号", width = 15)
+    @ApiModelProperty(value = "代理帐号")
+    private java.lang.String agentUsername;
+    /**代理姓名*/
+    @Excel(name = "代理姓名", width = 15)
+    @ApiModelProperty(value = "代理姓名")
+    private java.lang.String agentRealname;
+    /**介绍人ID*/
+    @Excel(name = "介绍人ID", width = 15)
+    @ApiModelProperty(value = "介绍人ID")
+    private java.lang.String salesmanId;
+    /**介绍人帐号*/
+    @Excel(name = "介绍人帐号", width = 15)
+    @ApiModelProperty(value = "介绍人帐号")
+    private java.lang.String salesmanUsername;
+    /**介绍人姓名*/
+    @Excel(name = "介绍人姓名", width = 15)
+    @ApiModelProperty(value = "介绍人姓名")
+    private java.lang.String salesmanRealname;
+    /**谷歌密钥*/
+    @Excel(name = "谷歌密钥", width = 15)
+    @ApiModelProperty(value = "谷歌密钥")
+    private java.lang.String googleSecretKey;
+    /**支付密码*/
+    @Excel(name = "支付密码", width = 15)
+    @ApiModelProperty(value = "支付密码")
+    private java.lang.String paymentPassword;
+    /**IP白名单开关*/
+    @Excel(name = "IP白名单开关", width = 15)
+    @ApiModelProperty(value = "IP白名单开关")
+    private java.lang.String ipSwitch;
 
 }
