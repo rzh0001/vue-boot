@@ -16,7 +16,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.jeecgframework.poi.excel.annotation.Excel;
 
 /**
- * @Description: 商户收入额度
+ * @Description: 高级代理下的商户和介绍人所得的总金额
  * @Author: jeecg-boot
  * @Date:   2019-07-31
  * @Version: V1.0
@@ -32,6 +32,10 @@ public class UserAmountEntity {
 	@TableId(type = IdType.UUID)
     @ApiModelProperty(value = "id")
 	private java.lang.String id;
+	/**高级代理id*/
+	@Excel(name = "高级代理id", width = 15)
+	@ApiModelProperty(value = "高级代理id")
+	private java.lang.String agentId;
 	/**用户id*/
 	@Excel(name = "用户id", width = 15)
     @ApiModelProperty(value = "用户id")
