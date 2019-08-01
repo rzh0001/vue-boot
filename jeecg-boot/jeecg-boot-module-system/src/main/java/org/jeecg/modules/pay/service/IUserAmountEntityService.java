@@ -11,5 +11,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @Version: V1.0
  */
 public interface IUserAmountEntityService extends IService<UserAmountEntity> {
-    UserAmountEntity getUserAmountByUserId(String userId);
+    UserAmountEntity getUserAmountByUserName(String userName);
 }

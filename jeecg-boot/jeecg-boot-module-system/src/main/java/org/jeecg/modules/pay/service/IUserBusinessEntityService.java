@@ -12,5 +12,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IUserBusinessEntityService extends IService<UserBusinessEntity> {
 
-    String queryBusinessCodeByUserId(String userId);
+    String queryBusinessCodeByUserName(String userName);
 }

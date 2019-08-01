@@ -22,13 +22,13 @@
         AND business_code = #{businessCode}
         AND del_flag IS NULL
     </select>
-    <select id="queryChannelBusinessByUserId" resultMap="ChannelBusinessEntity" parameterType="String">
+    <select id="queryChannelBusinessByUserName" resultMap="ChannelBusinessEntity" parameterType="String">
         SELECT
             c.*
         FROM
             sys_channel_businesss c
         LEFT JOIN sys_user_business u ON c.business_code = u.business_code
         WHERE
-            u.user_id = #{userId}
+            u.user_name = #{userName}
     </select>
 </mapper>

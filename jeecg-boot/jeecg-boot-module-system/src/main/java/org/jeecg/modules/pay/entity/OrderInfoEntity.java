@@ -44,6 +44,10 @@ public class OrderInfoEntity {
 	@Excel(name = "用户id", width = 15)
     @ApiModelProperty(value = "用户id")
 	private java.lang.String userId;
+	/**用户id*/
+	@Excel(name = "用户名", width = 15)
+	@ApiModelProperty(value = "用户名")
+	private java.lang.String userName;
 	/**上级用户id*/
 	@Excel(name = "上级用户id", width = 15)
     @ApiModelProperty(value = "上级用户id")

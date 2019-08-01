@@ -14,5 +14,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface UserBusinessEntityMapper extends BaseMapper<UserBusinessEntity> {
 
-    String queryBusinessCodeByUserId(@Param("userId")String userId);
+    String queryBusinessCodeByUserName(@Param("userName")String userName);
 }

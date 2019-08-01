@@ -13,5 +13,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @Version: V1.0
  */
 public interface UserChannelEntityMapper extends BaseMapper<UserChannelEntity> {
-    UserChannelEntity queryChannelAndUser(@Param("channelCode") String channelCode,@Param("userId") String userId);
+    UserChannelEntity queryChannelAndUser(@Param("channelCode") String channelCode,@Param("userName") String userName);
 }

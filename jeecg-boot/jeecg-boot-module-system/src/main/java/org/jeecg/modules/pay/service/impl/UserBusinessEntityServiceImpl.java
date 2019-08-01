@@ -17,7 +17,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 public class UserBusinessEntityServiceImpl extends ServiceImpl<UserBusinessEntityMapper, UserBusinessEntity> implements IUserBusinessEntityService {
 
     @Override
-    public String queryBusinessCodeByUserId(String userId) {
-        return baseMapper.queryBusinessCodeByUserId(userId);
+    public String queryBusinessCodeByUserName(String userName) {
+        return baseMapper.queryBusinessCodeByUserName(userName);
     }
 }

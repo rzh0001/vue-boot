@@ -2,6 +2,8 @@ package org.jeecg;
 
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.jeecg.modules.pay.controller.ApiController;
 import org.jeecg.modules.util.AES128Util;
 import org.jeecg.modules.util.BaseConstant;
@@ -12,6 +14,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.Random;
 
 /**
  * @title:
@@ -30,7 +33,7 @@ public class PayTest {
         JSONObject req = new JSONObject();
         JSONObject data = new JSONObject();
         data.put(BaseConstant.OUTER_ORDER_ID,"abc123456789");
-        data.put(BaseConstant.USER_ID,"abc123456789");
+        data.put(BaseConstant.USER_NAME,"abc123456789");
         data.put(BaseConstant.SUBMIT_AMOUNT,"100");
         data.put(BaseConstant.PAY_TYPE,"ysf");
         data.put(BaseConstant.CALLBACK_URL,"http://localhost:8080");
@@ -43,9 +46,13 @@ public class PayTest {
         req.put(BaseConstant.SIGN, DigestUtils.md5Hex(sign.toString()));
         req.put(BaseConstant.TIMESTAMP,time);
         req.put(BaseConstant.DATA,dataEn);
-        req.put(BaseConstant.USER_ID,"abc123456789");
+        req.put(BaseConstant.USER_NAME,"abc123456789");
         System.out.println(req.toJSONString());
         api.create(req);
+    }
+    @Test
+    public void a(){
+        System.out.println(RandomStringUtils.randomAlphabetic(10));
     }
 
 }

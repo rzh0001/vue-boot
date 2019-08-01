@@ -19,7 +19,6 @@ import org.jeecg.modules.system.util.IPUtils;
 import org.jeecg.modules.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -58,7 +57,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
 
 
     /**
-     * userId：商户ID
+     * userName：商户
      * submitAmount： 支付金额
      * payType：通道
      * outerOrderId：外部订单号
@@ -128,9 +127,9 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
                 if (order == null) {
                     return R.error("订单查询异常，无此订单信息");
                 }
-                String userId = (String) checkParam.get(BaseConstant.USER_ID);
+                String userName = (String) checkParam.get(BaseConstant.USER_NAME);
                 ChannelBusinessEntity channelBusiness =
-                        channelBusinessEntityService.queryChannelBusinessByUserId(userId);
+                        channelBusinessEntityService.queryChannelBusinessByUserName(userName);
                 //3
                 JSONObject callobj = encryptAESData(order, channelBusiness.getApiKey());
                 HttpResult result = HttpUtils.doPostJson(order.getSuccessCallbackUrl(), callobj.toJSONString());
@@ -155,12 +154,12 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * * 2、限额：
      * * 查看该用户提交金额，是否在限额范围内
      *
-     * @param userId
+     * @param userName
      * @param submitAmount
      * @throws Exception
      */
-    private void countAmount(String userId, String submitAmount) throws Exception {
-        SysUser user = userService.getUserByName(userId);
+    private void countAmount(String userName, String submitAmount) throws Exception {
+        SysUser user = userService.getUserByName(userName);
         //验证金额是否符合上下线要求
         if (Double.parseDouble(submitAmount) > user.getUpperLimit().doubleValue()) {
             throw new RRException("非法请求，申请金额超出申请上限");
@@ -170,7 +169,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         }
         //高级代理的利润
         BigDecimal submit = new BigDecimal(submitAmount);
-        String rate = rateEntityService.getUserRate(userId);
+        String rate = rateEntityService.getUserRateByUserName(userName);
         BigDecimal userRate = new BigDecimal(rate);
         BigDecimal agentMoney = submit.multiply(userRate);
 
@@ -180,11 +179,11 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
                 throw new RRException("非法请求，无对应的代理商户存在");
             } else {
                 //统计商户的所得金额
-                countUserRate(userId, user.getAgentId(), submit, agentMoney);
+                countUserRate(userName, user.getAgentId(), submit, agentMoney);
             }
             if (!StringUtils.isBlank(user.getSalesmanId())) {
                 //统计介绍人的所得金额
-                countSalesmanRate(user.getSalesmanId(), user.getAgentId(), agentMoney);
+                countSalesmanRate(user.getSalesmanUsername(), user.getAgentId(), agentMoney);
             }
         } else {
             throw new RRException("非法请求，请求类型不是商户");
@@ -194,13 +193,13 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     /**
      * 介绍人的所得额度 = 高级代理所得额度 * 介绍人的rate
      *
-     * @param salesmanId 介绍人的id
-     * @param agentId 高级代理的id
-     * @param agentMoney 高级代理所得利润
+     * @param salesmanName 介绍人
+     * @param agentId      高级代理的id
+     * @param agentMoney   高级代理所得利润
      */
-    private void countSalesmanRate(String salesmanId, String agentId, BigDecimal agentMoney) {
-        String salesmanRate = rateEntityService.getUserRate(salesmanId);
-        UserAmountEntity salesman = amountService.getUserAmountByUserId(salesmanId);
+    private void countSalesmanRate(String salesmanName, String agentId, BigDecimal agentMoney) {
+        String salesmanRate = rateEntityService.getUserRateByUserName(salesmanName);
+        UserAmountEntity salesman = amountService.getUserAmountByUserName(salesmanName);
         salesman.setAgentId(agentId);
         BigDecimal salesmanNow = agentMoney.multiply(new BigDecimal(salesmanRate));
         salesman.setAmount(salesman.getAmount().add(salesmanNow));
@@ -210,13 +209,14 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
 
     /**
      * 商户的所得额度 = 申请金额 - 高级代理所得额度
-     * @param userId 商户id
-     * @param agentId 高级代理id
-     * @param amount 订单申请金额
+     *
+     * @param userName   商户
+     * @param agentId    高级代理id
+     * @param amount     订单申请金额
      * @param agentMoney 高级代理所得利润
      */
-    private void countUserRate(String userId, String agentId, BigDecimal amount, BigDecimal agentMoney) {
-        UserAmountEntity user = amountService.getUserAmountByUserId(userId);
+    private void countUserRate(String userName, String agentId, BigDecimal amount, BigDecimal agentMoney) {
+        UserAmountEntity user = amountService.getUserAmountByUserName(userName);
         user.setAgentId(agentId);
         BigDecimal userNow = amount.subtract(agentMoney);
         user.setAmount(userNow.add(user.getAmount()));
@@ -231,16 +231,16 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      */
     private void addOrder(R checkParam) throws Exception {
         String outerOrderId = (String) checkParam.get(BaseConstant.OUTER_ORDER_ID);
-        String userId = (String) checkParam.get(BaseConstant.USER_ID);
+        String userName = (String) checkParam.get(BaseConstant.USER_NAME);
         String submitAmount = (String) checkParam.get(BaseConstant.SUBMIT_AMOUNT);
         String payType = (String) checkParam.get(BaseConstant.PAY_TYPE);
         String callbackUrl = (String) checkParam.get(BaseConstant.CALLBACK_URL);
         //校验用户通道是否存在
-        if (channelIsOpen(payType, userId)) {
+        if (channelIsOpen(payType, userName)) {
             throw new RRException("通道未定义，或用户无此通道权限");
         }
         //查询用户对应的商户
-        String businessCode = businessEntityService.queryBusinessCodeByUserId(userId);
+        String businessCode = businessEntityService.queryBusinessCodeByUserName(userName);
         if (StringUtils.isBlank(businessCode)) {
             throw new RRException("该用户无对应商户信息");
         }
@@ -248,7 +248,8 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         OrderInfoEntity order = new OrderInfoEntity();
         order.setOrderId(orderId);
         order.setOuterOrderId(outerOrderId);
-        order.setUserId(userId);
+        //order.setUserId(userId);
+        order.setUserName(userName);
         order.setBusinessCode(businessCode);
         order.setSubmitAmount(BigDecimal.valueOf(Long.valueOf(submitAmount)));
         order.setStatus(BaseConstant.ORDER_STATUS_NOT_PAY);
@@ -259,7 +260,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         //保存订单信息
         this.save(order);
         //统计商户和介绍人的收入
-        countAmount(userId, submitAmount);
+        countAmount(userName, submitAmount);
         //请求挂马平台
         requestSupport(order);
     }
@@ -281,15 +282,15 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * 校验通道是否是开启的
      *
      * @param channelCode
-     * @param useriId
+     * @param userName
      * @return
      */
-    private boolean channelIsOpen(String channelCode, String useriId) {
+    private boolean channelIsOpen(String channelCode, String userName) {
         ChannelEntity channel = chnannelDao.queryChannelByCode(channelCode);
         if (channel == null) {
             return false;
         }
-        UserChannelEntity channelUser = channelUserDao.queryChannelAndUser(channelCode, useriId);
+        UserChannelEntity channelUser = channelUserDao.queryChannelAndUserName(channelCode, userName);
         if (channelUser == null) {
             return false;
         }
@@ -392,22 +393,22 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         //RSA 加密data
         String data = reqobj.getString(BaseConstant.DATA);
         //四方系统用户
-        String userId = reqobj.getString(BaseConstant.USER_ID);
+        String userName = reqobj.getString(BaseConstant.USER_NAME);
 
         Assert.isBlank(sign, "签名不能为空");
         Assert.isBlank(data, "数据不能为空");
         Assert.isBlank(timestamp, "时间戳不能为空");
-        Assert.isBlank(userId, "商户不能为空");
+        Assert.isBlank(userName, "商户不能为空");
 
-        R decryptData = decryptData(data, userId, timestamp, sign);
+        R decryptData = decryptData(data, userName, timestamp, sign);
         if (BaseConstant.CHECK_PARAM_SUCCESS.equals(decryptData.get(BaseConstant.CODE).toString())) {
             JSONObject dataObj = (JSONObject) decryptData.get(BaseConstant.DECRYPT_DATA);
             if (!createOrder) {
                 return R.ok().put(BaseConstant.ORDER_ID, dataObj.getString(BaseConstant.ORDER_ID))
-                        .put(BaseConstant.USER_ID, dataObj.getString(BaseConstant.USER_ID));
+                        .put(BaseConstant.USER_NAME, dataObj.getString(BaseConstant.USER_NAME));
             }
             return R.ok().put(BaseConstant.OUTER_ORDER_ID, dataObj.getString(BaseConstant.OUTER_ORDER_ID))
-                    .put(BaseConstant.USER_ID, dataObj.getString(BaseConstant.USER_ID))
+                    .put(BaseConstant.USER_NAME, dataObj.getString(BaseConstant.USER_NAME))
                     .put(BaseConstant.SUBMIT_AMOUNT, dataObj.getString(BaseConstant.SUBMIT_AMOUNT))
                     .put(BaseConstant.PAY_TYPE, dataObj.getString(BaseConstant.PAY_TYPE))
                     .put(BaseConstant.CALLBACK_URL, dataObj.getString(BaseConstant.CALLBACK_URL));
@@ -423,10 +424,10 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * @return
      * @throws Exception
      */
-    private R decryptData(String data, String userId, Long timestamp, String sign) throws Exception {
-        ChannelBusinessEntity channelBusiness = channelBusinessEntityService.queryChannelBusinessByUserId(userId);
+    private R decryptData(String data, String userName, Long timestamp, String sign) throws Exception {
+        ChannelBusinessEntity channelBusiness = channelBusinessEntityService.queryChannelBusinessByUserName(userName);
         StringBuilder local = new StringBuilder();
-        local.append(userId).append(timestamp).append(data).append(channelBusiness.getApiKey());
+        local.append(userName).append(timestamp).append(data).append(channelBusiness.getApiKey());
         String localSgin = DigestUtils.md5Hex(local.toString());
         if (!localSgin.equals(sign)) {
             return R.error("签名验证不通过");
@@ -475,4 +476,5 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     public OrderInfoEntity queryOrderInfoByOrderId(String orderId) {
         return null;
     }
+
 }

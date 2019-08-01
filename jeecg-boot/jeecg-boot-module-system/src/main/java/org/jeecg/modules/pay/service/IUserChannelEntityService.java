@@ -10,5 +10,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @Version: V1.0
  */
 public interface IUserChannelEntityService extends IService<UserChannelEntity> {
-    UserChannelEntity queryChannelAndUser(String channelCode, String userId);
+    UserChannelEntity queryChannelAndUserName(String channelCode, String userName);
 }

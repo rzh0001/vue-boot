@@ -2,6 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.jeecg.modules.pay.mapper.UserChannelEntityMapper">
     <select id="queryChannelAndUser" parameterType="String"  resultType="org.jeecg.modules.pay.entity.UserChannelEntity">
-        select * from sys_user_channel where user_id=#{userId} and channel_code=#{channelCode}  and del_flag is null
+        select * from sys_user_channel where user_name=#{userName} and channel_code=#{channelCode}  and del_flag is null
     </select>
 </mapper>

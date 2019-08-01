@@ -22,7 +22,7 @@ public class ChannelBusinessEntityServiceImpl extends ServiceImpl<ChannelBusines
     }
 
     @Override
-    public ChannelBusinessEntity queryChannelBusinessByUserId(String userId) {
-        return baseMapper.queryChannelBusinessByUserId(userId);
+    public ChannelBusinessEntity queryChannelBusinessByUserName(String userName) {
+        return baseMapper.queryChannelBusinessByUserName(userName);
     }
 }

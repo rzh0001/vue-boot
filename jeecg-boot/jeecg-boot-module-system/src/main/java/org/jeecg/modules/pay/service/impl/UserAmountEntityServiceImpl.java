@@ -17,7 +17,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 public class UserAmountEntityServiceImpl extends ServiceImpl<UserAmountEntityMapper, UserAmountEntity> implements IUserAmountEntityService {
 
     @Override
-    public UserAmountEntity getUserAmountByUserId(String userId) {
-        return baseMapper.getUserAmountByUserId(userId);
+    public UserAmountEntity getUserAmountByUserName(String userName) {
+        return baseMapper.getUserAmountByUserName(userName);
     }
 }

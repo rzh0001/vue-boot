@@ -16,7 +16,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 @Service
 public class UserChannelEntityServiceImpl extends ServiceImpl<UserChannelEntityMapper, UserChannelEntity> implements IUserChannelEntityService {
     @Override
-    public UserChannelEntity queryChannelAndUser(String channelCode, String userId) {
-        return baseMapper.queryChannelAndUser(channelCode,userId);
+    public UserChannelEntity queryChannelAndUserName(String channelCode, String userName) {
+        return baseMapper.queryChannelAndUser(channelCode,userName);
     }
 }

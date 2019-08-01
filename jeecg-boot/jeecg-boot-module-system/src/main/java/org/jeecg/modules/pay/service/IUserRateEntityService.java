@@ -11,5 +11,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @Version: V1.0
  */
 public interface IUserRateEntityService extends IService<UserRateEntity> {
-    String getUserRate(String userId);
+    String getUserRateByUserName(String userName);
 }

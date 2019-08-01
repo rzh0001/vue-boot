@@ -13,6 +13,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @Version: V1.0
  */
 public interface UserAmountEntityMapper extends BaseMapper<UserAmountEntity> {
-    UserAmountEntity getUserAmountByUserId(@Param("userId")String userId);
+    UserAmountEntity getUserAmountByUserName(@Param("userName")String userName);
 
 }
