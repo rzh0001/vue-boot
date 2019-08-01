@@ -155,12 +155,12 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * * 2、限额：
      * * 查看该用户提交金额，是否在限额范围内
      *
-     * @param userName
+     * @param userId
      * @param submitAmount
      * @throws Exception
      */
-    private void countAmount(String userName, String submitAmount) throws Exception {
-        SysUser user = userService.getUserByName(userName);
+    private void countAmount(String userId, String submitAmount) throws Exception {
+        SysUser user = userService.getUserByName(userId);
         //验证金额是否符合上下线要求
         if (Double.parseDouble(submitAmount) > user.getUpperLimit().doubleValue()) {
             throw new RRException("非法请求，申请金额超出申请上限");
@@ -168,18 +168,23 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         if (Double.parseDouble(submitAmount) < user.getLowerLimit().doubleValue()) {
             throw new RRException("非法请求，申请金额低于申请下限");
         }
+        //高级代理的利润
+        BigDecimal submit = new BigDecimal(submitAmount);
+        String rate = rateEntityService.getUserRate(userId);
+        BigDecimal userRate = new BigDecimal(rate);
+        BigDecimal agentMoney = submit.multiply(userRate);
+
         //只有普通商户才有权限走单子
         if (user.getMemberType().equals(BaseConstant.USER_MERCHANTS)) {
-            BigDecimal submit = new BigDecimal(submitAmount);
             if (StringUtils.isBlank(user.getAgentId())) {
                 throw new RRException("非法请求，无对应的代理商户存在");
             } else {
                 //统计商户的所得金额
-                countRate(userName, submit, user.getAgentId());
+                countUserRate(userId, user.getAgentId(), submit, agentMoney);
             }
             if (!StringUtils.isBlank(user.getSalesmanId())) {
                 //统计介绍人的所得金额
-                countRate(user.getSalesmanId(), submit, user.getAgentId());
+                countSalesmanRate(user.getSalesmanId(), user.getAgentId(), agentMoney);
             }
         } else {
             throw new RRException("非法请求，请求类型不是商户");
@@ -187,21 +192,36 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     }
 
     /**
-     * 统计商户和介绍人的所得金额
+     * 介绍人的所得额度 = 高级代理所得额度 * 介绍人的rate
      *
-     * @param userId
-     * @param amount
-     * @param agentId
+     * @param salesmanId 介绍人的id
+     * @param agentId 高级代理的id
+     * @param agentMoney 高级代理所得利润
      */
-    private void countRate(String userId, BigDecimal amount, String agentId) {
+    private void countSalesmanRate(String salesmanId, String agentId, BigDecimal agentMoney) {
+        String salesmanRate = rateEntityService.getUserRate(salesmanId);
+        UserAmountEntity salesman = amountService.getUserAmountByUserId(salesmanId);
+        salesman.setAgentId(agentId);
+        BigDecimal salesmanNow = agentMoney.multiply(new BigDecimal(salesmanRate));
+        salesman.setAmount(salesman.getAmount().add(salesmanNow));
+        amountService.saveOrUpdate(salesman);
+        return;
+    }
+
+    /**
+     * 商户的所得额度 = 申请金额 - 高级代理所得额度
+     * @param userId 商户id
+     * @param agentId 高级代理id
+     * @param amount 订单申请金额
+     * @param agentMoney 高级代理所得利润
+     */
+    private void countUserRate(String userId, String agentId, BigDecimal amount, BigDecimal agentMoney) {
         UserAmountEntity user = amountService.getUserAmountByUserId(userId);
-        String rate = rateEntityService.getUserRate(userId);
-        BigDecimal salesmanRate = new BigDecimal(rate);
-        //介绍人所得的手续费
-        BigDecimal referralFee = amount.multiply(salesmanRate);
-        user.setAmount(referralFee.add(user.getAmount()));
         user.setAgentId(agentId);
+        BigDecimal userNow = amount.subtract(agentMoney);
+        user.setAmount(userNow.add(user.getAmount()));
         amountService.saveOrUpdate(user);
+        return;
     }
 
     /**
