@@ -32,8 +32,8 @@ public class PayTest {
     public void create(){
         JSONObject req = new JSONObject();
         JSONObject data = new JSONObject();
-        data.put(BaseConstant.OUTER_ORDER_ID,"abc123456789");
-        data.put(BaseConstant.USER_NAME,"abc123456789");
+        data.put(BaseConstant.OUTER_ORDER_ID,"out_id123456789");
+        data.put(BaseConstant.USER_NAME,"www");
         data.put(BaseConstant.SUBMIT_AMOUNT,"100");
         data.put(BaseConstant.PAY_TYPE,"ysf");
         data.put(BaseConstant.CALLBACK_URL,"http://localhost:8080");
@@ -41,18 +41,40 @@ public class PayTest {
         StringBuilder sign = new StringBuilder();
         //userId+timestamp+data
         Long time = new Date().getTime();
-        sign.append("abc123456789").append(time).append(dataEn);
+        sign.append("www").append(time).append(dataEn);
 
         req.put(BaseConstant.SIGN, DigestUtils.md5Hex(sign.toString()));
         req.put(BaseConstant.TIMESTAMP,time);
         req.put(BaseConstant.DATA,dataEn);
-        req.put(BaseConstant.USER_NAME,"abc123456789");
+        req.put(BaseConstant.USER_NAME,"www");
         System.out.println(req.toJSONString());
         api.create(req);
+    }
+
+    public static void main(String[] args) {
+        JSONObject req = new JSONObject();
+        JSONObject data = new JSONObject();
+        data.put(BaseConstant.OUTER_ORDER_ID,"out_id123456789");
+        data.put(BaseConstant.USER_NAME,"www");
+        data.put(BaseConstant.SUBMIT_AMOUNT,"100");
+        data.put(BaseConstant.PAY_TYPE,"ysf");
+        data.put(BaseConstant.CALLBACK_URL,"http://localhost:8080");
+        String dataEn = AES128Util.encryptBase64(data.toJSONString(), "abc123#@!");
+        StringBuilder sign = new StringBuilder();
+        //userId+timestamp+data
+        Long time = new Date().getTime();
+        sign.append("www").append(time).append(dataEn).append("abc123#@!");
+
+        req.put(BaseConstant.SIGN, DigestUtils.md5Hex(sign.toString()));
+        req.put(BaseConstant.TIMESTAMP,time);
+        req.put(BaseConstant.DATA,dataEn);
+        req.put(BaseConstant.USER_NAME,"www");
+        System.out.println(req.toJSONString());
     }
     @Test
     public void a(){
         System.out.println(RandomStringUtils.randomAlphabetic(10));
     }
+
 
 }
