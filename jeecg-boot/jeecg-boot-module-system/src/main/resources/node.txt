@@ -7,17 +7,18 @@
         data:加密数据，json字符串（"orderId":"123456789" 采用BASE64加密）
         sign:签名（userName+timestamp+data使用MD5进行加密）
 
-2、订单创建：/api/create
+2、订单创建：http://localhost:8080/jeecg-boot/api/create
+
     入参：
         userName：用户
         timestamp:时间戳
-        data:加密数据，json字符串;采用BASE64加密；属性有以下：
+        data:json字符串;采用BASE64加密；属性有以下：
             outerOrderId:商户订单号
             username:商户名
             submitAmount:申请金额
             payType:通道
             callbackUrl：回调url
-        sign:签名（userName+timestamp+data使用MD5进行加密）
+        sign:签名（userName+timestamp+data(data是经过加密之后的data)+apikey使用MD5进行加密）
 
         样例入参：
         {

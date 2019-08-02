@@ -1,22 +1,23 @@
 CREATE TABLE `pay_order_info` (
   `id` varchar(32) NOT NULL COMMENT '主键id',
-  `order_id` varchar(32) DEFAULT NULL COMMENT '四方系统订单号',
-  `outer_order_id` varchar(32) DEFAULT NULL COMMENT '外部订单号',
-  `user_id` varchar(32) NOT NULL COMMENT '用户id',
+  `order_id` varchar(32) NOT NULL COMMENT '四方系统订单号',
+  `outer_order_id` varchar(32) NOT NULL COMMENT '外部订单号',
+  `user_id` varchar(32) DEFAULT NULL COMMENT '用户id',
   `parent_user` varchar(32) NOT NULL COMMENT '上级用户id',
-  `business_code` varchar(32) DEFAULT NULL COMMENT '商户编号',
+  `business_code` varchar(32) NOT NULL COMMENT '商户编号',
   `submit_amount` decimal(7,3) DEFAULT NULL COMMENT '申请金额',
   `poundage` decimal(7,3) DEFAULT NULL COMMENT '手续费',
   `actual_amount` decimal(7,3) DEFAULT NULL COMMENT '实际金额',
-  `status` int(2) DEFAULT NULL COMMENT '状态：-1:无效  0:未支付 1:成功，未返回 2:成功，已返回',
-  `pay_type` varchar(12) DEFAULT NULL COMMENT '支付通道',
-  `success_callback_url` varchar(360) DEFAULT NULL COMMENT '成功回调地址',
+  `status` int(2) NOT NULL COMMENT '状态：-1:无效  0:未支付 1:成功，未返回 2:成功，已返回',
+  `pay_type` varchar(12) NOT NULL COMMENT '支付通道',
+  `success_callback_url` varchar(360) NOT NULL COMMENT '成功回调地址',
   `err_callback_url` varchar(360) DEFAULT NULL COMMENT '失败回调地址',
   `available_amount` decimal(10,3) DEFAULT NULL COMMENT '可用金额，即可提现额度',
   `create_by` varchar(32) DEFAULT NULL COMMENT '创建人',
   `create_time` datetime DEFAULT NULL COMMENT '创建时间',
   `update_by` varchar(32) DEFAULT NULL COMMENT '更新人',
   `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  `user_name` varchar(32) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='订单信息';
 
@@ -46,11 +47,24 @@ CREATE TABLE `sys_channel_businesss` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='通道关联商户 ==》 通道绑定商户（商户是指挂马的商户）';
 
+CREATE TABLE `sys_user_amount` (
+  `id` varchar(32) NOT NULL,
+  `user_id` varchar(32) DEFAULT NULL COMMENT '用户id',
+  `user_name` varchar(32) NOT NULL COMMENT '用户名',
+  `amount` decimal(10,2) DEFAULT NULL COMMENT '收入金额',
+  `create_user` varchar(32) DEFAULT NULL COMMENT '创建人',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_user` varchar(32) DEFAULT NULL COMMENT '更新人',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  `agent_id` varchar(32) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='商户额度';
+
 CREATE TABLE `sys_user_business` (
   `id` varchar(32) NOT NULL,
-  `user_id` varchar(32) NOT NULL COMMENT '用户id',
-  `user_name` varchar(32) DEFAULT NULL COMMENT '用户名',
-  `business_code` varchar(32) DEFAULT NULL COMMENT '商户code',
+  `user_id` varchar(32) DEFAULT NULL COMMENT '用户id',
+  `user_name` varchar(32) NOT NULL COMMENT '用户名',
+  `business_code` varchar(32) NOT NULL COMMENT '商户code',
   `del_flag` int(1) DEFAULT NULL COMMENT '删除状态，1删除状态',
   `create_user` varchar(32) DEFAULT NULL COMMENT '创建人',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -61,9 +75,9 @@ CREATE TABLE `sys_user_business` (
 
 CREATE TABLE `sys_user_channel` (
   `id` varchar(32) NOT NULL,
-  `user_id` varchar(32) NOT NULL COMMENT '用户id',
-  `user_name` varchar(32) DEFAULT NULL COMMENT '用户名',
-  `channel_id` varchar(32) NOT NULL COMMENT '通道id',
+  `user_id` varchar(32) DEFAULT NULL COMMENT '用户id',
+  `user_name` varchar(32) NOT NULL COMMENT '用户名',
+  `channel_id` varchar(32) DEFAULT NULL COMMENT '通道id',
   `channel_code` varchar(32) NOT NULL COMMENT '通道code',
   `del_flag` int(1) DEFAULT NULL COMMENT '删除状态，1删除状态',
   `create_user` varchar(32) DEFAULT NULL COMMENT '创建人',
@@ -75,10 +89,8 @@ CREATE TABLE `sys_user_channel` (
 
 CREATE TABLE `sys_user_rate` (
   `id` varchar(32) NOT NULL,
-  `user_id` varchar(32) NOT NULL COMMENT '用户id',
-  `user_name` varchar(32) DEFAULT NULL COMMENT '用户名',
-  `channel_id` varchar(32) NOT NULL COMMENT '通道id',
-  `channel_code` varchar(32) NOT NULL COMMENT '通道code',
+  `user_id` varchar(32) DEFAULT NULL COMMENT '用户id',
+  `user_name` varchar(32) NOT NULL COMMENT '用户名',
   `user_rate` varchar(10) NOT NULL COMMENT '费率',
   `del_flag` int(1) DEFAULT NULL COMMENT '删除状态，1删除状态',
   `create_user` varchar(32) DEFAULT NULL COMMENT '创建人',
@@ -89,16 +101,3 @@ CREATE TABLE `sys_user_rate` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户在指定通道下的费率 ==》指定用户在不同通道下的费率';
 
-
-CREATE TABLE `sys_user_amount` (
-  `id` varchar(32) NOT NULL,
-  `user_id` varchar(32) NOT NULL COMMENT '用户id',
-  `user_name` varchar(32) DEFAULT NULL COMMENT '用户名',
-  `amount` decimal(10,2) DEFAULT NULL COMMENT '收入金额',
-  `create_user` varchar(32) DEFAULT NULL COMMENT '创建人',
-  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_user` varchar(32) DEFAULT NULL COMMENT '更新人',
-  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
-  `agent_id` varchar(32) NOT NULL COMMENT '高级代理id',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='商户额度';
