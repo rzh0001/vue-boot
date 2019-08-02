@@ -27,7 +27,7 @@
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
           label="商户code">
-          <a-input placeholder="请输入商户code" v-decorator="['businessCcode', {}]" />
+          <a-input placeholder="请输入商户code" v-decorator="['businessCode', {}]" />
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"

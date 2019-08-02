@@ -16,26 +16,22 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.jeecgframework.poi.excel.annotation.Excel;
 
 /**
- * @Description: 高级代理下的商户和介绍人所得的总金额
+ * @Description: 商户、介绍人所得总额
  * @Author: jeecg-boot
- * @Date:   2019-07-31
+ * @Date:   2019-08-02
  * @Version: V1.0
  */
 @Data
 @TableName("sys_user_amount")
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value="sys_user_amount对象", description="商户收入额度")
+@ApiModel(value="sys_user_amount对象", description="商户、介绍人所得总额")
 public class UserAmountEntity {
     
 	/**id*/
 	@TableId(type = IdType.UUID)
     @ApiModelProperty(value = "id")
 	private java.lang.String id;
-	/**高级代理id*/
-	@Excel(name = "高级代理id", width = 15)
-	@ApiModelProperty(value = "高级代理id")
-	private java.lang.String agentId;
 	/**用户id*/
 	@Excel(name = "用户id", width = 15)
     @ApiModelProperty(value = "用户id")
@@ -68,4 +64,8 @@ public class UserAmountEntity {
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "更新时间")
 	private java.util.Date updateTime;
+	/**agentId*/
+	@Excel(name = "agentId", width = 15)
+    @ApiModelProperty(value = "agentId")
+	private java.lang.String agentId;
 }

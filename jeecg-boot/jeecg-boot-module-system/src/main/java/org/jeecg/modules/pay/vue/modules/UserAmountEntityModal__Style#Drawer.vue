@@ -41,6 +41,12 @@
           label="更新人">
           <a-input placeholder="请输入更新人" v-decorator="['updateUser', {}]" />
         </a-form-item>
+        <a-form-item
+          :labelCol="labelCol"
+          :wrapperCol="wrapperCol"
+          label="agentId">
+          <a-input placeholder="请输入agentId" v-decorator="['agentId', validatorRules.agentId ]" />
+        </a-form-item>
 		
       </a-form>
     </a-spin>
@@ -74,6 +80,7 @@
         form: this.$form.createForm(this),
         validatorRules:{
         userId:{rules: [{ required: true, message: '请输入用户id!' }]},
+        agentId:{rules: [{ required: true, message: '请输入agentId!' }]},
         },
         url: {
           add: "/pay/userAmountEntity/add",
@@ -92,7 +99,7 @@
         this.model = Object.assign({}, record);
         this.visible = true;
         this.$nextTick(() => {
-          this.form.setFieldsValue(pick(this.model,'userId','userName','amount','createUser','updateUser'))
+          this.form.setFieldsValue(pick(this.model,'userId','userName','amount','createUser','updateUser','agentId'))
 		  //时间格式化
         });
 

@@ -15,25 +15,13 @@
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
           label="用户id">
-          <a-input placeholder="请输入用户id" v-decorator="['userId', validatorRules.userId ]" />
+          <a-input placeholder="请输入用户id" v-decorator="['userId', {}]" />
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
           label="用户名">
-          <a-input placeholder="请输入用户名" v-decorator="['userName', {}]" />
-        </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="通道id">
-          <a-input placeholder="请输入通道id" v-decorator="['channelId', validatorRules.channelId ]" />
-        </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="通道code">
-          <a-input placeholder="请输入通道code" v-decorator="['channelCode', validatorRules.channelCode ]" />
+          <a-input placeholder="请输入用户名" v-decorator="['userName', validatorRules.userName ]" />
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"
@@ -58,6 +46,12 @@
           :wrapperCol="wrapperCol"
           label="更新人">
           <a-input placeholder="请输入更新人" v-decorator="['updateUser', {}]" />
+        </a-form-item>
+        <a-form-item
+          :labelCol="labelCol"
+          :wrapperCol="wrapperCol"
+          label="高级代理id">
+          <a-input placeholder="请输入高级代理id" v-decorator="['agentId', validatorRules.agentId ]" />
         </a-form-item>
 		
       </a-form>
@@ -89,10 +83,9 @@
         confirmLoading: false,
         form: this.$form.createForm(this),
         validatorRules:{
-        userId:{rules: [{ required: true, message: '请输入用户id!' }]},
-        channelId:{rules: [{ required: true, message: '请输入通道id!' }]},
-        channelCode:{rules: [{ required: true, message: '请输入通道code!' }]},
+        userName:{rules: [{ required: true, message: '请输入用户名!' }]},
         userRate:{rules: [{ required: true, message: '请输入费率!' }]},
+        agentId:{rules: [{ required: true, message: '请输入高级代理id!' }]},
         },
         url: {
           add: "/pay/userRateEntity/add",
@@ -111,7 +104,7 @@
         this.model = Object.assign({}, record);
         this.visible = true;
         this.$nextTick(() => {
-          this.form.setFieldsValue(pick(this.model,'userId','userName','channelId','channelCode','userRate','delFlag','createUser','updateUser'))
+          this.form.setFieldsValue(pick(this.model,'userId','userName','userRate','delFlag','createUser','updateUser','agentId'))
 		  //时间格式化
         });
 

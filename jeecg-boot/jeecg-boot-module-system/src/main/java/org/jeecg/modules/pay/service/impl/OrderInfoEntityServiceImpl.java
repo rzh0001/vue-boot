@@ -72,6 +72,8 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             R checkParam = checkParam(reqobj, true);
             if (BaseConstant.CHECK_PARAM_SUCCESS.equals(checkParam.get(BaseConstant.CODE).toString())) {
                 addOrder(checkParam);
+            } else {
+                return R.error("创建订单异常");
             }
         } catch (Exception e) {
             log.info("创建订单异常，异常信息为:{}", e);
@@ -235,8 +237,9 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         String submitAmount = (String) checkParam.get(BaseConstant.SUBMIT_AMOUNT);
         String payType = (String) checkParam.get(BaseConstant.PAY_TYPE);
         String callbackUrl = (String) checkParam.get(BaseConstant.CALLBACK_URL);
+        String agentName = (String) checkParam.get(BaseConstant.AGENT_NAME);
         //校验用户通道是否存在
-        if (channelIsOpen(payType, userName)) {
+        if (!channelIsOpen(payType, userName)) {
             throw new RRException("通道未定义，或用户无此通道权限");
         }
         //查询用户对应的商户
@@ -246,6 +249,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         }
         String orderId = generateOrderId();
         OrderInfoEntity order = new OrderInfoEntity();
+
         order.setOrderId(orderId);
         order.setOuterOrderId(outerOrderId);
         //order.setUserId(userId);
@@ -257,6 +261,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         order.setSuccessCallbackUrl(callbackUrl);
         order.setCreateTime(new Date());
         order.setCreateBy("api");
+        order.setParentUser(agentName);
         //保存订单信息
         this.save(order);
         //统计商户和介绍人的收入
@@ -275,7 +280,6 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         if (order.getPayType().equals(BaseConstant.ALI_PAY)) {
             aliPayCallBack(order);
         }
-
     }
 
     /**
@@ -400,18 +404,24 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         Assert.isBlank(timestamp, "时间戳不能为空");
         Assert.isBlank(userName, "商户不能为空");
 
+        SysUser user = userService.getUserByName(userName);
+        if (user == null) {
+            return R.error("用户不存在");
+        }
         R decryptData = decryptData(data, userName, timestamp, sign);
         if (BaseConstant.CHECK_PARAM_SUCCESS.equals(decryptData.get(BaseConstant.CODE).toString())) {
             JSONObject dataObj = (JSONObject) decryptData.get(BaseConstant.DECRYPT_DATA);
             if (!createOrder) {
                 return R.ok().put(BaseConstant.ORDER_ID, dataObj.getString(BaseConstant.ORDER_ID))
-                        .put(BaseConstant.USER_NAME, dataObj.getString(BaseConstant.USER_NAME));
+                        .put(BaseConstant.USER_NAME, dataObj.getString(BaseConstant.USER_NAME))
+                        .put(BaseConstant.AGENT_NAME, user.getAgentUsername());
             }
             return R.ok().put(BaseConstant.OUTER_ORDER_ID, dataObj.getString(BaseConstant.OUTER_ORDER_ID))
                     .put(BaseConstant.USER_NAME, dataObj.getString(BaseConstant.USER_NAME))
                     .put(BaseConstant.SUBMIT_AMOUNT, dataObj.getString(BaseConstant.SUBMIT_AMOUNT))
                     .put(BaseConstant.PAY_TYPE, dataObj.getString(BaseConstant.PAY_TYPE))
-                    .put(BaseConstant.CALLBACK_URL, dataObj.getString(BaseConstant.CALLBACK_URL));
+                    .put(BaseConstant.CALLBACK_URL, dataObj.getString(BaseConstant.CALLBACK_URL))
+                    .put(BaseConstant.AGENT_NAME, user.getAgentUsername());
         } else {
             return decryptData;
         }

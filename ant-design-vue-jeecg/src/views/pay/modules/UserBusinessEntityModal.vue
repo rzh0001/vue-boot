@@ -27,7 +27,7 @@
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
           label="商户code">
-          <a-input placeholder="请输入商户code" v-decorator="['businessCcode', {}]" />
+          <a-input placeholder="请输入商户code" v-decorator="['businessCode', {}]" />
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"
@@ -96,7 +96,7 @@
         this.model = Object.assign({}, record);
         this.visible = true;
         this.$nextTick(() => {
-          this.form.setFieldsValue(pick(this.model,'userId','userName','businessCcode','delFlag','createUser','updateUser'))
+          this.form.setFieldsValue(pick(this.model,'userId','userName','businessCode','delFlag','createUser','updateUser'))
 		  //时间格式化
         });
 

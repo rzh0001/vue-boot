@@ -19,7 +19,7 @@
         <template v-if="toggleSearchStatus">
         <a-col :md="6" :sm="8">
             <a-form-item label="商户code">
-              <a-input placeholder="请输入商户code" v-model="queryParam.businessCcode"></a-input>
+              <a-input placeholder="请输入商户code" v-model="queryParam.businessCode"></a-input>
             </a-form-item>
           </a-col>
           <a-col :md="6" :sm="8">
@@ -145,7 +145,7 @@
 		   {
             title: '商户code',
             align:"center",
-            dataIndex: 'businessCcode'
+            dataIndex: 'businessCode'
            },
 		   {
             title: '删除状态，1删除状态',

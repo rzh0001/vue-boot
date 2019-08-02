@@ -18,18 +18,18 @@
           </a-col>
         <template v-if="toggleSearchStatus">
         <a-col :md="6" :sm="8">
-            <a-form-item label="通道id">
-              <a-input placeholder="请输入通道id" v-model="queryParam.channelId"></a-input>
-            </a-form-item>
-          </a-col>
-          <a-col :md="6" :sm="8">
-            <a-form-item label="通道code">
-              <a-input placeholder="请输入通道code" v-model="queryParam.channelCode"></a-input>
-            </a-form-item>
-          </a-col>
-          <a-col :md="6" :sm="8">
             <a-form-item label="费率">
               <a-input placeholder="请输入费率" v-model="queryParam.userRate"></a-input>
+            </a-form-item>
+          </a-col>
+          <a-col :md="6" :sm="8">
+            <a-form-item label="删除状态，1删除状态">
+              <a-input placeholder="请输入删除状态，1删除状态" v-model="queryParam.delFlag"></a-input>
+            </a-form-item>
+          </a-col>
+          <a-col :md="6" :sm="8">
+            <a-form-item label="创建人">
+              <a-input placeholder="请输入创建人" v-model="queryParam.createUser"></a-input>
             </a-form-item>
           </a-col>
           </template>
@@ -51,7 +51,7 @@
     <!-- 操作按钮区域 -->
     <div class="table-operator">
       <a-button @click="handleAdd" type="primary" icon="plus">新增</a-button>
-      <a-button type="primary" icon="download" @click="handleExportXls('用户在指定通道下的费率')">导出</a-button>
+      <a-button type="primary" icon="download" @click="handleExportXls('费率')">导出</a-button>
       <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl" @change="handleImportExcel">
         <a-button type="primary" icon="import">导入</a-button>
       </a-upload>
@@ -119,7 +119,7 @@
     },
     data () {
       return {
-        description: '用户在指定通道下的费率管理页面',
+        description: '费率管理页面',
         // 表头
         columns: [
           {
@@ -143,16 +143,6 @@
             dataIndex: 'userName'
            },
 		   {
-            title: '通道id',
-            align:"center",
-            dataIndex: 'channelId'
-           },
-		   {
-            title: '通道code',
-            align:"center",
-            dataIndex: 'channelCode'
-           },
-		   {
             title: '费率',
             align:"center",
             dataIndex: 'userRate'
@@ -171,6 +161,11 @@
             title: '更新人',
             align:"center",
             dataIndex: 'updateUser'
+           },
+		   {
+            title: '高级代理id',
+            align:"center",
+            dataIndex: 'agentId'
            },
           {
             title: '操作',

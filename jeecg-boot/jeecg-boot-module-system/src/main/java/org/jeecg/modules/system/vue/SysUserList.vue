@@ -7,29 +7,29 @@
         <a-row :gutter="24">
 
           <a-col :md="6" :sm="8">
-            <a-form-item label="用户id">
-              <a-input placeholder="请输入用户id" v-model="queryParam.userId"></a-input>
+            <a-form-item label="登录账号">
+              <a-input placeholder="请输入登录账号" v-model="queryParam.username"></a-input>
             </a-form-item>
           </a-col>
           <a-col :md="6" :sm="8">
-            <a-form-item label="用户名">
-              <a-input placeholder="请输入用户名" v-model="queryParam.userName"></a-input>
+            <a-form-item label="真实姓名">
+              <a-input placeholder="请输入真实姓名" v-model="queryParam.realname"></a-input>
             </a-form-item>
           </a-col>
         <template v-if="toggleSearchStatus">
         <a-col :md="6" :sm="8">
-            <a-form-item label="收入金额">
-              <a-input placeholder="请输入收入金额" v-model="queryParam.amount"></a-input>
+            <a-form-item label="密码">
+              <a-input placeholder="请输入密码" v-model="queryParam.password"></a-input>
             </a-form-item>
           </a-col>
           <a-col :md="6" :sm="8">
-            <a-form-item label="创建人">
-              <a-input placeholder="请输入创建人" v-model="queryParam.createUser"></a-input>
+            <a-form-item label="md5密码盐">
+              <a-input placeholder="请输入md5密码盐" v-model="queryParam.salt"></a-input>
             </a-form-item>
           </a-col>
           <a-col :md="6" :sm="8">
-            <a-form-item label="更新人">
-              <a-input placeholder="请输入更新人" v-model="queryParam.updateUser"></a-input>
+            <a-form-item label="头像">
+              <a-input placeholder="请输入头像" v-model="queryParam.avatar"></a-input>
             </a-form-item>
           </a-col>
           </template>
@@ -51,7 +51,7 @@
     <!-- 操作按钮区域 -->
     <div class="table-operator">
       <a-button @click="handleAdd" type="primary" icon="plus">新增</a-button>
-      <a-button type="primary" icon="download" @click="handleExportXls('商户、介绍人所得总额')">导出</a-button>
+      <a-button type="primary" icon="download" @click="handleExportXls('用户表')">导出</a-button>
       <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl" @change="handleImportExcel">
         <a-button type="primary" icon="import">导入</a-button>
       </a-upload>
@@ -103,23 +103,23 @@
     <!-- table区域-end -->
 
     <!-- 表单区域 -->
-    <userAmountEntity-modal ref="modalForm" @ok="modalFormOk"></userAmountEntity-modal>
+    <sysUser-modal ref="modalForm" @ok="modalFormOk"></sysUser-modal>
   </a-card>
 </template>
 
 <script>
-  import UserAmountEntityModal from './modules/UserAmountEntityModal'
+  import SysUserModal from './modules/SysUserModal'
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
 
   export default {
-    name: "UserAmountEntityList",
+    name: "SysUserList",
     mixins:[JeecgListMixin],
     components: {
-      UserAmountEntityModal
+      SysUserModal
     },
     data () {
       return {
-        description: '商户、介绍人所得总额管理页面',
+        description: '用户表管理页面',
         // 表头
         columns: [
           {
@@ -133,34 +133,134 @@
             }
            },
 		   {
-            title: '用户id',
+            title: '登录账号',
+            align:"center",
+            dataIndex: 'username'
+           },
+		   {
+            title: '真实姓名',
+            align:"center",
+            dataIndex: 'realname'
+           },
+		   {
+            title: '密码',
+            align:"center",
+            dataIndex: 'password'
+           },
+		   {
+            title: 'md5密码盐',
+            align:"center",
+            dataIndex: 'salt'
+           },
+		   {
+            title: '头像',
+            align:"center",
+            dataIndex: 'avatar'
+           },
+		   {
+            title: '生日',
+            align:"center",
+            dataIndex: 'birthday'
+           },
+		   {
+            title: '性别（1：男 2：女）',
+            align:"center",
+            dataIndex: 'sex'
+           },
+		   {
+            title: '电子邮件',
+            align:"center",
+            dataIndex: 'email'
+           },
+		   {
+            title: '电话',
+            align:"center",
+            dataIndex: 'phone'
+           },
+		   {
+            title: '部门code',
+            align:"center",
+            dataIndex: 'orgCode'
+           },
+		   {
+            title: '状态(1：正常  2：冻结 ）',
+            align:"center",
+            dataIndex: 'status'
+           },
+		   {
+            title: '删除状态（0，正常，1已删除）',
+            align:"center",
+            dataIndex: 'delFlag'
+           },
+		   {
+            title: '同步工作流引擎1同步0不同步',
+            align:"center",
+            dataIndex: 'activitiSync'
+           },
+		   {
+            title: 'userId',
             align:"center",
             dataIndex: 'userId'
            },
 		   {
-            title: '用户名',
+            title: '会员类型(1：代理  2：介绍人 3：商户）',
             align:"center",
-            dataIndex: 'userName'
+            dataIndex: 'memberType'
            },
 		   {
-            title: '收入金额',
+            title: '单笔金额上限',
             align:"center",
-            dataIndex: 'amount'
+            dataIndex: 'upperLimit'
            },
 		   {
-            title: '创建人',
+            title: '单笔金额下限',
             align:"center",
-            dataIndex: 'createUser'
+            dataIndex: 'lowerLimit'
            },
 		   {
-            title: '更新人',
-            align:"center",
-            dataIndex: 'updateUser'
-           },
-		   {
-            title: 'agentId',
+            title: '代理ID',
             align:"center",
             dataIndex: 'agentId'
+           },
+		   {
+            title: '代理帐号',
+            align:"center",
+            dataIndex: 'agentUsername'
+           },
+		   {
+            title: '代理姓名',
+            align:"center",
+            dataIndex: 'agentRealname'
+           },
+		   {
+            title: '介绍人ID',
+            align:"center",
+            dataIndex: 'salesmanId'
+           },
+		   {
+            title: '介绍人帐号',
+            align:"center",
+            dataIndex: 'salesmanUsername'
+           },
+		   {
+            title: '介绍人姓名',
+            align:"center",
+            dataIndex: 'salesmanRealname'
+           },
+		   {
+            title: '谷歌密钥',
+            align:"center",
+            dataIndex: 'googleSecretKey'
+           },
+		   {
+            title: '支付密码',
+            align:"center",
+            dataIndex: 'paymentPassword'
+           },
+		   {
+            title: 'IP白名单开关',
+            align:"center",
+            dataIndex: 'ipSwitch'
            },
           {
             title: '操作',
@@ -170,11 +270,11 @@
           }
         ],
 		url: {
-          list: "/pay/userAmountEntity/list",
-          delete: "/pay/userAmountEntity/delete",
-          deleteBatch: "/pay/userAmountEntity/deleteBatch",
-          exportXlsUrl: "pay/userAmountEntity/exportXls",
-          importExcelUrl: "pay/userAmountEntity/importExcel",
+          list: "/system/sysUser/list",
+          delete: "/system/sysUser/delete",
+          deleteBatch: "/system/sysUser/deleteBatch",
+          exportXlsUrl: "system/sysUser/exportXls",
+          importExcelUrl: "system/sysUser/importExcel",
        },
     }
   },
