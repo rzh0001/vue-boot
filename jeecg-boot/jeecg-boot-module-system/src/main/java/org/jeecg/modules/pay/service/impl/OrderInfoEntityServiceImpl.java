@@ -23,6 +23,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.*;
@@ -39,7 +40,7 @@ import java.util.*;
 public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMapper, OrderInfoEntity> implements IOrderInfoEntityService {
 
     @Autowired
-    private ISysDictService dictService;
+    public  ISysDictService dictService;
     @Autowired
     private IChannelEntityService chnannelDao;
     @Autowired
@@ -55,7 +56,27 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     @Autowired
     private IUserAmountEntityService amountService;
 
-
+    private static OrderInfoEntityServiceImpl orderInfoEntityService;
+    private static  String aliPayUrl = null;
+    private static String bankPayUrl = null;
+    private static String ysfPayUrl = null;
+    @PostConstruct
+    public void init(){
+        orderInfoEntityService=this;
+        orderInfoEntityService.dictService = this.dictService;
+        List<DictModel> payUrl = dictService.queryDictItemsByCode(BaseConstant.REQUEST_URL);
+        for (DictModel dict : payUrl) {
+            if (BaseConstant.REQUEST_ZFB.equals(dict.getText())) {
+                aliPayUrl = dict.getValue();
+            }
+            if (BaseConstant.REQUEST_BANK.equals(dict.getText())) {
+                bankPayUrl = dict.getValue();
+            }
+            if (BaseConstant.REQUEST_YSF.equals(dict.getText())) {
+                ysfPayUrl = dict.getValue();
+            }
+        }
+    }
     /**
      * userName：商户
      * submitAmount： 支付金额
@@ -177,8 +198,10 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         //只有普通商户才有权限走单子
         if (user.getMemberType().equals(BaseConstant.USER_MERCHANTS)) {
             if (StringUtils.isBlank(user.getAgentUsername())) {
-                return R.error("非法请求，无对应的代理商户存在");
+                throw new RRException("非法请求，无对应的代理商户存在"+userName);
             } else {
+                //统计高级代理所得额度
+                countAgentMoney(user.getAgentUsername(), submit);
                 //统计商户的所得金额
                 countUserRate(userName, user.getAgentUsername(), submit, agentMoney);
             }
@@ -188,22 +211,39 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             }
             return R.ok();
         } else {
-            return R.error("非法请求，请求类型不是商户");
+            return R.error("非法请求，请求类型不是商户"+userName);
         }
 
+    }
+
+    /**
+     * 统计高级代理所得总额
+     *
+     * @param agentName 高级代理
+     * @param submit    申请金额
+     */
+    private void countAgentMoney(String agentName, BigDecimal submit) {
+        UserAmountEntity agent = amountService.getUserAmountByUserName(agentName);
+        if (agent == null) {
+            agent = new UserAmountEntity();
+            agent.setAmount(new BigDecimal(0));
+        }
+        agent.setUserName(agentName);
+        agent.setAmount(agent.getAmount().add(submit));
+        amountService.saveOrUpdate(agent);
     }
 
     /**
      * 介绍人的所得额度 = 高级代理所得额度 * 介绍人的rate
      *
      * @param salesmanName 介绍人
-     * @param agentName      高级代理的id
+     * @param agentName    高级代理的id
      * @param agentMoney   高级代理所得利润
      */
     private void countSalesmanRate(String salesmanName, String agentName, BigDecimal agentMoney) {
         String salesmanRate = rateEntityService.getUserRateByUserName(salesmanName);
         UserAmountEntity salesman = amountService.getUserAmountByUserName(salesmanName);
-        if(salesman == null){
+        if (salesman == null) {
             salesman = new UserAmountEntity();
             salesman.setAmount(new BigDecimal(0));
         }
@@ -218,13 +258,13 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * 商户的所得额度 = 申请金额 - 高级代理所得额度
      *
      * @param userName   商户
-     * @param agentName    高级代理
+     * @param agentName  高级代理
      * @param amount     订单申请金额
      * @param agentMoney 高级代理所得利润
      */
     private void countUserRate(String userName, String agentName, BigDecimal amount, BigDecimal agentMoney) {
         UserAmountEntity user = amountService.getUserAmountByUserName(userName);
-        if(user == null){
+        if (user == null) {
             user = new UserAmountEntity();
             user.setAmount(new BigDecimal(0));
         }
@@ -233,6 +273,20 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         BigDecimal userNow = amount.subtract(agentMoney);
         user.setAmount(userNow.add(user.getAmount()));
         amountService.saveOrUpdate(user);
+    }
+
+    /**
+     * 校验外部订单是否已经创建过
+     *
+     * @param outerOrderId
+     * @return
+     */
+    private boolean outerOrderIdIsOnly(String outerOrderId) {
+        String orderId = baseMapper.queryOrderByOuterOrderId(outerOrderId);
+        if (StringUtils.isNotBlank(orderId)) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -249,19 +303,20 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         String agentName = (String) checkParam.get(BaseConstant.AGENT_NAME);
         //校验用户通道是否存在
         if (!channelIsOpen(payType, userName)) {
-            return R.error("通道未定义，或用户无此通道权限");
+            throw new RRException("通道未定义，或用户无此通道权限,用户为：" + userName);
         }
         //查询用户对应的商户
         String businessCode = businessEntityService.queryBusinessCodeByUserName(userName);
         if (StringUtils.isBlank(businessCode)) {
-            return R.error("该用户无对应商户信息");
+            throw new RRException(userName + "用户无对应商户信息");
+        }
+        if (!outerOrderIdIsOnly(outerOrderId)) {
+            throw new RRException("该订单已经创建过，无需重复创建" + outerOrderId);
         }
         String orderId = generateOrderId();
         OrderInfoEntity order = new OrderInfoEntity();
-
         order.setOrderId(orderId);
         order.setOuterOrderId(outerOrderId);
-        //order.setUserId(userId);
         order.setUserName(userName);
         order.setBusinessCode(businessCode);
         order.setSubmitAmount(BigDecimal.valueOf(Long.valueOf(submitAmount)));
@@ -275,7 +330,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         this.save(order);
         //统计商户和介绍人的收入
         R r = countAmount(userName, submitAmount);
-        if(!BaseConstant.CHECK_PARAM_SUCCESS.equals(r.get(BaseConstant.CODE))){
+        if (!BaseConstant.CHECK_PARAM_SUCCESS.equals(r.get(BaseConstant.CODE))) {
             return r;
         }
         //请求挂马平台
@@ -290,8 +345,17 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * @throws Exception
      */
     private void requestSupport(OrderInfoEntity order) throws Exception {
+        //转账
         if (order.getPayType().equals(BaseConstant.ALI_PAY)) {
-            aliPayCallBack(order);
+            aliPayCallBack(order,aliPayUrl);
+        }
+        //云闪付
+        if(order.getPayType().equals(BaseConstant.REQUEST_YSF)){
+
+        }
+        //转卡
+        if(order.getPayType().equals(BaseConstant.REQUEST_BANK)){
+
         }
     }
 
@@ -314,23 +378,13 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         return true;
     }
 
-
     /**
      * 请求挂马后台，生成付款页面
      * 回调挂马平台的地址，从数据字典中获取
      */
-    private void aliPayCallBack(OrderInfoEntity order) throws Exception {
+    private void aliPayCallBack(OrderInfoEntity order,String url) throws Exception {
         AliPayCallBackParam param = new AliPayCallBackParam();
         param.setSign(sign(order));
-        //获取挂马平台的地址
-        List<DictModel> aliPayUrl = dictService.queryDictItemsByCode(BaseConstant.ALIPAY_URL);
-        if (CollectionUtils.isEmpty(aliPayUrl)) {
-            throw new RRException("未配置回调地址，请联系管理员配置回调地址");
-        }
-        String url = null;
-        for (DictModel dict : aliPayUrl) {
-            url = dict.getValue();
-        }
         if (StringUtils.isBlank(url)) {
             throw new RRException("未配置回调地址，请联系管理员配置回调地址");
         }

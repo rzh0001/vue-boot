@@ -29,4 +29,6 @@ public interface IOrderInfoEntityService extends IService<OrderInfoEntity> {
     R callback(JSONObject reqobj, HttpServletRequest req);
 
     OrderInfoEntity queryOrderInfoByOrderId(String orderId);
+
+
 }
