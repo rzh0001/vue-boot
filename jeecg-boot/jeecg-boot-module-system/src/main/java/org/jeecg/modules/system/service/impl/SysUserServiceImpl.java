@@ -1,19 +1,23 @@
 package org.jeecg.modules.system.service.impl;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.constant.CacheConstant;
 import org.jeecg.common.constant.CommonConstant;
+import org.jeecg.common.constant.PayConstant;
 import org.jeecg.common.system.api.ISysBaseAPI;
 import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.system.vo.SysUserCacheInfo;
+import org.jeecg.common.util.PasswordUtil;
 import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.system.entity.*;
 import org.jeecg.modules.system.mapper.*;
+import org.jeecg.modules.system.service.ISysRoleService;
 import org.jeecg.modules.system.service.ISysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -21,12 +25,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-
-import lombok.extern.slf4j.Slf4j;
+import java.util.*;
 
 /**
  * <p>
@@ -44,6 +43,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 	private SysUserMapper userMapper;
 	@Autowired
 	private SysPermissionMapper sysPermissionMapper;
+	@Autowired
+	private ISysRoleService sysRoleService;
 	@Autowired
 	private SysUserRoleMapper sysUserRoleMapper;
 	@Autowired
@@ -244,7 +245,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 			return result;
 		}
 		//情况2：根据用户信息查询，该用户已注销
-		if (CommonConstant.DEL_FLAG_1.toString().equals(sysUser.getDelFlag())) {
+		if (CommonConstant.DELETED_FLAG.toString().equals(sysUser.getDelFlag())) {
 			sysBaseAPI.addLog("用户登录失败，用户名:" + sysUser.getUsername() + "已注销！", CommonConstant.LOG_TYPE_1, null);
 			result.error500("该用户已注销");
 			return result;
@@ -256,5 +257,35 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 			return result;
 		}
 		return result;
+	}
+	
+	@Override
+	public void addPayMember(SysUser user, String memberType) {
+		user.setCreateTime(new Date());
+		user.setSalt(oConvertUtils.randomGen(8));
+		String passwordEncode = PasswordUtil.encrypt(user.getUsername(), user.getPassword(), user.getSalt());
+		user.setPassword(passwordEncode);
+		user.setStatus(CommonConstant.USER_UNFREEZE);
+		user.setDelFlag(CommonConstant.NOT_DELETE_FLAG);
+		user.setMemberType(PayConstant.MEMBER_TYPE_AGENT);
+		String roleCode = "";
+		switch (memberType) {
+			case PayConstant.MEMBER_TYPE_AGENT:
+				roleCode = PayConstant.ROLE_CODE_AGENT;
+				break;
+			case PayConstant.MEMBER_TYPE_SALESMAN:
+				roleCode = PayConstant.ROLE_CODE_SALESMAN;
+				break;
+			case PayConstant.MEMBER_TYPE_MEMBER:
+				roleCode = PayConstant.ROLE_CODE_MEMBER;
+				break;
+			default:
+		}
+		SysRole role = sysRoleService.getOne(new LambdaQueryWrapper<SysRole>().eq(SysRole::getRoleCode, roleCode));
+		Optional<SysRole> opt = Optional.ofNullable(role);
+		if (!opt.isPresent()) {
+//			result.fail("支付平台角色配置出错！");
+		}
+		this.addUserWithRole(user, opt.get().getId());
 	}
 }

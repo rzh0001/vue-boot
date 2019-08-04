@@ -15,12 +15,12 @@ public interface CommonConstant {
 	/**
 	 * 删除标志
 	 */
-	public static final Integer DEL_FLAG_1 = 1;
+    public static final String DELETED_FLAG = "1";
 
 	/**
 	 * 未删除
 	 */
-	public static final Integer DEL_FLAG_0 = 0;
+    public static final String NOT_DELETE_FLAG = "0";
 
 	/**
 	 * 系统日志类型： 登录

@@ -1,8 +1,6 @@
 package org.jeecg.modules.system.controller;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -39,7 +37,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -77,7 +74,7 @@ public class SysAnnouncementController {
 									  @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 									  HttpServletRequest req) {
 		Result<IPage<SysAnnouncement>> result = new Result<IPage<SysAnnouncement>>();
-		sysAnnouncement.setDelFlag(CommonConstant.DEL_FLAG_0.toString());
+		sysAnnouncement.setDelFlag(CommonConstant.NOT_DELETE_FLAG.toString());
 		QueryWrapper<SysAnnouncement> queryWrapper = new QueryWrapper<SysAnnouncement>(sysAnnouncement);
 		Page<SysAnnouncement> page = new Page<SysAnnouncement>(pageNo,pageSize);
 		//排序逻辑 处理
@@ -109,7 +106,7 @@ public class SysAnnouncementController {
 	public Result<SysAnnouncement> add(@RequestBody SysAnnouncement sysAnnouncement) {
 		Result<SysAnnouncement> result = new Result<SysAnnouncement>();
 		try {
-			sysAnnouncement.setDelFlag(CommonConstant.DEL_FLAG_0.toString());
+			sysAnnouncement.setDelFlag(CommonConstant.NOT_DELETE_FLAG.toString());
 			sysAnnouncement.setSendStatus(CommonSendStatus.UNPUBLISHED_STATUS_0);//未发布
 			sysAnnouncementService.saveAnnouncement(sysAnnouncement);
 			result.success("添加成功！");
@@ -154,7 +151,7 @@ public class SysAnnouncementController {
 		if(sysAnnouncement==null) {
 			result.error500("未找到对应实体");
 		}else {
-			sysAnnouncement.setDelFlag(CommonConstant.DEL_FLAG_1.toString());
+			sysAnnouncement.setDelFlag(CommonConstant.DELETED_FLAG.toString());
 			boolean ok = sysAnnouncementService.updateById(sysAnnouncement);
 			if(ok) {
 				result.success("删除成功!");
@@ -178,7 +175,7 @@ public class SysAnnouncementController {
 			String[] id = ids.split(",");
 			for(int i=0;i<id.length;i++) {
 				SysAnnouncement announcement = sysAnnouncementService.getById(id[i]);
-				announcement.setDelFlag(CommonConstant.DEL_FLAG_1.toString());
+				announcement.setDelFlag(CommonConstant.DELETED_FLAG.toString());
 				sysAnnouncementService.updateById(announcement);
 			}
 			result.success("删除成功!");
@@ -266,7 +263,7 @@ public class SysAnnouncementController {
 		Collection<String> anntIds = sysAnnouncementSendService.queryByUserId(userId);
 		LambdaQueryWrapper<SysAnnouncement> querySaWrapper = new LambdaQueryWrapper<SysAnnouncement>();
 		querySaWrapper.eq(SysAnnouncement::getMsgType,CommonConstant.MSG_TYPE_ALL); // 全部人员
-		querySaWrapper.eq(SysAnnouncement::getDelFlag,CommonConstant.DEL_FLAG_0.toString());  // 未删除
+		querySaWrapper.eq(SysAnnouncement::getDelFlag,CommonConstant.NOT_DELETE_FLAG.toString());  // 未删除
 		querySaWrapper.eq(SysAnnouncement::getSendStatus, CommonConstant.HAS_SEND); //已发布
 		if(anntIds!=null&&anntIds.size()>0) {
 			querySaWrapper.notIn(SysAnnouncement::getId, anntIds);
@@ -340,7 +337,7 @@ public class SysAnnouncementController {
                 List<SysAnnouncement> listSysAnnouncements = ExcelImportUtil.importExcel(file.getInputStream(), SysAnnouncement.class, params);
                 for (SysAnnouncement sysAnnouncementExcel : listSysAnnouncements) {
                 	if(sysAnnouncementExcel.getDelFlag()==null){
-                		sysAnnouncementExcel.setDelFlag(CommonConstant.DEL_FLAG_0.toString());
+                		sysAnnouncementExcel.setDelFlag(CommonConstant.NOT_DELETE_FLAG.toString());
 					}
                     sysAnnouncementService.save(sysAnnouncementExcel);
                 }

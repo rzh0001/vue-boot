@@ -65,6 +65,9 @@
     <!-- 操作按钮区域 -->
     <div class="table-operator" style="border-top: 5px">
       <a-button @click="handleAdd" v-has="'user:add'" type="primary" icon="plus">添加用户</a-button>
+      <a-button @click="handleAddAgent" v-has="'user:addAgent'" type="primary" icon="plus">添加代理</a-button>
+      <a-button @click="handleAddSalesman" v-has="'user:addSalesma'" type="primary" icon="plus">添加介绍人</a-button>
+      <a-button @click="handleAddMember" v-has="'user:addMember'" type="primary" icon="plus">添加商户</a-button>
       <a-button type="primary" icon="download" @click="handleExportXls('用户信息')">导出</a-button>
       <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl" @change="handleImportExcel">
         <a-button type="primary" icon="import">导入</a-button>
@@ -166,6 +169,8 @@
 
     <user-modal ref="modalForm" @ok="modalFormOk"></user-modal>
 
+    <user-agent-modal ref="agentModalForm" @ok="modalFormOk"></user-agent-modal>
+
     <password-modal ref="passwordmodal" @ok="passwordModalOk"></password-modal>
 
     <sys-user-agent-modal ref="sysUserAgentModal"></sys-user-agent-modal>
@@ -174,6 +179,7 @@
 
 <script>
   import UserModal from './modules/UserModal'
+  import UserAgentModal from './modules/UserAgentModal'
   import PasswordModal from './modules/PasswordModal'
   import {putAction} from '@/api/manage';
   import {frozenBatch} from '@/api/api'
@@ -186,6 +192,7 @@
     components: {
       SysUserAgentModal,
       UserModal,
+      UserAgentModal,
       PasswordModal
     },
     data() {
@@ -216,25 +223,36 @@
             dataIndex: 'realname',
           },
           {
-            title: '头像',
+            title: '会员类型',
             align: "center",
             width: 120,
-            dataIndex: 'avatar',
-            scopedSlots: {customRender: "avatarslot"}
+            dataIndex: 'memberType',
+            key: 'memberType',
+            customRender: function(text) {
+              if (text == 1) {
+                return '代理'
+              } else if (text == 2) {
+                return '介绍人'
+              } else if (text == 3) {
+                return '商户'
+              } else {
+                return text
+              }
+            }
           },
 
           {
-            title: '性别',
+            title: '上级代理',
             align: "center",
             width: 80,
-            dataIndex: 'sex_dictText',
+            dataIndex: 'agentRealname',
             sorter: true
           },
           {
-            title: '生日',
+            title: '介绍人',
             align: "center",
             width: 180,
-            dataIndex: 'birthday'
+            dataIndex: 'salesmanRealname'
           },
           {
             title: '手机号码',
@@ -316,6 +334,11 @@
             }
           });
         }
+      },
+      handleAddAgent: function () {
+        this.$refs.agentModalForm.add();
+        this.$refs.agentModalForm.title = "新增代理";
+        this.$refs.agentModalForm.disableSubmit = false;
       },
       handleMenuClick(e) {
         if (e.key == 1) {

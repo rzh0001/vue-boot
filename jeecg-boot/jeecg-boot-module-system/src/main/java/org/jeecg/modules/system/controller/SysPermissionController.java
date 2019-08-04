@@ -70,7 +70,7 @@ public class SysPermissionController {
 		Result<List<SysPermissionTree>> result = new Result<>();
 		try {
 			LambdaQueryWrapper<SysPermission> query = new LambdaQueryWrapper<SysPermission>();
-			query.eq(SysPermission::getDelFlag, CommonConstant.DEL_FLAG_0);
+			query.eq(SysPermission::getDelFlag, CommonConstant.NOT_DELETE_FLAG);
 			query.orderByAsc(SysPermission::getSortNo);
 			List<SysPermission> list = sysPermissionService.list(query);
 			List<SysPermissionTree> treeList = new ArrayList<>();
@@ -128,7 +128,7 @@ public class SysPermissionController {
 			this.getAuthJsonArray(authjsonArray, metaList);
 			//查询所有的权限
 			LambdaQueryWrapper<SysPermission> query = new LambdaQueryWrapper<SysPermission>();
-			query.eq(SysPermission::getDelFlag, CommonConstant.DEL_FLAG_0);
+			query.eq(SysPermission::getDelFlag, CommonConstant.NOT_DELETE_FLAG);
 			query.eq(SysPermission::getMenuType, CommonConstant.MENU_TYPE_2);
 			//query.eq(SysPermission::getStatus, "1");
 			List<SysPermission> allAuthList = sysPermissionService.list(query);
@@ -245,7 +245,7 @@ public class SysPermissionController {
 		List<String> ids = new ArrayList<>();
 		try {
 			LambdaQueryWrapper<SysPermission> query = new LambdaQueryWrapper<SysPermission>();
-			query.eq(SysPermission::getDelFlag, CommonConstant.DEL_FLAG_0);
+			query.eq(SysPermission::getDelFlag, CommonConstant.NOT_DELETE_FLAG);
 			query.orderByAsc(SysPermission::getSortNo);
 			List<SysPermission> list = sysPermissionService.list(query);
 			for (SysPermission sysPer : list) {

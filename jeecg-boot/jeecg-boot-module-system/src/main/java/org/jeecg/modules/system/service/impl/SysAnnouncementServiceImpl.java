@@ -108,7 +108,7 @@ public class SysAnnouncementServiceImpl extends ServiceImpl<SysAnnouncementMappe
 		announcement.setMsgType(CommonConstant.MSG_TYPE_ALL);
 		announcement.setSendStatus(CommonConstant.HAS_SEND);
 		announcement.setSendTime(new Date());
-		announcement.setDelFlag(CommonConstant.DEL_FLAG_0.toString());
+		announcement.setDelFlag(CommonConstant.NOT_DELETE_FLAG.toString());
 		sysAnnouncementMapper.insert(announcement);
 	}
 

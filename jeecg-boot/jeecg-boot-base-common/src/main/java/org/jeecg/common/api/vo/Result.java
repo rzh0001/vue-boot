@@ -1,10 +1,11 @@
 package org.jeecg.common.api.vo;
 
-import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import org.jeecg.common.constant.CommonConstant;
 import lombok.Data;
+import org.jeecg.common.constant.CommonConstant;
+
+import java.io.Serializable;
 
 /**
  *   接口返回数据格式
@@ -63,6 +64,13 @@ public class Result<T> implements Serializable {
 		this.message = message;
 		this.code = CommonConstant.SC_OK_200;
 		this.success = true;
+		return this;
+	}
+	
+	public Result<T> fail(String message) {
+		this.message = "操作失败，" + message;
+		this.code = CommonConstant.SC_INTERNAL_SERVER_ERROR_500;
+		this.success = false;
 		return this;
 	}
 	

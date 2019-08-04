@@ -1,19 +1,16 @@
 package org.jeecg.modules.system.entity;
 
-import java.io.Serializable;
-import java.util.Date;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.TableField;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.jeecgframework.poi.excel.annotation.Excel;
+import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  * @Description: 用户表
@@ -106,10 +103,7 @@ public class SysUser {
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "更新时间")
 	private java.util.Date updateTime;
-	/**userId*/
-	@Excel(name = "userId", width = 15)
-    @ApiModelProperty(value = "userId")
-	private java.lang.String userId;
+	
 	/**会员类型(1：代理  2：介绍人 3：商户）*/
 	@Excel(name = "会员类型(1：代理  2：介绍人 3：商户）", width = 15)
     @ApiModelProperty(value = "会员类型(1：代理  2：介绍人 3：商户）")
@@ -152,7 +146,7 @@ public class SysUser {
 	private java.lang.String googleSecretKey;
 	/**支付密码*/
 	@Excel(name = "支付密码", width = 15)
-    @ApiModelProperty(value = "支付密码")
+	@ApiModelProperty(value = "支付密码")
 	private java.lang.String paymentPassword;
 	/**IP白名单开关*/
 	@Excel(name = "IP白名单开关", width = 15)

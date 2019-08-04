@@ -12,7 +12,7 @@ File Encoding         : 65001
 
 Date: 2019-07-05 15:05:59
 */
-use jeecgboot;
+use jeecgboot2;
 SET FOREIGN_KEY_CHECKS=0;
 
 -- ----------------------------
