@@ -891,8 +891,6 @@ public class SysUserController {
     @RequiresPermissions("user:addAgent")
     public Result<SysUser> addAgent(@RequestBody JSONObject jsonObject) {
         Result<SysUser> result = new Result<SysUser>();
-        String selectedRoles = jsonObject.getString("selectedroles");
-        String selectedDeparts = jsonObject.getString("selecteddeparts");
         try {
             SysUser user = JSON.parseObject(jsonObject.toJSONString(), SysUser.class);
             sysUserService.addPayMember(user, PayConstant.MEMBER_TYPE_AGENT);
@@ -903,5 +901,57 @@ public class SysUserController {
         }
         return result;
     }
-	
+    
+    @RequestMapping(value = "/addMember", method = RequestMethod.POST)
+    @RequiresPermissions("user:addMember")
+    public Result<SysUser> addMember(@RequestBody JSONObject jsonObject) {
+        jsonObject.get("s");
+        
+        Result<SysUser> result = new Result<SysUser>();
+        try {
+            SysUser user = JSON.parseObject(jsonObject.toJSONString(), SysUser.class);
+            sysUserService.addPayMember(user, PayConstant.MEMBER_TYPE_MEMBER);
+            result.success("添加成功！");
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            result.error500("操作失败");
+        }
+        return result;
+    }
+    
+    @RequestMapping(value = "/addSalesman", method = RequestMethod.POST)
+    @RequiresPermissions("user:addSalesman")
+    public Result<SysUser> addSalesman(@RequestBody JSONObject jsonObject) {
+        jsonObject.get("s");
+        Result<SysUser> result = new Result<SysUser>();
+        try {
+            SysUser user = JSON.parseObject(jsonObject.toJSONString(), SysUser.class);
+            sysUserService.addPayMember(user, PayConstant.MEMBER_TYPE_SALESMAN);
+            result.success("添加成功！");
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            result.error500("操作失败");
+        }
+        return result;
+    }
+    
+    @RequestMapping(value = "/querySalesmanByAgent", method = RequestMethod.GET)
+    public Result<List<SysUser>> querySalesmanByAgent(@RequestParam(name = "userid", required = false) String userid) {
+        Result<List<SysUser>> result = new Result<>();
+        LoginUser optUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+        
+        List<SysUser> list =
+                sysUserService.list(
+                        new QueryWrapper<SysUser>()
+                                .lambda()
+                                .eq(SysUser::getAgentId, optUser.getId())
+                                .eq(SysUser::getMemberType, PayConstant.MEMBER_TYPE_SALESMAN)
+                                .eq(SysUser::getDelFlag, CommonConstant.NOT_DELETE_FLAG));
+        
+        result.setResult(list);
+        result.setSuccess(true);
+        
+        return result;
+    }
+    
 }

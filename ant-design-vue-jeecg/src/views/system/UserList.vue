@@ -66,7 +66,7 @@
     <div class="table-operator" style="border-top: 5px">
       <a-button @click="handleAdd" v-has="'user:add'" type="primary" icon="plus">添加用户</a-button>
       <a-button @click="handleAddAgent" v-has="'user:addAgent'" type="primary" icon="plus">添加代理</a-button>
-      <a-button @click="handleAddSalesman" v-has="'user:addSalesma'" type="primary" icon="plus">添加介绍人</a-button>
+      <a-button @click="handleAddSalesman" v-has="'user:addSalesman'" type="primary" icon="plus">添加介绍人</a-button>
       <a-button @click="handleAddMember" v-has="'user:addMember'" type="primary" icon="plus">添加商户</a-button>
       <a-button type="primary" icon="download" @click="handleExportXls('用户信息')">导出</a-button>
       <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl" @change="handleImportExcel">
@@ -170,6 +170,8 @@
     <user-modal ref="modalForm" @ok="modalFormOk"></user-modal>
 
     <user-agent-modal ref="agentModalForm" @ok="modalFormOk"></user-agent-modal>
+    <user-salesman-modal ref="salesmanModalForm" @ok="modalFormOk"></user-salesman-modal>
+    <user-member-modal ref="memberModalForm" @ok="modalFormOk"></user-member-modal>
 
     <password-modal ref="passwordmodal" @ok="passwordModalOk"></password-modal>
 
@@ -180,6 +182,8 @@
 <script>
   import UserModal from './modules/UserModal'
   import UserAgentModal from './modules/UserAgentModal'
+  import UserSalesmanModal from './modules/UserSalesmanModal'
+  import UserMemberModal from './modules/UserMemberModal'
   import PasswordModal from './modules/PasswordModal'
   import {putAction} from '@/api/manage';
   import {frozenBatch} from '@/api/api'
@@ -193,6 +197,8 @@
       SysUserAgentModal,
       UserModal,
       UserAgentModal,
+      UserSalesmanModal,
+      UserMemberModal,
       PasswordModal
     },
     data() {
@@ -339,6 +345,16 @@
         this.$refs.agentModalForm.add();
         this.$refs.agentModalForm.title = "新增代理";
         this.$refs.agentModalForm.disableSubmit = false;
+      },
+      handleAddSalesman: function () {
+        this.$refs.salesmanModalForm.add();
+        this.$refs.salesmanModalForm.title = "新增介绍人";
+        this.$refs.salesmanModalForm.disableSubmit = false;
+      },
+      handleAddMember: function () {
+        this.$refs.memberModalForm.add();
+        this.$refs.memberModalForm.title = "新增商户";
+        this.$refs.memberModalForm.disableSubmit = false;
       },
       handleMenuClick(e) {
         if (e.key == 1) {

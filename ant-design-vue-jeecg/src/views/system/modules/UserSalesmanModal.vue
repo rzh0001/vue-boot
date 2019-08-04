@@ -105,10 +105,18 @@
         <a-input placeholder="请输入手机号码" :disabled="isDisabledAuth('user:form:phone')" v-decorator="[ 'phone', validatorRules.phone]" />
       </a-form-item>
 
-        <a-form-item label="单笔金额限制" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input placeholder="请输入下限" :disabled="isDisabledAuth('user:form:lowerLimit')" v-decorator="[ 'lowerLimit']" />
-          <a-input placeholder="请输入上限" :disabled="isDisabledAuth('user:form:upperLimit')" v-decorator="[ 'upperLimit']" />
-        </a-form-item>
+
+<!--        <a-form-item label="所属介绍人" :labelCol="labelCol" :wrapperCol="wrapperCol" v-show="!salesmanDisabled" >-->
+<!--          <a-select-->
+<!--            mode="single"-->
+<!--            style="width: 100%"-->
+<!--            placeholder="请选择商户介绍人"-->
+<!--            v-model="selectedSalesman">-->
+<!--            <a-select-option v-for="(user,userindex) in salesmanList" :key="userindex.toString()" :value="user.id">-->
+<!--              {{ user.realname }}-->
+<!--            </a-select-option>-->
+<!--          </a-select>-->
+<!--        </a-form-item>-->
 
         <a-form-item label="手机号码" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input placeholder="请输入手机号码" :disabled="isDisabledAuth('user:form:phone')" v-decorator="[ 'phone', validatorRules.phone]" />
@@ -143,12 +151,12 @@
   import departWindow from './DepartWindow'
   import { ACCESS_TOKEN } from "@/store/mutation-types"
   import { getAction } from '@/api/manage'
-  import {addUser,addAgentUser,editUser,queryUserRole,queryall } from '@/api/api'
+  import {addUser,addSalesmanUser,editUser,queryUserRole,queryall } from '@/api/api'
   import { disabledAuthFilter } from "@/utils/authFilter"
   import {duplicateCheck } from '@/api/api'
 
   export default {
-    name: "RoleModal",
+    name: "UserSalesmanModal",
     components: {
       departWindow,
     },
@@ -207,6 +215,8 @@
         model: {},
         roleList:[],
         selectedRole:[],
+        selesmanList:[],
+        selectedSelesman:[],
         labelCol: {
           xs: { span: 24 },
           sm: { span: 5 },
@@ -361,7 +371,7 @@
             let obj;
             if(!this.model.id){
               formData.id = this.userId;
-              obj=addAgentUser(formData);
+              obj=addSalesmanUser(formData);
             }else{
               obj=editUser(formData);
             }

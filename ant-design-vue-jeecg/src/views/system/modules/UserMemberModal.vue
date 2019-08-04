@@ -97,17 +97,29 @@
 <!--          </a-select>-->
 <!--        </a-form-item>-->
 
-        <a-form-item label="邮箱" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input placeholder="请输入邮箱" v-decorator="[ 'email', validatorRules.email]" />
-        </a-form-item>
+<!--        <a-form-item label="邮箱" :labelCol="labelCol" :wrapperCol="wrapperCol">-->
+<!--          <a-input placeholder="请输入邮箱" v-decorator="[ 'email', validatorRules.email]" />-->
+<!--        </a-form-item>-->
 
-        <a-form-item label="手机号码" :labelCol="labelCol" :wrapperCol="wrapperCol">
-        <a-input placeholder="请输入手机号码" :disabled="isDisabledAuth('user:form:phone')" v-decorator="[ 'phone', validatorRules.phone]" />
-      </a-form-item>
+<!--        <a-form-item label="手机号码" :labelCol="labelCol" :wrapperCol="wrapperCol">-->
+<!--        <a-input placeholder="请输入手机号码" :disabled="isDisabledAuth('user:form:phone')" v-decorator="[ 'phone', validatorRules.phone]" />-->
+<!--      </a-form-item>-->
 
         <a-form-item label="单笔金额限制" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input placeholder="请输入下限" :disabled="isDisabledAuth('user:form:lowerLimit')" v-decorator="[ 'lowerLimit']" />
           <a-input placeholder="请输入上限" :disabled="isDisabledAuth('user:form:upperLimit')" v-decorator="[ 'upperLimit']" />
+        </a-form-item>
+
+        <a-form-item label="所属介绍人" :labelCol="labelCol" :wrapperCol="wrapperCol" v-show="!salesmanDisabled" >
+          <a-select
+            mode="single"
+            style="width: 100%"
+            placeholder="请选择商户介绍人"
+            v-model="selectedSalesman">
+            <a-select-option v-for="(user,userindex) in salesmanList" :key="userindex.toString()" :value="user.id">
+              {{ user.realname }}
+            </a-select-option>
+          </a-select>
         </a-form-item>
 
         <a-form-item label="手机号码" :labelCol="labelCol" :wrapperCol="wrapperCol">
@@ -143,12 +155,12 @@
   import departWindow from './DepartWindow'
   import { ACCESS_TOKEN } from "@/store/mutation-types"
   import { getAction } from '@/api/manage'
-  import {addUser,addAgentUser,editUser,queryUserRole,queryall } from '@/api/api'
+  import {addUser,addMemberUser,editUser,queryUserRole,queryall,querySalesmanByAgent } from '@/api/api'
   import { disabledAuthFilter } from "@/utils/authFilter"
   import {duplicateCheck } from '@/api/api'
 
   export default {
-    name: "RoleModal",
+    name: "UserMemberModal",
     components: {
       departWindow,
     },
@@ -156,6 +168,7 @@
       return {
         departDisabled: false, //是否是我的部门调用该页面
         roleDisabled: false, //是否是角色维护调用该页面
+        salesmanDisabled: false, //是否是角色维护调用该页面
         modalWidth:800,
         drawerWidth:700,
         modaltoggleFlag:true,
@@ -207,6 +220,8 @@
         model: {},
         roleList:[],
         selectedRole:[],
+        salesmanList:[],
+        selectedSalesman:[],
         labelCol: {
           xs: { span: 24 },
           sm: { span: 5 },
@@ -261,6 +276,15 @@
           }
         });
       },
+      initialSalesmanList(){
+        querySalesmanByAgent({userid: ''}).then((res)=>{
+          if(res.success){
+            this.salesmanList = res.result;
+          }else{
+            console.log(res.message);
+          }
+        });
+      },
       loadUserRoles(userid){
         queryUserRole({userid:userid}).then((res)=>{
           if(res.success){
@@ -271,7 +295,7 @@
         });
       },
       loadSalesman(userid){
-        queryUserRole({userid:userid}).then((res)=>{
+        querySalesmanByMember({userid:userid}).then((res)=>{
           if(res.success){
             this.selectedSalesman = res.result;
           }else{
@@ -295,6 +319,7 @@
         this.resetScreenSize(); // 调用此方法,根据屏幕宽度自适应调整抽屉的宽度
         let that = this;
         that.initialRoleList();
+        that.initialSalesmanList();
         that.checkedDepartNameString = "";
         that.form.resetFields();
         if(record.hasOwnProperty("id")){
@@ -334,6 +359,7 @@
         this.visible = false;
         this.disableSubmit = false;
         this.selectedRole = [];
+        this.selectedSalesman = [];
         this.userDepartModel = {userId:'',departIdList:[]};
         this.checkedDepartNames = [];
         this.checkedDepartNameString='';
@@ -356,12 +382,15 @@
             }
             let formData = Object.assign(this.model, values);
             formData.avatar = avatar;
+            // formData.selectedroles = this.selectedRole.length>0?this.selectedRole.join(","):'';
+            formData.selectedSalesman = this.selectedSalesman.length>0?this.selectedSalesman.join(","):'';
+            formData.salesmanId = this.selectedSalesman;
 
             // that.addDepartsToUser(that,formData); // 调用根据当前用户添加部门信息的方法
             let obj;
             if(!this.model.id){
               formData.id = this.userId;
-              obj=addAgentUser(formData);
+              obj=addMemberUser(formData);
             }else{
               obj=editUser(formData);
             }

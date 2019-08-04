@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.SecurityUtils;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.constant.CacheConstant;
 import org.jeecg.common.constant.CommonConstant;
@@ -267,7 +268,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 		user.setPassword(passwordEncode);
 		user.setStatus(CommonConstant.USER_UNFREEZE);
 		user.setDelFlag(CommonConstant.NOT_DELETE_FLAG);
-		user.setMemberType(PayConstant.MEMBER_TYPE_AGENT);
+		user.setMemberType(memberType);
+		
+		LoginUser optUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
 		String roleCode = "";
 		switch (memberType) {
 			case PayConstant.MEMBER_TYPE_AGENT:
@@ -275,9 +278,19 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 				break;
 			case PayConstant.MEMBER_TYPE_SALESMAN:
 				roleCode = PayConstant.ROLE_CODE_SALESMAN;
+				user.setAgentId(optUser.getId());
+				user.setAgentUsername(optUser.getUsername());
+				user.setAgentRealname(optUser.getRealname());
 				break;
 			case PayConstant.MEMBER_TYPE_MEMBER:
 				roleCode = PayConstant.ROLE_CODE_MEMBER;
+				user.setAgentId(optUser.getId());
+				user.setAgentUsername(optUser.getUsername());
+				user.setAgentRealname(optUser.getRealname());
+				
+				SysUser salesman = getById(user.getSalesmanId());
+				user.setSalesmanUsername(salesman.getUsername());
+				user.setSalesmanRealname(salesman.getRealname());
 				break;
 			default:
 		}

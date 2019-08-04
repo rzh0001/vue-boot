@@ -19,6 +19,7 @@ const addUser = (params)=>postAction("/sys/user/add",params);
 const addAgentUser = (params)=>postAction("/sys/user/addAgent",params);
 const addMemberUser = (params)=>postAction("/sys/user/addMember",params);
 const addSalesmanUser = (params)=>postAction("/sys/user/addSalesman",params);
+const querySalesmanByAgent = (params)=>getAction("/sys/user/querySalesmanByAgent",params);
 const editUser = (params)=>putAction("/sys/user/edit",params);
 const queryUserRole = (params)=>getAction("/sys/user/queryUserRole",params);
 const getUserList = (params)=>getAction("/sys/user/list",params);
@@ -139,6 +140,7 @@ export {
   queryUserRoleMap,
   duplicateCheck,
   queryTreeListForRole,
+  querySalesmanByAgent
 }
 
 
