@@ -46,12 +46,14 @@ public class BaseConstant {
     public static final String USER_REFERENCES = "2";
 
     //数据字典配置的挂马平台的地址
+    public static final String API_KEY = "apiKey";
     public static final String REQUEST_URL = "requestPay";
     public static final String REQUEST_YSF = "ysf";
     public static final String REQUEST_ZFB = "zfb";
     public static final String REQUEST_BANK = "bank";
     public static final String IP_WHITE_LIST= "ipWhiteList";
 
+    public static final String QUERY_ORDER_STATUS_URL = "queryOrderStatusUrl";
     //四方回调挂马平台的返回码
     public static final int SUCCESS = 200;
 

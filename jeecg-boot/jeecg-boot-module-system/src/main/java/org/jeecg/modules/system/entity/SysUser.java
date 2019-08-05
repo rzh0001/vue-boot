@@ -41,6 +41,10 @@ public class SysUser {
 	@Excel(name = "密码", width = 15)
     @ApiModelProperty(value = "密码")
 	private java.lang.String password;
+	/**密码*/
+	@Excel(name = "api密钥", width = 15)
+	@ApiModelProperty(value = "api密钥")
+	private java.lang.String apiKey;
 	/**md5密码盐*/
 	@Excel(name = "md5密码盐", width = 15)
     @ApiModelProperty(value = "md5密码盐")

@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
  * @Version: V1.0
  */
 public interface IOrderInfoEntityService extends IService<OrderInfoEntity> {
-    R createOrder(JSONObject reqobj);
+    R createOrder(JSONObject reqobj) throws Exception;
     /**
      * 查询订单信息
      * @param reqobj
@@ -26,7 +26,7 @@ public interface IOrderInfoEntityService extends IService<OrderInfoEntity> {
      * @param reqobj
      * @return
      */
-    R callback(JSONObject reqobj, HttpServletRequest req);
+    R callback(JSONObject reqobj, HttpServletRequest req) throws Exception;
 
     OrderInfoEntity queryOrderInfoByOrderId(String orderId);
 

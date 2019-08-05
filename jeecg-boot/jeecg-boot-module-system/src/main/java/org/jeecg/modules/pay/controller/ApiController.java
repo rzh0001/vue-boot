@@ -36,7 +36,12 @@ public class ApiController {
     @RequestMapping(value = "/create", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     @ResponseBody
     public R create(@RequestBody JSONObject reqobj) {
-        return orderInfoService.createOrder(reqobj);
+        try {
+            return orderInfoService.createOrder(reqobj);
+        } catch (Exception e) {
+            log.info("创建订单异常，异常信息为：", e);
+            return R.error("创建订单异常");
+        }
     }
 
     /**
@@ -50,7 +55,12 @@ public class ApiController {
     @PostMapping(value = "/callback", produces = "application/json;charset=UTF-8")
     @ResponseBody
     public R callback(@RequestParam JSONObject reqobj, HttpServletRequest req) {
-        return orderInfoService.callback(reqobj, req);
+        try {
+            return orderInfoService.callback(reqobj, req);
+        } catch (Exception e) {
+            log.info("订单回调异常，异常信息为：", e);
+            return R.error("订单回调异常");
+        }
     }
 
 

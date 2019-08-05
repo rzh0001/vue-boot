@@ -36,11 +36,11 @@ import java.util.*;
  */
 @Slf4j
 @Service
-@Transactional
+@Transactional(rollbackFor = Exception.class)
 public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMapper, OrderInfoEntity> implements IOrderInfoEntityService {
 
     @Autowired
-    public  ISysDictService dictService;
+    public ISysDictService dictService;
     @Autowired
     private IChannelEntityService chnannelDao;
     @Autowired
@@ -57,12 +57,14 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     private IUserAmountEntityService amountService;
 
     private static OrderInfoEntityServiceImpl orderInfoEntityService;
-    private static  String aliPayUrl = null;
+    private static String aliPayUrl = null;
     private static String bankPayUrl = null;
     private static String ysfPayUrl = null;
+    private static String key = null;
+
     @PostConstruct
-    public void init(){
-        orderInfoEntityService=this;
+    public void init() {
+        orderInfoEntityService = this;
         orderInfoEntityService.dictService = this.dictService;
         List<DictModel> payUrl = dictService.queryDictItemsByCode(BaseConstant.REQUEST_URL);
         for (DictModel dict : payUrl) {
@@ -76,7 +78,14 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
                 ysfPayUrl = dict.getValue();
             }
         }
+        List<DictModel> apiKey = dictService.queryDictItemsByCode(BaseConstant.API_KEY);
+        for (DictModel k : apiKey) {
+            if ("key".equals(k.getText())) {
+                key = k.getValue();
+            }
+        }
     }
+
     /**
      * userName：商户
      * submitAmount： 支付金额
@@ -88,16 +97,11 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * @return
      */
     @Override
-    public R createOrder(JSONObject reqobj) {
-        try {
-            R checkParam = checkParam(reqobj, true);
-            if (BaseConstant.CHECK_PARAM_SUCCESS.equals(checkParam.get(BaseConstant.CODE).toString())) {
-                return addOrder(checkParam);
-            } else {
-                return R.error("创建订单异常");
-            }
-        } catch (Exception e) {
-            log.info("创建订单异常，异常信息为:{}", e);
+    public R createOrder(JSONObject reqobj) throws Exception {
+        R checkParam = checkParam(reqobj, true);
+        if (BaseConstant.CHECK_PARAM_SUCCESS.equals(checkParam.get(BaseConstant.CODE).toString())) {
+            return addOrder(checkParam);
+        } else {
             return R.error("创建订单异常");
         }
     }
@@ -137,34 +141,60 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * @return
      */
     @Override
-    public R callback(JSONObject reqobj, HttpServletRequest req) {
-        try {
-            //1
-            checkIp(req);
-            R checkParam = checkParam(reqobj, false);
-            if (BaseConstant.CHECK_PARAM_SUCCESS.equals(checkParam.get(BaseConstant.CODE).toString())) {
-                String orderId = (String) checkParam.get(BaseConstant.ORDER_ID);
-                //2
-                OrderInfoEntity order = queryOrderInfoByOrderId(orderId);
-                if (order == null) {
-                    return R.error("订单查询异常，无此订单信息");
-                }
-                String userName = (String) checkParam.get(BaseConstant.USER_NAME);
-                ChannelBusinessEntity channelBusiness =
-                        channelBusinessEntityService.queryChannelBusinessByUserName(userName);
-                //3
-                JSONObject callobj = encryptAESData(order, channelBusiness.getApiKey());
-                HttpResult result = HttpUtils.doPostJson(order.getSuccessCallbackUrl(), callobj.toJSONString());
-                return null;
-            } else {
-                return checkParam;
+    public R callback(JSONObject reqobj, HttpServletRequest req) throws Exception {
+        //1 校验ip是否来源于挂马平台
+        checkIp(req);
+        R checkParam = checkParam(reqobj, false);
+        if (BaseConstant.CHECK_PARAM_SUCCESS.equals(checkParam.get(BaseConstant.CODE).toString())) {
+            String orderId = (String) checkParam.get(BaseConstant.ORDER_ID);
+            String payType = (String) checkParam.get(BaseConstant.PAY_TYPE);
+            //2 校验订单状态 ，从挂马平台查询
+            if (!orderStatusOk(orderId, payType)) {
+                return R.error("订单查询异常，无此订单信息");
             }
-        } catch (Exception e) {
-            log.info("订单回调异常，异常信息为:{}", e);
-            return R.error("订单回调异常");
+            String userName = (String) checkParam.get(BaseConstant.USER_NAME);
+            //3 数据加密之后，通知下游商户
+            OrderInfoEntity order = queryOrderInfoByOrderId(orderId);
+            JSONObject callobj = encryptAESData(order, key);
+            HttpResult result = HttpUtils.doPostJson(order.getSuccessCallbackUrl(), callobj.toJSONString());
+            return null;
+        } else {
+            return checkParam;
         }
     }
 
+    /**
+     * 从挂马平台查询，订单状态
+     *
+     * @param orderId 订单号
+     * @param payType 支付通道类型
+     * @return
+     */
+    private boolean orderStatusOk(String orderId, String payType) throws Exception {
+        //通过支付通道从数据字典中获取要查询的地址
+        List<DictModel> queryOrderStatusUrls = dictService.queryDictItemsByCode(BaseConstant.QUERY_ORDER_STATUS_URL);
+        String url = null;
+        for (DictModel model : queryOrderStatusUrls) {
+            if (payType.equals(model.getText())) {
+                url = model.getValue();
+                break;
+            }
+        }
+        if (StringUtils.isBlank(url)) {
+            throw new RRException("未配置四方系统查询挂马平台的订单状态地址,单号：" + orderId + ";通道为：" + payType);
+        }
+        JSONObject data = new JSONObject();
+        data.put("id", orderId);
+
+        HttpResult result = HttpUtils.doPostJson(url, data.toJSONString());
+        if (result.getCode() == BaseConstant.SUCCESS) {
+            log.info("订单状态查询成功，订单号：{}", orderId);
+        } else {
+            log.info("订单状态查询失败，单号为：" + orderId);
+            return false;
+        }
+        return false;
+    }
 
     /**
      * * 校验商户信息
@@ -198,7 +228,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         //只有普通商户才有权限走单子
         if (user.getMemberType().equals(BaseConstant.USER_MERCHANTS)) {
             if (StringUtils.isBlank(user.getAgentUsername())) {
-                throw new RRException("非法请求，无对应的代理商户存在"+userName);
+                throw new RRException("非法请求，无对应的代理商户存在" + userName);
             } else {
                 //统计高级代理所得额度
                 countAgentMoney(user.getAgentUsername(), submit);
@@ -211,7 +241,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             }
             return R.ok();
         } else {
-            return R.error("非法请求，请求类型不是商户"+userName);
+            return R.error("非法请求，请求类型不是商户" + userName);
         }
 
     }
@@ -347,14 +377,14 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     private void requestSupport(OrderInfoEntity order) throws Exception {
         //转账
         if (order.getPayType().equals(BaseConstant.ALI_PAY)) {
-            aliPayCallBack(order,aliPayUrl);
+            aliPayCallBack(order, aliPayUrl);
         }
         //云闪付
-        if(order.getPayType().equals(BaseConstant.REQUEST_YSF)){
+        if (order.getPayType().equals(BaseConstant.REQUEST_YSF)) {
 
         }
         //转卡
-        if(order.getPayType().equals(BaseConstant.REQUEST_BANK)){
+        if (order.getPayType().equals(BaseConstant.REQUEST_BANK)) {
 
         }
     }
@@ -380,20 +410,34 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
 
     /**
      * 请求挂马后台，生成付款页面
-     * 回调挂马平台的地址，从数据字典中获取
+     * 支付宝转账
      */
-    private void aliPayCallBack(OrderInfoEntity order,String url) throws Exception {
+    private void aliPayCallBack(OrderInfoEntity order, String url) throws Exception {
         AliPayCallBackParam param = new AliPayCallBackParam();
+        param.setAccount_id(order.getUserName());
+        param.setContent_type("text");
+        param.setThoroughfare("alipay_auto");
+        param.setType("3");
+        param.setOut_trade_no(order.getOuterOrderId());
+        param.setRobin("2");
+        param.setKeyId("");
+        param.setAmount(order.getSubmitAmount().toString());
+        param.setCallback_url(order.getSuccessCallbackUrl());
         param.setSign(sign(order));
         if (StringUtils.isBlank(url)) {
             throw new RRException("未配置回调地址，请联系管理员配置回调地址");
         }
-        log.info("四方回调挂马平台，url:{};param:{}", url, JSON.toJSONString(param));
-        HttpResult result = HttpUtils.doPostJson(url, JSON.toJSONString(param));
-        if (result.getCode() == BaseConstant.SUCCESS) {
+        log.info("四方回调挂马平台，加密前数据，url:{};param:{}", url, JSON.toJSONString(param));
 
+        String data = AES128Util.encryptBase64(JSON.toJSONString(param), key);
+
+        log.info("四方回调挂马平台，加密后数据，url:{};param:{}", url, data);
+
+        HttpResult result = HttpUtils.doPostJson(url, data);
+        if (result.getCode() == BaseConstant.SUCCESS) {
+            log.info("四方回调挂马平台成功，订单号：{}", order.getOuterOrderId());
         } else {
-            throw new RRException("四方回调挂马平台失败");
+            throw new RRException("四方回调挂马平台失败,订单创建失败：" + order.getOuterOrderId());
         }
     }
 
@@ -428,7 +472,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     }
 
     /**
-     * 校验IP是否合法
+     * 校验ip是否是从挂马平台过来的
      * IP白名单从数据字典中获取
      *
      * @return
@@ -437,11 +481,13 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         String ip = IPUtils.getIpAddr(req);
         List<DictModel> ipWhiteList = dictService.queryDictItemsByCode(BaseConstant.IP_WHITE_LIST);
         List<String> ips = new ArrayList<>();
-        for (DictModel dictModel : ipWhiteList) {
-            ips.add(dictModel.getValue());
-        }
-        if (!ips.contains(ip)) {
-            return false;
+        if (!CollectionUtils.isEmpty(ipWhiteList)) {
+            for (DictModel dictModel : ipWhiteList) {
+                ips.add(dictModel.getValue());
+            }
+            if (!ips.contains(ip)) {
+                return false;
+            }
         }
         return true;
     }
@@ -475,13 +521,14 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         if (user == null) {
             return R.error("用户不存在");
         }
-        R decryptData = decryptData(data, userName, timestamp, sign);
+        R decryptData = decryptData(data, userName, timestamp, sign, user.getApiKey());
         if (BaseConstant.CHECK_PARAM_SUCCESS.equals(decryptData.get(BaseConstant.CODE).toString())) {
             JSONObject dataObj = (JSONObject) decryptData.get(BaseConstant.DECRYPT_DATA);
             if (!createOrder) {
                 return R.ok().put(BaseConstant.ORDER_ID, dataObj.getString(BaseConstant.ORDER_ID))
                         .put(BaseConstant.USER_NAME, dataObj.getString(BaseConstant.USER_NAME))
-                        .put(BaseConstant.AGENT_NAME, user.getAgentUsername());
+                        .put(BaseConstant.AGENT_NAME, user.getAgentUsername())
+                        .put(BaseConstant.PAY_TYPE, dataObj.getString(BaseConstant.PAY_TYPE));
             }
             return R.ok().put(BaseConstant.OUTER_ORDER_ID, dataObj.getString(BaseConstant.OUTER_ORDER_ID))
                     .put(BaseConstant.USER_NAME, dataObj.getString(BaseConstant.USER_NAME))
@@ -495,21 +542,23 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     }
 
     /**
-     * 解密数据
-     *
-     * @param data
+     * @param data      加密数据
+     * @param userName  商户
+     * @param timestamp 时间戳
+     * @param sign      签名 -》 MD5(userName+timestamp+data+apiKey)
+     * @param apiKey    商户密钥
      * @return
      * @throws Exception
      */
-    private R decryptData(String data, String userName, Long timestamp, String sign) throws Exception {
-        ChannelBusinessEntity channelBusiness = channelBusinessEntityService.queryChannelBusinessByUserName(userName);
+    private R decryptData(String data, String userName, Long timestamp, String sign, String apiKey) throws Exception {
         StringBuilder local = new StringBuilder();
-        local.append(userName).append(timestamp).append(data).append(channelBusiness.getApiKey());
+        local.append(userName).append(timestamp).append(data).append(apiKey);
         String localSgin = DigestUtils.md5Hex(local.toString());
         if (!localSgin.equals(sign)) {
             return R.error("签名验证不通过");
         }
-        String dataStr = AES128Util.decryptBase64(data, channelBusiness.getApiKey());
+        //解密
+        String dataStr = AES128Util.decryptBase64(data, apiKey);
         if (StringUtils.isBlank(dataStr)) {
             return R.error("数据解密出现异常");
         }
@@ -527,7 +576,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * @param aseKey
      * @return
      */
-    public JSONObject encryptAESData(OrderInfoEntity order, String aseKey) {
+    public JSONObject encryptAESData(OrderInfoEntity order, String aseKey) throws Exception {
         JSONObject callobj = new JSONObject();
         Long timestamp = System.currentTimeMillis();
         callobj.put(BaseConstant.ORDER_ID, order.getOrderId());

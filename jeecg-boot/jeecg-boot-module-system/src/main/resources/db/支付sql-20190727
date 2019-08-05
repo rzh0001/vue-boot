@@ -101,3 +101,4 @@ CREATE TABLE `sys_user_rate` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='用户在指定通道下的费率 ==》指定用户在不同通道下的费率';
 
+alter table sys_user ADD api_key VARCHAR(32) not null ;
