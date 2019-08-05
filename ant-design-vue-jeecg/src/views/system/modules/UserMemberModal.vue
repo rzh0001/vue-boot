@@ -383,8 +383,8 @@
             let formData = Object.assign(this.model, values);
             formData.avatar = avatar;
             // formData.selectedroles = this.selectedRole.length>0?this.selectedRole.join(","):'';
-            formData.selectedSalesman = this.selectedSalesman.length>0?this.selectedSalesman.join(","):'';
-            formData.salesmanId = this.selectedSalesman;
+            formData.salesmanId = this.selectedSalesman.length>0?this.selectedSalesman:'';
+            // formData.salesmanId = this.selectedSalesman;
 
             // that.addDepartsToUser(that,formData); // 调用根据当前用户添加部门信息的方法
             let obj;
