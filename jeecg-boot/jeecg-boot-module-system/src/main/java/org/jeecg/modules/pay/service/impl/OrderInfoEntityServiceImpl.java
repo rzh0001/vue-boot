@@ -98,7 +98,9 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      */
     @Override
     public R createOrder(JSONObject reqobj) throws Exception {
-        R checkParam = checkParam(reqobj, true);
+        String userName = reqobj.getString(BaseConstant.USER_NAME);
+        SysUser user = userService.getUserByName(userName);
+        R checkParam = checkParam(reqobj, true, false);
         if (BaseConstant.CHECK_PARAM_SUCCESS.equals(checkParam.get(BaseConstant.CODE).toString())) {
             return addOrder(checkParam);
         } else {
@@ -109,7 +111,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     @Override
     public R queryOrderInfo(JSONObject reqobj) {
         try {
-            R checkParam = checkParam(reqobj, false);
+            R checkParam = checkParam(reqobj, false, false);
             if (BaseConstant.CHECK_PARAM_SUCCESS.equals(checkParam.get(BaseConstant.CODE).toString())) {
                 String orderId = (String) checkParam.get(BaseConstant.ORDER_ID);
                 OrderInfoEntity order = queryOrderInfoByOrderId(orderId);
@@ -133,18 +135,24 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     }
 
     /**
-     * 1、校验IP是否合法
-     * 2、校验订单状态是否合法
-     * 3、回调商户 , 回调商户的数据需要加密
+     * 挂马 --> 四方
+     * <p>
+     * 1、校验IP是否合法；ip来源是否来自四方
+     * 2、校验订单状态是否合法；订单是否已经支付
+     * 3、回调商户;使用用户密钥加密后再进行回调
+     * 4、修改订单状态为已支付
      *
      * @param reqobj
      * @return
      */
     @Override
     public R callback(JSONObject reqobj, HttpServletRequest req) throws Exception {
+        String a = (String) req.getAttribute("data");
         //1 校验ip是否来源于挂马平台
-        checkIp(req);
-        R checkParam = checkParam(reqobj, false);
+        if (!checkIpOk(req)) {
+            throw new RRException("IP非法");
+        }
+        R checkParam = checkParam(reqobj, false, true);
         if (BaseConstant.CHECK_PARAM_SUCCESS.equals(checkParam.get(BaseConstant.CODE).toString())) {
             String orderId = (String) checkParam.get(BaseConstant.ORDER_ID);
             String payType = (String) checkParam.get(BaseConstant.PAY_TYPE);
@@ -152,12 +160,26 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             if (!orderStatusOk(orderId, payType)) {
                 return R.error("订单查询异常，无此订单信息");
             }
-            String userName = (String) checkParam.get(BaseConstant.USER_NAME);
             //3 数据加密之后，通知下游商户
+            String userName = (String) checkParam.get(BaseConstant.USER_NAME);
+            SysUser user = userService.getUserByName(userName);
             OrderInfoEntity order = queryOrderInfoByOrderId(orderId);
-            JSONObject callobj = encryptAESData(order, key);
+            JSONObject callobj = encryptAESData(order, user.getApiKey());
             HttpResult result = HttpUtils.doPostJson(order.getSuccessCallbackUrl(), callobj.toJSONString());
-            return null;
+            //4、修改订单状态
+            if (result.getCode() == BaseConstant.SUCCESS) {
+                CallBackResult callBackResult = JSONObject.parseObject(result.getBody(), CallBackResult.class);
+                if (callBackResult.getCode() == BaseConstant.SUCCESS) {
+                    updateOrderStatusSuccessByOrderId(orderId);
+                    return R.ok("通知商户成功，并且商户返回成功");
+                } else {
+                    updateOrderStatusNoBackByOrderId(orderId);
+                    return R.ok("通知商户失败");
+                }
+            } else {
+                updateOrderStatusNoBackByOrderId(orderId);
+                return R.ok("通知商户失败");
+            }
         } else {
             return checkParam;
         }
@@ -183,14 +205,21 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         if (StringUtils.isBlank(url)) {
             throw new RRException("未配置四方系统查询挂马平台的订单状态地址,单号：" + orderId + ";通道为：" + payType);
         }
-        JSONObject data = new JSONObject();
+        Map<String, String> data = new HashMap();
         data.put("id", orderId);
-
-        HttpResult result = HttpUtils.doPostJson(url, data.toJSONString());
-        if (result.getCode() == BaseConstant.SUCCESS) {
-            log.info("订单状态查询成功，订单号：{}", orderId);
+        String result = HttpUtils.doGet(url, data);
+        if (StringUtils.isNotBlank(result)) {
+            log.info("订单状态查询成功，返回信息为：{}", result);
+            QueryOrderStatusResult orderStatusResult = JSONObject.parseObject(result, QueryOrderStatusResult.class);
+            if (orderStatusResult != null && orderStatusResult.getCode() == BaseConstant.SUCCESS) {
+                if (BaseConstant.QUERY_ORDER_STATUS_SUCCESS.equals(orderStatusResult.getData().getStatus())) {
+                    return true;
+                }
+            } else {
+                return false;
+            }
         } else {
-            log.info("订单状态查询失败，单号为：" + orderId);
+            log.info("订单状态查询失败，单号为：{}", orderId);
             return false;
         }
         return false;
@@ -477,7 +506,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      *
      * @return
      */
-    private boolean checkIp(HttpServletRequest req) {
+    private boolean checkIpOk(HttpServletRequest req) {
         String ip = IPUtils.getIpAddr(req);
         List<DictModel> ipWhiteList = dictService.queryDictItemsByCode(BaseConstant.IP_WHITE_LIST);
         List<String> ips = new ArrayList<>();
@@ -486,6 +515,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
                 ips.add(dictModel.getValue());
             }
             if (!ips.contains(ip)) {
+                log.info("非法访问ip，ip={}", ip);
                 return false;
             }
         }
@@ -502,7 +532,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * @param reqobj
      * @return
      */
-    private R checkParam(JSONObject reqobj, boolean createOrder) throws Exception {
+    private R checkParam(JSONObject reqobj, boolean createOrder, boolean fromInner) throws Exception {
         //时间戳
         Long timestamp = reqobj.getLong(BaseConstant.TIMESTAMP);
         //MD5值
@@ -520,6 +550,12 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         SysUser user = userService.getUserByName(userName);
         if (user == null) {
             return R.error("用户不存在");
+        }
+        String apiKey = null;
+        if (fromInner) {
+            apiKey = key;
+        } else {
+            apiKey = user.getApiKey();
         }
         R decryptData = decryptData(data, userName, timestamp, sign, user.getApiKey());
         if (BaseConstant.CHECK_PARAM_SUCCESS.equals(decryptData.get(BaseConstant.CODE).toString())) {
@@ -600,7 +636,17 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
 
     @Override
     public OrderInfoEntity queryOrderInfoByOrderId(String orderId) {
-        return null;
+        return baseMapper.queryOrderByOrderId(orderId);
+    }
+
+    @Override
+    public void updateOrderStatusSuccessByOrderId(String orderId) {
+        baseMapper.updateOrderStatusSuccessByOrderId(orderId);
+    }
+
+    @Override
+    public void updateOrderStatusNoBackByOrderId(String orderId) {
+        baseMapper.updateOrderStatusNoBackByOrderId(orderId);
     }
 
 }

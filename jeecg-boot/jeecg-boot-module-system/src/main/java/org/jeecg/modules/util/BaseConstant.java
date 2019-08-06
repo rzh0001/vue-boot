@@ -37,6 +37,7 @@ public class BaseConstant {
     //成功，已返回
     public static final int ORDER_STATUS_SUCCESS =2;
 
+    public static final String QUERY_ORDER_STATUS_SUCCESS = "4";
     //用户类型
     //1：代理
     public static final String USER_AGENT = "1";

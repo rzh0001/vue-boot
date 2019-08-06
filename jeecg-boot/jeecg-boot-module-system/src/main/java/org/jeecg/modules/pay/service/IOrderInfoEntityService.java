@@ -1,6 +1,7 @@
 package org.jeecg.modules.pay.service;
 
 import com.alibaba.fastjson.JSONObject;
+import org.apache.ibatis.annotations.Param;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.jeecg.modules.util.R;
@@ -30,5 +31,15 @@ public interface IOrderInfoEntityService extends IService<OrderInfoEntity> {
 
     OrderInfoEntity queryOrderInfoByOrderId(String orderId);
 
+    /**
+     * 更新订单状态为支付已返回
+     * @param orderId
+     */
+    void updateOrderStatusSuccessByOrderId(@Param("orderId") String orderId);
 
+    /**
+     * 更新订单状态为支付未返回
+     * @param orderId
+     */
+    void updateOrderStatusNoBackByOrderId(@Param("orderId") String orderId);
 }

@@ -15,4 +15,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 public interface OrderInfoEntityMapper extends BaseMapper<OrderInfoEntity> {
 
     String queryOrderByOuterOrderId(@Param("outerOrderId") String outerOrderId);
+    OrderInfoEntity queryOrderByOrderId(@Param("orderId") String orderId);
+    void updateOrderStatusSuccessByOrderId(@Param("orderId") String orderId);
+    void updateOrderStatusNoBackByOrderId(@Param("orderId") String orderId);
 }
