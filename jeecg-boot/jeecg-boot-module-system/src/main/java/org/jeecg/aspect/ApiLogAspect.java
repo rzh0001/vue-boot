@@ -46,7 +46,7 @@ public class ApiLogAspect {
     public void init() {
         List<DictModel> apiKey = dictService.queryDictItemsByCode(BaseConstant.API_KEY);
         for (DictModel k : apiKey) {
-            if ("key".equals(k.getText())) {
+            if (BaseConstant.API_KEY.equals(k.getText())) {
                 key = k.getValue();
             }
         }

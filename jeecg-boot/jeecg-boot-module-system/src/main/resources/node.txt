@@ -1,14 +1,13 @@
 ==== 商户对接文档 ===
-1、订单查询
-
+1、订单查询：http://域名/jeecg-boot/api/queryOrder
     入参：
         userName：用户
         timestamp:时间戳
-        data:加密数据，json字符串（"orderId":"123456789" 采用BASE64加密）
-        sign:签名（userName+timestamp+data使用MD5进行加密）
+        data:加密数据，json字符串;采用BASE64加密；属性有以下：
+            "orderId": 订单号，系统分配的订单号，不是商户的订单号
+        sign:签名（userName+timestamp+data(data是经过加密之后的data)+apikey使用MD5进行加密）
 
-2、订单创建：http://localhost:8080/jeecg-boot/api/create
-
+2、订单创建：http://域名/jeecg-boot/api/create
     入参：
         userName：用户
         timestamp:时间戳
@@ -27,7 +26,8 @@
         	"userName": "abc123456789",
         	"timestamp": 1564464261670
         }
-3、挂马平台收款后，通知四方平台：http://localhost:8080/jeecg-boot/api/callback
+
+3、挂马平台收款后，通知四方平台：http://域名/jeecg-boot/api/callback
     入参：
         userName：用户
         timestamp:时间戳
@@ -53,4 +53,22 @@
 
 
 
+=================数据字典说明===============
+1、数据字典编号：requestPay --》配置四方平台请求挂马平台的地址
+zfb = 支付宝转账的挂马平台地址
+bank = 支付宝转卡的挂马平台地址
+ysf = 云闪付的挂马平台地址
+
+2、数据字典编号：apiKey --》配置四方平台请求挂马平台时候，数据加密的密钥
+apiKey = 密钥
+
+3、数据字典编号：innerCallBackUrl --》配置四方平台请求挂马平台时候，挂马平台回调四方的回调地址
+innerCallBackUrl = 四方平台的回调地址
+
+
+4、数据字典编号：queryOrderStatusUrl --》配置四方平台到挂马平台查询订单状态的地址
+payType（具体的通道类型） = 挂马平台的对应通道的查询地址 如：支付宝转账通过的配置
+bank = http://bank.klecode.com/gateway/pay/automaticBankQueryStatus.do
+
+5、数据字典编号：ipWhiteList --》配置ip白名单，用于在四方平台回调商户时候，校验ip是否来自于挂马平台
 

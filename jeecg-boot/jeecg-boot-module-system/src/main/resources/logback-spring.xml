@@ -120,6 +120,24 @@
 		</triggeringPolicy>
 	</appender>
 
+	<!--api 日志-->
+	<appender name="API_SERVICE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<!--滚动策略-->
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!--路径-->
+			<fileNamePattern>${LOG_HOME}/api/apiService.%d{yyyy-MM-dd}.log</fileNamePattern>
+		</rollingPolicy>
+		<encoder>
+			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50}:%L - %mdc{username} - %msg%n</pattern>
+		</encoder>
+		<!--日志文件最大的大小 -->
+		<triggeringPolicy
+				class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<MaxFileSize>10MB</MaxFileSize>
+		</triggeringPolicy>
+	</appender>
+
+
 	<!--myibatis log configure -->
 	<Logger name="com.apache.ibatis" level="TRACE" />
 	<Logger name="java.sql.Connection" level="DEBUG" />
@@ -128,7 +146,9 @@
 	<Logger name="org.jeecg.aspect.ApiLogAspect" level="INFO"  additivity="false">
 		<appender-ref ref="API"/>
 	</Logger>
-
+	<Logger name="org.jeecg.modules.pay.service.impl.OrderInfoEntityServiceImpl" level="INFO">
+		<appender-ref ref="API_SERVICE"/>
+	</Logger>
 	<!-- 日志输出级别 -->
 	<root level="INFO">
 		<appender-ref ref="STDOUT" />

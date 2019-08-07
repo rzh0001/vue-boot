@@ -48,6 +48,7 @@ public class BaseConstant {
 
     //数据字典配置的挂马平台的地址
     public static final String API_KEY = "apiKey";
+    public static final String INNER_CALL_BACK_URL= "innerCallBackUrl";
     public static final String REQUEST_URL = "requestPay";
     public static final String REQUEST_YSF = "ysf";
     public static final String REQUEST_ZFB = "zfb";
