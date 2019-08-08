@@ -3,6 +3,8 @@ package org.jeecg.modules.pay.service;
 import org.jeecg.modules.pay.entity.ChannelEntity;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+
 /**
  * @Description: 通道设置
  * @Author: jeecg-boot
@@ -11,4 +13,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IChannelEntityService extends IService<ChannelEntity> {
     ChannelEntity queryChannelByCode(String channelCode);
+    List<String> queryAllChannelCode();
 }

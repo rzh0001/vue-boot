@@ -15,7 +15,11 @@
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
           label="通道code">
-          <a-input placeholder="请输入通道code" v-decorator="['channelCode', {}]" />
+          <select v-decorator="['channelCode', {}]">
+            <option v-for="option in channelCodes" v-bind:value="option">
+              {{ option}}
+            </option>
+          </select>
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"
@@ -29,25 +33,7 @@
           label="商户code">
           <a-input placeholder="请输入商户code" v-decorator="['businessCode', {}]" />
         </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="删除状态，1删除状态">
-          <a-input-number v-decorator="[ 'delFlag', {}]" />
-        </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="创建人">
-          <a-input placeholder="请输入创建人" v-decorator="['createUser', {}]" />
-        </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="更新人">
-          <a-input placeholder="请输入更新人" v-decorator="['updateUser', {}]" />
-        </a-form-item>
-		
+
       </a-form>
     </a-spin>
   </a-modal>
@@ -63,6 +49,7 @@
     data () {
       return {
         title:"操作",
+        channelCodes: [],
         visible: false,
         model: {},
         labelCol: {
@@ -81,12 +68,25 @@
         url: {
           add: "/pay/channelBusinessEntity/add",
           edit: "/pay/channelBusinessEntity/edit",
+          channel: "/pay/channelEntity/channel"
         },
       }
     },
     created () {
     },
+    mounted:function () {
+      this.channel();
+    },
     methods: {
+      channel(){
+        httpAction(this.url.channel,null,'get').then((res)=>{
+          if(res.success){
+          this.channelCodes = res.result;
+        }else{
+          this.$message.warning(res.message);
+        }
+      })
+      },
       add () {
         this.edit({});
       },
@@ -95,7 +95,7 @@
         this.model = Object.assign({}, record);
         this.visible = true;
         this.$nextTick(() => {
-          this.form.setFieldsValue(pick(this.model,'channelCode','apiKey','businessCcode','delFlag','createUser','updateUser'))
+          this.form.setFieldsValue(pick(this.model,'channelCode','apiKey','businessCode','delFlag','createUser','updateUser'))
 		  //时间格式化
         });
 

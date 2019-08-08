@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
+import java.util.List;
+
 /**
  * @Description: 通道设置
  * @Author: jeecg-boot
@@ -18,5 +20,10 @@ public class ChannelEntityServiceImpl extends ServiceImpl<ChannelEntityMapper, C
     @Override
     public ChannelEntity queryChannelByCode(String channelCode) {
         return baseMapper.queryChannelByCode(channelCode);
+    }
+
+    @Override
+    public List<String> queryAllChannelCode() {
+        return baseMapper.queryAllChannelCode();
     }
 }

@@ -14,46 +14,22 @@
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
-          label="用户id">
-          <a-input placeholder="请输入用户id" v-decorator="['userId', validatorRules.userId ]" />
-        </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
           label="用户名">
           <a-input placeholder="请输入用户名" v-decorator="['userName', {}]" />
         </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="通道id">
-          <a-input placeholder="请输入通道id" v-decorator="['channelId', validatorRules.channelId ]" />
-        </a-form-item>
+
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
           label="通道code">
-          <a-input placeholder="请输入通道code" v-decorator="['channelCode', validatorRules.channelCode ]" />
+          <select v-decorator="['channelCode', validatorRules.channelCode ]">
+            <option v-for="option in channelCodes" v-bind:value="option">
+              {{ option}}
+            </option>
+          </select>
         </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="删除状态，1删除状态">
-          <a-input-number v-decorator="[ 'delFlag', {}]" />
-        </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="创建人">
-          <a-input placeholder="请输入创建人" v-decorator="['createUser', {}]" />
-        </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="更新人">
-          <a-input placeholder="请输入更新人" v-decorator="['updateUser', {}]" />
-        </a-form-item>
-		
+
+
       </a-form>
     </a-spin>
   </a-modal>
@@ -71,6 +47,7 @@
         title:"操作",
         visible: false,
         model: {},
+        channelCodes: [],
         labelCol: {
           xs: { span: 24 },
           sm: { span: 5 },
@@ -90,12 +67,25 @@
         url: {
           add: "/pay/userChannelEntity/add",
           edit: "/pay/userChannelEntity/edit",
+          channel: "/pay/channelEntity/channel"
         },
       }
     },
     created () {
     },
+    mounted:function () {
+      this.channel();
+    },
     methods: {
+      channel(){
+        httpAction(this.url.channel,null,'get').then((res)=>{
+          if(res.success){
+          this.channelCodes = res.result;
+        }else{
+          this.$message.warning(res.message);
+        }
+      })
+      },
       add () {
         this.edit({});
       },
@@ -154,7 +144,8 @@
       },
 
 
-    }
+    },
+
   }
 </script>
 

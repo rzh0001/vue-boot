@@ -26,28 +26,12 @@
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
-          label="状态 0：关闭；1：开启">
-          <a-input-number v-decorator="[ 'status', {}]" />
+          label="状态">
+          <select v-decorator="[ 'status', {}]">
+            <option value="0">关闭</option>
+            <option value="1">开启</option>
+          </select>
         </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="删除状态，1删除状态">
-          <a-input-number v-decorator="[ 'delFlag', {}]" />
-        </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="创建人">
-          <a-input placeholder="请输入创建人" v-decorator="['createUser', {}]" />
-        </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="更新人">
-          <a-input placeholder="请输入更新人" v-decorator="['updateUser', {}]" />
-        </a-form-item>
-		
       </a-form>
     </a-spin>
   </a-modal>

@@ -14,12 +14,6 @@
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
-          label="用户id">
-          <a-input placeholder="请输入用户id" v-decorator="['userId', {}]" />
-        </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
           label="用户名">
           <a-input placeholder="请输入用户名" v-decorator="['userName', validatorRules.userName ]" />
         </a-form-item>
@@ -32,26 +26,8 @@
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
-          label="删除状态，1删除状态">
-          <a-input-number v-decorator="[ 'delFlag', {}]" />
-        </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="创建人">
-          <a-input placeholder="请输入创建人" v-decorator="['createUser', {}]" />
-        </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="更新人">
-          <a-input placeholder="请输入更新人" v-decorator="['updateUser', {}]" />
-        </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="高级代理id">
-          <a-input placeholder="请输入高级代理id" v-decorator="['agentId', validatorRules.agentId ]" />
+          label="高级代理名称">
+          <a-input placeholder="请输入高级代理名称" v-decorator="['agentId', validatorRules.agentId ]" />
         </a-form-item>
 		
       </a-form>
@@ -85,7 +61,7 @@
         validatorRules:{
         userName:{rules: [{ required: true, message: '请输入用户名!' }]},
         userRate:{rules: [{ required: true, message: '请输入费率!' }]},
-        agentId:{rules: [{ required: true, message: '请输入高级代理id!' }]},
+        //agentId:{rules: [{ required: true, message: '请输入高级代理名称!' }]},
         },
         url: {
           add: "/pay/userRateEntity/add",

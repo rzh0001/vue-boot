@@ -7,29 +7,14 @@
         <a-row :gutter="24">
 
           <a-col :md="6" :sm="8">
-            <a-form-item label="用户id">
-              <a-input placeholder="请输入用户id" v-model="queryParam.userId"></a-input>
-            </a-form-item>
-          </a-col>
-          <a-col :md="6" :sm="8">
             <a-form-item label="用户名">
               <a-input placeholder="请输入用户名" v-model="queryParam.userName"></a-input>
             </a-form-item>
           </a-col>
         <template v-if="toggleSearchStatus">
-        <a-col :md="6" :sm="8">
-            <a-form-item label="通道id">
-              <a-input placeholder="请输入通道id" v-model="queryParam.channelId"></a-input>
-            </a-form-item>
-          </a-col>
           <a-col :md="6" :sm="8">
             <a-form-item label="通道code">
               <a-input placeholder="请输入通道code" v-model="queryParam.channelCode"></a-input>
-            </a-form-item>
-          </a-col>
-          <a-col :md="6" :sm="8">
-            <a-form-item label="删除状态，1删除状态">
-              <a-input placeholder="请输入删除状态，1删除状态" v-model="queryParam.delFlag"></a-input>
             </a-form-item>
           </a-col>
           </template>
@@ -133,19 +118,9 @@
             }
            },
 		   {
-            title: '用户id',
-            align:"center",
-            dataIndex: 'userId'
-           },
-		   {
             title: '用户名',
             align:"center",
             dataIndex: 'userName'
-           },
-		   {
-            title: '通道id',
-            align:"center",
-            dataIndex: 'channelId'
            },
 		   {
             title: '通道code',
@@ -175,6 +150,7 @@
           }
         ],
 		url: {
+          channel: "/pay/channelEntity/channel",
           list: "/pay/userChannelEntity/list",
           delete: "/pay/userChannelEntity/delete",
           deleteBatch: "/pay/userChannelEntity/deleteBatch",

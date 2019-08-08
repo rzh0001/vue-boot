@@ -48,18 +48,22 @@ public class BaseConstant {
 
     //数据字典配置的挂马平台的地址
     public static final String API_KEY = "apiKey";
+    public static final String IP_WHITE_LIST= "ipWhiteList";
     public static final String INNER_CALL_BACK_URL= "innerCallBackUrl";
     public static final String REQUEST_URL = "requestPay";
-    public static final String REQUEST_YSF = "ysf";
-    public static final String REQUEST_ZFB = "zfb";
-    public static final String REQUEST_BANK = "bank";
-    public static final String IP_WHITE_LIST= "ipWhiteList";
-
     public static final String QUERY_ORDER_STATUS_URL = "queryOrderStatusUrl";
+    //支付通道
+    //云闪付
+    public static final String REQUEST_YSF = "ysf";
+    //支付宝转账
+    public static final String REQUEST_ALI_ZZ = "ali_zz";
+    //支付宝转卡
+    public static final String REQUEST_ALI_BANK = "ali_bank";
+    //农信 微信
+    public static final String REQUEST_NXYS_WX = "nxys_wx";
+    //农信 支付宝
+    public static final String REQUEST_NXYS_ALIPAY = "nxys_alipay";
+
     //四方回调挂马平台的返回码
     public static final int SUCCESS = 200;
-
-    //支付通道
-    public static final String ALI_PAY = "aliPay";
-    public static final String PAY_CLOUD = "YSF";
 }

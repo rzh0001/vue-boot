@@ -72,7 +72,13 @@ public class ChannelEntityController {
 		result.setResult(pageList);
 		return result;
 	}
-	
+
+	 @GetMapping(value = "/channel")
+	public Result<List<String>> queryAllChannelCode(){
+		 Result<List<String>> result = new Result<>();
+		 result.setResult(channelEntityService.queryAllChannelCode());
+		return result;
+	}
 	/**
 	  *   添加
 	 * @param channelEntity

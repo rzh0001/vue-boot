@@ -14,4 +14,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface ChannelEntityMapper extends BaseMapper<ChannelEntity> {
     ChannelEntity queryChannelByCode(@Param("channelCode") String channelCode);
+    List<String> queryAllChannelCode();
 }

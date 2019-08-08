@@ -14,12 +14,6 @@
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
-          label="用户id">
-          <a-input placeholder="请输入用户id" v-decorator="['userId', validatorRules.userId ]" />
-        </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
           label="用户名">
           <a-input placeholder="请输入用户名" v-decorator="['userName', {}]" />
         </a-form-item>
@@ -28,24 +22,6 @@
           :wrapperCol="wrapperCol"
           label="商户code">
           <a-input placeholder="请输入商户code" v-decorator="['businessCode', {}]" />
-        </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="删除状态，1删除状态">
-          <a-input-number v-decorator="[ 'delFlag', {}]" />
-        </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="创建人">
-          <a-input placeholder="请输入创建人" v-decorator="['createUser', {}]" />
-        </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="更新人">
-          <a-input placeholder="请输入更新人" v-decorator="['updateUser', {}]" />
         </a-form-item>
 		
       </a-form>

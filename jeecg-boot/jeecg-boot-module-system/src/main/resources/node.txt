@@ -55,9 +55,11 @@
 
 =================数据字典说明===============
 1、数据字典编号：requestPay --》配置四方平台请求挂马平台的地址
-zfb = 支付宝转账的挂马平台地址
-bank = 支付宝转卡的挂马平台地址
+ali_zz = http://zh.klecode.com/gateway/index/checkpoint.do
+ali_bank = http://zh.klecode.com/gateway/index/checkpoint.do
 ysf = 云闪付的挂马平台地址
+nxys_wx = http://nxyswx.com/xppayapi
+nxys_alipay = http://nxyswx.com/xppayapi
 
 2、数据字典编号：apiKey --》配置四方平台请求挂马平台时候，数据加密的密钥
 apiKey = 密钥
