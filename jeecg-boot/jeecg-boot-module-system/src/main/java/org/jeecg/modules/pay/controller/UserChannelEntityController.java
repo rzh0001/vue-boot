@@ -20,6 +20,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 
+import org.jeecg.modules.system.entity.SysUser;
+import org.jeecg.modules.system.service.ISysUserService;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -48,7 +50,8 @@ import io.swagger.annotations.ApiOperation;
 public class UserChannelEntityController {
 	@Autowired
 	private IUserChannelEntityService userChannelEntityService;
-	
+	 @Autowired
+	 private ISysUserService userService;
 	/**
 	  * 分页列表查询
 	 * @param userChannelEntity
@@ -84,6 +87,12 @@ public class UserChannelEntityController {
 	public Result<UserChannelEntity> add(@RequestBody UserChannelEntity userChannelEntity) {
 		Result<UserChannelEntity> result = new Result<UserChannelEntity>();
 		try {
+			String userName = userChannelEntity.getUserName();
+			SysUser user = userService.getUserByName(userName);
+			if(user == null){
+				result.error500("用户不存在");
+				return result;
+			}
 			userChannelEntityService.save(userChannelEntity);
 			result.success("添加成功！");
 		} catch (Exception e) {
