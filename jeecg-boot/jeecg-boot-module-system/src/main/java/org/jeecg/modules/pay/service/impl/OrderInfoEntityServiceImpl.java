@@ -402,6 +402,11 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         String payType = (String) checkParam.get(BaseConstant.PAY_TYPE);
         String callbackUrl = (String) checkParam.get(BaseConstant.CALLBACK_URL);
         String agentName = (String) checkParam.get(BaseConstant.AGENT_NAME);
+        //校验是否是重复订单
+        if (!outerOrderIdIsOnly(outerOrderId)) {
+            log.info("该订单已经创建过，无需重复创建;orderid:{}", outerOrderId);
+            throw new RRException("该订单已经创建过，无需重复创建" + outerOrderId);
+        }
         //校验用户通道是否存在
         if (!channelIsOpen(payType, userName)) {
             log.info("通道未定义，或用户无此通道权限,用户为：{}", userName);
@@ -412,11 +417,6 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         if (StringUtils.isBlank(businessCode)) {
             log.info("用户:{},无对应商户信息", userName);
             throw new RRException(userName + "用户无对应商户信息");
-        }
-        //校验是否是重复订单
-        if (!outerOrderIdIsOnly(outerOrderId)) {
-            log.info("该订单已经创建过，无需重复创建;orderid:{}", outerOrderId);
-            throw new RRException("该订单已经创建过，无需重复创建" + outerOrderId);
         }
         //校验金额的合法性
         R checkAmountValidity = checkAmountValidity(userName, submitAmount);
