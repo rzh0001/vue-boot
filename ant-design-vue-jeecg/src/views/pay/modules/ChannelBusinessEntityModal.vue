@@ -15,7 +15,7 @@
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
           label="通道code">
-          <select v-decorator="['channelCode', {}]">
+          <select v-decorator="['channelCode', validatorRules.channelCode]">
             <option v-for="option in channelCodes" v-bind:value="option">
               {{ option}}
             </option>
@@ -31,7 +31,7 @@
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
           label="商户code">
-          <a-input placeholder="请输入商户code" v-decorator="['businessCode', {}]" />
+          <a-input placeholder="请输入商户code" v-decorator="['businessCode', validatorRules.businessCode]" />
         </a-form-item>
 
       </a-form>
@@ -60,10 +60,11 @@
           xs: { span: 24 },
           sm: { span: 16 },
         },
-
         confirmLoading: false,
         form: this.$form.createForm(this),
         validatorRules:{
+          channelCode:{rules: [{ required: true, message: '请选择通道!' }]},
+          businessCode:{rules: [{ required: true, message: '请输入商户!' }]},
         },
         url: {
           add: "/pay/channelBusinessEntity/add",

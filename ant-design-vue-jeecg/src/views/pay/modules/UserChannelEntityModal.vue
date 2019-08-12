@@ -15,7 +15,7 @@
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
           label="用户名">
-          <a-input placeholder="请输入用户名" v-decorator="['userName', {}]" />
+          <a-input placeholder="请输入用户名" v-decorator="['userName', validatorRules.userName]" />
         </a-form-item>
 
         <a-form-item
@@ -60,8 +60,7 @@
         confirmLoading: false,
         form: this.$form.createForm(this),
         validatorRules:{
-        userId:{rules: [{ required: true, message: '请输入用户id!' }]},
-        channelId:{rules: [{ required: true, message: '请输入通道id!' }]},
+          userName:{rules: [{ required: true, message: '请输入用户!' }]},
         channelCode:{rules: [{ required: true, message: '请输入通道code!' }]},
         },
         url: {

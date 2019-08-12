@@ -15,19 +15,19 @@
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
           label="通道名称">
-          <a-input placeholder="请输入通道名称" v-decorator="['channelName', {}]" />
+          <a-input placeholder="请输入通道名称" v-decorator="['channelName', validatorRules.channelName]" />
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
           label="通道代码">
-          <a-input placeholder="请输入通道代码" v-decorator="['channelCode', {}]" />
+          <a-input placeholder="请输入通道代码" v-decorator="['channelCode', validatorRules.channelCode]" />
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
           label="状态">
-          <select v-decorator="[ 'status', {}]">
+          <select v-decorator="[ 'status', validatorRules.status]">
             <option value="0">关闭</option>
             <option value="1">开启</option>
           </select>
@@ -61,6 +61,9 @@
         confirmLoading: false,
         form: this.$form.createForm(this),
         validatorRules:{
+          channelName:{rules: [{ required: true, message: '请输入通道名称!' }]},
+          channelCode:{rules: [{ required: true, message: '请输入通道代码' }]},
+          status:{rules: [{ required: true, message: '请选择状态!' }]},
         },
         url: {
           add: "/pay/channelEntity/add",

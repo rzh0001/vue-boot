@@ -15,13 +15,13 @@
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
           label="用户名">
-          <a-input placeholder="请输入用户名" v-decorator="['userName', {}]" />
+          <a-input placeholder="请输入用户名" v-decorator="['userName', validatorRules.userName]" />
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
           label="商户code">
-          <a-input placeholder="请输入商户code" v-decorator="['businessCode', {}]" />
+          <a-input placeholder="请输入商户code" v-decorator="['businessCode', validatorRules.businessCode]" />
         </a-form-item>
 		
       </a-form>
@@ -53,7 +53,8 @@
         confirmLoading: false,
         form: this.$form.createForm(this),
         validatorRules:{
-        userId:{rules: [{ required: true, message: '请输入用户id!' }]},
+          userName:{rules: [{ required: true, message: '请输入用户!' }]},
+          businessCode:{rules: [{ required: true, message: '请输入商户!' }]},
         },
         url: {
           add: "/pay/userBusinessEntity/add",
