@@ -93,6 +93,11 @@ public class UserChannelEntityController {
 				result.error500("用户不存在");
 				return result;
 			}
+			UserChannelEntity channel = userChannelEntityService.queryChannelAndUserName(userChannelEntity.getChannelCode(),userChannelEntity.getUserName());
+			if(channel != null){
+				result.error500("该用户已经添加过通道");
+				return result;
+			}
 			userChannelEntityService.save(userChannelEntity);
 			result.success("添加成功！");
 		} catch (Exception e) {

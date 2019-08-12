@@ -8,6 +8,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang3.StringUtils;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.aspect.annotation.AutoLog;
@@ -91,6 +93,11 @@ public class UserBusinessEntityController {
 			SysUser user = userService.getUserByName(userName);
 			if(user == null){
 				result.error500("用户不存在");
+				return result;
+			}
+			String code = userBusinessEntityService.queryBusinessCodeByUserName(userName);
+			if(StringUtils.isNotBlank(code) && code.equals(userBusinessEntity.getBusinessCode())){
+				result.error500("用户已经关联过该商户了");
 				return result;
 			}
 			userBusinessEntityService.save(userBusinessEntity);

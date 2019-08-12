@@ -84,7 +84,13 @@ public class ChannelBusinessEntityController {
 	public Result<ChannelBusinessEntity> add(@RequestBody ChannelBusinessEntity channelBusinessEntity) {
 		Result<ChannelBusinessEntity> result = new Result<ChannelBusinessEntity>();
 		try {
+			ChannelBusinessEntity businessEntity = channelBusinessEntityService.queryChannelBusiness(channelBusinessEntity.getBusinessCode(),channelBusinessEntity.getChannelCode());
+			if(businessEntity != null){
+				result.error500("该商户已经关联过该通道");
+				return result;
+			}
 			channelBusinessEntityService.save(channelBusinessEntity);
+
 			result.success("添加成功！");
 		} catch (Exception e) {
 			log.error(e.getMessage(),e);
