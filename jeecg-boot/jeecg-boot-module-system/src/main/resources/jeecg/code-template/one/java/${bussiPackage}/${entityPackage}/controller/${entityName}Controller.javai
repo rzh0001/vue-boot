@@ -50,7 +50,7 @@ public class ${entityName}Controller {
 	private I${entityName}Service ${entityName?uncap_first}Service;
 	
 	/**
-	  * 分页列表查询
+	 * 分页列表查询
 	 * @param ${entityName?uncap_first}
 	 * @param pageNo
 	 * @param pageSize
@@ -74,7 +74,7 @@ public class ${entityName}Controller {
 	}
 	
 	/**
-	  *   添加
+	 *   添加
 	 * @param ${entityName?uncap_first}
 	 * @return
 	 */
@@ -94,7 +94,7 @@ public class ${entityName}Controller {
 	}
 	
 	/**
-	  *  编辑
+	 *  编辑
 	 * @param ${entityName?uncap_first}
 	 * @return
 	 */
@@ -118,7 +118,7 @@ public class ${entityName}Controller {
 	}
 	
 	/**
-	  *   通过id删除
+	 *   通过id删除
 	 * @param id
 	 * @return
 	 */
@@ -136,7 +136,7 @@ public class ${entityName}Controller {
 	}
 	
 	/**
-	  *  批量删除
+	 *  批量删除
 	 * @param ids
 	 * @return
 	 */
@@ -155,7 +155,7 @@ public class ${entityName}Controller {
 	}
 	
 	/**
-	  * 通过id查询
+	 * 通过id查询
 	 * @param id
 	 * @return
 	 */
@@ -175,7 +175,7 @@ public class ${entityName}Controller {
 	}
 
   /**
-      * 导出excel
+   * 导出excel
    *
    * @param request
    * @param response
@@ -207,7 +207,7 @@ public class ${entityName}Controller {
   }
 
   /**
-      * 通过excel导入数据
+   * 通过excel导入数据
    *
    * @param request
    * @param response

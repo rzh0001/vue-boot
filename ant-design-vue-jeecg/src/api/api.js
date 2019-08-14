@@ -92,6 +92,10 @@ const queryUserRoleMap = (params)=>getAction("/sys/user/queryUserRoleMap",params
 // 重复校验
 const duplicateCheck = (params)=>getAction("/sys/duplicate/check",params);
 
+const queryBankCard = (params)=>getAction("/pay/bankCard/queryBankCard",params);
+
+
+
 export {
   // imgView,
   // doMian,
@@ -140,7 +144,8 @@ export {
   queryUserRoleMap,
   duplicateCheck,
   queryTreeListForRole,
-  querySalesmanByAgent
+  querySalesmanByAgent,
+  queryBankCard
 }
 
 
