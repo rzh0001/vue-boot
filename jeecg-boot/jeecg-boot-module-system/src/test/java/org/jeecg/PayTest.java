@@ -46,12 +46,12 @@ public class PayTest {
     public void create(){
         JSONObject req = new JSONObject();
         JSONObject data = new JSONObject();
-        data.put(BaseConstant.OUTER_ORDER_ID,"out_id123456789");
+        data.put(BaseConstant.OUTER_ORDER_ID,"1565776105000abc");
         data.put(BaseConstant.USER_NAME,"www");
-        data.put(BaseConstant.SUBMIT_AMOUNT,"100");
+        data.put(BaseConstant.SUBMIT_AMOUNT,"111");
         data.put(BaseConstant.PAY_TYPE,"ysf");
-        data.put(BaseConstant.CALLBACK_URL,"http://localhost:8080");
-        String dataEn = AES128Util.encryptBase64(data.toJSONString(), "abc123#@!");
+        data.put(BaseConstant.CALLBACK_URL,"http://localhost/api/callback");
+        String dataEn = AES128Util.encryptBase64(data.toJSONString(), "1234123412ABCDEF");
         StringBuilder sign = new StringBuilder();
         //userId+timestamp+data
         Long time = new Date().getTime();
@@ -103,26 +103,34 @@ public class PayTest {
     public static void main(String[] args) {
         JSONObject req = new JSONObject();
         JSONObject data = new JSONObject();
-        data.put(BaseConstant.OUTER_ORDER_ID,"65254488524455221");
+        data.put(BaseConstant.OUTER_ORDER_ID,"1565776105000abc");
         data.put(BaseConstant.USER_NAME,"www");
-        data.put(BaseConstant.SUBMIT_AMOUNT,"100");
-        data.put(BaseConstant.PAY_TYPE,"aliPay");
-        data.put(BaseConstant.CALLBACK_URL,"http://localhost:8080/jeecg-boot/api/callback");
-        String dataEn = AES128Util.encryptBase64(data.toJSONString(), "abc123#@!");
-        StringBuilder sign = new StringBuilder();
-        //userId+timestamp+data
-        Long time = new Date().getTime();
-        sign.append("www").append(time).append(dataEn).append("abc123#@!");
-
-        req.put(BaseConstant.SIGN, DigestUtils.md5Hex(sign.toString()));
-        req.put(BaseConstant.TIMESTAMP,time);
-        req.put(BaseConstant.DATA,dataEn);
-        req.put(BaseConstant.USER_NAME,"www");
-        System.out.println(req.toJSONString());
+        data.put(BaseConstant.SUBMIT_AMOUNT,"111");
+        data.put(BaseConstant.PAY_TYPE,"ysf");
+        data.put(BaseConstant.CALLBACK_URL,"http://localhost/api/callback");
+        String dataEn = AES128Util.encryptBase64(data.toJSONString(), "1234123412ABCDEF");
+        System.out.println(dataEn);
+//        StringBuilder sign = new StringBuilder();
+//        //userId+timestamp+data
+//        Long time = new Date().getTime();
+//        sign.append("www").append(time).append(dataEn).append("abc123#@!");
+//
+//        req.put(BaseConstant.SIGN, DigestUtils.md5Hex(sign.toString()));
+//        req.put(BaseConstant.TIMESTAMP,time);
+//        req.put(BaseConstant.DATA,dataEn);
+//        req.put(BaseConstant.USER_NAME,"www");
+//        System.out.println(req.toJSONString());
     }
     @Test
     public void a(){
-        System.out.println(RandomStringUtils.randomAlphabetic(10));
+        JSONObject data = new JSONObject();
+        data.put(BaseConstant.OUTER_ORDER_ID,"1565776105000abc");
+        data.put(BaseConstant.USER_NAME,"www");
+        data.put(BaseConstant.SUBMIT_AMOUNT,"111");
+        data.put(BaseConstant.PAY_TYPE,"ysf");
+        data.put(BaseConstant.CALLBACK_URL,"http://localhost/api/callback");
+        String dataEn = AES128Util.encryptBase64(data.toJSONString(), "1234123412ABCDEF");
+        System.out.println(dataEn);
     }
 
 
