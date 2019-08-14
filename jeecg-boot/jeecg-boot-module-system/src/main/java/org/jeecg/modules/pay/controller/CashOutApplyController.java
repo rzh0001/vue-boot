@@ -36,7 +36,7 @@ import java.util.Map;
  /**
  * @Description: 会员提现申请
  * @Author: jeecg-boot
- * @Date:   2019-08-14
+  * @Date: 2019-08-15
  * @Version: V1.0
  */
 @Slf4j
@@ -48,7 +48,7 @@ public class CashOutApplyController {
 	private ICashOutApplyService cashOutApplyService;
 	
 	/**
-	  * 分页列表查询
+	 * 分页列表查询
 	 * @param cashOutApply
 	 * @param pageNo
 	 * @param pageSize
@@ -72,7 +72,7 @@ public class CashOutApplyController {
 	}
 	
 	/**
-	  *   添加
+	 *   添加
 	 * @param cashOutApply
 	 * @return
 	 */
@@ -92,7 +92,7 @@ public class CashOutApplyController {
 	}
 	
 	/**
-	  *  编辑
+	 *  编辑
 	 * @param cashOutApply
 	 * @return
 	 */
@@ -116,7 +116,7 @@ public class CashOutApplyController {
 	}
 	
 	/**
-	  *   通过id删除
+	 *   通过id删除
 	 * @param id
 	 * @return
 	 */
@@ -134,7 +134,7 @@ public class CashOutApplyController {
 	}
 	
 	/**
-	  *  批量删除
+	 *  批量删除
 	 * @param ids
 	 * @return
 	 */
@@ -153,7 +153,7 @@ public class CashOutApplyController {
 	}
 	
 	/**
-	  * 通过id查询
+	 * 通过id查询
 	 * @param id
 	 * @return
 	 */
@@ -173,7 +173,7 @@ public class CashOutApplyController {
 	}
 
   /**
-      * 导出excel
+   * 导出excel
    *
    * @param request
    * @param response
@@ -197,15 +197,15 @@ public class CashOutApplyController {
       ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
       List<CashOutApply> pageList = cashOutApplyService.list(queryWrapper);
       //导出文件名称
-      mv.addObject(NormalExcelConstants.FILE_NAME, "1列表");
+	  mv.addObject(NormalExcelConstants.FILE_NAME, "会员提现申请列表");
       mv.addObject(NormalExcelConstants.CLASS, CashOutApply.class);
-      mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("1列表数据", "导出人:Jeecg", "导出信息"));
+	  mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("会员提现申请列表数据", "导出人:Jeecg", "导出信息"));
       mv.addObject(NormalExcelConstants.DATA_LIST, pageList);
       return mv;
   }
 
   /**
-      * 通过excel导入数据
+   * 通过excel导入数据
    *
    * @param request
    * @param response

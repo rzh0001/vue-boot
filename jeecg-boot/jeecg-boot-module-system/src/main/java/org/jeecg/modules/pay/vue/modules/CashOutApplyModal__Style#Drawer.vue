@@ -32,8 +32,8 @@
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
-          label="md5密码盐">
-          <a-input placeholder="请输入md5密码盐" v-decorator="['bankCardId', {}]" />
+          label="银行卡表ID">
+          <a-input placeholder="请输入银行卡表ID" v-decorator="['bankCardId', {}]" />
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"

@@ -10,30 +10,30 @@
     
     <a-spin :spinning="confirmLoading">
       <a-form :form="form">
-      
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="用户ID">
-          <a-input placeholder="请输入用户ID" v-decorator="['userId', {}]" />
-        </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="登录账号">
-          <a-input placeholder="请输入登录账号" v-decorator="['username', {}]" />
-        </a-form-item>
+
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
           label="提现金额">
           <a-input-number v-decorator="[ 'amount', {}]" />
         </a-form-item>
+        <a-form-item label="银行卡" :labelCol="labelCol" :wrapperCol="wrapperCol" v-show="!salesmanDisabled" >
+          <a-select
+            mode="single"
+            style="width: 100%"
+            placeholder="请选择银行卡"
+            v-model="selectedBankCard">
+            <a-select-option v-for="(bankCard,bankCardindex) in bankCardList" :key="bankCardindex.toString()" :value="bankCard.id">
+              {{ bankCard.bankName + '|' +  bankCard.accountName + '|'  +  bankCard.cardNumber}}
+            </a-select-option>
+          </a-select>
+        </a-form-item>
+
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
-          label="md5密码盐">
-          <a-input placeholder="请输入md5密码盐" v-decorator="['bankCardId', {}]" />
+          label="银行卡表ID">
+          <a-input placeholder="请输入银行卡表ID" v-decorator="['bankCardId', {}]" />
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"
@@ -74,13 +74,13 @@
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
-          label="状态(1-待审核;2-通过;3-拒绝)">
+          label="状态">
           <a-input placeholder="请输入状态(1-待审核;2-通过;3-拒绝)" v-decorator="['status', {}]" />
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
-          label="删除状态（0，正常，1已删除）">
+          label="删除状态">
           <a-input placeholder="请输入删除状态（0，正常，1已删除）" v-decorator="['delFlag', {}]" />
         </a-form-item>
 		

@@ -1,31 +1,28 @@
 package org.jeecg.modules.pay.entity;
 
-import java.io.Serializable;
-import java.util.Date;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.TableField;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.jeecgframework.poi.excel.annotation.Excel;
+import org.springframework.format.annotation.DateTimeFormat;
 
 /**
- * @Description: 1
+ * @Description: 会员提现申请
  * @Author: jeecg-boot
- * @Date:   2019-08-14
+ * @Date: 2019-08-15
  * @Version: V1.0
  */
 @Data
 @TableName("pay_cash_out_apply")
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value="pay_cash_out_apply对象", description="1")
+@ApiModel(value = "pay_cash_out_apply对象", description = "会员提现申请")
 public class CashOutApply {
     
 	/**主键id*/
@@ -44,9 +41,11 @@ public class CashOutApply {
 	@Excel(name = "提现金额", width = 15)
     @ApiModelProperty(value = "提现金额")
 	private java.math.BigDecimal amount;
-	/**md5密码盐*/
-	@Excel(name = "md5密码盐", width = 15)
-    @ApiModelProperty(value = "md5密码盐")
+	/**
+	 * 银行卡表ID
+	 */
+	@Excel(name = "银行卡表ID", width = 15)
+	@ApiModelProperty(value = "银行卡表ID")
 	private java.lang.String bankCardId;
 	/**银行名称*/
 	@Excel(name = "银行名称", width = 15)
