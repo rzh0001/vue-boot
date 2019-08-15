@@ -32,8 +32,8 @@
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
-          label="银行卡表ID">
-          <a-input placeholder="请输入银行卡表ID" v-decorator="['bankCardId', {}]" />
+          label="md5密码盐">
+          <a-input placeholder="请输入md5密码盐" v-decorator="['bankCardId', {}]" />
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"
@@ -70,6 +70,24 @@
           :wrapperCol="wrapperCol"
           label="审批时间">
           <a-date-picker showTime format='YYYY-MM-DD HH:mm:ss' v-decorator="[ 'approvalTime', {}]" />
+        </a-form-item>
+        <a-form-item
+          :labelCol="labelCol"
+          :wrapperCol="wrapperCol"
+          label="代理ID">
+          <a-input placeholder="请输入代理ID" v-decorator="['agentId', {}]" />
+        </a-form-item>
+        <a-form-item
+          :labelCol="labelCol"
+          :wrapperCol="wrapperCol"
+          label="代理帐号">
+          <a-input placeholder="请输入代理帐号" v-decorator="['agentUsername', {}]" />
+        </a-form-item>
+        <a-form-item
+          :labelCol="labelCol"
+          :wrapperCol="wrapperCol"
+          label="代理姓名">
+          <a-input placeholder="请输入代理姓名" v-decorator="['agentRealname', {}]" />
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"
@@ -133,7 +151,7 @@
         this.model = Object.assign({}, record);
         this.visible = true;
         this.$nextTick(() => {
-          this.form.setFieldsValue(pick(this.model,'userId','username','amount','bankCardId','bankName','branchName','accountName','cardNumber','status','delFlag'))
+          this.form.setFieldsValue(pick(this.model,'userId','username','amount','bankCardId','bankName','branchName','accountName','cardNumber','agentId','agentUsername','agentRealname','status','delFlag'))
 		  //时间格式化
           this.form.setFieldsValue({applyTime:this.model.applyTime?moment(this.model.applyTime):null})
           this.form.setFieldsValue({approvalTime:this.model.approvalTime?moment(this.model.approvalTime):null})

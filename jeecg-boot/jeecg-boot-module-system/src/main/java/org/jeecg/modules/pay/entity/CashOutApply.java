@@ -13,7 +13,7 @@ import org.jeecgframework.poi.excel.annotation.Excel;
 import org.springframework.format.annotation.DateTimeFormat;
 
 /**
- * @Description: 会员提现申请
+ * @Description: 提现申请
  * @Author: jeecg-boot
  * @Date: 2019-08-15
  * @Version: V1.0
@@ -22,12 +22,12 @@ import org.springframework.format.annotation.DateTimeFormat;
 @TableName("pay_cash_out_apply")
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value = "pay_cash_out_apply对象", description = "会员提现申请")
+@ApiModel(value = "pay_cash_out_apply对象", description = "提现申请")
 public class CashOutApply {
     
 	/**主键id*/
 	@TableId(type = IdType.UUID)
-    @ApiModelProperty(value = "主键id")
+	@ApiModelProperty(value = "主键id")
 	private java.lang.String id;
 	/**用户ID*/
 	@Excel(name = "用户ID", width = 15)
@@ -42,10 +42,10 @@ public class CashOutApply {
     @ApiModelProperty(value = "提现金额")
 	private java.math.BigDecimal amount;
 	/**
-	 * 银行卡表ID
+	 * md5密码盐
 	 */
-	@Excel(name = "银行卡表ID", width = 15)
-	@ApiModelProperty(value = "银行卡表ID")
+	@Excel(name = "md5密码盐", width = 15)
+	@ApiModelProperty(value = "md5密码盐")
 	private java.lang.String bankCardId;
 	/**银行名称*/
 	@Excel(name = "银行名称", width = 15)
@@ -75,6 +75,24 @@ public class CashOutApply {
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "审批时间")
 	private java.util.Date approvalTime;
+	/**
+	 * 代理ID
+	 */
+	@Excel(name = "代理ID", width = 15)
+	@ApiModelProperty(value = "代理ID")
+	private java.lang.String agentId;
+	/**
+	 * 代理帐号
+	 */
+	@Excel(name = "代理帐号", width = 15)
+	@ApiModelProperty(value = "代理帐号")
+	private java.lang.String agentUsername;
+	/**
+	 * 代理姓名
+	 */
+	@Excel(name = "代理姓名", width = 15)
+	@ApiModelProperty(value = "代理姓名")
+	private java.lang.String agentRealname;
 	/**状态(1-待审核;2-通过;3-拒绝)*/
 	@Excel(name = "状态(1-待审核;2-通过;3-拒绝)", width = 15)
     @ApiModelProperty(value = "状态(1-待审核;2-通过;3-拒绝)")

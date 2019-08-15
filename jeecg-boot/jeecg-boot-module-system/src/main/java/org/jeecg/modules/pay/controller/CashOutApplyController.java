@@ -7,12 +7,19 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.SecurityUtils;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.aspect.annotation.AutoLog;
+import org.jeecg.common.constant.CommonConstant;
 import org.jeecg.common.system.query.QueryGenerator;
+import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.oConvertUtils;
+import org.jeecg.modules.pay.entity.BankCard;
 import org.jeecg.modules.pay.entity.CashOutApply;
+import org.jeecg.modules.pay.service.IBankCardService;
 import org.jeecg.modules.pay.service.ICashOutApplyService;
+import org.jeecg.modules.system.entity.SysUser;
+import org.jeecg.modules.system.service.ISysUserService;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -30,22 +37,29 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
  /**
- * @Description: 会员提现申请
+  * @Description: 提现申请
  * @Author: jeecg-boot
   * @Date: 2019-08-15
  * @Version: V1.0
  */
 @Slf4j
-@Api(tags="会员提现申请")
+@Api(tags = "提现申请")
 @RestController
 @RequestMapping("/pay/cashOutApply")
 public class CashOutApplyController {
 	@Autowired
 	private ICashOutApplyService cashOutApplyService;
+	
+	 @Autowired
+	 private ISysUserService sysUserService;
+	
+	 @Autowired
+	 private IBankCardService bankCardService;
 	
 	/**
 	 * 分页列表查询
@@ -55,8 +69,8 @@ public class CashOutApplyController {
 	 * @param req
 	 * @return
 	 */
-	@AutoLog(value = "会员提现申请-分页列表查询")
-	@ApiOperation(value="会员提现申请-分页列表查询", notes="会员提现申请-分页列表查询")
+	@AutoLog(value = "提现申请-分页列表查询")
+	@ApiOperation(value = "提现申请-分页列表查询", notes = "提现申请-分页列表查询")
 	@GetMapping(value = "/list")
 	public Result<IPage<CashOutApply>> queryPageList(CashOutApply cashOutApply,
 									  @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
@@ -76,11 +90,27 @@ public class CashOutApplyController {
 	 * @param cashOutApply
 	 * @return
 	 */
-	@AutoLog(value = "会员提现申请-添加")
-	@ApiOperation(value="会员提现申请-添加", notes="会员提现申请-添加")
+	@AutoLog(value = "提现申请-添加")
+	@ApiOperation(value = "提现申请-添加", notes = "提现申请-添加")
 	@PostMapping(value = "/add")
 	public Result<CashOutApply> add(@RequestBody CashOutApply cashOutApply) {
 		Result<CashOutApply> result = new Result<CashOutApply>();
+		LoginUser optUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+		cashOutApply.setUserId(optUser.getId());
+		cashOutApply.setUsername(optUser.getUsername());
+		cashOutApply.setDelFlag(CommonConstant.NOT_DELETE_FLAG);
+		cashOutApply.setStatus("0");
+		cashOutApply.setApplyTime(new Date());
+		SysUser user = sysUserService.getById(optUser.getId());
+		cashOutApply.setAgentId(user.getAgentId());
+		cashOutApply.setAgentUsername(user.getAgentUsername());
+		cashOutApply.setAgentRealname(user.getAgentRealname());
+		
+		BankCard bankCard = bankCardService.getById(cashOutApply.getBankCardId());
+		cashOutApply.setBankName(bankCard.getBankName());
+		cashOutApply.setBranchName(bankCard.getBranchName());
+		cashOutApply.setAccountName(bankCard.getAccountName());
+		cashOutApply.setCardNumber(bankCard.getCardNumber());
 		try {
 			cashOutApplyService.save(cashOutApply);
 			result.success("添加成功！");
@@ -96,8 +126,8 @@ public class CashOutApplyController {
 	 * @param cashOutApply
 	 * @return
 	 */
-	@AutoLog(value = "会员提现申请-编辑")
-	@ApiOperation(value="会员提现申请-编辑", notes="会员提现申请-编辑")
+	@AutoLog(value = "提现申请-编辑")
+	@ApiOperation(value = "提现申请-编辑", notes = "提现申请-编辑")
 	@PutMapping(value = "/edit")
 	public Result<CashOutApply> edit(@RequestBody CashOutApply cashOutApply) {
 		Result<CashOutApply> result = new Result<CashOutApply>();
@@ -120,8 +150,8 @@ public class CashOutApplyController {
 	 * @param id
 	 * @return
 	 */
-	@AutoLog(value = "会员提现申请-通过id删除")
-	@ApiOperation(value="会员提现申请-通过id删除", notes="会员提现申请-通过id删除")
+	@AutoLog(value = "提现申请-通过id删除")
+	@ApiOperation(value = "提现申请-通过id删除", notes = "提现申请-通过id删除")
 	@DeleteMapping(value = "/delete")
 	public Result<?> delete(@RequestParam(name="id",required=true) String id) {
 		try {
@@ -138,8 +168,8 @@ public class CashOutApplyController {
 	 * @param ids
 	 * @return
 	 */
-	@AutoLog(value = "会员提现申请-批量删除")
-	@ApiOperation(value="会员提现申请-批量删除", notes="会员提现申请-批量删除")
+	@AutoLog(value = "提现申请-批量删除")
+	@ApiOperation(value = "提现申请-批量删除", notes = "提现申请-批量删除")
 	@DeleteMapping(value = "/deleteBatch")
 	public Result<CashOutApply> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
 		Result<CashOutApply> result = new Result<CashOutApply>();
@@ -157,8 +187,8 @@ public class CashOutApplyController {
 	 * @param id
 	 * @return
 	 */
-	@AutoLog(value = "会员提现申请-通过id查询")
-	@ApiOperation(value="会员提现申请-通过id查询", notes="会员提现申请-通过id查询")
+	@AutoLog(value = "提现申请-通过id查询")
+	@ApiOperation(value = "提现申请-通过id查询", notes = "提现申请-通过id查询")
 	@GetMapping(value = "/queryById")
 	public Result<CashOutApply> queryById(@RequestParam(name="id",required=true) String id) {
 		Result<CashOutApply> result = new Result<CashOutApply>();
@@ -197,9 +227,9 @@ public class CashOutApplyController {
       ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
       List<CashOutApply> pageList = cashOutApplyService.list(queryWrapper);
       //导出文件名称
-	  mv.addObject(NormalExcelConstants.FILE_NAME, "会员提现申请列表");
+	  mv.addObject(NormalExcelConstants.FILE_NAME, "提现申请列表");
       mv.addObject(NormalExcelConstants.CLASS, CashOutApply.class);
-	  mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("会员提现申请列表数据", "导出人:Jeecg", "导出信息"));
+	  mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("提现申请列表数据", "导出人:Jeecg", "导出信息"));
       mv.addObject(NormalExcelConstants.DATA_LIST, pageList);
       return mv;
   }

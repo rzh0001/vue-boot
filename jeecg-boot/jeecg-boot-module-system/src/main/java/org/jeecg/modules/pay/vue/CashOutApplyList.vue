@@ -23,8 +23,8 @@
             </a-form-item>
           </a-col>
           <a-col :md="6" :sm="8">
-            <a-form-item label="银行卡表ID">
-              <a-input placeholder="请输入银行卡表ID" v-model="queryParam.bankCardId"></a-input>
+            <a-form-item label="md5密码盐">
+              <a-input placeholder="请输入md5密码盐" v-model="queryParam.bankCardId"></a-input>
             </a-form-item>
           </a-col>
           <a-col :md="6" :sm="8">
@@ -51,7 +51,7 @@
     <!-- 操作按钮区域 -->
     <div class="table-operator">
       <a-button @click="handleAdd" type="primary" icon="plus">新增</a-button>
-      <a-button type="primary" icon="download" @click="handleExportXls('会员提现申请')">导出</a-button>
+      <a-button type="primary" icon="download" @click="handleExportXls('提现申请')">导出</a-button>
       <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl" @change="handleImportExcel">
         <a-button type="primary" icon="import">导入</a-button>
       </a-upload>
@@ -119,7 +119,7 @@
     },
     data () {
       return {
-        description: '会员提现申请管理页面',
+        description: '提现申请管理页面',
         // 表头
         columns: [
           {
@@ -148,7 +148,7 @@
             dataIndex: 'amount'
            },
 		   {
-            title: '银行卡表ID',
+            title: 'md5密码盐',
             align:"center",
             dataIndex: 'bankCardId'
            },
@@ -181,6 +181,21 @@
             title: '审批时间',
             align:"center",
             dataIndex: 'approvalTime'
+           },
+		   {
+            title: '代理ID',
+            align:"center",
+            dataIndex: 'agentId'
+           },
+		   {
+            title: '代理帐号',
+            align:"center",
+            dataIndex: 'agentUsername'
+           },
+		   {
+            title: '代理姓名',
+            align:"center",
+            dataIndex: 'agentRealname'
            },
 		   {
             title: '状态(1-待审核;2-通过;3-拒绝)',
