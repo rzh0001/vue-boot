@@ -101,9 +101,8 @@ public class PayTest {
 
 
     public static void main(String[] args) {
-        JSONObject req = new JSONObject();
         JSONObject data = new JSONObject();
-        data.put(BaseConstant.OUTER_ORDER_ID,"1565776105000abc");
+        data.put(BaseConstant.OUTER_ORDER_ID,"1565944907000abc");
         data.put(BaseConstant.USER_NAME,"www");
         data.put(BaseConstant.SUBMIT_AMOUNT,"111");
         data.put(BaseConstant.PAY_TYPE,"ysf");
@@ -124,7 +123,7 @@ public class PayTest {
     @Test
     public void a(){
         JSONObject data = new JSONObject();
-        data.put(BaseConstant.OUTER_ORDER_ID,"1565776105000abc");
+        data.put(BaseConstant.OUTER_ORDER_ID,"1565944907000abc");
         data.put(BaseConstant.USER_NAME,"www");
         data.put(BaseConstant.SUBMIT_AMOUNT,"111");
         data.put(BaseConstant.PAY_TYPE,"ysf");

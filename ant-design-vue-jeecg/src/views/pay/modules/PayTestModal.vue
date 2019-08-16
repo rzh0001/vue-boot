@@ -15,7 +15,7 @@
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
           label="金额">
-          <a-input placeholder="申请金额" v-decorator="['amount', validatorRules.amount]" />
+          <a-input placeholder="申请金额" v-decorator="['submitAmount', validatorRules.submitAmount]" />
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"
@@ -65,7 +65,7 @@
         confirmLoading: false,
         form: this.$form.createForm(this),
         validatorRules:{
-          amount:{rules: [{ required: true, message: '请输入金额!' }]},
+          submitAmount:{rules: [{ required: true, message: '请输入金额!' }]},
           username:{rules: [{ required: true, message: '请输入用户名!' }]},
           payType:{rules: [{ required: true, message: '请输入通道代码' }]}
         },
@@ -119,12 +119,10 @@
             let outerOrderId = Date.parse(new Date())+'abc';
             let form = Object.assign(this.model, {"callbackUrl":"http://localhost/api/callback","outerOrderId":outerOrderId});
             let data = JSON.stringify(form);
-            console.log(data);
-            console.log(Encrypt(form,'1234123412ABCDEF'));
+            console.log('json字符串data:'+data);
+            console.log('json字符串data 加密：'+Encrypt(data,'1234123412ABCDEF'));
           var timestamp = Date.parse(new Date());
-          console.log(this.model.username+timestamp+Encrypt(form,'1234123412ABCDEF')+'1234123412ABCDEF');
-          var sign = MD5(this.model.username+timestamp+Encrypt(form,'1234123412ABCDEF')+'1234123412ABCDEF');
-          console.log(sign);
+          var sign = MD5(this.model.username+timestamp+Encrypt(data,'1234123412ABCDEF')+'1234123412ABCDEF');
           var jsonObj = {
             "data":Encrypt(data,'1234123412ABCDEF'),
             "username":this.model.username,

@@ -6,7 +6,7 @@ export function Encrypt(word, keyStr){
   let srcs = CryptoJS.enc.Utf8.parse(word);
   let key = CryptoJS.enc.Utf8.parse(keyStr);
   let encrypted = CryptoJS.AES.encrypt(srcs, key, {mode: CryptoJS.mode.ECB, padding: CryptoJS.pad.Pkcs7 });
-  return encrypted.toString().toUpperCase();
+  return CryptoJS.enc.Base64.stringify(encrypted.ciphertext);
 }
 //解密方法
 export function Decrypt(word){
