@@ -457,11 +457,13 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         if (order.getPayType().equals(BaseConstant.REQUEST_ALI_ZZ)) {
             AliPayCallBackParam param = structuralAliParam(order, "text", "alipay_auto", "3", "2");
             aliPayCallBack(param, aliPayUrl);
+            return;
         }
         //转卡
         if (order.getPayType().equals(BaseConstant.REQUEST_ALI_BANK)) {
             AliPayCallBackParam param = structuralAliParam(order, "text", "jdpay_auto", "3", "2");
             aliPayCallBack(param, bankPayUrl);
+            return;
         }
         //云闪付
         if (order.getPayType().equals(BaseConstant.REQUEST_YSF)) {
@@ -479,10 +481,12 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             String aesKey = keys[1];
             String param = structuralYsfParam(order, md5Key, aesKey, agentCode, userName);
             ysfCallBack(param, ysfPayUrl);
+            return;
         }
         //农信易扫
         if (order.getPayType().equals(BaseConstant.REQUEST_NXYS_WX) || order.getPayType().equals(BaseConstant.REQUEST_NXYS_ALIPAY)){
             nxysCallBack(order);
+            return;
         }
 
     }
