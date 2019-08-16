@@ -1,7 +1,7 @@
 <template>
   <div class="footer">
     <div class="links">
-      <a href="http://www.jeecg.org" target="_blank">JEECG 首页</a>
+      <a href="http://www.jeecg.org" target="_blank"> 首页</a>
       <a href="https://github.com/zhangdaiscott/jeecg-boot" target="_blank">
         <a-icon type="github"/>
       </a>
@@ -11,7 +11,7 @@
     <div class="copyright">
       Copyright
       <a-icon type="copyright"/>
-      2019 <span>JEECG开源社区 出品</span>
+      2019 <span>支付平台 出品</span>
     </div>
   </div>
 </template>
