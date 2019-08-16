@@ -305,14 +305,14 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         BigDecimal submit = new BigDecimal(submitAmount);
         String rate = rateEntityService.getUserRateByUserName(userName);
         BigDecimal userRate = new BigDecimal(rate);
-        BigDecimal agentMoney = submit.multiply(userRate);
+        BigDecimal agentMoney = submit.multiply(userRate).setScale(2, BigDecimal.ROUND_HALF_UP);
 
         //统计高级代理所得额度
         countAgentMoney(user.getAgentUsername(), submit);
         //统计商户的所得金额
         countUserRate(userName, user.getAgentUsername(), submit, agentMoney);
-        if (!StringUtils.isBlank(user.getSalesmanId())) {
-            //统计介绍人的所得金额
+        //统计介绍人的所得金额
+        if (!StringUtils.isBlank(user.getSalesmanUsername())) {
             countSalesmanRate(user.getSalesmanUsername(), user.getAgentUsername(), agentMoney);
         }
     }
@@ -371,8 +371,8 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         }
         user.setAgentId(agentName);
         user.setUserName(userName);
-        BigDecimal userNow = amount.subtract(agentMoney);
-        user.setAmount(userNow.add(user.getAmount()));
+        BigDecimal userNow = amount.subtract(agentMoney).setScale(2, BigDecimal.ROUND_HALF_UP);
+        user.setAmount(userNow.add(user.getAmount()).setScale(2, BigDecimal.ROUND_HALF_UP));
         amountService.saveOrUpdate(user);
     }
 

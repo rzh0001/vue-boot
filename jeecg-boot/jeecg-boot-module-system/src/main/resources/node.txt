@@ -74,3 +74,8 @@ bank = http://bank.klecode.com/gateway/pay/automaticBankQueryStatus.do
 
 5、数据字典编号：ipWhiteList --》配置ip白名单，用于在四方平台回调商户时候，校验ip是否来自于挂马平台
 
+===============================
+业务说明：
+1、利率：利息是对应高级代理而言的
+普通商户利息：哪个高级代理下的商户
+介绍人利息：哪个高级代理下的哪个商户
