@@ -445,8 +445,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         //请求挂马平台
         ChannelBusinessEntity channelBusinessEntity = channelBusinessEntityService.queryChannelBusiness(businessCode,
                 payType);
-        requestSupport(order, channelBusinessEntity, userName, businessCode);
-        return R.ok("订单创建成功");
+        return requestSupport(order, channelBusinessEntity, userName, businessCode);
     }
 
     /**
@@ -455,19 +454,19 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * @param order
      * @throws Exception
      */
-    private void requestSupport(OrderInfoEntity order, ChannelBusinessEntity channelBusinessEntity, String userName,
+    private R requestSupport(OrderInfoEntity order, ChannelBusinessEntity channelBusinessEntity, String userName,
                                 String agentCode) throws Exception {
         //支付宝转账
         if (order.getPayType().equals(BaseConstant.REQUEST_ALI_ZZ)) {
             AliPayCallBackParam param = structuralAliParam(order, "text", "alipay_auto", "3", "2");
             aliPayCallBack(param, aliPayUrl);
-            return;
+            return R.ok();
         }
         //转卡
         if (order.getPayType().equals(BaseConstant.REQUEST_ALI_BANK)) {
             AliPayCallBackParam param = structuralAliParam(order, "text", "jdpay_auto", "3", "2");
             aliPayCallBack(param, bankPayUrl);
-            return;
+            return R.ok();
         }
         //云闪付
         if (order.getPayType().equals(BaseConstant.REQUEST_YSF)) {
@@ -484,15 +483,15 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             String md5Key = keys[0];
             String aesKey = keys[1];
             String param = structuralYsfParam(order, md5Key, aesKey, agentCode, userName);
-            ysfCallBack(param, ysfPayUrl);
-            return;
+            String url = ysfCallBack(param, ysfPayUrl);
+            return R.ok().put("url",url);
         }
         //农信易扫
         if (order.getPayType().equals(BaseConstant.REQUEST_NXYS_WX) || order.getPayType().equals(BaseConstant.REQUEST_NXYS_ALIPAY)) {
             nxysCallBack(order);
-            return;
+            return R.ok();
         }
-
+        return  R.error("无匹配通道");
     }
 
     /**
@@ -586,10 +585,10 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * @param url
      * @throws Exception
      */
-    private void ysfCallBack(String param, String url) throws Exception {
+    private String ysfCallBack(String param, String url) throws Exception {
         log.info("云闪付请求挂马平台，入参为：{}", param);
         if (StringUtils.isBlank(url)) {
-            throw new RRException("未配置支付宝回调地址，请联系管理员配置回调地址");
+            throw new RRException("未配置云闪付回调地址，请联系管理员配置回调地址");
         }
         HttpResult result = HttpUtils.doPostJson(url, param);
         if (result.getCode() == BaseConstant.SUCCESS) {
@@ -598,11 +597,12 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             String resultUrl = (String) r.get("payurl");
             if (StringUtils.isNotBlank(resultUrl)) {
                 //打开返回的链接
-                BareBonesBrowserLaunch.openURL(resultUrl);
+                return resultUrl;
             }
         } else {
             throw new RRException("云闪付请求挂马平台，四方回调挂马平台失败,订单创建失败：" + param);
         }
+        return null;
     }
 
     /**
