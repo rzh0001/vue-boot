@@ -50,7 +50,7 @@
 
     <!-- 操作按钮区域 -->
     <div class="table-operator">
-      <a-button @click="handleAdd" v-has="'user:add'" type="primary" icon="plus">新增</a-button>
+      <a-button @click="handleAdd" v-has="'cashOutApply:add'" type="primary" icon="plus">新增</a-button>
       <a-button type="primary" icon="download" @click="handleExportXls('会员提现申请')">导出</a-button>
       <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl"
                 @change="handleImportExcel">
@@ -92,13 +92,13 @@
         <span slot="action" slot-scope="text, record">
 <!--          <a @click="handleEdit(record)" >开始处理</a>-->
 <!--          <a @click="handleEdit(record)" v-has="'user:edit'">开始处理</a>-->
-          <a-popconfirm title="确定开始处理吗?" v-if="record.status==0" @confirm="() => handleApproval({id: record.id, status: '1'})">
+          <a-popconfirm title="确定开始处理吗?" v-has="'cashOutApply:approval'" v-if="record.status==0" @confirm="() => handleApproval({id: record.id, status: '1'})">
                   <a>开始处理</a>
           </a-popconfirm>
-          <a-popconfirm title="确定已打款吗?" v-if="record.status==1" @confirm="() => handleApproval({id: record.id, status: '2'})">
+          <a-popconfirm title="确定已打款吗?" v-has="'cashOutApply:approval'" v-if="record.status==1" @confirm="() => handleApproval({id: record.id, status: '2'})">
                   <a>已打款</a> <a-divider type="vertical"/>
           </a-popconfirm>
-          <a-popconfirm title="确定拒绝打款申请吗?" v-if="record.status==1" @confirm="() => handleApproval({id: record.id, status: '3'})">
+          <a-popconfirm title="确定拒绝打款申请吗?" v-has="'cashOutApply:approval'" v-if="record.status==1" @confirm="() => handleApproval({id: record.id, status: '3'})">
                   <a>拒绝</a>
           </a-popconfirm>
 
@@ -202,7 +202,20 @@
           {
             title: '状态',
             align: 'center',
-            dataIndex: 'status'
+            dataIndex: 'status',
+            customRender: function(text) {
+              if (text == 0) {
+                return '待处理'
+              } else if (text == 1) {
+                return '处理中'
+              }else if (text == 2) {
+                return '已打款'
+              } else if (text == 3) {
+                return '已拒绝'
+              } else {
+                return text
+              }
+            }
           },
           // {
           //   title: '删除状态',

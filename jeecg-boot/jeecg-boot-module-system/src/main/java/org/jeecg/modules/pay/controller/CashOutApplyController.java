@@ -162,7 +162,7 @@ public class CashOutApplyController {
 	 /**
 	  * 审核
 	  *
-	  * @param cashOutApply
+	  * @param jsonObject
 	  * @return
 	  */
 	 @AutoLog(value = "提现申请-审核")
@@ -176,6 +176,7 @@ public class CashOutApplyController {
 			 result.error500("未找到对应实体");
 		 } else {
 			 cashOutApplyEntity.setStatus(jsonObject.getString("status"));
+			 cashOutApplyEntity.setApprovalTime(new Date());
 			 boolean ok = cashOutApplyService.updateById(cashOutApplyEntity);
 			 //TODO 返回false说明什么？
 			 if (ok) {

@@ -129,7 +129,7 @@
         validatorRules: {
           status:{
             rules: [{
-              required: true, message: '请选择操作!',
+              required: this.statusDisabled, message: '请选择操作!',
             }, {
               // validator: ,
             }],
@@ -137,7 +137,7 @@
         },
         url: {
           add: '/pay/cashOutApply/add',
-          edit: '/pay/cashOutApply/edit',
+          edit: '/pay/cashOutApply/edit'
         }
       }
     },
@@ -186,8 +186,8 @@
             let formData = Object.assign(this.model, values)
             formData.bankCardId = this.selectedBankCard
             //时间格式化
-            // formData.applyTime = formData.applyTime?formData.applyTime.format('YYYY-MM-DD HH:mm:ss'):null;
-            // formData.approvalTime = formData.approvalTime?formData.approvalTime.format('YYYY-MM-DD HH:mm:ss'):null;
+            formData.applyTime = formData.applyTime?formData.applyTime.format('YYYY-MM-DD HH:mm:ss'):null;
+            formData.approvalTime = formData.approvalTime?formData.approvalTime.format('YYYY-MM-DD HH:mm:ss'):null;
 
             console.log(formData)
             httpAction(httpurl, formData, method).then((res) => {

@@ -270,15 +270,7 @@
           }
         });
       },
-      loadSalesman(userid){
-        queryUserRole({userid:userid}).then((res)=>{
-          if(res.success){
-            this.selectedSalesman = res.result;
-          }else{
-            console.log(res.message);
-          }
-        });
-      },
+
       refresh () {
           this.selectedDepartKeys=[];
           this.checkedDepartKeys=[];
@@ -299,7 +291,6 @@
         that.form.resetFields();
         if(record.hasOwnProperty("id")){
           that.loadUserRoles(record.id);
-          this.picUrl = "Has no pic url yet";
         }
         that.userId = record.id;
         that.visible = true;
@@ -309,26 +300,8 @@
         });
         // 调用查询用户对应的部门信息的方法
         that.checkedDepartKeys = [];
-        that.loadCheckedDeparts();
       },
-      //
-      loadCheckedDeparts(){
-        let that = this;
-        if(!that.userId){return}
-        getAction(that.url.userWithDepart,{userId:that.userId}).then((res)=>{
-          that.checkedDepartNames = [];
-          if(res.success){
-            for (let i = 0; i < res.result.length; i++) {
-              that.checkedDepartNames.push(res.result[i].title);
-              this.checkedDepartNameString = this.checkedDepartNames.join(",");
-              that.checkedDepartKeys.push(res.result[i].key);
-            }
-            that.userDepartModel.departIdList = that.checkedDepartKeys
-          }else{
-            console.log(res.message);
-          }
-        })
-      },
+
       close () {
         this.$emit('close');
         this.visible = false;
@@ -509,10 +482,7 @@
       getAvatarView(){
         return this.url.imgerver +"/"+ this.model.avatar;
       },
-      // 搜索用户对应的部门API
-      onSearch(){
-        this.$refs.departWindow.add(this.checkedDepartKeys,this.userId);
-      },
+
 
       // 获取用户对应部门弹出框提交给返回的数据
       modalFormOk (formData) {
