@@ -529,12 +529,14 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         String data = AES128Util.encryptBase64(JSON.toJSONString(param), key);
 
         log.info("四方回调挂马平台，加密后数据，url:{};param:{}", url, data);
-
-        HttpResult result = HttpUtils.doPostJson(url, data);
+        JSONObject p = new JSONObject();
+        p.put("data",data);
+        HttpResult result = HttpUtils.doPostJson(url, p.toJSONString());
         if (result.getCode() == BaseConstant.SUCCESS) {
-            log.info("四方回调挂马平台成功，订单号：{}", param.getOut_trade_no());
+            JSONObject r = JSONObject.parseObject(result.getBody());
+            log.info("四方回调挂马平台成功，返回信息：{}", r.toJSONString());
         } else {
-            throw new RRException("四方回调挂马平台失败,订单创建失败：" + param.getOut_trade_no());
+            throw new RRException("四方回调挂马平台失败,订单创建失败：" +result.getBody());
         }
     }
 

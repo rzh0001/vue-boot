@@ -187,11 +187,6 @@
             align:"center",
             dataIndex: 'successCallbackUrl'
            },
-		   {
-            title: '可用金额，即可提现额度',
-            align:"center",
-            dataIndex: 'availableAmount'
-           },
           {
             title: '操作',
             dataIndex: 'action',
