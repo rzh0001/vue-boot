@@ -275,6 +275,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 		switch (memberType) {
 			case PayConstant.MEMBER_TYPE_AGENT:
 				roleCode = PayConstant.ROLE_CODE_AGENT;
+				user.setApiKey(UUID.randomUUID().toString());
 				break;
 			case PayConstant.MEMBER_TYPE_SALESMAN:
 				roleCode = PayConstant.ROLE_CODE_SALESMAN;
