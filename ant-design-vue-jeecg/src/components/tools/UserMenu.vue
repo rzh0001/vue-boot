@@ -28,21 +28,21 @@
           <a-icon type="setting"/>
           <span>密码修改</span>
         </a-menu-item>
-        <a-menu-item key="3" @click="updateCurrentDepart">
-          <a-icon type="cluster"/>
-          <span>切换部门</span>
-        </a-menu-item>
-       <!-- <a-menu-item key="2" disabled>
-          <a-icon type="setting"/>
-          <span>测试</span>
-        </a-menu-item>
-        <a-menu-divider/>
-        <a-menu-item key="3">
-          <a href="javascript:;" @click="handleLogout">
-            <a-icon type="logout"/>
-            <span>退出登录</span>
-          </a>
-        </a-menu-item>-->
+        <!--        <a-menu-item key="3" @click="updateCurrentDepart">-->
+        <!--          <a-icon type="cluster"/>-->
+        <!--          <span>切换部门</span>-->
+        <!--        </a-menu-item>-->
+        <!-- <a-menu-item key="2" disabled>
+           <a-icon type="setting"/>
+           <span>测试</span>
+         </a-menu-item>
+         <a-menu-divider/>
+         <a-menu-item key="3">
+           <a href="javascript:;" @click="handleLogout">
+             <a-icon type="logout"/>
+             <span>退出登录</span>
+           </a>
+         </a-menu-item>-->
       </a-menu>
     </a-dropdown>
     <span class="action">
@@ -64,7 +64,7 @@
   import { mixinDevice } from '@/utils/mixin.js'
 
   export default {
-    name: "UserMenu",
+    name: 'UserMenu',
     mixins: [mixinDevice],
     components: {
       HeaderNotice,
@@ -79,11 +79,11 @@
       }
     },
     methods: {
-      ...mapActions(["Logout"]),
-      ...mapGetters(["nickname", "avatar","userInfo"]),
-      getAvatar(){
-        console.log('url = '+ window._CONFIG['imgDomainURL']+"/"+this.avatar())
-        return window._CONFIG['imgDomainURL']+"/"+this.avatar()
+      ...mapActions(['Logout']),
+      ...mapGetters(['nickname', 'avatar', 'userInfo']),
+      getAvatar() {
+        console.log('url = ' + window._CONFIG['imgDomainURL'] + '/' + this.avatar())
+        return window._CONFIG['imgDomainURL'] + '/' + this.avatar()
       },
       handleLogout() {
         const that = this
@@ -93,7 +93,7 @@
           content: '真的要注销登录吗 ?',
           onOk() {
             return that.Logout({}).then(() => {
-                window.location.href="/";
+              window.location.href = '/'
               //window.location.reload()
             }).catch(err => {
               that.$message.error({
@@ -103,14 +103,14 @@
             })
           },
           onCancel() {
-          },
-        });
+          }
+        })
       },
-      updatePassword(){
+      updatePassword() {
         let username = this.userInfo().username
         this.$refs.userPassword.show(username)
       },
-      updateCurrentDepart(){
+      updateCurrentDepart() {
         this.$refs.departSelect.show()
       }
     }
