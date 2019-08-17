@@ -4,7 +4,7 @@
  * data中url定义 list为查询列表  delete为删除单条记录  deleteBatch为批量删除
  */
 import { filterObj } from '@/utils/util';
-import { deleteAction, getAction,downFile } from '@/api/manage'
+import { putAction,deleteAction, getAction,downFile } from '@/api/manage'
 import Vue from 'vue'
 import { ACCESS_TOKEN } from "@/store/mutation-types"
 
@@ -169,6 +169,21 @@ export const JeecgListMixin = {
       }
       var that = this;
       deleteAction(that.url.delete, {id: id}).then((res) => {
+        if (res.success) {
+          that.$message.success(res.message);
+          that.loadData();
+        } else {
+          that.$message.warning(res.message);
+        }
+      });
+    },
+    handleApproval: function (params) {
+      if(!this.url.approval){
+        this.$message.error("请设置url.approval属性!")
+        return
+      }
+      var that = this;
+      putAction(that.url.approval, params).then((res) => {
         if (res.success) {
           that.$message.success(res.message);
           that.loadData();

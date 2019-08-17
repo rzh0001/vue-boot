@@ -50,7 +50,7 @@
 
     <!-- 操作按钮区域 -->
     <div class="table-operator">
-      <a-button @click="handleAdd" type="primary" icon="plus">新增</a-button>
+      <a-button @click="handleAdd" v-has="'user:add'" type="primary" icon="plus">新增</a-button>
       <a-button type="primary" icon="download" @click="handleExportXls('会员提现申请')">导出</a-button>
       <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl"
                 @change="handleImportExcel">
@@ -90,19 +90,29 @@
         @change="handleTableChange">
 
         <span slot="action" slot-scope="text, record">
-          <a @click="handleEdit(record)">编辑</a>
+<!--          <a @click="handleEdit(record)" >开始处理</a>-->
+<!--          <a @click="handleEdit(record)" v-has="'user:edit'">开始处理</a>-->
+          <a-popconfirm title="确定开始处理吗?" v-if="record.status==0" @confirm="() => handleApproval({id: record.id, status: '1'})">
+                  <a>开始处理</a>
+          </a-popconfirm>
+          <a-popconfirm title="确定已打款吗?" v-if="record.status==1" @confirm="() => handleApproval({id: record.id, status: '2'})">
+                  <a>已打款</a> <a-divider type="vertical"/>
+          </a-popconfirm>
+          <a-popconfirm title="确定拒绝打款申请吗?" v-if="record.status==1" @confirm="() => handleApproval({id: record.id, status: '3'})">
+                  <a>拒绝</a>
+          </a-popconfirm>
 
-          <a-divider type="vertical"/>
-          <a-dropdown>
-            <a class="ant-dropdown-link">更多 <a-icon type="down"/></a>
-            <a-menu slot="overlay">
-              <a-menu-item>
-                <a-popconfirm title="确定删除吗?" @confirm="() => handleDelete(record.id)">
-                  <a>删除</a>
-                </a-popconfirm>
-              </a-menu-item>
-            </a-menu>
-          </a-dropdown>
+<!--          <a-divider type="vertical"/>-->
+<!--          <a-dropdown>-->
+<!--            <a class="ant-dropdown-link">更多 <a-icon type="down"/></a>-->
+<!--            <a-menu slot="overlay">-->
+<!--              <a-menu-item>-->
+<!--                <a-popconfirm title="确定删除吗?" @confirm="() => handleDelete(record.id)">-->
+<!--                  <a>删除</a>-->
+<!--                </a-popconfirm>-->
+<!--              </a-menu-item>-->
+<!--            </a-menu>-->
+<!--          </a-dropdown>-->
         </span>
 
       </a-table>
@@ -194,11 +204,11 @@
             align: 'center',
             dataIndex: 'status'
           },
-          {
-            title: '删除状态',
-            align: 'center',
-            dataIndex: 'delFlag'
-          },
+          // {
+          //   title: '删除状态',
+          //   align: 'center',
+          //   dataIndex: 'delFlag'
+          // },
           {
             title: '操作',
             dataIndex: 'action',
@@ -211,7 +221,8 @@
           delete: '/pay/cashOutApply/delete',
           deleteBatch: '/pay/cashOutApply/deleteBatch',
           exportXlsUrl: 'pay/cashOutApply/exportXls',
-          importExcelUrl: 'pay/cashOutApply/importExcel'
+          importExcelUrl: 'pay/cashOutApply/importExcel',
+          approval: '/pay/cashOutApply/approval'
         }
       }
     },

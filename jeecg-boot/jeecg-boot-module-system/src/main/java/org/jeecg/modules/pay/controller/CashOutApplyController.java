@@ -1,6 +1,7 @@
 package org.jeecg.modules.pay.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -11,6 +12,7 @@ import org.apache.shiro.SecurityUtils;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.aspect.annotation.AutoLog;
 import org.jeecg.common.constant.CommonConstant;
+import org.jeecg.common.constant.PayConstant;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.oConvertUtils;
@@ -78,6 +80,18 @@ public class CashOutApplyController {
 									  HttpServletRequest req) {
 		Result<IPage<CashOutApply>> result = new Result<IPage<CashOutApply>>();
 		QueryWrapper<CashOutApply> queryWrapper = QueryGenerator.initQueryWrapper(cashOutApply, req.getParameterMap());
+		LoginUser optUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+		if (optUser.getMemberType() != null) {
+			switch (optUser.getMemberType()) {
+				case PayConstant.MEMBER_TYPE_AGENT:
+					queryWrapper.lambda().eq(CashOutApply::getAgentId, optUser.getId());
+					break;
+				case PayConstant.MEMBER_TYPE_SALESMAN:
+				case PayConstant.MEMBER_TYPE_MEMBER:
+					queryWrapper.lambda().eq(CashOutApply::getUserId, optUser.getId());
+				default:
+			}
+		}
 		Page<CashOutApply> page = new Page<CashOutApply>(pageNo, pageSize);
 		IPage<CashOutApply> pageList = cashOutApplyService.page(page, queryWrapper);
 		result.setSuccess(true);
@@ -144,6 +158,33 @@ public class CashOutApplyController {
 		
 		return result;
 	}
+	
+	 /**
+	  * 审核
+	  *
+	  * @param cashOutApply
+	  * @return
+	  */
+	 @AutoLog(value = "提现申请-审核")
+	 @ApiOperation(value = "提现申请-审核", notes = "提现申请-审核")
+	 @PutMapping(value = "/approval")
+	 public Result<CashOutApply> approval(@RequestBody JSONObject jsonObject) {
+		
+		 Result<CashOutApply> result = new Result<CashOutApply>();
+		 CashOutApply cashOutApplyEntity = cashOutApplyService.getById(jsonObject.getString("id"));
+		 if (cashOutApplyEntity == null) {
+			 result.error500("未找到对应实体");
+		 } else {
+			 cashOutApplyEntity.setStatus(jsonObject.getString("status"));
+			 boolean ok = cashOutApplyService.updateById(cashOutApplyEntity);
+			 //TODO 返回false说明什么？
+			 if (ok) {
+				 result.success("修改成功!");
+			 }
+		 }
+		
+		 return result;
+	 }
 	
 	/**
 	 *   通过id删除
