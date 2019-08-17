@@ -1,12 +1,12 @@
 <template>
   <div class="footer">
     <div class="links">
-      <a href="http://www.jeecg.org" target="_blank"> 首页</a>
-      <a href="https://github.com/zhangdaiscott/jeecg-boot" target="_blank">
-        <a-icon type="github"/>
-      </a>
-      <a href="https://ant.design/">Ant Design</a>
-      <a href="https://vuecomponent.github.io/ant-design-vue/docs/vue/introduce-cn/">Vue Antd</a>
+<!--      <a href="http://www.jeecg.org" target="_blank"> 首页</a>-->
+<!--      <a href="https://github.com/zhangdaiscott/jeecg-boot" target="_blank">-->
+<!--        <a-icon type="github"/>-->
+<!--      </a>-->
+<!--      <a href="https://ant.design/">Ant Design</a>-->
+<!--      <a href="https://vuecomponent.github.io/ant-design-vue/docs/vue/introduce-cn/">Vue Antd</a>-->
     </div>
     <div class="copyright">
       Copyright
