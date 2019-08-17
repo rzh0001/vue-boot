@@ -18,8 +18,8 @@
           </a-col>
         <template v-if="toggleSearchStatus">
         <a-col :md="6" :sm="8">
-            <a-form-item label="用户id">
-              <a-input placeholder="请输入用户id" v-model="queryParam.userId"></a-input>
+            <a-form-item label="用户">
+              <a-input placeholder="请输入用户id" v-model="queryParam.userName"></a-input>
             </a-form-item>
           </a-col>
           <a-col :md="6" :sm="8">
@@ -49,7 +49,7 @@
     </div>
 
     <!-- 操作按钮区域 -->
-    <div class="table-operator">
+   <!-- <div class="table-operator">
       <a-button @click="handleAdd" type="primary" icon="plus">新增</a-button>
       <a-button type="primary" icon="download" @click="handleExportXls('订单信息')">导出</a-button>
       <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl" @change="handleImportExcel">
@@ -61,14 +61,14 @@
         </a-menu>
         <a-button style="margin-left: 8px"> 批量操作 <a-icon type="down" /></a-button>
       </a-dropdown>
-    </div>
+    </div>-->
 
     <!-- table区域-begin -->
     <div>
-      <div class="ant-alert ant-alert-info" style="margin-bottom: 16px;">
+   <!--   <div class="ant-alert ant-alert-info" style="margin-bottom: 16px;">
         <i class="anticon anticon-info-circle ant-alert-icon"></i> 已选择 <a style="font-weight: 600">{{ selectedRowKeys.length }}</a>项
         <a style="margin-left: 24px" @click="onClearSelected">清空</a>
-      </div>
+      </div>-->
 
       <a-table
         ref="table"
@@ -143,12 +143,12 @@
             dataIndex: 'outerOrderId'
            },
 		   {
-            title: '用户id',
+            title: '用户',
             align:"center",
-            dataIndex: 'userId'
+            dataIndex: 'userName'
            },
 		   {
-            title: '上级用户id',
+            title: '上级用户',
             align:"center",
             dataIndex: 'parentUser'
            },
@@ -186,11 +186,6 @@
             title: '成功回调地址',
             align:"center",
             dataIndex: 'successCallbackUrl'
-           },
-		   {
-            title: '失败回调地址',
-            align:"center",
-            dataIndex: 'errCallbackUrl'
            },
 		   {
             title: '可用金额，即可提现额度',

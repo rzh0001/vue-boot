@@ -263,6 +263,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
 
     /**
      * 校验申请金额
+     *
      * @param userName
      * @param submitAmount
      * @return
@@ -303,7 +304,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         SysUser user = userService.getUserByName(userName);
         //高级代理的利润
         BigDecimal submit = new BigDecimal(submitAmount);
-        String rate = rateEntityService.getUserRateByUserName(userName);
+        String rate = rateEntityService.getUserRateByUserNameAndAngetCode(userName, user.getAgentUsername());
         BigDecimal userRate = new BigDecimal(rate);
         BigDecimal agentMoney = submit.multiply(userRate).setScale(2, BigDecimal.ROUND_HALF_UP);
 
@@ -313,7 +314,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         countUserRate(userName, user.getAgentUsername(), submit, agentMoney);
         //统计介绍人的所得金额
         if (!StringUtils.isBlank(user.getSalesmanUsername())) {
-            countSalesmanRate(user.getSalesmanUsername(), user.getAgentUsername(), agentMoney);
+            countSalesmanRate(userName, user.getSalesmanUsername(), user.getAgentUsername(), agentMoney);
         }
     }
 
@@ -330,19 +331,21 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             agent.setAmount(new BigDecimal(0));
         }
         agent.setUserName(agentName);
-        agent.setAmount(agent.getAmount().add(submit));
+        agent.setAmount(agent.getAmount().add(submit).setScale(2, BigDecimal.ROUND_HALF_UP));
         amountService.saveOrUpdate(agent);
     }
 
     /**
      * 介绍人的所得额度 = 高级代理所得额度 * 介绍人的rate
      *
+     * @param userName     被介绍人
      * @param salesmanName 介绍人
-     * @param agentName    高级代理的id
+     * @param agentName    高级代理
      * @param agentMoney   高级代理所得利润
      */
-    private void countSalesmanRate(String salesmanName, String agentName, BigDecimal agentMoney) {
-        String salesmanRate = rateEntityService.getUserRateByUserName(salesmanName);
+    private void countSalesmanRate(String userName, String salesmanName, String agentName, BigDecimal agentMoney) {
+        //介绍人费率
+        String salesmanRate = rateEntityService.getBeIntroducerRate(salesmanName, agentName, userName);
         UserAmountEntity salesman = amountService.getUserAmountByUserName(salesmanName);
         if (salesman == null) {
             salesman = new UserAmountEntity();
@@ -350,8 +353,9 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         }
         salesman.setUserName(salesmanName);
         salesman.setAgentId(agentName);
-        BigDecimal salesmanNow = agentMoney.multiply(new BigDecimal(salesmanRate));
-        salesman.setAmount(salesman.getAmount().add(salesmanNow));
+        BigDecimal salesmanNow = agentMoney.multiply(new BigDecimal(salesmanRate)).setScale(2,
+                BigDecimal.ROUND_HALF_UP);
+        salesman.setAmount(salesman.getAmount().add(salesmanNow).setScale(2, BigDecimal.ROUND_HALF_UP));
         amountService.saveOrUpdate(salesman);
     }
 
@@ -441,8 +445,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         //请求挂马平台
         ChannelBusinessEntity channelBusinessEntity = channelBusinessEntityService.queryChannelBusiness(businessCode,
                 payType);
-        requestSupport(order, channelBusinessEntity, userName, businessCode);
-        return R.ok("订单创建成功");
+        return requestSupport(order, channelBusinessEntity, userName, businessCode);
     }
 
     /**
@@ -451,19 +454,19 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * @param order
      * @throws Exception
      */
-    private void requestSupport(OrderInfoEntity order, ChannelBusinessEntity channelBusinessEntity, String userName,
+    private R requestSupport(OrderInfoEntity order, ChannelBusinessEntity channelBusinessEntity, String userName,
                                 String agentCode) throws Exception {
         //支付宝转账
         if (order.getPayType().equals(BaseConstant.REQUEST_ALI_ZZ)) {
             AliPayCallBackParam param = structuralAliParam(order, "text", "alipay_auto", "3", "2");
             aliPayCallBack(param, aliPayUrl);
-            return;
+            return R.ok();
         }
         //转卡
         if (order.getPayType().equals(BaseConstant.REQUEST_ALI_BANK)) {
             AliPayCallBackParam param = structuralAliParam(order, "text", "jdpay_auto", "3", "2");
             aliPayCallBack(param, bankPayUrl);
-            return;
+            return R.ok();
         }
         //云闪付
         if (order.getPayType().equals(BaseConstant.REQUEST_YSF)) {
@@ -480,15 +483,15 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             String md5Key = keys[0];
             String aesKey = keys[1];
             String param = structuralYsfParam(order, md5Key, aesKey, agentCode, userName);
-            ysfCallBack(param, ysfPayUrl);
-            return;
+            String url = ysfCallBack(param, ysfPayUrl);
+            return R.ok().put("url",url);
         }
         //农信易扫
-        if (order.getPayType().equals(BaseConstant.REQUEST_NXYS_WX) || order.getPayType().equals(BaseConstant.REQUEST_NXYS_ALIPAY)){
+        if (order.getPayType().equals(BaseConstant.REQUEST_NXYS_WX) || order.getPayType().equals(BaseConstant.REQUEST_NXYS_ALIPAY)) {
             nxysCallBack(order);
-            return;
+            return R.ok();
         }
-
+        return  R.error("无匹配通道");
     }
 
     /**
@@ -537,10 +540,11 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
 
     /**
      * 农信易扫请求挂马平台
+     *
      * @param order
      * @throws Exception
      */
-    private void nxysCallBack(OrderInfoEntity order) throws Exception{
+    private void nxysCallBack(OrderInfoEntity order) throws Exception {
         NxysCallBackParam nxys = new NxysCallBackParam();
         nxys.setMerchantid(order.getBusinessCode());
         nxys.setOrderid(order.getOrderId());
@@ -553,19 +557,19 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         nxys.setSign(sign(order));
 
         String param = JSON.toJSONString(nxys);
-        log.info("农信易扫请求挂马后台，入参：{}",param);
+        log.info("农信易扫请求挂马后台，入参：{}", param);
         String url = nxysAliPayUrl;
-        if(order.getPayType().equals(BaseConstant.REQUEST_NXYS_WX)){
+        if (order.getPayType().equals(BaseConstant.REQUEST_NXYS_WX)) {
             url = nxysWxPayUrl;
         }
-        if(StringUtils.isBlank(url)){
+        if (StringUtils.isBlank(url)) {
             throw new RRException("农信易扫未配置回调挂马地址");
         }
         HttpResult result = HttpUtils.doPostJson(url, param);
         if (result.getCode() == BaseConstant.SUCCESS) {
             log.info("农信易扫请求挂马后台;四方回调挂马平台成功");
             JSONObject r = JSONObject.parseObject(result.getBody());
-            if((int)r.get("code") == 0){
+            if ((int) r.get("code") == 0) {
                 String qrcode = (String) r.get("data");
                 //展示农信易扫的二维码
             }
@@ -581,17 +585,24 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * @param url
      * @throws Exception
      */
-    private void ysfCallBack(String param, String url) throws Exception {
-        log.info("云闪付请求挂马平台，入参为：{}",param);
+    private String ysfCallBack(String param, String url) throws Exception {
+        log.info("云闪付请求挂马平台，入参为：{}", param);
         if (StringUtils.isBlank(url)) {
-            throw new RRException("未配置支付宝回调地址，请联系管理员配置回调地址");
+            throw new RRException("未配置云闪付回调地址，请联系管理员配置回调地址");
         }
         HttpResult result = HttpUtils.doPostJson(url, param);
         if (result.getCode() == BaseConstant.SUCCESS) {
-            log.info("云闪付请求挂马平台，四方回调挂马平台成功，请求信息：{}", param);
+            log.info("云闪付挂马平台返回信息为：{}", result.getBody());
+            JSONObject r = JSON.parseObject(result.getBody());
+            String resultUrl = (String) r.get("payurl");
+            if (StringUtils.isNotBlank(resultUrl)) {
+                //打开返回的链接
+                return resultUrl;
+            }
         } else {
             throw new RRException("云闪付请求挂马平台，四方回调挂马平台失败,订单创建失败：" + param);
         }
+        return null;
     }
 
     /**
@@ -700,7 +711,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     /**
      * 参数校验
      * data：使用AES加密
-     * md5：userId+timestamp+data+apikey
+     * md5：userName+timestamp+data+apikey
      * timestamp：时间戳
      * userName：商户
      *
@@ -727,6 +738,14 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             log.info("userName参数校验-->用户不存在，username:{}", userName);
             return R.error("用户不存在");
         }
+        if (createOrder) {
+            if (!BaseConstant.USER_MERCHANTS.equals(user.getMemberType())) {
+                log.info("用户类型不是商户，无法提交订单，用户名为：{}", userName);
+                return R.error("用户类型不是商户，无法提交订单");
+            }
+            checkRate(user);
+        }
+
         String apiKey = null;
         if (fromInner) {
             apiKey = key;
@@ -750,6 +769,32 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
                     .put(BaseConstant.AGENT_NAME, user.getAgentUsername());
         } else {
             return decryptData;
+        }
+    }
+
+    /**
+     * 检查用户的费率是否完整
+     *
+     * @param user
+     * @throws Exception
+     */
+    private void checkRate(SysUser user) throws Exception {
+        if (StringUtils.isBlank(user.getAgentUsername())) {
+            throw new RRException("用户未配置高级代理");
+        }
+        //商户
+        String rate = rateEntityService.getUserRateByUserNameAndAngetCode(user.getUsername(), user.getAgentUsername());
+        if (StringUtils.isBlank(rate)) {
+            throw new RRException("用户未配置费率，请联系管理员配置");
+        }
+        if (StringUtils.isNotBlank(user.getSalesmanUsername())) {
+            //介绍人
+            SysUser sale = userService.getUserByName(user.getSalesmanUsername());
+            String salesRate = rateEntityService.getBeIntroducerRate(user.getSalesmanUsername(),
+                    sale.getAgentUsername(), user.getUsername());
+            if (StringUtils.isBlank(salesRate)) {
+                throw new RRException("用户的介绍人未配置费率，请联系管理员配置");
+            }
         }
     }
 

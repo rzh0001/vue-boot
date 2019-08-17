@@ -13,6 +13,14 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @Version: V1.0
  */
 public interface UserRateEntityMapper extends BaseMapper<UserRateEntity> {
+    /**
+     * 根据用户名和高级代理名称查询
+     * @param userName
+     * @param agentUsername
+     * @return
+     */
+    String getUserRateByUserNameAndAngetCode(@Param("userName")String userName,@Param("agentUsername")String agentUsername);
 
-    String getUserRateByUserName(@Param("userName")String userName);
+
+    String getBeIntroducerRate(@Param("userName")String userName, @Param("agentUsername")String agentUsername, @Param("beIntroducerName")String beIntroducerName);
 }

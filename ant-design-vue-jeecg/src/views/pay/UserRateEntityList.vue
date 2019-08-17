@@ -141,6 +141,11 @@
             dataIndex: 'agentId'
            },
           {
+            title: '被介绍人名称',
+            align:"center",
+            dataIndex: 'beIntroducerName'
+          },
+          {
             title: '操作',
             dataIndex: 'action',
             align:"center",

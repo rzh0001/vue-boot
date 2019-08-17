@@ -103,21 +103,42 @@ public class UserRateEntityController {
                 result.error500("用户不存在");
                 return result;
             }
-            //判断该用户是否已经添加过
-            String rate = userRateEntityService.getUserRateByUserName(userName);
-            if(StringUtils.isNotBlank(rate)){
-                result.error500("该用户已经添加过");
-                return result;
-            }
             //2、如果是普通商户，则必须填写高级代理
             if (BaseConstant.USER_MERCHANTS.equals(user.getMemberType())) {
-                if (StringUtils.isBlank(user.getAgentUsername())) {
+                if (StringUtils.isBlank(userRateEntity.getAgentId())) {
                     result.error500("普通商户的高级代理必填");
                     return result;
                 }
-                SysUser agent = userService.getUserByName(user.getAgentUsername());
+                SysUser agent = userService.getUserByName(userRateEntity.getAgentId());
                 if(agent == null){
                     result.error500("高级代理不存在");
+                    return result;
+                }
+                //判断该高级代理下的该用户，是否已经添加过费率
+                String rate = userRateEntityService.getUserRateByUserNameAndAngetCode(userName,userRateEntity.getAgentId());
+                if(StringUtils.isNotBlank(rate)){
+                    result.error500("该用户已经添加过费率");
+                    return result;
+                }
+            }
+            //介绍人
+            if(BaseConstant.USER_REFERENCES.equals(user.getMemberType())){
+                if (StringUtils.isBlank(userRateEntity.getAgentId())) {
+                    result.error500("介绍人的高级代理必填");
+                    return result;
+                }
+                if (StringUtils.isBlank(userRateEntity.getBeIntroducerName())) {
+                    result.error500("被介绍人姓名必填");
+                    return result;
+                }
+                SysUser agent = userService.getUserByName(userRateEntity.getAgentId());
+                if(agent == null){
+                    result.error500("高级代理不存在");
+                    return result;
+                }
+                SysUser beIntroducer = userService.getUserByName(userRateEntity.getBeIntroducerName());
+                if(beIntroducer == null){
+                    result.error500("被介绍人不存在");
                     return result;
                 }
             }

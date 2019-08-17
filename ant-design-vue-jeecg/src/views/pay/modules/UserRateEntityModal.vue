@@ -29,6 +29,12 @@
           label="高级代理名称">
           <a-input placeholder="请输入高级代理名称" v-decorator="['agentId', validatorRules.agentId ]" />
         </a-form-item>
+        <a-form-item
+          :labelCol="labelCol"
+          :wrapperCol="wrapperCol"
+          label="被介绍人名称">
+          <a-input placeholder="被介绍人名称" v-decorator="['beIntroducerName', validatorRules.beIntroducerName ]" />
+        </a-form-item>
 		
       </a-form>
     </a-spin>
@@ -80,7 +86,7 @@
         this.model = Object.assign({}, record);
         this.visible = true;
         this.$nextTick(() => {
-          this.form.setFieldsValue(pick(this.model,'userId','userName','userRate','delFlag','createUser','updateUser','agentId'))
+          this.form.setFieldsValue(pick(this.model,'userId','userName','userRate','delFlag','createUser','updateUser','agentId','beIntroducerName'))
 		  //时间格式化
         });
 
