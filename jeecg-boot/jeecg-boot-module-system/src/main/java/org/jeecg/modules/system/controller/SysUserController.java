@@ -86,6 +86,18 @@ public class SysUserController {
 									  @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,HttpServletRequest req) {
 		Result<IPage<SysUser>> result = new Result<IPage<SysUser>>();
 		QueryWrapper<SysUser> queryWrapper = QueryGenerator.initQueryWrapper(user, req.getParameterMap());
+        LoginUser optUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+        if (optUser.getMemberType() != null) {
+            switch (optUser.getMemberType()) {
+                case PayConstant.MEMBER_TYPE_AGENT:
+                    queryWrapper.lambda().eq(SysUser::getAgentId, optUser.getId());
+                    break;
+                case PayConstant.MEMBER_TYPE_SALESMAN:
+                    queryWrapper.lambda().eq(SysUser::getSalesmanId, optUser.getId());
+                    break;
+                default:
+            }
+        }
 		Page<SysUser> page = new Page<SysUser>(pageNo, pageSize);
 		IPage<SysUser> pageList = sysUserService.page(page, queryWrapper);
 		result.setSuccess(true);

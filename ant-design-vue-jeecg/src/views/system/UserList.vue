@@ -235,11 +235,11 @@
             dataIndex: 'memberType',
             key: 'memberType',
             customRender: function(text) {
-              if (text == 1) {
+              if (text === 1) {
                 return '代理'
-              } else if (text == 2) {
+              } else if (text === 2) {
                 return '介绍人'
-              } else if (text == 3) {
+              } else if (text === 3) {
                 return '商户'
               } else {
                 return text

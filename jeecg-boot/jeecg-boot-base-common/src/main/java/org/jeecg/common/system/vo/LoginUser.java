@@ -1,14 +1,12 @@
 package org.jeecg.common.system.vo;
 
-import java.util.Date;
-
-import org.springframework.format.annotation.DateTimeFormat;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.util.Date;
 
 /**
  * <p>
@@ -79,5 +77,7 @@ public class LoginUser {
      * 同步工作流引擎1同步0不同步
      */
     private String activitiSync;
+	
+	private String memberType;
 
 }
