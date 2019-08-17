@@ -2,6 +2,7 @@ package org.jeecg.modules.pay.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
+import org.jeecg.modules.exception.RRException;
 import org.jeecg.modules.pay.service.IOrderInfoEntityService;
 import org.jeecg.modules.util.R;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +41,7 @@ public class ApiController {
             return orderInfoService.createOrder(reqobj);
         } catch (Exception e) {
             log.info("创建订单异常，异常信息为：", e);
-            return R.error("创建订单异常");
+            return R.error(e.getMessage());
         }
     }
 
