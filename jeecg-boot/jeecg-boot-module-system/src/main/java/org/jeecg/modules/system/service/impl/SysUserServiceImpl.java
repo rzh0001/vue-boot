@@ -288,10 +288,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 				user.setAgentId(optUser.getId());
 				user.setAgentUsername(optUser.getUsername());
 				user.setAgentRealname(optUser.getRealname());
-				
-				SysUser salesman = getById(user.getSalesmanId());
-				user.setSalesmanUsername(salesman.getUsername());
-				user.setSalesmanRealname(salesman.getRealname());
+				if (user.getSalesmanId() != null) {
+					SysUser salesman = getById(user.getSalesmanId());
+					user.setSalesmanUsername(salesman.getUsername());
+					user.setSalesmanRealname(salesman.getRealname());
+				}
 				break;
 			default:
 		}
