@@ -46,7 +46,7 @@ module.exports = {
           'border-radius-base': '4px',
           */
         },
-        javascriptEnabled: true,
+        javascriptEnabled: true
       }
     }
   },
@@ -54,19 +54,22 @@ module.exports = {
   devServer: {
     port: 3000,
     proxy: {
-     /* '/api': {
-        target: 'https://mock.ihx.me/mock/5baf3052f7da7e07e04a5116/antd-pro', //mock API接口系统
+      /* '/api': {
+         target: 'https://mock.ihx.me/mock/5baf3052f7da7e07e04a5116/antd-pro', //mock API接口系统
+         ws: false,
+         changeOrigin: true,
+         pathRewrite: {
+           '/jeecg-boot': ''  //默认所有请求都加了jeecg-boot前缀，需要去掉
+         }
+       },*/
+      '/jeecg-boot': {
+        target: 'http://localhost:8080', //请求本地 需要jeecg-boot后台项目
         ws: false,
         changeOrigin: true,
         pathRewrite: {
           '/jeecg-boot': ''  //默认所有请求都加了jeecg-boot前缀，需要去掉
         }
-      },*/
-      '/jeecg-boot': {
-        target: 'http://localhost:8080', //请求本地 需要jeecg-boot后台项目
-        ws: false,
-        changeOrigin: true
-      },
+      }
     }
   },
 
