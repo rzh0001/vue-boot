@@ -428,12 +428,18 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             return checkAmountValidity;
         }
         String orderId = generateOrderId();
+
         OrderInfoEntity order = new OrderInfoEntity();
+        BigDecimal amount = new BigDecimal(submitAmount);
+        String rate = rateEntityService.getUserRateByUserNameAndAngetCode(userName, agentName);
+        BigDecimal poundage = amount.multiply(new BigDecimal(rate)).setScale(2, BigDecimal.ROUND_HALF_UP);
+        order.setPoundage(poundage);
+        order.setActualAmount(amount.subtract(poundage).setScale(2, BigDecimal.ROUND_HALF_UP));
         order.setOrderId(orderId);
         order.setOuterOrderId(outerOrderId);
         order.setUserName(userName);
         order.setBusinessCode(businessCode);
-        order.setSubmitAmount(BigDecimal.valueOf(Long.valueOf(submitAmount)));
+        order.setSubmitAmount(amount);
         order.setStatus(BaseConstant.ORDER_STATUS_NOT_PAY);
         order.setPayType(payType);
         order.setSuccessCallbackUrl(callbackUrl);
@@ -455,7 +461,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * @throws Exception
      */
     private R requestSupport(OrderInfoEntity order, ChannelBusinessEntity channelBusinessEntity, String userName,
-                                String agentCode) throws Exception {
+                             String agentCode) throws Exception {
         //支付宝转账
         if (order.getPayType().equals(BaseConstant.REQUEST_ALI_ZZ)) {
             AliPayCallBackParam param = structuralAliParam(order, "text", "alipay_auto", "3", "2");
@@ -484,14 +490,14 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             String aesKey = keys[1];
             String param = structuralYsfParam(order, md5Key, aesKey, agentCode, userName);
             String url = ysfCallBack(param, ysfPayUrl);
-            return R.ok().put("url",url);
+            return R.ok().put("url", url);
         }
         //农信易扫
         if (order.getPayType().equals(BaseConstant.REQUEST_NXYS_WX) || order.getPayType().equals(BaseConstant.REQUEST_NXYS_ALIPAY)) {
             nxysCallBack(order);
             return R.ok();
         }
-        return  R.error("无匹配通道");
+        return R.error("无匹配通道");
     }
 
     /**
@@ -530,13 +536,13 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
 
         log.info("四方回调挂马平台，加密后数据，url:{};param:{}", url, data);
         JSONObject p = new JSONObject();
-        p.put("data",data);
+        p.put("data", data);
         HttpResult result = HttpUtils.doPostJson(url, p.toJSONString());
         if (result.getCode() == BaseConstant.SUCCESS) {
             JSONObject r = JSONObject.parseObject(result.getBody());
             log.info("四方回调挂马平台成功，返回信息：{}", r.toJSONString());
         } else {
-            throw new RRException("四方回调挂马平台失败,订单创建失败：" +result.getBody());
+            throw new RRException("四方回调挂马平台失败,订单创建失败：" + result.getBody());
         }
     }
 
