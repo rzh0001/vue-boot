@@ -5,6 +5,6 @@
       select * from sys_channel where channel_code=#{channelCode}
     </select>
     <select id="queryAllChannelCode" resultType="String">
-      select channel_code as code from sys_channel
+      select channel_name as code from sys_channel
     </select>
 </mapper>

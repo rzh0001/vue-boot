@@ -20,6 +20,16 @@
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
+          label="通道">
+          <select v-decorator="['channelCode', validatorRules.channelCode ]">
+            <option v-for="option in channelCodes" v-bind:value="option">
+              {{ option}}
+            </option>
+          </select>
+        </a-form-item>
+        <a-form-item
+          :labelCol="labelCol"
+          :wrapperCol="wrapperCol"
           label="费率">
           <a-input placeholder="请输入费率" v-decorator="['userRate', validatorRules.userRate ]" />
         </a-form-item>
@@ -52,6 +62,7 @@
       return {
         title:"操作",
         visible: false,
+        channelCodes: [],
         model: {},
         labelCol: {
           xs: { span: 24 },
@@ -67,17 +78,31 @@
         validatorRules:{
         userName:{rules: [{ required: true, message: '请输入用户名!' }]},
         userRate:{rules: [{ required: true, message: '请输入费率!' }]},
+          channelCode:{rules: [{ required: true, message: '请选择通道' }]},
         //agentId:{rules: [{ required: true, message: '请输入高级代理名称!' }]},
         },
         url: {
           add: "/pay/userRateEntity/add",
           edit: "/pay/userRateEntity/edit",
+          channel: "/pay/channelEntity/channel"
         },
       }
     },
     created () {
     },
+    mounted:function () {
+      this.channel();
+    },
     methods: {
+      channel(){
+        httpAction(this.url.channel,null,'get').then((res)=>{
+          if(res.success){
+          this.channelCodes = res.result;
+        }else{
+          this.$message.warning(res.message);
+        }
+      })
+      },
       add () {
         this.edit({});
       },

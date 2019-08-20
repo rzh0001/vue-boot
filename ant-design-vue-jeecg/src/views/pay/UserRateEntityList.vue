@@ -115,6 +115,11 @@
             align:"center",
             dataIndex: 'userName'
            },
+          {
+            title: '通道',
+            align:"center",
+            dataIndex: 'channelCode'
+          },
 		   {
             title: '费率',
             align:"center",
