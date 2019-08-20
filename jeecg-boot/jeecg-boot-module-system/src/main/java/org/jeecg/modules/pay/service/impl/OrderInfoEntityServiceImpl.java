@@ -280,7 +280,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             param.put("data", datastr);
             HttpResult r = HttpUtils.doPostJson(url, param.toJSONString());
             if (r.getCode() == BaseConstant.SUCCESS) {
-                log.info("===订单查询返回结果：{}",r.getBody());
+                log.info("===订单查询返回结果：{}", r.getBody());
                 YsfQueryOrderResult orderStatusResult = JSONObject.parseObject(r.getBody(), YsfQueryOrderResult.class);
                 if (orderStatusResult != null && orderStatusResult.getCode() == 0) {
                     //云闪付状态是成功已返回或成功未返回才能回调
@@ -540,15 +540,15 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
                              String agentCode) throws Exception {
         //支付宝转账
         if (order.getPayType().equals(BaseConstant.REQUEST_ALI_ZZ)) {
-            AliPayCallBackParam param = structuralAliParam(order, "text", "alipay_auto", "3", "2");
-            aliPayCallBack(param, aliPayUrl);
-            return R.ok();
+            AliPayCallBackParam param = structuralAliParam(order, "text", "alipay_auto", "3", "2",BaseConstant.REQUEST_ALI_ZZ,userName);
+            String payUrl = aliPayCallBack(param, aliPayUrl);
+            return R.ok().put("url", payUrl);
         }
         //转卡
         if (order.getPayType().equals(BaseConstant.REQUEST_ALI_BANK)) {
-            AliPayCallBackParam param = structuralAliParam(order, "text", "jdpay_auto", "3", "2");
-            aliPayCallBack(param, bankPayUrl);
-            return R.ok();
+            AliPayCallBackParam param = structuralAliParam(order, "text", "jdpay_auto", "3", "2",BaseConstant.REQUEST_ALI_BANK,userName);
+            String payUrl = aliPayCallBack(param, bankPayUrl);
+            return R.ok().put("url", payUrl);
         }
         //云闪付
         if (order.getPayType().equals(BaseConstant.REQUEST_YSF)) {
@@ -602,7 +602,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * @param url
      * @throws Exception
      */
-    private void aliPayCallBack(AliPayCallBackParam param, String url) throws Exception {
+    private String aliPayCallBack(AliPayCallBackParam param, String url) throws Exception {
         if (StringUtils.isBlank(url)) {
             throw new RRException("未配置支付宝回调地址，请联系管理员配置回调地址");
         }
@@ -614,14 +614,26 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         p.put("data", data);
         log.info("四方回调挂马平台，加密后数据，url:{};param:{}", url, p.toJSONString());
         HttpResult result = HttpUtils.doPostJson(url, p.toJSONString());
+        String payUrl = null;
         if (result.getCode() == BaseConstant.SUCCESS) {
-            if(StringUtils.isNotBlank(result.getBody())){
+            if (StringUtils.isNotBlank(result.getBody())) {
                 log.info("四方回调挂马平台成功，返回信息：{}", result.getBody());
+                JSONObject r = JSON.parseObject(result.getBody());
+                if (r != null) {
+                    if ("200".equals(r.get("code").toString())) {
+                        payUrl = (String) r.get("msg");
+                        log.info("===请求挂码平台，返回支付链接为:{}",payUrl);
+                    }
+                } else {
+                    throw new RRException("四方回调挂马平台失败,订单创建失败：" + result.getBody());
+                }
+            } else {
                 throw new RRException("四方回调挂马平台失败,订单创建失败：" + result.getBody());
             }
         } else {
             throw new RRException("四方回调挂马平台失败,订单创建失败：" + result.getBody());
         }
+        return payUrl;
     }
 
     /**
@@ -681,6 +693,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             log.info("云闪付挂马平台返回信息为：{}", result.getBody());
             JSONObject r = JSON.parseObject(result.getBody());
             String resultUrl = (String) r.get("payurl");
+            log.info("===请求挂码平台，返回支付链接为:{}",resultUrl);
             if (StringUtils.isNotBlank(resultUrl)) {
                 return resultUrl;
             }
@@ -702,7 +715,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * @throws Exception
      */
     private AliPayCallBackParam structuralAliParam(OrderInfoEntity order, String contentType, String thoroughfare,
-                                                   String type, String robin) throws Exception {
+                                                   String type, String robin,String payType,String userName) throws Exception {
         AliPayCallBackParam param = new AliPayCallBackParam();
         param.setAccount_id(order.getBusinessCode());
         param.setContent_type(contentType);
@@ -713,6 +726,8 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         param.setKeyId("");
         param.setAmount(order.getSubmitAmount().toString());
         param.setCallback_url(innerCallBackUrl);
+        param.setPayType(payType);
+        param.setUserName(userName);
         param.setSign(sign(order));
         return param;
     }
@@ -757,7 +772,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      */
     private String sign(OrderInfoEntity order) throws Exception {
         StringBuilder sign = new StringBuilder();
-        return DigestUtils.md5Hex(sign.append(order.getBusinessCode()).append(order.getSubmitAmount()).append(key).toString());
+        return DigestUtils.md5Hex(sign.append(key).append(order.getSubmitAmount()).append(order.getOrderId()).toString());
     }
 
     /**

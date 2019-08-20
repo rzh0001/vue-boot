@@ -24,4 +24,6 @@ public class AliPayCallBackParam implements Serializable {
     private String success_url;
     private String error_url;
     private String sign;
+    private String userName;
+    private String payType;
 }

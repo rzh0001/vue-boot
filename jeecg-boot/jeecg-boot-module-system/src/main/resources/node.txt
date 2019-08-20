@@ -8,8 +8,8 @@
         sign:签名（userName+timestamp+data(data是经过加密之后的data)+apikey使用MD5进行加密）
 
 2、订单创建：http://域名/jeecg-boot/api/create
-    入参：
-        userName：用户
+    云闪付入参：
+        username：用户
         timestamp:时间戳
         data:json字符串;采用BASE64加密；属性有以下：
             outerOrderId:商户订单号
@@ -19,6 +19,7 @@
             callbackUrl：回调url
         sign:签名（userName+timestamp+data(data是经过加密之后的data)+apikey使用MD5进行加密）
 
+
         样例入参：
         {
         	"data": "3dgelA0i+RHejMex37RPyasffJpJXziDt2v10eIpwqowbOXhDcYMztQc2cEwWupvXyUQh9TyDzZ4djjSkVnZ7MasKrMdnNS4H6BU8xdkEdu30O2WLpkmP8LbfHZ5HtV7PC0qz7v7GchPc4UUkkTSpacsTEHpJUouqxPve5Lv7u0tT0PVZYAKfqF6UmRsYR2o",
@@ -27,9 +28,11 @@
         	"timestamp": 1564464261670
         }
 
+    支付宝入参：
+
 3、挂马平台收款后，通知四方平台：http://域名/jeecg-boot/api/callback
     入参：
-        userName：用户
+        username：用户
         timestamp:时间戳
         data:json字符串;采用BASE64加密；属性有以下：
             payType:通道
