@@ -3,6 +3,7 @@ package org.jeecg.modules.pay.entity;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @title:
@@ -17,5 +18,7 @@ public class YsfData implements Serializable {
     private String agentorderid;
     private Double applyamount;
     private Integer orderchannel;
+    private Date createtime;
+    private Date paytime;
 
 }

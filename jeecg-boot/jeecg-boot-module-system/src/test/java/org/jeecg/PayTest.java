@@ -80,7 +80,7 @@ public class PayTest {
         StringBuilder sign = new StringBuilder();
         sign.append("www").append(time).append(dataEn).append("abc123#@!");
         req.put(BaseConstant.SIGN, DigestUtils.md5Hex(sign.toString()));
-        api.callback(req,request);
+//        api.callback(req,request);
     }
 
     @Test

@@ -182,6 +182,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         if (order == null) {
             return R.error("订单查询异常，无此订单信息");
         }
+
         //2 校验订单状态 ，从挂马平台查询
         if (!orderStatusOk(orderId, payType, order.getBusinessCode())) {
             log.info("订单回调过程中，订单查询异常,orderID:{}", orderId);
@@ -274,15 +275,17 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             param.put("sign", sign);
             JSONObject data = new JSONObject();
             data.put("orderids", orderId);
+            data.put("isNew", "1");
             String datastr = AES128Util.encryptBase64(data.toJSONString(), aesKey);
             param.put("data", datastr);
             HttpResult r = HttpUtils.doPostJson(url, param.toJSONString());
             if (r.getCode() == BaseConstant.SUCCESS) {
+                log.info("===订单查询返回结果：{}",r.getBody());
                 YsfQueryOrderResult orderStatusResult = JSONObject.parseObject(r.getBody(), YsfQueryOrderResult.class);
-                if (orderStatusResult != null && orderStatusResult.getCode() == BaseConstant.SUCCESS) {
+                if (orderStatusResult != null && orderStatusResult.getCode() == 0) {
                     //云闪付状态是成功已返回或成功未返回才能回调
-                    if (BaseConstant.ORDER_STATUS_SUCCESS_NOT_RETURN == orderStatusResult.getData().getStatus() ||
-                            BaseConstant.ORDER_STATUS_SUCCESS == orderStatusResult.getData().getStatus()) {
+                    if (BaseConstant.ORDER_STATUS_SUCCESS_NOT_RETURN == orderStatusResult.getData().get(0).getStatus() ||
+                            BaseConstant.ORDER_STATUS_SUCCESS == orderStatusResult.getData().get(0).getStatus()) {
                         return true;
                     }
                 } else {
@@ -607,13 +610,15 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
 
         String data = AES128Util.encryptBase64(JSON.toJSONString(param), key);
 
-        log.info("四方回调挂马平台，加密后数据，url:{};param:{}", url, data);
         JSONObject p = new JSONObject();
         p.put("data", data);
+        log.info("四方回调挂马平台，加密后数据，url:{};param:{}", url, p.toJSONString());
         HttpResult result = HttpUtils.doPostJson(url, p.toJSONString());
         if (result.getCode() == BaseConstant.SUCCESS) {
-            JSONObject r = JSONObject.parseObject(result.getBody());
-            log.info("四方回调挂马平台成功，返回信息：{}", r.toJSONString());
+            if(StringUtils.isNotBlank(result.getBody())){
+                log.info("四方回调挂马平台成功，返回信息：{}", result.getBody());
+                throw new RRException("四方回调挂马平台失败,订单创建失败：" + result.getBody());
+            }
         } else {
             throw new RRException("四方回调挂马平台失败,订单创建失败：" + result.getBody());
         }

@@ -7,6 +7,8 @@ import org.jeecg.modules.pay.service.IOrderInfoEntityService;
 import org.jeecg.modules.util.R;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -55,9 +57,9 @@ public class ApiController {
      */
     @PostMapping(value = "/callback", produces = "application/json;charset=UTF-8")
     @ResponseBody
-    public R callback(@RequestParam JSONObject reqobj, HttpServletRequest req) {
+    public R callback(@RequestBody JSONObject reqobj) {
         try {
-            return orderInfoService.callback(reqobj, req);
+            return orderInfoService.callback(reqobj,((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest());
         } catch (Exception e) {
             log.info("订单回调异常，异常信息为：", e);
             return R.error("订单回调异常");

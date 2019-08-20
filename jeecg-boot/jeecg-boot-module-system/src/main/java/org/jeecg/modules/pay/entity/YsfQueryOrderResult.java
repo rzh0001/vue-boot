@@ -1,6 +1,7 @@
 package org.jeecg.modules.pay.entity;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @title:
@@ -12,5 +13,5 @@ import java.io.Serializable;
 public class YsfQueryOrderResult  implements Serializable {
     private Integer code;
     private String msg;
-    private YsfData data;
+    private List<YsfData> data;
 }
