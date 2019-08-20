@@ -259,7 +259,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 		}
 		return result;
 	}
-	
+
+	public static void main(String[] args) {
+		System.out.println(UUID.randomUUID().toString().replaceAll("-","").substring(0,16));
+	}
+
 	@Override
 	public void addPayMember(SysUser user, String memberType) {
 		user.setCreateTime(new Date());
@@ -275,7 +279,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 		switch (memberType) {
 			case PayConstant.MEMBER_TYPE_AGENT:
 				roleCode = PayConstant.ROLE_CODE_AGENT;
-				user.setApiKey(UUID.randomUUID().toString());
+				user.setApiKey(UUID.randomUUID().toString().replaceAll("-","").substring(0,16));
 				break;
 			case PayConstant.MEMBER_TYPE_SALESMAN:
 				roleCode = PayConstant.ROLE_CODE_SALESMAN;
