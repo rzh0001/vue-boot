@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.constant.CacheConstant;
@@ -292,7 +293,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 				user.setAgentId(optUser.getId());
 				user.setAgentUsername(optUser.getUsername());
 				user.setAgentRealname(optUser.getRealname());
-				if (user.getSalesmanId() != null) {
+				if (StringUtils.isNotBlank(user.getSalesmanId())) {
 					SysUser salesman = getById(user.getSalesmanId());
 					user.setSalesmanUsername(salesman.getUsername());
 					user.setSalesmanRealname(salesman.getRealname());
