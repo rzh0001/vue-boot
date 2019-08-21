@@ -14,10 +14,10 @@
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
-          label="通道code">
-          <select v-decorator="['channelCode', validatorRules.channelCode]">
-            <option v-for="option in channelCodes" v-bind:value="option">
-              {{ option}}
+          label="通道">
+          <select v-decorator="['channelCode', validatorRules.channelCode ]">
+            <option v-for="option in channels" v-bind:value="option.channelCode">
+              {{ option.channelName}}
             </option>
           </select>
         </a-form-item>
@@ -30,8 +30,8 @@
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
-          label="商户code">
-          <a-input placeholder="请输入商户code" v-decorator="['businessCode', validatorRules.businessCode]" />
+          label="商户">
+          <a-input placeholder="请输入商户" v-decorator="['businessCode', validatorRules.businessCode]" />
         </a-form-item>
 
       </a-form>
@@ -49,7 +49,7 @@
     data () {
       return {
         title:"操作",
-        channelCodes: [],
+        channels: [],
         visible: false,
         model: {},
         labelCol: {
@@ -82,7 +82,7 @@
       channel(){
         httpAction(this.url.channel,null,'get').then((res)=>{
           if(res.success){
-          this.channelCodes = res.result;
+          this.channels = res.result;
         }else{
           this.$message.warning(res.message);
         }

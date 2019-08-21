@@ -222,7 +222,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         } finally {
             if (flag) {
                 //5、只有在通知商户成功，才统计高级代理。商户。介绍人的收入情况
-                countAmount(orderId, userName, submitAmount);
+                countAmount(orderId, userName, submitAmount, payType);
             }
         }
         return R.ok(msg.toString());
@@ -349,21 +349,24 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * * 2、限额：
      * * 查看该用户提交金额，是否在限额范围内
      *
-     * @param orderId
-     * @param userName
-     * @param submitAmount
+     * @param orderId      四方系统的订单id
+     * @param userName     用户
+     * @param submitAmount 申请金融
+     * @param payType      通道
      * @throws Exception
      */
-    private void countAmount(String orderId, String userName, String submitAmount) throws Exception {
+    private void countAmount(String orderId, String userName, String submitAmount, String payType) throws Exception {
         SysUser user = userService.getUserByName(userName);
         //高级代理的利润
         BigDecimal submit = new BigDecimal(submitAmount);
-        String rate = rateEntityService.getUserRateByUserNameAndAngetCode(userName, user.getAgentUsername());
+        //获取对应通道下的高级代理对应的商户的费率
+        String rate = rateEntityService.getUserRateByUserNameAndAngetCode(userName, user.getAgentUsername(), payType);
         BigDecimal userRate = new BigDecimal(rate);
         BigDecimal agentMoney = submit.multiply(userRate).setScale(2, BigDecimal.ROUND_HALF_UP);
 
         //记录商户手续费的收取详情
         RateLogEntity log = new RateLogEntity();
+        log.setChannelCode(payType);
         log.setOrderId(orderId);
         log.setUserName(userName);
         log.setAgentName(user.getAgentUsername());
@@ -379,7 +382,8 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         countUserRate(userName, user.getAgentUsername(), submit, agentMoney);
         //统计介绍人的所得金额
         if (!StringUtils.isBlank(user.getSalesmanUsername())) {
-            countSalesmanRate(userName, user.getSalesmanUsername(), user.getAgentUsername(), agentMoney, orderId);
+            countSalesmanRate(userName, user.getSalesmanUsername(), user.getAgentUsername(), agentMoney, orderId,
+                    payType);
         }
 
     }
@@ -410,9 +414,9 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * @param agentMoney   高级代理所得利润
      */
     private void countSalesmanRate(String userName, String salesmanName, String agentName, BigDecimal agentMoney,
-                                   String orderId) {
+                                   String orderId, String payType) {
         //介绍人费率
-        String salesmanRate = rateEntityService.getBeIntroducerRate(salesmanName, agentName, userName);
+        String salesmanRate = rateEntityService.getBeIntroducerRate(salesmanName, agentName, userName, payType);
         UserAmountEntity salesman = amountService.getUserAmountByUserName(salesmanName);
         if (salesman == null) {
             salesman = new UserAmountEntity();
@@ -426,6 +430,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         amountService.saveOrUpdate(salesman);
         //记录介绍人收入详情日志
         IntroducerLogEntity log = new IntroducerLogEntity();
+        log.setChannelCode(payType);
         log.setOrderId(orderId);
         log.setIntroducerName(salesmanName);
         log.setAgentName(agentName);
@@ -503,11 +508,14 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         if (!BaseConstant.CHECK_PARAM_SUCCESS.equals(checkAmountValidity.get(BaseConstant.CODE))) {
             return checkAmountValidity;
         }
-        String orderId = generateOrderId();
+        //校验用户费率是否有填写
+        SysUser user = userService.getUserByName(userName);
+        checkRate(user, payType);
 
+        String orderId = generateOrderId();
         OrderInfoEntity order = new OrderInfoEntity();
         BigDecimal amount = new BigDecimal(submitAmount);
-        String rate = rateEntityService.getUserRateByUserNameAndAngetCode(userName, agentName);
+        String rate = rateEntityService.getUserRateByUserNameAndAngetCode(userName, agentName,payType);
         BigDecimal poundage = amount.multiply(new BigDecimal(rate)).setScale(2, BigDecimal.ROUND_HALF_UP);
         order.setPoundage(poundage);
         order.setActualAmount(amount.subtract(poundage).setScale(2, BigDecimal.ROUND_HALF_UP));
@@ -540,13 +548,15 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
                              String agentCode) throws Exception {
         //支付宝转账
         if (order.getPayType().equals(BaseConstant.REQUEST_ALI_ZZ)) {
-            AliPayCallBackParam param = structuralAliParam(order, "text", "alipay_auto", "3", "2",BaseConstant.REQUEST_ALI_ZZ,userName);
+            AliPayCallBackParam param = structuralAliParam(order, "text", "alipay_auto", "3", "2",
+                    BaseConstant.REQUEST_ALI_ZZ, userName);
             String payUrl = aliPayCallBack(param, aliPayUrl);
             return R.ok().put("url", payUrl);
         }
         //转卡
         if (order.getPayType().equals(BaseConstant.REQUEST_ALI_BANK)) {
-            AliPayCallBackParam param = structuralAliParam(order, "text", "jdpay_auto", "3", "2",BaseConstant.REQUEST_ALI_BANK,userName);
+            AliPayCallBackParam param = structuralAliParam(order, "text", "jdpay_auto", "3", "2",
+                    BaseConstant.REQUEST_ALI_BANK, userName);
             String payUrl = aliPayCallBack(param, bankPayUrl);
             return R.ok().put("url", payUrl);
         }
@@ -622,7 +632,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
                 if (r != null) {
                     if ("200".equals(r.get("code").toString())) {
                         payUrl = (String) r.get("msg");
-                        log.info("===请求挂码平台，返回支付链接为:{}",payUrl);
+                        log.info("===请求挂码平台，返回支付链接为:{}", payUrl);
                     }
                 } else {
                     throw new RRException("四方回调挂马平台失败,订单创建失败：" + result.getBody());
@@ -693,7 +703,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             log.info("云闪付挂马平台返回信息为：{}", result.getBody());
             JSONObject r = JSON.parseObject(result.getBody());
             String resultUrl = (String) r.get("payurl");
-            log.info("===请求挂码平台，返回支付链接为:{}",resultUrl);
+            log.info("===请求挂码平台，返回支付链接为:{}", resultUrl);
             if (StringUtils.isNotBlank(resultUrl)) {
                 return resultUrl;
             }
@@ -715,7 +725,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * @throws Exception
      */
     private AliPayCallBackParam structuralAliParam(OrderInfoEntity order, String contentType, String thoroughfare,
-                                                   String type, String robin,String payType,String userName) throws Exception {
+                                                   String type, String robin, String payType, String userName) throws Exception {
         AliPayCallBackParam param = new AliPayCallBackParam();
         param.setAccount_id(order.getBusinessCode());
         param.setContent_type(contentType);
@@ -843,7 +853,6 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
                 log.info("用户类型不是商户，无法提交订单，用户名为：{}", userName);
                 return R.error("用户类型不是商户，无法提交订单");
             }
-            checkRate(user);
         }
 
         String apiKey = null;
@@ -878,12 +887,12 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * @param user
      * @throws Exception
      */
-    private void checkRate(SysUser user) throws Exception {
+    private void checkRate(SysUser user, String payType) throws Exception {
         if (StringUtils.isBlank(user.getAgentUsername())) {
             throw new RRException("用户未配置高级代理");
         }
         //商户
-        String rate = rateEntityService.getUserRateByUserNameAndAngetCode(user.getUsername(), user.getAgentUsername());
+        String rate = rateEntityService.getUserRateByUserNameAndAngetCode(user.getUsername(), user.getAgentUsername(),payType);
         if (StringUtils.isBlank(rate)) {
             throw new RRException("用户未配置费率，请联系管理员配置");
         }
@@ -891,7 +900,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             //介绍人
             SysUser sale = userService.getUserByName(user.getSalesmanUsername());
             String salesRate = rateEntityService.getBeIntroducerRate(user.getSalesmanUsername(),
-                    sale.getAgentUsername(), user.getUsername());
+                    sale.getAgentUsername(), user.getUsername(),payType);
             if (StringUtils.isBlank(salesRate)) {
                 throw new RRException("用户的介绍人未配置费率，请联系管理员配置");
             }

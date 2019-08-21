@@ -74,8 +74,8 @@ public class ChannelEntityController {
 	}
 
 	 @GetMapping(value = "/channel")
-	public Result<List<String>> queryAllChannelCode(){
-		 Result<List<String>> result = new Result<>();
+	public Result<List<ChannelEntity>> queryAllChannelCode(){
+		 Result<List<ChannelEntity>> result = new Result<>();
 		 result.setResult(channelEntityService.queryAllChannelCode());
 		return result;
 	}

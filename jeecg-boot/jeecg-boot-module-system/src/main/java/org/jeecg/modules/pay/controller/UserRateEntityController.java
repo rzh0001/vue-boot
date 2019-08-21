@@ -115,7 +115,7 @@ public class UserRateEntityController {
                     return result;
                 }
                 //判断该高级代理下的该用户，是否已经添加过费率
-                String rate = userRateEntityService.getUserRateByUserNameAndAngetCode(userName,userRateEntity.getAgentId());
+                String rate = userRateEntityService.getUserRateByUserNameAndAngetCode(userName,userRateEntity.getAgentId(),userRateEntity.getChannelCode());
                 if(StringUtils.isNotBlank(rate)){
                     result.error500("该用户已经添加过费率");
                     return result;

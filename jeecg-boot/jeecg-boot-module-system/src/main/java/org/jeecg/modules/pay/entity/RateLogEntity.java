@@ -48,6 +48,10 @@ public class RateLogEntity {
 	@Excel(name = "被介绍人名称", width = 15)
     @ApiModelProperty(value = "被介绍人名称")
 	private java.lang.String introducerName;
+	/**被介绍人名称*/
+	@Excel(name = "通道", width = 15)
+	@ApiModelProperty(value = "通道")
+	private java.lang.String channelCode;
 	/**费率*/
 	@Excel(name = "费率", width = 15)
     @ApiModelProperty(value = "费率")
@@ -60,6 +64,7 @@ public class RateLogEntity {
 	@Excel(name = "手续费", width = 15)
     @ApiModelProperty(value = "手续费")
 	private java.math.BigDecimal poundage;
+
 	/**创建时间*/
 	@Excel(name = "创建时间", width = 20, format = "yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")

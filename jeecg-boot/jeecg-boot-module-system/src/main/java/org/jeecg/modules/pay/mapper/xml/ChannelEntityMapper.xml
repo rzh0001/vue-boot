@@ -4,7 +4,7 @@
     <select id="queryChannelByCode" parameterType="String" resultType="org.jeecg.modules.pay.entity.ChannelEntity">
       select * from sys_channel where channel_code=#{channelCode}
     </select>
-    <select id="queryAllChannelCode" resultType="String">
-      select channel_code as code from sys_channel
+    <select id="queryAllChannelCode" resultType="org.jeecg.modules.pay.entity.ChannelEntity">
+      select channel_code as channelCode,channel_name as channelName from sys_channel
     </select>
 </mapper>

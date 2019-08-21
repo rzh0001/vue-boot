@@ -11,7 +11,7 @@
     <div class="copyright">
       Copyright
       <a-icon type="copyright"/>
-      2019 <span>支付平台 出品</span>
+      2019 <span>快乐平台 出品</span>
     </div>
   </div>
 </template>

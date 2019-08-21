@@ -44,6 +44,9 @@ public class IntroducerLogEntity {
 	@Excel(name = "高级代理", width = 15)
     @ApiModelProperty(value = "高级代理")
 	private java.lang.String agentName;
+	@Excel(name = "通道", width = 15)
+	@ApiModelProperty(value = "通道")
+	private java.lang.String channelCode;
 	/**费率*/
 	@Excel(name = "费率", width = 15)
     @ApiModelProperty(value = "费率")

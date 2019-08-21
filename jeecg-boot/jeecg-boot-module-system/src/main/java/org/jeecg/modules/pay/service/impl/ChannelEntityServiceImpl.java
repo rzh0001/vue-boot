@@ -23,7 +23,7 @@ public class ChannelEntityServiceImpl extends ServiceImpl<ChannelEntityMapper, C
     }
 
     @Override
-    public List<String> queryAllChannelCode() {
+    public List<ChannelEntity> queryAllChannelCode() {
         return baseMapper.queryAllChannelCode();
     }
 }

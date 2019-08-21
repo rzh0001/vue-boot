@@ -11,7 +11,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @Version: V1.0
  */
 public interface IUserRateEntityService extends IService<UserRateEntity> {
-    String getUserRateByUserNameAndAngetCode(String userName,String agentUsername);
+    String getUserRateByUserNameAndAngetCode(String userName,String agentUsername,String payType);
 
     /**
      * 获取介绍人的费率
@@ -20,5 +20,5 @@ public interface IUserRateEntityService extends IService<UserRateEntity> {
      * @param beIntroducerName 被介绍人
      * @return
      */
-    String getBeIntroducerRate(String userName,String agentUsername,String beIntroducerName);
+    String getBeIntroducerRate(String userName,String agentUsername,String beIntroducerName, String payType);
 }

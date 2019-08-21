@@ -17,7 +17,7 @@
         :type="collapsed ? 'menu-unfold' : 'menu-fold'"
         @click.native="toggle"/>
 
-      <span v-if="device === 'desktop'">支付平台</span>
+      <span v-if="device === 'desktop'">快乐平台</span>
       <span v-else>PAY</span>
 
       <user-menu :theme="theme"/>

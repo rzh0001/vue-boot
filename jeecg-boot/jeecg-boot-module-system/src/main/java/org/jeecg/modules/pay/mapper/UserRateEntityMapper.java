@@ -19,8 +19,8 @@ public interface UserRateEntityMapper extends BaseMapper<UserRateEntity> {
      * @param agentUsername
      * @return
      */
-    String getUserRateByUserNameAndAngetCode(@Param("userName")String userName,@Param("agentUsername")String agentUsername);
+    String getUserRateByUserNameAndAngetCode(@Param("userName")String userName,@Param("agentUsername")String agentUsername,@Param("payType")String payType);
 
 
-    String getBeIntroducerRate(@Param("userName")String userName, @Param("agentUsername")String agentUsername, @Param("beIntroducerName")String beIntroducerName);
+    String getBeIntroducerRate(@Param("userName")String userName, @Param("agentUsername")String agentUsername, @Param("beIntroducerName")String beIntroducerName,@Param("payType") String payType);
 }

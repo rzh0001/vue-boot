@@ -5,25 +5,17 @@
         <div class="header">
           <a href="/">
             <img src="~@/assets/logo.svg" class="logo" alt="logo">
-            <span class="title">支付平台</span>
+            <span class="title">快乐平台</span>
           </a>
         </div>
         <div class="desc">
-          支付平台
+          快乐平台
         </div>
       </div>
 
       <route-view></route-view>
 
       <div class="footer">
-        <div class="links">
-          <a href="#" target="_blank">帮助</a>
-          <a href="#" target="_blank">隐私</a>
-          <a href="#" target="_blank">条款</a>
-        </div>
-        <div class="copyright">
-          Copyright &copy; 2019 支付平台 出品
-        </div>
       </div>
     </div>
   </div>

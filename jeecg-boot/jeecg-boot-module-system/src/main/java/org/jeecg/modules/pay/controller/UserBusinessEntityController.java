@@ -24,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.service.ISysUserService;
+import org.jeecg.modules.util.BaseConstant;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -93,6 +94,11 @@ public class UserBusinessEntityController {
 			SysUser user = userService.getUserByName(userName);
 			if(user == null){
 				result.error500("用户不存在");
+				return result;
+			}
+			//必须是商户才能关联通道
+			if(!BaseConstant.USER_MERCHANTS.equals(user.getMemberType())){
+				result.error500("用户角色不是商户，无法关联通道");
 				return result;
 			}
 			String code = userBusinessEntityService.queryBusinessCodeByUserName(userName);

@@ -10,28 +10,15 @@
     
     <a-spin :spinning="confirmLoading">
       <a-form :form="form">
-      
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="用户名">
-          <a-input placeholder="请输入用户名" v-decorator="['userName', validatorRules.userName ]" />
-        </a-form-item>
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
           label="通道">
           <select v-decorator="['channelCode', validatorRules.channelCode ]">
-            <option v-for="option in channelCodes" v-bind:value="option">
-              {{ option}}
+            <option v-for="option in channels" v-bind:value="option.channelCode">
+              {{ option.channelName}}
             </option>
           </select>
-        </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="费率">
-          <a-input placeholder="请输入费率" v-decorator="['userRate', validatorRules.userRate ]" />
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"
@@ -42,10 +29,21 @@
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
-          label="被介绍人名称">
-          <a-input placeholder="被介绍人名称" v-decorator="['beIntroducerName', validatorRules.beIntroducerName ]" />
+          label="用户名">
+          <a-input placeholder="请输入用户名" v-decorator="['userName', validatorRules.userName ]" />
         </a-form-item>
-		
+        <a-form-item
+          :labelCol="labelCol"
+          :wrapperCol="wrapperCol"
+          label="被介绍人名称">
+          <a-input placeholder="只有在设置介绍人费率的时候，才需要填" v-decorator="['beIntroducerName', validatorRules.beIntroducerName ]" />
+        </a-form-item>
+        <a-form-item
+          :labelCol="labelCol"
+          :wrapperCol="wrapperCol"
+          label="费率">
+          <a-input placeholder="请输入费率，如0.003" v-decorator="['userRate', validatorRules.userRate ]" />
+        </a-form-item>
       </a-form>
     </a-spin>
   </a-modal>
@@ -62,7 +60,7 @@
       return {
         title:"操作",
         visible: false,
-        channelCodes: [],
+        channels: [],
         model: {},
         labelCol: {
           xs: { span: 24 },
@@ -79,7 +77,7 @@
         userName:{rules: [{ required: true, message: '请输入用户名!' }]},
         userRate:{rules: [{ required: true, message: '请输入费率!' }]},
           channelCode:{rules: [{ required: true, message: '请选择通道' }]},
-        //agentId:{rules: [{ required: true, message: '请输入高级代理名称!' }]},
+        agentId:{rules: [{ required: true, message: '请输入高级代理名称!' }]},
         },
         url: {
           add: "/pay/userRateEntity/add",
@@ -97,7 +95,7 @@
       channel(){
         httpAction(this.url.channel,null,'get').then((res)=>{
           if(res.success){
-          this.channelCodes = res.result;
+          this.channels = res.result;
         }else{
           this.$message.warning(res.message);
         }

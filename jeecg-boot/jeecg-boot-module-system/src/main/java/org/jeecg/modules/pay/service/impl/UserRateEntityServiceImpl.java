@@ -17,12 +17,12 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 public class UserRateEntityServiceImpl extends ServiceImpl<UserRateEntityMapper, UserRateEntity> implements IUserRateEntityService {
 
     @Override
-    public String getUserRateByUserNameAndAngetCode(String userName,String agentUsername) {
-        return baseMapper.getUserRateByUserNameAndAngetCode(userName, agentUsername);
+    public String getUserRateByUserNameAndAngetCode(String userName,String agentUsername,String payType) {
+        return baseMapper.getUserRateByUserNameAndAngetCode(userName, agentUsername,payType);
     }
 
     @Override
-    public String getBeIntroducerRate(String userName, String agentUsername, String beIntroducerName) {
-        return baseMapper.getBeIntroducerRate(userName,agentUsername,beIntroducerName);
+    public String getBeIntroducerRate(String userName, String agentUsername, String beIntroducerName, String payType) {
+        return baseMapper.getBeIntroducerRate(userName,agentUsername,beIntroducerName,payType);
     }
 }
