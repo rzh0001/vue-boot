@@ -27,7 +27,7 @@
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
           label="通道代码">
-          <select v-decorator="['channelCode', validatorRules.channelCode ]">
+          <select v-decorator="['payType', validatorRules.payType ]">
             <option v-for="option in channels" v-bind:value="option.channelCode">
               {{ option.channelName}}
             </option>
