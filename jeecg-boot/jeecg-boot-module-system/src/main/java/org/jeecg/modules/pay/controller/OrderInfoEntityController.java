@@ -65,6 +65,7 @@ public class OrderInfoEntityController {
 									  @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 									  HttpServletRequest req) {
 		Result<IPage<OrderInfoEntity>> result = new Result<IPage<OrderInfoEntity>>();
+
 		QueryWrapper<OrderInfoEntity> queryWrapper = QueryGenerator.initQueryWrapper(orderInfoEntity, req.getParameterMap());
 		Page<OrderInfoEntity> page = new Page<OrderInfoEntity>(pageNo, pageSize);
 		IPage<OrderInfoEntity> pageList = orderInfoEntityService.page(page, queryWrapper);

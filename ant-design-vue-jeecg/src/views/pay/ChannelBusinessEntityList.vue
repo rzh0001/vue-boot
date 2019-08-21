@@ -104,7 +104,23 @@
 		   {
             title: '通道',
             align:"center",
-            dataIndex: 'channelCode'
+            dataIndex: 'channelCode',
+         key: 'channelCode',
+         customRender: function (text) {
+           if (text == 'ysf') {
+             return '云闪付'
+           } else if (text == 'ali_bank') {
+             return '支付宝转卡'
+           } else if (text == 'ali_zz') {
+             return '支付宝转账'
+           }else if (text == 'nxys_wx') {
+             return '农信易扫微信'
+           }else if (text == 'nxys_alipay') {
+             return '农信易扫支付宝'
+           } else {
+             return text
+           }
+         }
            },
 		   {
             title: '加密密钥',

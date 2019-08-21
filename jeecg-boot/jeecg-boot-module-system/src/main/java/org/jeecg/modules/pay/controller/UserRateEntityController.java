@@ -76,7 +76,7 @@ public class UserRateEntityController {
                                                        HttpServletRequest req) {
         Result<IPage<UserRateEntity>> result = new Result<IPage<UserRateEntity>>();
         QueryWrapper<UserRateEntity> queryWrapper = QueryGenerator.initQueryWrapper(userRateEntity,
-				req.getParameterMap());
+                req.getParameterMap());
         Page<UserRateEntity> page = new Page<UserRateEntity>(pageNo, pageSize);
         IPage<UserRateEntity> pageList = userRateEntityService.page(page, queryWrapper);
         result.setSuccess(true);
@@ -110,19 +110,20 @@ public class UserRateEntityController {
                     return result;
                 }
                 SysUser agent = userService.getUserByName(userRateEntity.getAgentId());
-                if(agent == null){
+                if (agent == null) {
                     result.error500("高级代理不存在");
                     return result;
                 }
                 //判断该高级代理下的该用户，是否已经添加过费率
-                String rate = userRateEntityService.getUserRateByUserNameAndAngetCode(userName,userRateEntity.getAgentId(),userRateEntity.getChannelCode());
-                if(StringUtils.isNotBlank(rate)){
+                String rate = userRateEntityService.getUserRateByUserNameAndAngetCode(userName,
+                        userRateEntity.getAgentId(), userRateEntity.getChannelCode());
+                if (StringUtils.isNotBlank(rate)) {
                     result.error500("该用户已经添加过费率");
                     return result;
                 }
             }
             //介绍人
-            if(BaseConstant.USER_REFERENCES.equals(user.getMemberType())){
+            if (BaseConstant.USER_REFERENCES.equals(user.getMemberType())) {
                 if (StringUtils.isBlank(userRateEntity.getAgentId())) {
                     result.error500("介绍人的高级代理必填");
                     return result;
@@ -131,14 +132,31 @@ public class UserRateEntityController {
                     result.error500("被介绍人姓名必填");
                     return result;
                 }
+
+                //被介绍人
+                SysUser beIntroducer = userService.getUserByName(userRateEntity.getBeIntroducerName());
+                if (beIntroducer == null) {
+                    result.error500("被介绍人不存在");
+                    return result;
+                }
+                if(!userName.equals(beIntroducer.getSalesmanUsername())){
+                    result.error500("被介绍人与介绍人的关系不存在");
+                    return result;
+                }
                 SysUser agent = userService.getUserByName(userRateEntity.getAgentId());
-                if(agent == null){
+                if (agent == null) {
                     result.error500("高级代理不存在");
                     return result;
                 }
-                SysUser beIntroducer = userService.getUserByName(userRateEntity.getBeIntroducerName());
-                if(beIntroducer == null){
-                    result.error500("被介绍人不存在");
+                if(!userRateEntity.getAgentId().equals(beIntroducer.getAgentUsername())){
+                    result.error500("介绍人与高级代理关系不存在");
+                    return result;
+                }
+                //验证介绍人是否已经添加过费率
+                String rate = userRateEntityService.getBeIntroducerRate(userName, userRateEntity.getAgentId(),
+                        userRateEntity.getBeIntroducerName(), userRateEntity.getChannelCode());
+                if (StringUtils.isNotBlank(rate)) {
+                    result.error500("该介绍人已经添加过费率，不能重复添加");
                     return result;
                 }
             }
@@ -286,7 +304,8 @@ public class UserRateEntityController {
             params.setHeadRows(1);
             params.setNeedSave(true);
             try {
-                List<UserRateEntity> listUserRateEntitys = ExcelImportUtil.importExcel(file.getInputStream(), UserRateEntity.class, params);
+                List<UserRateEntity> listUserRateEntitys = ExcelImportUtil.importExcel(file.getInputStream(),
+                        UserRateEntity.class, params);
                 userRateEntityService.saveBatch(listUserRateEntitys);
                 return Result.ok("文件导入成功！数据行数:" + listUserRateEntitys.size());
             } catch (Exception e) {

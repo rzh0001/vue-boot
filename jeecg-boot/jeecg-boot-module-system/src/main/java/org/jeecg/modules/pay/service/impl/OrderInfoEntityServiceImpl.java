@@ -942,7 +942,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * @param aseKey
      * @return
      */
-    public JSONObject encryptAESData(OrderInfoEntity order, String aseKey) throws Exception {
+    public static JSONObject encryptAESData(OrderInfoEntity order, String aseKey) throws Exception {
         JSONObject callobj = new JSONObject();
         Long timestamp = System.currentTimeMillis();
         callobj.put(BaseConstant.ORDER_ID, order.getOrderId());
@@ -964,6 +964,32 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         return callbackjson;
     }
 
+    public static void main(String[] args) {
+        OrderInfoEntity order = new OrderInfoEntity();
+        order.setOrderId("111");
+        order.setOuterOrderId("222");
+        order.setSubmitAmount(new BigDecimal(0.5));
+        order.setStatus(2);
+        JSONObject callobj = new JSONObject();
+        Long timestamp = System.currentTimeMillis();
+        callobj.put(BaseConstant.ORDER_ID, order.getOrderId());
+        callobj.put(BaseConstant.OUTER_ORDER_ID, order.getOuterOrderId());
+        callobj.put(BaseConstant.SUBMIT_AMOUNT, order.getSubmitAmount());
+        callobj.put(BaseConstant.STATUS, order.getStatus());
+
+        log.info("====回调商户加密前数据====" + callobj.toJSONString());
+        //加密数据
+        String data = AES128Util.encryptBase64(callobj.toJSONString(), "aaaa");
+        JSONObject callbackjson = new JSONObject();
+        StringBuilder sign = new StringBuilder();
+        //sign = orderID+outOrderId+submitAmount+timestamp
+        sign.append(order.getOrderId()).append(order.getOuterOrderId()).append(order.getSubmitAmount()).append(timestamp);
+        callbackjson.put(BaseConstant.SIGN, DigestUtils.md5Hex(sign.toString()));
+        callbackjson.put(BaseConstant.DATA, data);
+        callbackjson.put(BaseConstant.TIMESTAMP, timestamp);
+        log.info("====回调商户加密后数据====" + callbackjson);
+        System.out.println(callbackjson.toJSONString());
+    }
     @Override
     public OrderInfoEntity queryOrderInfoByOrderId(String orderId) {
         return baseMapper.queryOrderByOrderId(orderId);

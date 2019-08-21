@@ -16,23 +16,6 @@
               <a-input placeholder="请输入通道代码" v-model="queryParam.channelCode"></a-input>
             </a-form-item>
           </a-col>
-        <template v-if="toggleSearchStatus">
-          <!--<a-col :md="6" :sm="8">
-              <a-form-item label="状态 0：关闭；1：开启">
-                <a-input placeholder="请输入状态 0：关闭；1：开启" v-model="queryParam.status"></a-input>
-              </a-form-item>
-            </a-col>
-            <a-col :md="6" :sm="8">
-              <a-form-item label="删除状态，1删除状态">
-                <a-input placeholder="请输入删除状态，1删除状态" v-model="queryParam.delFlag"></a-input>
-              </a-form-item>
-            </a-col>
-            <a-col :md="6" :sm="8">
-              <a-form-item label="创建人">
-                <a-input placeholder="请输入创建人" v-model="queryParam.createUser"></a-input>
-              </a-form-item>
-            </a-col>-->
-          </template>
           <a-col :md="6" :sm="8" >
             <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
               <a-button type="primary" @click="searchQuery" icon="search">查询</a-button>

@@ -11,14 +11,14 @@
               <a-input placeholder="请输入用户名" v-model="queryParam.userName"></a-input>
             </a-form-item>
           </a-col>
-        <template v-if="toggleSearchStatus">
-          <a-col :md="6" :sm="8">
-            <a-form-item label="通道名称">
-              <a-input placeholder="请输入通道" v-model="queryParam.channelCode"></a-input>
-            </a-form-item>
-          </a-col>
+          <template v-if="toggleSearchStatus">
+            <a-col :md="6" :sm="8">
+              <a-form-item label="通道名称">
+                <a-input placeholder="请输入通道" v-model="queryParam.channelCode"></a-input>
+              </a-form-item>
+            </a-col>
           </template>
-          <a-col :md="6" :sm="8" >
+          <a-col :md="6" :sm="8">
             <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
               <a-button type="primary" @click="searchQuery" icon="search">查询</a-button>
               <a-button type="primary" @click="searchReset" icon="reload" style="margin-left: 8px">重置</a-button>
@@ -56,9 +56,9 @@
         <span slot="action" slot-scope="text, record">
           <a @click="handleEdit(record)">编辑</a>
 
-          <a-divider type="vertical" />
+          <a-divider type="vertical"/>
           <a-dropdown>
-            <a class="ant-dropdown-link">更多 <a-icon type="down" /></a>
+            <a class="ant-dropdown-link">更多 <a-icon type="down"/></a>
             <a-menu slot="overlay">
               <a-menu-item>
                 <a-popconfirm title="确定删除吗?" @confirm="() => handleDelete(record.id)">
@@ -80,15 +80,15 @@
 
 <script>
   import UserChannelEntityModal from './modules/UserChannelEntityModal'
-  import { JeecgListMixin } from '@/mixins/JeecgListMixin'
+  import {JeecgListMixin} from '@/mixins/JeecgListMixin'
 
   export default {
     name: "UserChannelEntityList",
-    mixins:[JeecgListMixin],
+    mixins: [JeecgListMixin],
     components: {
       UserChannelEntityModal
     },
-    data () {
+    data() {
       return {
         description: '用户关联通道管理页面',
         // 表头
@@ -96,48 +96,62 @@
           {
             title: '#',
             dataIndex: '',
-            key:'rowIndex',
-            width:60,
-            align:"center",
-            customRender:function (t,r,index) {
-              return parseInt(index)+1;
+            key: 'rowIndex',
+            width: 60,
+            align: "center",
+            customRender: function (t, r, index) {
+              return parseInt(index) + 1;
             }
-           },
-		   {
+          },
+          {
             title: '用户名',
-            align:"center",
+            align: "center",
             dataIndex: 'userName'
-           },
-		   {
+          },
+          {
             title: '通道code',
-            align:"center",
-            dataIndex: 'channelCode'
-           },
+            align: "center",
+            dataIndex: 'channelCode',
+            key: 'channelCode',
+            customRender: function (text) {
+              if (text == 'ysf') {
+                return '云闪付'
+              } else if (text == 'ali_bank') {
+                return '支付宝转卡'
+              } else if (text == 'ali_zz') {
+                return '支付宝转账'
+              }else if (text == 'nxys_wx') {
+                return '农信易扫微信'
+              }else if (text == 'nxys_alipay') {
+                return '农信易扫支付宝'
+              } else {
+                return text
+              }
+            }
+          },
           {
             title: '操作',
             dataIndex: 'action',
-            align:"center",
-            scopedSlots: { customRender: 'action' },
+            align: "center",
+            scopedSlots: {customRender: 'action'},
           }
         ],
-		url: {
+        url: {
           channel: "/pay/channelEntity/channel",
           list: "/pay/userChannelEntity/list",
           delete: "/pay/userChannelEntity/delete",
           deleteBatch: "/pay/userChannelEntity/deleteBatch",
           exportXlsUrl: "pay/userChannelEntity/exportXls",
           importExcelUrl: "pay/userChannelEntity/importExcel",
-       },
-    }
-  },
-  computed: {
-    importExcelUrl: function(){
-      return `${window._CONFIG['domianURL']}/${this.url.importExcelUrl}`;
-    }
-  },
-    methods: {
-     
-    }
+        },
+      }
+    },
+    computed: {
+      importExcelUrl: function () {
+        return `${window._CONFIG['domianURL']}/${this.url.importExcelUrl}`;
+      }
+    },
+    methods: {}
   }
 </script>
 <style scoped>

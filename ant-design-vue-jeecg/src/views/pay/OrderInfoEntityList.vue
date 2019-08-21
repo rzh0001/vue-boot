@@ -173,19 +173,44 @@
             dataIndex: 'actualAmount'
            },
 		   {
-            title: '状态：-1:无效  0:未支付 1:成功，未返回 2:成功，已返回',
+            title: '支付状态',
             align:"center",
-            dataIndex: 'status'
+            dataIndex: 'status',
+         key: 'status',
+         customRender: function (text) {
+           if (text == -1) {
+             return '无效'
+           } else if (text == 0) {
+             return '未支付'
+           } else if (text ==1) {
+             return '成功，未返回'
+           }else if (text == 2) {
+             return '成功，已返回'
+           }else {
+             return text
+           }
+         }
            },
 		   {
             title: '支付通道',
             align:"center",
-            dataIndex: 'payType'
-           },
-		   {
-            title: '成功回调地址',
-            align:"center",
-            dataIndex: 'successCallbackUrl'
+            dataIndex: 'payType',
+         key: 'payType',
+         customRender: function (text) {
+           if (text == 'ysf') {
+             return '云闪付'
+           } else if (text == 'ali_bank') {
+             return '支付宝转卡'
+           } else if (text == 'ali_zz') {
+             return '支付宝转账'
+           }else if (text == 'nxys_wx') {
+             return '农信易扫微信'
+           }else if (text == 'nxys_alipay') {
+             return '农信易扫支付宝'
+           } else {
+             return text
+           }
+         }
            },
           {
             title: '操作',
