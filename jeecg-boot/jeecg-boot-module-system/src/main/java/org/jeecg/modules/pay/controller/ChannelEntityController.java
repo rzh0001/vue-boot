@@ -8,6 +8,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.aspect.annotation.AutoLog;
@@ -87,6 +89,7 @@ public class ChannelEntityController {
 	@AutoLog(value = "通道设置-添加")
 	@ApiOperation(value="通道设置-添加", notes="通道设置-添加")
 	@PostMapping(value = "/add")
+	@RequiresPermissions("channel::add")
 	public Result<ChannelEntity> add(@RequestBody ChannelEntity channelEntity) {
 		Result<ChannelEntity> result = new Result<ChannelEntity>();
 		try {
@@ -107,6 +110,7 @@ public class ChannelEntityController {
 	@AutoLog(value = "通道设置-编辑")
 	@ApiOperation(value="通道设置-编辑", notes="通道设置-编辑")
 	@PutMapping(value = "/edit")
+	@RequiresPermissions("channel::edit")
 	public Result<ChannelEntity> edit(@RequestBody ChannelEntity channelEntity) {
 		Result<ChannelEntity> result = new Result<ChannelEntity>();
 		ChannelEntity channelEntityEntity = channelEntityService.getById(channelEntity.getId());
@@ -131,6 +135,7 @@ public class ChannelEntityController {
 	@AutoLog(value = "通道设置-通过id删除")
 	@ApiOperation(value="通道设置-通过id删除", notes="通道设置-通过id删除")
 	@DeleteMapping(value = "/delete")
+	@RequiresPermissions("channel:delete")
 	public Result<?> delete(@RequestParam(name="id",required=true) String id) {
 		try {
 			channelEntityService.removeById(id);

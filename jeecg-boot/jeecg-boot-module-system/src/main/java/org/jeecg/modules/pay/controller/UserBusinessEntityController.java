@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.aspect.annotation.AutoLog;
@@ -87,6 +88,7 @@ public class UserBusinessEntityController {
 	@AutoLog(value = "用户关联商户-添加")
 	@ApiOperation(value="用户关联商户-添加", notes="用户关联商户-添加")
 	@PostMapping(value = "/add")
+	@RequiresPermissions("user::business::add")
 	public Result<UserBusinessEntity> add(@RequestBody UserBusinessEntity userBusinessEntity) {
 		Result<UserBusinessEntity> result = new Result<UserBusinessEntity>();
 		try {
@@ -123,6 +125,7 @@ public class UserBusinessEntityController {
 	@AutoLog(value = "用户关联商户-编辑")
 	@ApiOperation(value="用户关联商户-编辑", notes="用户关联商户-编辑")
 	@PutMapping(value = "/edit")
+	@RequiresPermissions("user::business::edit")
 	public Result<UserBusinessEntity> edit(@RequestBody UserBusinessEntity userBusinessEntity) {
 		Result<UserBusinessEntity> result = new Result<UserBusinessEntity>();
 		UserBusinessEntity userBusinessEntityEntity = userBusinessEntityService.getById(userBusinessEntity.getId());
@@ -147,6 +150,7 @@ public class UserBusinessEntityController {
 	@AutoLog(value = "用户关联商户-通过id删除")
 	@ApiOperation(value="用户关联商户-通过id删除", notes="用户关联商户-通过id删除")
 	@DeleteMapping(value = "/delete")
+	@RequiresPermissions("user::business::delete")
 	public Result<?> delete(@RequestParam(name="id",required=true) String id) {
 		try {
 			userBusinessEntityService.removeById(id);

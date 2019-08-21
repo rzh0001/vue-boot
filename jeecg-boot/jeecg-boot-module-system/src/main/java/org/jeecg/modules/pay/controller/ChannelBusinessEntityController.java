@@ -8,6 +8,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.aspect.annotation.AutoLog;
@@ -81,6 +83,7 @@ public class ChannelBusinessEntityController {
 	@AutoLog(value = "通道关联商户-添加")
 	@ApiOperation(value="通道关联商户-添加", notes="通道关联商户-添加")
 	@PostMapping(value = "/add")
+	@RequiresPermissions("channel::business::add")
 	public Result<ChannelBusinessEntity> add(@RequestBody ChannelBusinessEntity channelBusinessEntity) {
 		Result<ChannelBusinessEntity> result = new Result<ChannelBusinessEntity>();
 		try {
@@ -107,6 +110,7 @@ public class ChannelBusinessEntityController {
 	@AutoLog(value = "通道关联商户-编辑")
 	@ApiOperation(value="通道关联商户-编辑", notes="通道关联商户-编辑")
 	@PutMapping(value = "/edit")
+	@RequiresPermissions("channel::business::edit")
 	public Result<ChannelBusinessEntity> edit(@RequestBody ChannelBusinessEntity channelBusinessEntity) {
 		Result<ChannelBusinessEntity> result = new Result<ChannelBusinessEntity>();
 		ChannelBusinessEntity channelBusinessEntityEntity = channelBusinessEntityService.getById(channelBusinessEntity.getId());
@@ -131,6 +135,7 @@ public class ChannelBusinessEntityController {
 	@AutoLog(value = "通道关联商户-通过id删除")
 	@ApiOperation(value="通道关联商户-通过id删除", notes="通道关联商户-通过id删除")
 	@DeleteMapping(value = "/delete")
+	@RequiresPermissions("channel::business::delete")
 	public Result<?> delete(@RequestParam(name="id",required=true) String id) {
 		try {
 			channelBusinessEntityService.removeById(id);

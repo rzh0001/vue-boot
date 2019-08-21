@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.aspect.annotation.AutoLog;
@@ -93,6 +94,7 @@ public class UserRateEntityController {
     @AutoLog(value = "用户在指定通道下的费率-添加")
     @ApiOperation(value = "用户在指定通道下的费率-添加", notes = "用户在指定通道下的费率-添加")
     @PostMapping(value = "/add")
+    @RequiresPermissions("rate::add")
     public Result<UserRateEntity> add(@RequestBody UserRateEntity userRateEntity) {
         Result<UserRateEntity> result = new Result<UserRateEntity>();
         try {
@@ -178,6 +180,7 @@ public class UserRateEntityController {
     @AutoLog(value = "用户在指定通道下的费率-编辑")
     @ApiOperation(value = "用户在指定通道下的费率-编辑", notes = "用户在指定通道下的费率-编辑")
     @PutMapping(value = "/edit")
+    @RequiresPermissions("rate::edit")
     public Result<UserRateEntity> edit(@RequestBody UserRateEntity userRateEntity) {
         Result<UserRateEntity> result = new Result<UserRateEntity>();
         UserRateEntity userRateEntityEntity = userRateEntityService.getById(userRateEntity.getId());
@@ -203,6 +206,7 @@ public class UserRateEntityController {
     @AutoLog(value = "用户在指定通道下的费率-通过id删除")
     @ApiOperation(value = "用户在指定通道下的费率-通过id删除", notes = "用户在指定通道下的费率-通过id删除")
     @DeleteMapping(value = "/delete")
+    @RequiresPermissions("rate::delete")
     public Result<?> delete(@RequestParam(name = "id", required = true) String id) {
         try {
             userRateEntityService.removeById(id);
