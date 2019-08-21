@@ -12,23 +12,23 @@
             </a-form-item>
           </a-col>
 
-<!--          <a-col :md="6" :sm="8">-->
-<!--            <a-form-item label="性别">-->
-<!--              <a-select v-model="queryParam.sex" placeholder="请选择性别查询">-->
-<!--                <a-select-option value="">请选择性别查询</a-select-option>-->
-<!--                <a-select-option value="1">男性</a-select-option>-->
-<!--                <a-select-option value="2">女性</a-select-option>-->
-<!--              </a-select>-->
-<!--            </a-form-item>-->
-<!--          </a-col>-->
+          <!--          <a-col :md="6" :sm="8">-->
+          <!--            <a-form-item label="性别">-->
+          <!--              <a-select v-model="queryParam.sex" placeholder="请选择性别查询">-->
+          <!--                <a-select-option value="">请选择性别查询</a-select-option>-->
+          <!--                <a-select-option value="1">男性</a-select-option>-->
+          <!--                <a-select-option value="2">女性</a-select-option>-->
+          <!--              </a-select>-->
+          <!--            </a-form-item>-->
+          <!--          </a-col>-->
 
 
           <template v-if="toggleSearchStatus">
-<!--            <a-col :md="6" :sm="8">-->
-<!--              <a-form-item label="邮箱">-->
-<!--                <a-input placeholder="请输入邮箱查询" v-model="queryParam.email"></a-input>-->
-<!--              </a-form-item>-->
-<!--            </a-col>-->
+            <!--            <a-col :md="6" :sm="8">-->
+            <!--              <a-form-item label="邮箱">-->
+            <!--                <a-input placeholder="请输入邮箱查询" v-model="queryParam.email"></a-input>-->
+            <!--              </a-form-item>-->
+            <!--            </a-col>-->
 
             <a-col :md="6" :sm="8">
               <a-form-item label="手机号码">
@@ -69,7 +69,8 @@
       <a-button @click="handleAddSalesman" v-has="'user:addSalesman'" type="primary" icon="plus">添加介绍人</a-button>
       <a-button @click="handleAddMember" v-has="'user:addMember'" type="primary" icon="plus">添加商户</a-button>
       <a-button type="primary" icon="download" @click="handleExportXls('用户信息')">导出</a-button>
-      <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl" @change="handleImportExcel">
+      <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl"
+                @change="handleImportExcel">
         <a-button type="primary" icon="import">导入</a-button>
       </a-upload>
       <a-dropdown v-if="selectedRowKeys.length > 0">
@@ -97,7 +98,8 @@
     <!-- table区域-begin -->
     <div>
       <div class="ant-alert ant-alert-info" style="margin-bottom: 16px;">
-        <i class="anticon anticon-info-circle ant-alert-icon"></i>已选择&nbsp;<a style="font-weight: 600">{{ selectedRowKeys.length }}</a>项&nbsp;&nbsp;
+        <i class="anticon anticon-info-circle ant-alert-icon"></i>已选择&nbsp;<a style="font-weight: 600">{{
+        selectedRowKeys.length }}</a>项&nbsp;&nbsp;
         <a style="margin-left: 24px" @click="onClearSelected">清空</a>
       </div>
 
@@ -113,13 +115,11 @@
         :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
         @change="handleTableChange">
 
-        <template slot="avatarslot" slot-scope="text, record, index">
-          <div class="anty-img-wrap">
-            <a-avatar shape="square" :src="getAvatarView(record.avatar)" icon="user"/>
-          </div>
-        </template>
 
         <span slot="action" slot-scope="text, record">
+
+          <a @click="handleDetail(record)">详情</a>
+          <a-divider type="vertical"/>
           <a @click="handleEdit(record)">编辑</a>
           <a-divider type="vertical"/>
 
@@ -128,9 +128,6 @@
               更多 <a-icon type="down"/>
             </a>
             <a-menu slot="overlay">
-              <a-menu-item>
-                <a href="javascript:;" @click="handleDetail(record)">详情</a>
-              </a-menu-item>
 
               <a-menu-item>
                 <a href="javascript:;" @click="handleChangePassword(record.username)">密码</a>
@@ -154,9 +151,9 @@
                 </a-popconfirm>
               </a-menu-item>
 
-              <a-menu-item>
-                <a href="javascript:;" @click="handleAgentSettings(record.username)">代理人</a>
-              </a-menu-item>
+              <!--              <a-menu-item>-->
+              <!--                <a href="javascript:;" @click="handleAgentSettings(record.username)">代理人</a>-->
+              <!--              </a-menu-item>-->
 
             </a-menu>
           </a-dropdown>
@@ -185,13 +182,13 @@
   import UserSalesmanModal from './modules/UserSalesmanModal'
   import UserMemberModal from './modules/UserMemberModal'
   import PasswordModal from './modules/PasswordModal'
-  import {putAction} from '@/api/manage';
-  import {frozenBatch} from '@/api/api'
-  import {JeecgListMixin} from '@/mixins/JeecgListMixin'
-  import SysUserAgentModal from "./modules/SysUserAgentModal";
+  import { putAction } from '@/api/manage'
+  import { frozenBatch } from '@/api/api'
+  import { JeecgListMixin } from '@/mixins/JeecgListMixin'
+  import SysUserAgentModal from './modules/SysUserAgentModal'
 
   export default {
-    name: "UserList",
+    name: 'UserList',
     mixins: [JeecgListMixin],
     components: {
       SysUserAgentModal,
@@ -218,19 +215,19 @@
           },*/
           {
             title: '用户账号',
-            align: "center",
+            align: 'center',
             dataIndex: 'username',
             width: 120
           },
           {
             title: '真实姓名',
-            align: "center",
+            align: 'center',
             width: 100,
-            dataIndex: 'realname',
+            dataIndex: 'realname'
           },
           {
             title: '会员类型',
-            align: "center",
+            align: 'center',
             width: 120,
             dataIndex: 'memberType',
             key: 'memberType',
@@ -249,139 +246,155 @@
 
           {
             title: '上级代理',
-            align: "center",
+            align: 'center',
             width: 80,
             dataIndex: 'agentRealname',
             sorter: true
           },
           {
             title: '介绍人',
-            align: "center",
+            align: 'center',
             width: 180,
             dataIndex: 'salesmanRealname'
           },
-          {
-            title: '手机号码',
-            align: "center",
-            width: 100,
-            dataIndex: 'phone'
-          },
-          {
-            title: '邮箱',
-            align: "center",
-            dataIndex: 'email'
-          },
+          // {
+          //   title: '手机号码',
+          //   align: 'center',
+          //   width: 100,
+          //   dataIndex: 'phone'
+          // },
+          // {
+          //   title: '邮箱',
+          //   align: 'center',
+          //   dataIndex: 'email'
+          // },
           {
             title: '状态',
-            align: "center",
+            align: 'center',
             width: 80,
             dataIndex: 'status_dictText'
           },
-         /* {
-            title: '创建时间',
-            align: "center",
-            width: 150,
-            dataIndex: 'createTime',
-            sorter: true
-          },*/
+          /* {
+             title: '创建时间',
+             align: "center",
+             width: 150,
+             dataIndex: 'createTime',
+             sorter: true
+           },*/
           {
             title: '操作',
             dataIndex: 'action',
-            scopedSlots: {customRender: 'action'},
-            align: "center",
+            scopedSlots: { customRender: 'action' },
+            align: 'center',
             width: 170
           }
 
         ],
         url: {
-          imgerver: window._CONFIG['domianURL'] + "/sys/common/view",
-          syncUser: "/process/extActProcess/doSyncUser",
-          list: "/sys/user/list",
-          delete: "/sys/user/delete",
-          deleteBatch: "/sys/user/deleteBatch",
-          exportXlsUrl: "/sys/user/exportXls",
-          importExcelUrl: "sys/user/importExcel",
-        },
+          imgerver: window._CONFIG['domianURL'] + '/sys/common/view',
+          syncUser: '/process/extActProcess/doSyncUser',
+          list: '/sys/user/list',
+          delete: '/sys/user/delete',
+          deleteBatch: '/sys/user/deleteBatch',
+          exportXlsUrl: '/sys/user/exportXls',
+          importExcelUrl: 'sys/user/importExcel'
+        }
       }
     },
     computed: {
-      importExcelUrl: function(){
-        return `${window._CONFIG['domianURL']}/${this.url.importExcelUrl}`;
+      importExcelUrl: function() {
+        return `${window._CONFIG['domianURL']}/${this.url.importExcelUrl}`
       }
     },
     methods: {
-      getAvatarView: function (avatar) {
-        return this.url.imgerver + "/" + avatar;
+      getAvatarView: function(avatar) {
+        return this.url.imgerver + '/' + avatar
       },
 
-      batchFrozen: function (status) {
+      batchFrozen: function(status) {
         if (this.selectedRowKeys.length <= 0) {
-          this.$message.warning('请选择一条记录！');
-          return false;
+          this.$message.warning('请选择一条记录！')
+          return false
         } else {
-          let ids = "";
-          let that = this;
-          that.selectedRowKeys.forEach(function (val) {
-            ids += val + ",";
-          });
+          let ids = ''
+          let that = this
+          that.selectedRowKeys.forEach(function(val) {
+            ids += val + ','
+          })
           that.$confirm({
-            title: "确认操作",
-            content: "是否" + (status == 1 ? "解冻" : "冻结") + "选中账号?",
-            onOk: function () {
-              frozenBatch({ids: ids, status: status}).then((res) => {
+            title: '确认操作',
+            content: '是否' + (status == 1 ? '解冻' : '冻结') + '选中账号?',
+            onOk: function() {
+              frozenBatch({ ids: ids, status: status }).then((res) => {
                 if (res.success) {
-                  that.$message.success(res.message);
-                  that.loadData();
-                  that.onClearSelected();
+                  that.$message.success(res.message)
+                  that.loadData()
+                  that.onClearSelected()
                 } else {
-                  that.$message.warning(res.message);
+                  that.$message.warning(res.message)
                 }
-              });
+              })
             }
-          });
+          })
         }
       },
-      handleAddAgent: function () {
-        this.$refs.agentModalForm.add();
-        this.$refs.agentModalForm.title = "新增代理";
-        this.$refs.agentModalForm.disableSubmit = false;
+      handleAddAgent: function() {
+        this.$refs.agentModalForm.add()
+        this.$refs.agentModalForm.title = '新增代理'
+        this.$refs.agentModalForm.disableSubmit = false
       },
-      handleAddSalesman: function () {
-        this.$refs.salesmanModalForm.add();
-        this.$refs.salesmanModalForm.title = "新增介绍人";
-        this.$refs.salesmanModalForm.disableSubmit = false;
+      handleAddSalesman: function() {
+        this.$refs.salesmanModalForm.add()
+        this.$refs.salesmanModalForm.title = '新增介绍人'
+        this.$refs.salesmanModalForm.disableSubmit = false
       },
-      handleAddMember: function () {
-        this.$refs.memberModalForm.add();
-        this.$refs.memberModalForm.title = "新增商户";
-        this.$refs.memberModalForm.disableSubmit = false;
+      handleAddMember: function() {
+        this.$refs.memberModalForm.add()
+        this.$refs.memberModalForm.title = '新增商户'
+        this.$refs.memberModalForm.disableSubmit = false
       },
+      // handleDetail: function(record) {
+      //   if (record.memberType === 1) {
+      //     this.$refs.agentModalForm.edit(record)
+      //     this.$refs.agentModalForm.title = '详情'
+      //     this.$refs.agentModalForm.disableSubmit = true
+      //   } else if (record.memberType === 2) {
+      //     this.$refs.salesmanModalForm.edit(record)
+      //     this.$refs.salesmanModalForm.title = '详情'
+      //     this.$refs.salesmanModalForm.disableSubmit = true
+      //   } else if (record.memberType === 3) {
+      //     this.$refs.memberModalForm.edit(record)
+      //     this.$refs.memberModalForm.title = '详情'
+      //     this.$refs.memberModalForm.disableSubmit = true
+      //   }
+      //
+      // },
       handleMenuClick(e) {
         if (e.key == 1) {
-          this.batchDel();
+          this.batchDel()
         } else if (e.key == 2) {
-          this.batchFrozen(2);
+          this.batchFrozen(2)
         } else if (e.key == 3) {
-          this.batchFrozen(1);
+          this.batchFrozen(1)
         }
       },
-      handleFrozen: function (id, status) {
-        let that = this;
-        frozenBatch({ids: id, status: status}).then((res) => {
+      handleFrozen: function(id, status) {
+        let that = this
+        frozenBatch({ ids: id, status: status }).then((res) => {
           if (res.success) {
-            that.$message.success(res.message);
-            that.loadData();
+            that.$message.success(res.message)
+            that.loadData()
           } else {
-            that.$message.warning(res.message);
+            that.$message.warning(res.message)
           }
-        });
+        })
       },
       handleChangePassword(username) {
-        this.$refs.passwordmodal.show(username);
+        this.$refs.passwordmodal.show(username)
       },
-      handleAgentSettings(username){
-        this.$refs.sysUserAgentModal.agentSettings(username);
-        this.$refs.sysUserAgentModal.title = "用户代理人设置";
+      handleAgentSettings(username) {
+        this.$refs.sysUserAgentModal.agentSettings(username)
+        this.$refs.sysUserAgentModal.title = '用户代理人设置'
       },
       passwordModalOk() {
         //TODO 密码修改完成 不需要刷新页面，可以把datasource中的数据更新一下
