@@ -41,13 +41,12 @@
           <a-input placeholder="请输入用户名称" v-decorator="[ 'realname', validatorRules.realname]"/>
         </a-form-item>
 
-        <a-form-item v-if="!model.memberType" label="角色分配" :labelCol="labelCol" :wrapperCol="wrapperCol"
-                     v-show="!roleDisabled">
+        <a-form-item v-if="!model.memberType" label="角色分配" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-select
             mode="single"
             style="width: 100%"
             placeholder="请选择用户角色"
-            v-model="selectedRole" :disabled="true">
+            v-model="selectedRole" :disabled="disabledRole">
             <a-select-option v-for="(role,roleindex) in roleList" :key="roleindex.toString()" :value="role.id">
               {{ role.roleName }}
             </a-select-option>
@@ -125,16 +124,31 @@
           <a-input-group compact>
             <a-input-number placeholder="下限" :disabled="isDisabledAuth('user:form:lowerLimit')"
                             v-decorator="[ 'lowerLimit']" style="width: 30%;text-align: center"
-                            min="0.01"/>
+                            :min="0.01"/>
             <a-input placeholder="~" disabled
                      style="width: 30px; border-left: 0px; pointer-events: none;background-color: #fff"/>
             <a-input-number placeholder="上限" :disabled="isDisabledAuth('user:form:upperLimit')"
                             v-decorator="[ 'upperLimit']" style="width: 30%; border-left: 0px;text-align: center"
-                            min="0.01"/>
+                            :min="0.01"/>
           </a-input-group>
         </a-form-item>
 
-        <a-form-item v-if="model.memberType == 3" label="所属介绍人" :labelCol="labelCol" :wrapperCol="wrapperCol"
+        <a-form-item v-if="model.memberType == 3" label="所属介绍人" :labelCol="labelCol"
+                     :wrapperCol="wrapperCol">
+          <a-input-group compact>
+            <a-input placeholder="" :disabled="isDisabledAuth('user:form:salesmanUsername')"
+                     v-decorator="[ 'salesmanUsername']" style="width: 30%;text-align: center"
+            />
+            <a-input placeholder="-" disabled
+                     style="width: 30px; border-left: 0px; pointer-events: none;background-color: #fff"/>
+            <a-input placeholder="" :disabled="isDisabledAuth('user:form:salesmanUsername')"
+                     v-decorator="[ 'salesmanRealname']" style="width: 30%; border-left: 0px;text-align: center"
+            />
+          </a-input-group>
+        </a-form-item>
+
+        <a-form-item v-if="!model.id && model.memberType == 3" label="所属介绍人" :labelCol="labelCol"
+                     :wrapperCol="wrapperCol"
                      v-show="!salesmanDisabled">
           <a-select
             mode="single"
@@ -188,6 +202,7 @@
         departDisabled: false, //是否是我的部门调用该页面
         roleDisabled: false, //是否是角色维护调用该页面
         salesmanDisabled: false, //是否是角色维护调用该页面
+        disabledRole: false,
         modalWidth: 800,
         drawerWidth: 700,
         modaltoggleFlag: true,
@@ -294,10 +309,28 @@
           }
         })
       },
+      initialSalesmanList() {
+        querySalesmanByAgent({ userid: '' }).then((res) => {
+          if (res.success) {
+            this.salesmanList = res.result
+          } else {
+            console.log(res.message)
+          }
+        })
+      },
       loadUserRoles(userid) {
         queryUserRole({ userid: userid }).then((res) => {
           if (res.success) {
             this.selectedRole = res.result
+          } else {
+            console.log(res.message)
+          }
+        })
+      },
+      loadSalesman(userid) {
+        querySalesmanByMember({ userid: userid }).then((res) => {
+          if (res.success) {
+            this.selectedSalesman = res.result
           } else {
             console.log(res.message)
           }
@@ -311,8 +344,8 @@
         this.userId = ''
       },
       add() {
-        this.picUrl = ''
         this.refresh()
+        this.selectedRole = true
         this.edit({ activitiSync: '1' })
       },
       edit(record) {
