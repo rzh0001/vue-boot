@@ -78,7 +78,7 @@ public class UserChannelEntityController {
 	}
 	
 	/**
-	  *   添加
+	  *   代理和商户才能关联通道
 	 * @param userChannelEntity
 	 * @return
 	 */
@@ -95,8 +95,8 @@ public class UserChannelEntityController {
 				return result;
 			}
 			//必须是商户才能关联通道
-			if(!BaseConstant.USER_MERCHANTS.equals(user.getMemberType())){
-				result.error500("用户角色不是商户，无法关联通道");
+			if(BaseConstant.USER_REFERENCES.equals(user.getMemberType())){
+				result.error500("介绍人无法关联通道");
 				return result;
 			}
 			UserChannelEntity channel = userChannelEntityService.queryChannelAndUserName(userChannelEntity.getChannelCode(),userChannelEntity.getUserName());

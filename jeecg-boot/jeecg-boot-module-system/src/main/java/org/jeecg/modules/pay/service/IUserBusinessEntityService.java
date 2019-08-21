@@ -4,6 +4,8 @@ import org.apache.ibatis.annotations.Param;
 import org.jeecg.modules.pay.entity.UserBusinessEntity;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+
 /**
  * @Description: 用户关联商户
  * @Author: jeecg-boot
@@ -12,5 +14,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IUserBusinessEntityService extends IService<UserBusinessEntity> {
 
-    String queryBusinessCodeByUserName(String userName);
+    List<UserBusinessEntity> queryBusinessCodeByUserName(String userName, String channelCode);
 }

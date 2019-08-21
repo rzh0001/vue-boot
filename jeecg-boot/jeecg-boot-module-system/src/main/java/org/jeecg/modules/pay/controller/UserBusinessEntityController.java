@@ -32,6 +32,7 @@ import org.jeecgframework.poi.excel.entity.ImportParams;
 import org.jeecgframework.poi.excel.view.JeecgEntityExcelView;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -47,7 +48,7 @@ import io.swagger.annotations.ApiOperation;
  * @Version: V1.0
  */
 @Slf4j
-@Api(tags="用户关联商户")
+@Api(tags="代理关联挂码")
 @RestController
 @RequestMapping("/pay/userBusinessEntity")
 public class UserBusinessEntityController {
@@ -96,13 +97,14 @@ public class UserBusinessEntityController {
 				result.error500("用户不存在");
 				return result;
 			}
-			//必须是商户才能关联通道
-			if(!BaseConstant.USER_MERCHANTS.equals(user.getMemberType())){
+			//必须是代理才能关联挂码账号
+			if(!BaseConstant.USER_AGENT.equals(user.getMemberType())){
 				result.error500("用户角色不是商户，无法关联通道");
 				return result;
 			}
-			String code = userBusinessEntityService.queryBusinessCodeByUserName(userName);
-			if(StringUtils.isNotBlank(code) && code.equals(userBusinessEntity.getBusinessCode())){
+			//校验在该通道下的该代理是否已经关联过挂码账号
+			List<UserBusinessEntity> list = userBusinessEntityService.queryBusinessCodeByUserName(userName,userBusinessEntity.getChannelCode());
+			if(!CollectionUtils.isEmpty(list) && list.get(0).getBusinessCode().equals(userBusinessEntity.getBusinessCode())){
 				result.error500("用户已经关联过该商户了");
 				return result;
 			}
