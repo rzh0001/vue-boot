@@ -135,8 +135,10 @@
             httpAction(httpurl,jsonObj,method).then((res)=>{
               if(res.code == '0'){
                 that.$message.success(res.msg);
-                window.open(res.url);
-                that.$emit('ok');
+                if(res.url != null){
+                  window.open(res.url);
+                  that.$emit('ok');
+                }
               }else{
                 that.$message.warning(res.msg);
               }

@@ -101,13 +101,13 @@ public class UserBusinessEntityController {
 			}
 			//必须是代理才能关联挂码账号
 			if(!BaseConstant.USER_AGENT.equals(user.getMemberType())){
-				result.error500("用户角色不是商户，无法关联通道");
+				result.error500("只有代理才能关联挂马");
 				return result;
 			}
 			//校验在该通道下的该代理是否已经关联过挂码账号
 			List<UserBusinessEntity> list = userBusinessEntityService.queryBusinessCodeByUserName(userName,userBusinessEntity.getChannelCode());
 			if(!CollectionUtils.isEmpty(list) && list.get(0).getBusinessCode().equals(userBusinessEntity.getBusinessCode())){
-				result.error500("用户已经关联过该商户了");
+				result.error500("通道："+userBusinessEntity.getChannelCode()+"下，该代理："+userName+"已经关联过挂马账号："+userBusinessEntity.getBusinessCode());
 				return result;
 			}
 			userBusinessEntityService.save(userBusinessEntity);

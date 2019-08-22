@@ -97,7 +97,6 @@ public class UserChannelEntityController {
 				result.error500("用户不存在");
 				return result;
 			}
-			//必须是商户才能关联通道
 			if(BaseConstant.USER_REFERENCES.equals(user.getMemberType())){
 				result.error500("介绍人无法关联通道");
 				return result;
@@ -107,6 +106,7 @@ public class UserChannelEntityController {
 				result.error500("该用户已经添加过通道");
 				return result;
 			}
+			userChannelEntity.setMemberType(user.getMemberType());
 			userChannelEntityService.save(userChannelEntity);
 			result.success("添加成功！");
 		} catch (Exception e) {

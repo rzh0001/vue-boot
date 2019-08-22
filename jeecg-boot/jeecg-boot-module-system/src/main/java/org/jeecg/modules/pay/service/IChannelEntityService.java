@@ -14,4 +14,5 @@ import java.util.List;
 public interface IChannelEntityService extends IService<ChannelEntity> {
     ChannelEntity queryChannelByCode(String channelCode);
     List<ChannelEntity> queryAllChannelCode();
+    List<ChannelEntity> queryAgentChannelCodeByAgentName(String userName);
 }

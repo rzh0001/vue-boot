@@ -1,27 +1,30 @@
 package org.jeecg.modules.pay.controller;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.aspect.annotation.AutoLog;
+import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.pay.entity.ChannelEntity;
 import org.jeecg.modules.pay.service.IChannelEntityService;
-import java.util.Date;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 
+import org.jeecg.modules.system.entity.SysUser;
+import org.jeecg.modules.system.service.ISysUserService;
+import org.jeecg.modules.util.BaseConstant;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -50,7 +53,8 @@ import io.swagger.annotations.ApiOperation;
 public class ChannelEntityController {
 	@Autowired
 	private IChannelEntityService channelEntityService;
-	
+	 @Autowired
+	 private ISysUserService sysUserService;
 	/**
 	  * 分页列表查询
 	 * @param channelEntity
@@ -75,10 +79,28 @@ public class ChannelEntityController {
 		return result;
 	}
 
+	 /**
+	  * 获取通道
+	  * @return
+	  */
 	 @GetMapping(value = "/channel")
 	public Result<List<ChannelEntity>> queryAllChannelCode(){
+	 	 //获取系统用户
+		 LoginUser user = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+		 SysUser sysUser = sysUserService.getUserByName(user.getUsername());
+		 List<ChannelEntity> list = new ArrayList<>();
+		 //管理员登录 展示全部的通道
+		 if(StringUtils.isEmpty(sysUser.getMemberType())){
+		 	list = channelEntityService.queryAllChannelCode();
+		 }else if(BaseConstant.USER_AGENT.equals(sysUser.getMemberType())){
+			 //代理登录，则展示代理的通道
+			 list = channelEntityService.queryAgentChannelCodeByAgentName(sysUser.getUsername());
+		 }else{
+		 	 //商户或介绍人登录 ,展示其代理的通道
+			 list = channelEntityService.queryAgentChannelCodeByAgentName(sysUser.getAgentUsername());
+		 }
 		 Result<List<ChannelEntity>> result = new Result<>();
-		 result.setResult(channelEntityService.queryAllChannelCode());
+		 result.setResult(list);
 		return result;
 	}
 	/**

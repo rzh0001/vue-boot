@@ -26,4 +26,9 @@ public class ChannelEntityServiceImpl extends ServiceImpl<ChannelEntityMapper, C
     public List<ChannelEntity> queryAllChannelCode() {
         return baseMapper.queryAllChannelCode();
     }
+
+    @Override
+    public List<ChannelEntity> queryAgentChannelCodeByAgentName(String userName) {
+        return baseMapper.queryAgentChannelCodeByAgentName(userName);
+    }
 }

@@ -7,4 +7,14 @@
     <select id="queryAllChannelCode" resultType="org.jeecg.modules.pay.entity.ChannelEntity">
       select channel_code as channelCode,channel_name as channelName from sys_channel
     </select>
+    <select id="queryAgentChannelCodeByAgentName" parameterType="String" resultType="org.jeecg.modules.pay.entity.ChannelEntity">
+        SELECT
+            c.channel_code AS channelCode,
+            c.channel_name AS channelName
+        FROM
+            sys_user_channel u
+        LEFT JOIN sys_channel c ON u.channel_code = c.channel_code
+        WHERE
+            u.user_name = #{userName}
+    </select>
 </mapper>

@@ -104,12 +104,30 @@
             }
           },
           {
-            title: '用户名',
+            title: '代理/商户',
             align: "center",
             dataIndex: 'userName'
           },
           {
-            title: '通道code',
+            title: '会员类型',
+            align: 'center',
+            width: 120,
+            dataIndex: 'memberType',
+            key: 'memberType',
+            customRender: function(text) {
+              if (text == 1) {
+                return '代理'
+              } else if (text == 2) {
+                return '介绍人'
+              } else if (text == 3) {
+                return '商户'
+              } else {
+                return text
+              }
+            }
+          },
+          {
+            title: '通道',
             align: "center",
             dataIndex: 'channelCode',
             key: 'channelCode',

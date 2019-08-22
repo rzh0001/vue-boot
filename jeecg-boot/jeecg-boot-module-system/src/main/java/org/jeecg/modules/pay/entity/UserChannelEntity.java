@@ -40,6 +40,10 @@ public class UserChannelEntity {
 	@Excel(name = "用户名", width = 15)
     @ApiModelProperty(value = "用户名")
 	private java.lang.String userName;
+	/**会员类型(1：代理  2：介绍人 3：商户）*/
+	@Excel(name = "会员类型(1：代理  2：介绍人 3：商户）", width = 15)
+	@ApiModelProperty(value = "会员类型(1：代理  2：介绍人 3：商户）")
+	private java.lang.String memberType;
 	/**通道id*/
 	@Excel(name = "通道id", width = 15)
     @ApiModelProperty(value = "通道id")
