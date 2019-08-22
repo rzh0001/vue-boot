@@ -61,7 +61,7 @@
           </a-select>
         </a-form-item>
 
-        <a-form-item v-if="model.memberType == 1" label="API KEY" :labelCol="labelCol" :wrapperCol="wrapperCol">
+        <a-form-item v-if="model.memberType == 3" label="API KEY" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input placeholder="" :disabled="isDisabledAuth('user:form:apiKey')"
                    v-decorator="[ 'apiKey']"/>
         </a-form-item>
