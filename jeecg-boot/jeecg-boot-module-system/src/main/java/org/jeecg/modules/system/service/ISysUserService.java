@@ -129,4 +129,8 @@ public interface ISysUserService extends IService<SysUser> {
 	 * @return
 	 */
 	List<SysUser> getUserByAgent(String agentName);
+
+	List<SysUser> getUserAndReferByAgent(String agentName);
+
+	List<String> getUserByRefer(String refer);
 }

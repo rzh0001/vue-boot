@@ -45,5 +45,21 @@
 		WHERE
 			agent_username = #{agentName} AND member_type='3'
 	</select>
+	<select id="getUserAndReferByAgent" resultType="org.jeecg.modules.system.entity.SysUser">
+		SELECT
+			*
+		FROM
+			sys_user
+		WHERE
+			agent_username = #{agentName} AND member_type in ('3','2')
+	</select>
+	<select id="getUserByRefer" resultType="java.lang.String">
+		SELECT
+			username
+		FROM
+			sys_user
+		WHERE
+			salesman_realname = #{refer}
+	</select>
 	
 </mapper>

@@ -1,8 +1,6 @@
 package org.jeecg.modules.pay.controller;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -10,15 +8,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.aspect.annotation.AutoLog;
+import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.pay.entity.UserRateEntity;
 import org.jeecg.modules.pay.service.IUserRateEntityService;
-
-import java.util.Date;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -75,11 +73,37 @@ public class UserRateEntityController {
                                                        @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
                                                        @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
                                                        HttpServletRequest req) {
+        //获取系统用户
+        LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+        SysUser sysUser = userService.getUserByName(loginUser.getUsername());
+
         Result<IPage<UserRateEntity>> result = new Result<IPage<UserRateEntity>>();
         QueryWrapper<UserRateEntity> queryWrapper = QueryGenerator.initQueryWrapper(userRateEntity,
                 req.getParameterMap());
         Page<UserRateEntity> page = new Page<UserRateEntity>(pageNo, pageSize);
         IPage<UserRateEntity> pageList = userRateEntityService.page(page, queryWrapper);
+        List<UserRateEntity> db = pageList.getRecords();
+        List<UserRateEntity> newList = new ArrayList<>();
+        if (BaseConstant.USER_AGENT.equals(sysUser.getMemberType())){
+            //如果是代理登录，则可以看到该代理下的商户和介绍人
+            List<SysUser> users = userService.getUserAndReferByAgent(sysUser.getUsername());
+            for(UserRateEntity ur:db){
+                for(SysUser u:users){
+                    if(ur.getUserName().equals(u.getUsername())){
+                        newList.add(ur);
+                        break;
+                    }
+                }
+            }
+            pageList.setRecords(newList);
+        }else if(BaseConstant.USER_MERCHANTS.equals(sysUser.getMemberType()) || BaseConstant.USER_REFERENCES.equals(sysUser.getMemberType())){
+            for(UserRateEntity ur:db){
+                if(ur.getUserName().equals(sysUser.getUsername())){
+                    newList.add(ur);
+                }
+            }
+            pageList.setRecords(newList);
+        }
         result.setSuccess(true);
         result.setResult(pageList);
         return result;
@@ -98,14 +122,45 @@ public class UserRateEntityController {
     public Result<UserRateEntity> add(@RequestBody UserRateEntity userRateEntity) {
         Result<UserRateEntity> result = new Result<UserRateEntity>();
         try {
+            //当前登录系统的用户
+            LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+            SysUser sysUser = userService.getUserByName(loginUser.getUsername());
+
+            //添加的用户
             String userName = userRateEntity.getUserName();
-            //判断用户是否存在
             SysUser user = userService.getUserByName(userName);
             if (user == null) {
-                result.error500("用户不存在");
+                result.error500("添加的商户或介绍人不存在");
                 return result;
             }
-            //2、如果是普通商户，则必须填写高级代理
+            if (BaseConstant.USER_AGENT.equals(sysUser.getMemberType())){
+                //当前登录的用户如果是代理，则只能添加该代理下的介绍人或商户
+                List<SysUser> dbusers = userService.getUserAndReferByAgent(sysUser.getUsername());
+                boolean flag = false;
+                for(SysUser u:dbusers){
+                    if(userName.equals(u.getUsername())){
+                        flag = true;
+                        break;
+                    }
+                }
+                if(!flag){
+                    result.error500("该商户或介绍人不属于此代理");
+                    return result;
+                }
+                //高级代理登录添加的高级代理必须是当前登录人
+                if(!userRateEntity.getAgentId().equals(sysUser.getUsername())){
+                    result.error500("高级代理名称不匹配");
+                    return result;
+                }
+                if(StringUtils.isNotBlank(userRateEntity.getBeIntroducerName())){
+                    SysUser be = userService.getUserByName(userRateEntity.getBeIntroducerName());
+                    if(!userRateEntity.getAgentId().equals(be.getAgentUsername())){
+                        result.error500("被介绍人不属于此代理");
+                        return result;
+                    }
+                }
+            }
+            //2、如果添加的是普通商户，则必须填写高级代理
             if (BaseConstant.USER_MERCHANTS.equals(user.getMemberType())) {
                 if (StringUtils.isBlank(userRateEntity.getAgentId())) {
                     result.error500("普通商户的高级代理必填");
@@ -124,7 +179,7 @@ public class UserRateEntityController {
                     return result;
                 }
             }
-            //介绍人
+            //添加的是介绍人
             if (BaseConstant.USER_REFERENCES.equals(user.getMemberType())) {
                 if (StringUtils.isBlank(userRateEntity.getAgentId())) {
                     result.error500("介绍人的高级代理必填");

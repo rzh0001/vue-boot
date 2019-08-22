@@ -326,10 +326,10 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         if (user.getMemberType().equals(BaseConstant.USER_MERCHANTS) && StringUtils.isNotBlank(user.getAgentUsername())) {
             //是普通商户且存在高级代理，验证才能通过
             //验证金额是否符合上下线要求
-            if (Double.parseDouble(submitAmount) > user.getUpperLimit().doubleValue()) {
+            if (user.getUpperLimit() != null && Double.parseDouble(submitAmount) > user.getUpperLimit().doubleValue()) {
                 throw new RRException("非法请求，申请金额超出申请上限");
             }
-            if (Double.parseDouble(submitAmount) < user.getLowerLimit().doubleValue()) {
+            if (user.getLowerLimit() != null && Double.parseDouble(submitAmount) < user.getLowerLimit().doubleValue()) {
                 throw new RRException("非法请求，申请金额低于申请下限");
             }
         } else {
@@ -502,13 +502,14 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             throw new RRException("通道未定义，或用户无此通道权限,用户为：" + userName);
         }
         //校验在此通道下的该商户对应的代理是否有定义挂码账号
-        List<UserBusinessEntity> useBusinesses = businessEntityService.queryBusinessCodeByUserName(user.getAgentUsername(), payType);
+        List<UserBusinessEntity> useBusinesses =
+                businessEntityService.queryBusinessCodeByUserName(user.getAgentUsername(), payType);
         if (CollectionUtils.isEmpty(useBusinesses)) {
             log.info("用户:{},无对应商户信息", userName);
-            throw new RRException(userName + "对应的代理"+user.getAgentUsername()+"未配置挂码信息");
+            throw new RRException(userName + "对应的代理" + user.getAgentUsername() + "未配置挂码信息");
         }
-        if(useBusinesses.size()>1){
-            throw new RRException(userName + "对应的代理"+user.getAgentUsername()+"配置了多个挂码信息");
+        if (useBusinesses.size() > 1) {
+            throw new RRException(userName + "对应的代理" + user.getAgentUsername() + "配置了多个挂码信息");
         }
         UserBusinessEntity userBusinessEntity = useBusinesses.get(0);
         //校验金额的合法性
@@ -847,7 +848,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         SysUser user = userService.getUserByName(userName);
         if (user == null) {
             log.info("userName参数校验-->用户不存在，username:{}", userName);
-            throw new RRException("用户不存在:"+userName);
+            throw new RRException("用户不存在:" + userName);
         }
         String apiKey = null;
         if (fromInner) {
@@ -886,7 +887,8 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             throw new RRException("用户未配置高级代理");
         }
         //商户
-        String rate = rateEntityService.getUserRateByUserNameAndAngetCode(user.getUsername(), user.getAgentUsername(), payType);
+        String rate = rateEntityService.getUserRateByUserNameAndAngetCode(user.getUsername(), user.getAgentUsername()
+                , payType);
         if (StringUtils.isBlank(rate)) {
             throw new RRException("用户未配置费率，请联系管理员配置");
         }
