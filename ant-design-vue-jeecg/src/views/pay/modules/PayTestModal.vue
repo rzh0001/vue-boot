@@ -33,6 +33,12 @@
             </option>
           </select>
         </a-form-item>
+        <a-form-item
+          :labelCol="labelCol"
+          :wrapperCol="wrapperCol"
+          label="apikey">
+          <a-input placeholder="apikey" v-decorator="['apikey', validatorRules.apikey]" />
+        </a-form-item>
       </a-form>
     </a-spin>
   </a-modal>
@@ -51,6 +57,7 @@
       return {
         title:"操作",
         channels: [],
+        apikey:'',
         visible: false,
         model: {},
         labelCol: {
@@ -119,12 +126,13 @@
             let outerOrderId = Date.parse(new Date())+'abc';
             let form = Object.assign(this.model, {"callbackUrl":"http://localhost/api/callback","outerOrderId":outerOrderId});
             let data = JSON.stringify(form);
+            let key = this.apikey;
             console.log('json字符串data:'+data);
-            console.log('json字符串data 加密：'+Encrypt(data,'1234123412ABCDEF'));
+            console.log('json字符串data 加密：'+Encrypt(data,key));
           var timestamp = Date.parse(new Date());
-          var sign = MD5(this.model.username+timestamp+Encrypt(data,'1234123412ABCDEF')+'1234123412ABCDEF');
+          var sign = MD5(this.model.username+timestamp+Encrypt(data,key)+key);
           var jsonObj = {
-            "data":Encrypt(data,'1234123412ABCDEF'),
+            "data":Encrypt(data,key),
             "username":this.model.username,
             "timestamp":timestamp,
             //username+timestamp+data+apikey

@@ -486,6 +486,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         String payType = (String) checkParam.get(BaseConstant.PAY_TYPE);
         String callbackUrl = (String) checkParam.get(BaseConstant.CALLBACK_URL);
         String agentName = (String) checkParam.get(BaseConstant.AGENT_NAME);
+        log.info("请求创建订单，商户单号为:{};通道为：{};用户名为:{};申请金额为:{}",new String[]{outerOrderId,payType,userName});
         //校验是否是重复订单
         if (!outerOrderIdIsOnly(outerOrderId)) {
             log.info("该订单已经创建过，无需重复创建;orderid:{}", outerOrderId);
@@ -635,6 +636,8 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
                     if ("200".equals(r.get("code").toString())) {
                         payUrl = (String) r.get("msg");
                         log.info("===请求挂码平台，返回支付链接为:{}", payUrl);
+                    }else{
+                        throw new RRException("四方回调挂马平台失败,订单创建失败：" + result.getBody());
                     }
                 } else {
                     throw new RRException("四方回调挂马平台失败,订单创建失败：" + result.getBody());
@@ -784,7 +787,9 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      */
     private String sign(OrderInfoEntity order) throws Exception {
         StringBuilder sign = new StringBuilder();
-        return DigestUtils.md5Hex(sign.append(key).append(order.getSubmitAmount()).append(order.getOrderId()).toString());
+        sign.append(key).append(order.getSubmitAmount()).append(order.getOrderId());
+        log.info("===支付宝签名内容===》：{}",sign.toString());
+        return DigestUtils.md5Hex(sign.toString());
     }
 
     /**
