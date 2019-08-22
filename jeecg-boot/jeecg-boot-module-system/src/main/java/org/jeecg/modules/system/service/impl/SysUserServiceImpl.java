@@ -290,6 +290,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 				break;
 			case PayConstant.MEMBER_TYPE_MEMBER:
 				roleCode = PayConstant.ROLE_CODE_MEMBER;
+				user.setApiKey(UUID.randomUUID().toString().replaceAll("-","").substring(0,16));
 				user.setAgentId(optUser.getId());
 				user.setAgentUsername(optUser.getUsername());
 				user.setAgentRealname(optUser.getRealname());
