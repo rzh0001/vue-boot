@@ -313,4 +313,14 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 	public List<SysUser> getUserByAgent(String agentName) {
 		return userMapper.getUserByAgent(agentName);
 	}
+
+	@Override
+	public List<SysUser> getUserAndReferByAgent(String agentName) {
+		return userMapper.getUserAndReferByAgent(agentName);
+	}
+
+	@Override
+	public List<String> getUserByRefer(String refer) {
+		return userMapper.getUserByRefer(refer);
+	}
 }
