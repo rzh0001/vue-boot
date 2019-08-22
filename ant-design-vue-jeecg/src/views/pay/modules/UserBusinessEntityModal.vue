@@ -14,16 +14,31 @@
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
-          label="用户名">
-          <a-input placeholder="请输入用户名" v-decorator="['userName', validatorRules.userName]" />
+          label="代理账号">
+          <a-input placeholder="请输入代理账号" v-decorator="['userName', validatorRules.userName]" />
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
-          label="商户code">
-          <a-input placeholder="请输入商户code" v-decorator="['businessCode', validatorRules.businessCode]" />
+          label="挂码账号">
+          <a-input placeholder="挂码账号" v-decorator="['businessCode', validatorRules.businessCode]" />
         </a-form-item>
-		
+        <a-form-item
+          :labelCol="labelCol"
+          :wrapperCol="wrapperCol"
+          label="秘钥">
+          <a-input placeholder="秘钥" v-decorator="['apiKey', validatorRules.apiKey]" />
+        </a-form-item>
+        <a-form-item
+          :labelCol="labelCol"
+          :wrapperCol="wrapperCol"
+          label="通道">
+          <select v-decorator="['channelCode', validatorRules.channelCode ]">
+            <option v-for="option in channels" v-bind:value="option.channelCode">
+              {{ option.channelName}}
+            </option>
+          </select>
+        </a-form-item>
       </a-form>
     </a-spin>
   </a-modal>
@@ -41,6 +56,7 @@
         title:"操作",
         visible: false,
         model: {},
+        channels: [],
         labelCol: {
           xs: { span: 24 },
           sm: { span: 5 },
@@ -53,18 +69,32 @@
         confirmLoading: false,
         form: this.$form.createForm(this),
         validatorRules:{
-          userName:{rules: [{ required: true, message: '请输入用户!' }]},
-          businessCode:{rules: [{ required: true, message: '请输入商户!' }]},
+          userName:{rules: [{ required: true, message: '请输入代理!' }]},
+          businessCode:{rules: [{ required: true, message: '请输入挂码账号!' }]},
+          channelCode:{rules: [{ required: true, message: '请选择通道!' }]}
         },
         url: {
           add: "/pay/userBusinessEntity/add",
           edit: "/pay/userBusinessEntity/edit",
+          channel: "/pay/channelEntity/channel"
         },
       }
     },
     created () {
     },
+    mounted:function () {
+      this.channel();
+    },
     methods: {
+      channel(){
+        httpAction(this.url.channel,null,'get').then((res)=>{
+          if(res.success){
+          this.channels = res.result;
+        }else{
+          this.$message.warning(res.message);
+        }
+      })
+      },
       add () {
         this.edit({});
       },

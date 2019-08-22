@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.jeecg.common.aspect.annotation.Dict;
 import org.jeecgframework.poi.excel.annotation.Excel;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -78,6 +79,7 @@ public class SysUser {
 	/**状态(1：正常  2：冻结 ）*/
 	@Excel(name = "状态(1：正常  2：冻结 ）", width = 15)
     @ApiModelProperty(value = "状态(1：正常  2：冻结 ）")
+	@Dict(dicCode = "user_status")
 	private java.lang.Integer status;
 	/**删除状态（0，正常，1已删除）*/
 	@Excel(name = "删除状态（0，正常，1已删除）", width = 15)

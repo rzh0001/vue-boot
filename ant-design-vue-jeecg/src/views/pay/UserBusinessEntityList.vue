@@ -7,13 +7,13 @@
         <a-row :gutter="24">
 
           <a-col :md="6" :sm="8">
-            <a-form-item label="用户名">
-              <a-input placeholder="请输入用户名" v-model="queryParam.userName"></a-input>
+            <a-form-item label="代理">
+              <a-input placeholder="请输入代理账号" v-model="queryParam.userName"></a-input>
             </a-form-item>
           </a-col>
           <a-col :md="6" :sm="8">
-          <a-form-item label="商户">
-            <a-input placeholder="请输入商户" v-model="queryParam.businessCode"></a-input>
+          <a-form-item label="挂码账号">
+            <a-input placeholder="请输入挂码账号" v-model="queryParam.businessCode"></a-input>
           </a-form-item>
           </a-col>
           <a-col :md="6" :sm="8" >
@@ -102,15 +102,41 @@
             }
            },
 		   {
-            title: '用户名',
+            title: '代理账号',
             align:"center",
             dataIndex: 'userName'
            },
 		   {
-            title: '商户',
+            title: '挂码账号',
             align:"center",
             dataIndex: 'businessCode'
            },
+          {
+            title: '秘钥',
+            align:"center",
+            dataIndex: 'apiKey'
+          },
+          {
+            title: '通道',
+            align: "center",
+            dataIndex: 'channelCode',
+            key: 'channelCode',
+            customRender: function (text) {
+              if (text == 'ysf') {
+                return '云闪付'
+              } else if (text == 'ali_bank') {
+                return '支付宝转卡'
+              } else if (text == 'ali_zz') {
+                return '支付宝转账'
+              }else if (text == 'nxys_wx') {
+                return '农信易扫微信'
+              }else if (text == 'nxys_alipay') {
+                return '农信易扫支付宝'
+              } else {
+                return text
+              }
+            }
+          },
           {
             title: '操作',
             dataIndex: 'action',

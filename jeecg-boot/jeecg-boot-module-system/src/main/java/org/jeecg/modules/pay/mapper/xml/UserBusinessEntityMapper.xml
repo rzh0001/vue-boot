@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.jeecg.modules.pay.mapper.UserBusinessEntityMapper">
-    <select id="queryBusinessCodeByUserName" parameterType="String" resultType="String">
+    <select id="queryBusinessCodeByUserName" parameterType="String" resultType="org.jeecg.modules.pay.entity.UserBusinessEntity">
         SELECT
-            business_code
+            user_name as userName,
+            business_code as businessCode,
+            channel_code as channelCode,
+            api_key as apiKey
         FROM
             sys_user_business
         WHERE
-            user_name = #{userName}
+            user_name = #{userName} and channel_code = #{channelCode}
     </select>
 </mapper>

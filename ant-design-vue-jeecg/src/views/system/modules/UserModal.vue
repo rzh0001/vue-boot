@@ -41,16 +41,29 @@
           <a-input placeholder="请输入用户名称" v-decorator="[ 'realname', validatorRules.realname]"/>
         </a-form-item>
 
-        <a-form-item label="角色分配" :labelCol="labelCol" :wrapperCol="wrapperCol" v-show="!roleDisabled">
+        <a-form-item v-if="!model.memberType" label="角色分配" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-select
             mode="single"
             style="width: 100%"
             placeholder="请选择用户角色"
-            v-model="selectedRole">
+            v-model="selectedRole" :disabled="disabledRole">
             <a-select-option v-for="(role,roleindex) in roleList" :key="roleindex.toString()" :value="role.id">
               {{ role.roleName }}
             </a-select-option>
           </a-select>
+        </a-form-item>
+
+        <a-form-item v-if="model.memberType" label="会员类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-select v-decorator="[ 'memberType', {}]" placeholder="">
+            <a-select-option value="1">代理</a-select-option>
+            <a-select-option value="2">介绍人</a-select-option>
+            <a-select-option value="3">商户</a-select-option>
+          </a-select>
+        </a-form-item>
+
+        <a-form-item v-if="model.memberType == 1" label="API KEY" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input placeholder="" :disabled="isDisabledAuth('user:form:apiKey')"
+                   v-decorator="[ 'apiKey']"/>
         </a-form-item>
 
         <!--部门分配-->
@@ -96,28 +109,52 @@
         <!--          </a-select>-->
         <!--        </a-form-item>-->
 
-        <a-form-item label="邮箱" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input placeholder="请输入邮箱" v-decorator="[ 'email', validatorRules.email]"/>
+        <!--        <a-form-item label="邮箱" :labelCol="labelCol" :wrapperCol="wrapperCol">-->
+        <!--          <a-input placeholder="请输入邮箱" v-decorator="[ 'email', validatorRules.email]"/>-->
+        <!--        </a-form-item>-->
+
+        <!--        <a-form-item label="手机号码" :labelCol="labelCol" :wrapperCol="wrapperCol">-->
+        <!--          <a-input placeholder="请输入手机号码" :disabled="isDisabledAuth('user:form:phone')"-->
+        <!--                   v-decorator="[ 'phone', validatorRules.phone]"/>-->
+        <!--        </a-form-item>-->
+
+
+        <a-form-item v-if="model.memberType == 1 || model.memberType == 3" label="单笔金额限制" :labelCol="labelCol"
+                     :wrapperCol="wrapperCol">
+          <a-input-group compact>
+            <a-input-number placeholder="下限" :disabled="isDisabledAuth('user:form:lowerLimit')"
+                            v-decorator="[ 'lowerLimit']" style="width: 30%;text-align: center"
+                            :min="0.01"/>
+            <a-input placeholder="~" disabled
+                     style="width: 30px; border-left: 0px; pointer-events: none;background-color: #fff"/>
+            <a-input-number placeholder="上限" :disabled="isDisabledAuth('user:form:upperLimit')"
+                            v-decorator="[ 'upperLimit']" style="width: 30%; border-left: 0px;text-align: center"
+                            :min="0.01"/>
+          </a-input-group>
         </a-form-item>
 
-        <a-form-item label="手机号码" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input placeholder="请输入手机号码" :disabled="isDisabledAuth('user:form:phone')"
-                   v-decorator="[ 'phone', validatorRules.phone]"/>
+        <a-form-item v-if="model.memberType == 3" label="所属介绍人" :labelCol="labelCol"
+                     :wrapperCol="wrapperCol">
+          <a-input-group compact>
+            <a-input placeholder="" :disabled="isDisabledAuth('user:form:salesmanUsername')"
+                     v-decorator="[ 'salesmanUsername']" style="width: 30%;text-align: center"
+            />
+            <a-input placeholder="-" disabled
+                     style="width: 30px; border-left: 0px; pointer-events: none;background-color: #fff"/>
+            <a-input placeholder="" :disabled="isDisabledAuth('user:form:salesmanUsername')"
+                     v-decorator="[ 'salesmanRealname']" style="width: 30%; border-left: 0px;text-align: center"
+            />
+          </a-input-group>
         </a-form-item>
 
-        <a-form-item label="单笔金额限制" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input placeholder="请输入下限" :disabled="isDisabledAuth('user:form:lowerLimit')"
-                   v-decorator="[ 'lowerLimit']"/>
-          <a-input placeholder="请输入上限" :disabled="isDisabledAuth('user:form:upperLimit')"
-                   v-decorator="[ 'upperLimit']"/>
-        </a-form-item>
-
-        <a-form-item label="所属介绍人" :labelCol="labelCol" :wrapperCol="wrapperCol" v-show="!salesmanDisabled">
+        <a-form-item v-if="!model.id && model.memberType == 3" label="所属介绍人" :labelCol="labelCol"
+                     :wrapperCol="wrapperCol"
+                     v-show="!salesmanDisabled">
           <a-select
             mode="single"
             style="width: 100%"
-            placeholder="请选择商户介绍人"
-            v-model="selectedSalesman">
+            placeholder=""
+            v-model="selectedSalesman" disabled>
             <a-select-option v-for="(user,userindex) in salesmanList" :key="userindex.toString()" :value="user.id">
               {{ user.realname }}
             </a-select-option>
@@ -125,7 +162,7 @@
         </a-form-item>
 
 
-        <a-form-item label="工作流引擎" :labelCol="labelCol" :wrapperCol="wrapperCol">
+        <a-form-item label="工作流引擎" :labelCol="labelCol" :wrapperCol="wrapperCol" v-show="false">
           <j-dict-select-tag v-decorator="['activitiSync', {}]" placeholder="请选择是否同步工作流引擎" :type="'radio'"
                              :triggerChange="true" dictCode="activiti_sync"/>
         </a-form-item>
@@ -164,11 +201,14 @@
       return {
         departDisabled: false, //是否是我的部门调用该页面
         roleDisabled: false, //是否是角色维护调用该页面
+        salesmanDisabled: false, //是否是角色维护调用该页面
+        disabledRole: false,
         modalWidth: 800,
         drawerWidth: 700,
         modaltoggleFlag: true,
         confirmDirty: false,
         selectedDepartKeys: [], //保存用户选择部门id
+        selectedSalesman: [], //保存用户选择部门id
         checkedDepartKeys: [],
         checkedDepartNames: [], // 保存部门的名称 =>title
         checkedDepartNameString: '', // 保存部门的名称 =>title
@@ -269,10 +309,28 @@
           }
         })
       },
+      initialSalesmanList() {
+        querySalesmanByAgent({ userid: '' }).then((res) => {
+          if (res.success) {
+            this.salesmanList = res.result
+          } else {
+            console.log(res.message)
+          }
+        })
+      },
       loadUserRoles(userid) {
         queryUserRole({ userid: userid }).then((res) => {
           if (res.success) {
             this.selectedRole = res.result
+          } else {
+            console.log(res.message)
+          }
+        })
+      },
+      loadSalesman(userid) {
+        querySalesmanByMember({ userid: userid }).then((res) => {
+          if (res.success) {
+            this.selectedSalesman = res.result
           } else {
             console.log(res.message)
           }
@@ -286,19 +344,17 @@
         this.userId = ''
       },
       add() {
-        this.picUrl = ''
         this.refresh()
+        this.selectedRole = true
         this.edit({ activitiSync: '1' })
       },
       edit(record) {
         this.resetScreenSize() // 调用此方法,根据屏幕宽度自适应调整抽屉的宽度
         let that = this
         that.initialRoleList()
-        that.checkedDepartNameString = ''
         that.form.resetFields()
         if (record.hasOwnProperty('id')) {
           that.loadUserRoles(record.id)
-          this.picUrl = 'Has no pic url yet'
         }
         if (record.hasOwnProperty('memberType')) {
           if (record.memberType == '1') {
@@ -314,7 +370,10 @@
         that.visible = true
         that.model = Object.assign({}, record)
         that.$nextTick(() => {
-          that.form.setFieldsValue(pick(this.model, 'username', 'sex', 'realname', 'email', 'phone', 'activitiSync'))
+          let filedsVal = pick(this.model, 'username', 'realname', 'sex', 'email', 'phone', 'apiKey', 'memberType',
+            'upperLimit', 'lowerLimit', 'agentUsername', 'agentRealname', 'salesmanUsername', 'salesmanRealname', 'activitiSync')
+
+          that.form.setFieldsValue(filedsVal)
         })
         // 调用查询用户对应的部门信息的方法
         that.checkedDepartKeys = []
