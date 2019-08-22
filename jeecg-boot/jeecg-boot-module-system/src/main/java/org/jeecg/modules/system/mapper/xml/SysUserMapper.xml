@@ -37,5 +37,13 @@
 	<select id="getUserByEmail" resultType="org.jeecg.modules.system.entity.SysUser">
 	select * from  sys_user  where email = #{email} and del_flag = '0'
 	</select>
+	<select id="getUserByAgent"  resultType="org.jeecg.modules.system.entity.SysUser">
+		SELECT
+			*
+		FROM
+			sys_user
+		WHERE
+			agent_username = #{agentName} AND member_type='3'
+	</select>
 	
 </mapper>

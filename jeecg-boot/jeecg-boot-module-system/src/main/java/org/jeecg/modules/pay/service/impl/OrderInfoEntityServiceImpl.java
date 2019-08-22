@@ -847,7 +847,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         SysUser user = userService.getUserByName(userName);
         if (user == null) {
             log.info("userName参数校验-->用户不存在，username:{}", userName);
-            return R.error("用户不存在");
+            throw new RRException("用户不存在:"+userName);
         }
         String apiKey = null;
         if (fromInner) {

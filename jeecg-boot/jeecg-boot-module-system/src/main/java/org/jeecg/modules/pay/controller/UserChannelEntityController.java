@@ -1,22 +1,21 @@
 package org.jeecg.modules.pay.controller;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.aspect.annotation.AutoLog;
+import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.pay.entity.UserChannelEntity;
 import org.jeecg.modules.pay.service.IUserChannelEntityService;
-import java.util.Date;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -70,10 +69,41 @@ public class UserChannelEntityController {
 									  @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
 									  @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 									  HttpServletRequest req) {
+		//获取系统用户
+		LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+		SysUser sysUser = userService.getUserByName(loginUser.getUsername());
+
 		Result<IPage<UserChannelEntity>> result = new Result<IPage<UserChannelEntity>>();
 		QueryWrapper<UserChannelEntity> queryWrapper = QueryGenerator.initQueryWrapper(userChannelEntity, req.getParameterMap());
 		Page<UserChannelEntity> page = new Page<UserChannelEntity>(pageNo, pageSize);
 		IPage<UserChannelEntity> pageList = userChannelEntityService.page(page, queryWrapper);
+		List<UserChannelEntity> db = pageList.getRecords();
+		List<UserChannelEntity> newList = new ArrayList<>();
+		//如果是管理员登录，则展示全部的信息；如果是商户、代理登录
+		if (BaseConstant.USER_AGENT.equals(sysUser.getMemberType())){
+			//代理登录，则展示代理关联的。和代理下面商户关联的
+			List<SysUser> users = userService.getUserByAgent(sysUser.getUsername());
+			for(UserChannelEntity uc:db){
+				if(uc.getUserName().equals(sysUser.getUsername())){
+					newList.add(uc);
+				}
+				for(SysUser user:users){
+					if(user.getUsername().equals(uc.getUserName())){
+						newList.add(uc);
+						break;
+					}
+				}
+			}
+			pageList.setRecords(newList);
+		}else if(BaseConstant.USER_MERCHANTS.equals(sysUser.getMemberType())){
+			//商户登录，则只展示属于商户自己的关联信息
+			for(UserChannelEntity uc:db){
+				if(uc.getUserName().equals(sysUser.getUsername())){
+					newList.add(uc);
+				}
+			}
+			pageList.setRecords(newList);
+		}
 		result.setSuccess(true);
 		result.setResult(pageList);
 		return result;

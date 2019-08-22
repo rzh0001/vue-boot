@@ -122,4 +122,11 @@ public interface ISysUserService extends IService<SysUser> {
 	Result checkUserIsEffective(SysUser sysUser);
 	
 	public void addPayMember(SysUser user, String id);
+
+	/**
+	 * 通过代理获取代理下面的所有商户
+	 * @param agentName
+	 * @return
+	 */
+	List<SysUser> getUserByAgent(String agentName);
 }

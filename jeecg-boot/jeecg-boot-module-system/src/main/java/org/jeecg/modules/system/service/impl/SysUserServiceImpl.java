@@ -308,4 +308,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 		}
 		this.addUserWithRole(user, opt.get().getId());
 	}
+
+	@Override
+	public List<SysUser> getUserByAgent(String agentName) {
+		return userMapper.getUserByAgent(agentName);
+	}
 }

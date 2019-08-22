@@ -6,6 +6,8 @@ import org.apache.ibatis.annotations.Param;
 import org.jeecg.modules.system.entity.SysUser;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
+import java.util.List;
+
 /**
  * <p>
  * 用户表 Mapper 接口
@@ -59,4 +61,11 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
 	 * @return
 	 */
 	public SysUser getUserByEmail(@Param("email")String email);
+
+	/**
+	 * 通过代理获取代理下面的所有商户
+	 * @param agentName
+	 * @return
+	 */
+	List<SysUser> getUserByAgent(@Param("agentName")String agentName);
 }
