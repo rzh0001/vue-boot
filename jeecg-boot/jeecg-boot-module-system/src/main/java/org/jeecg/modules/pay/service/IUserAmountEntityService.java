@@ -1,8 +1,8 @@
 package org.jeecg.modules.pay.service;
 
-import org.apache.ibatis.annotations.Param;
-import org.jeecg.modules.pay.entity.UserAmountEntity;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.jeecg.modules.pay.entity.UserAmountEntity;
+import org.jeecg.modules.system.entity.SysUser;
 
 /**
  * @Description: 商户收入额度
@@ -12,4 +12,11 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IUserAmountEntityService extends IService<UserAmountEntity> {
     UserAmountEntity getUserAmountByUserName(String userName);
+    
+    /**
+     * 初始化会员余额表
+     *
+     * @param user
+     */
+    void initialUserAmount(SysUser user);
 }
