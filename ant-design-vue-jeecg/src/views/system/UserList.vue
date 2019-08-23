@@ -118,17 +118,26 @@
 
         <span slot="action" slot-scope="text, record">
 
-          <a @click="handleDetail(record)">详情</a>
-          <a-divider type="vertical"/>
-          <a @click="handleEdit(record)">编辑</a>
-          <a-divider type="vertical"/>
+<!--          <a @click="handleDetail(record)">详情</a>-->
+          <!--          <a-divider type="vertical"/>-->
+          <!--          <a @click="handleEdit(record)">编辑</a>-->
+          <!--          <a-divider type="vertical"/>-->
 
           <a-dropdown>
-            <a class="ant-dropdown-link">
-              更多 <a-icon type="down"/>
-            </a>
+<!--            <a class="ant-dropdown-link">-->
+            <!--              更多 <a-icon type="down"/>-->
+            <!--            </a>-->
+            <a-button>
+             帐号管理 <!-- <a-icon type="down"/>-->
+            </a-button>
             <a-menu slot="overlay">
 
+              <a-menu-item>
+                <a @click="handleDetail(record)">详情</a>
+              </a-menu-item>
+              <a-menu-item>
+                <a @click="handleEdit(record)">编辑</a>
+              </a-menu-item>
               <a-menu-item>
                 <a href="javascript:;" @click="handleChangePassword(record.username)">密码</a>
               </a-menu-item>
@@ -150,6 +159,49 @@
                   <a>解冻</a>
                 </a-popconfirm>
               </a-menu-item>
+
+              <!--              <a-menu-item>-->
+              <!--                <a href="javascript:;" @click="handleAgentSettings(record.username)">代理人</a>-->
+              <!--              </a-menu-item>-->
+
+            </a-menu>
+          </a-dropdown>
+          <a-dropdown>
+<!--            <a class="ant-dropdown-link">-->
+            <!--              更多 <a-icon type="down"/>-->
+            <!--            </a>-->
+            <a-button>
+              通道配置
+            </a-button>
+            <a-menu slot="overlay">
+
+              <a-menu-item>
+                              <a @click="handleDetail(record)">详情</a>
+                            </a-menu-item>
+              <!--                            <a-menu-item>-->
+              <!--                <a @click="handleEdit(record)">编辑</a>-->
+              <!--              </a-menu-item>-->
+              <!--              <a-menu-item>-->
+              <!--                <a href="javascript:;" @click="handleChangePassword(record.username)">密码</a>-->
+              <!--              </a-menu-item>-->
+
+              <!--              <a-menu-item>-->
+              <!--                <a-popconfirm title="确定删除吗?" @confirm="() => handleDelete(record.id)">-->
+              <!--                  <a>删除</a>-->
+              <!--                </a-popconfirm>-->
+              <!--              </a-menu-item>-->
+
+              <!--              <a-menu-item v-if="record.status==1">-->
+              <!--                <a-popconfirm title="确定冻结吗?" @confirm="() => handleFrozen(record.id,2)">-->
+              <!--                  <a>冻结</a>-->
+              <!--                </a-popconfirm>-->
+              <!--              </a-menu-item>-->
+
+              <!--              <a-menu-item v-if="record.status==2">-->
+              <!--                <a-popconfirm title="确定解冻吗?" @confirm="() => handleFrozen(record.id,1)">-->
+              <!--                  <a>解冻</a>-->
+              <!--                </a-popconfirm>-->
+              <!--              </a-menu-item>-->
 
               <!--              <a-menu-item>-->
               <!--                <a href="javascript:;" @click="handleAgentSettings(record.username)">代理人</a>-->
@@ -247,22 +299,22 @@
           {
             title: '上级代理',
             align: 'center',
-            width: 80,
+            width: 100,
             dataIndex: 'agentRealname',
             sorter: true
           },
           {
             title: '介绍人',
             align: 'center',
-            width: 180,
+            width: 100,
             dataIndex: 'salesmanRealname'
           },
-          // {
-          //   title: '手机号码',
-          //   align: 'center',
-          //   width: 100,
-          //   dataIndex: 'phone'
-          // },
+          {
+            title: '可提现金额',
+            align: 'center',
+            width: 100,
+            dataIndex: 'amount'
+          },
           // {
           //   title: '邮箱',
           //   align: 'center',
@@ -283,10 +335,11 @@
            },*/
           {
             title: '操作',
+            // fixed: 'right',
             dataIndex: 'action',
             scopedSlots: { customRender: 'action' },
             align: 'center',
-            width: 170
+            width: 200
           }
 
         ],

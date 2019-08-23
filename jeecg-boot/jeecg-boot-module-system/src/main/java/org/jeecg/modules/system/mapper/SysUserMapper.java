@@ -1,10 +1,11 @@
 package org.jeecg.modules.system.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
 import org.jeecg.modules.system.entity.SysUser;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.jeecg.modules.system.vo.SysUserPage;
 
 import java.util.List;
 
@@ -24,7 +25,14 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
      * @return
      */
     public SysUser getUserByName(@Param("username") String username);
-
+    
+    /**
+     * @param page
+     * @param user
+     * @return
+     */
+    IPage<SysUserPage> listUserWithPaymentInfo(Page page, SysUser user);
+    
     /**
      * 根据部门Id查询用户信息
      *

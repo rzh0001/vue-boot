@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.vo.SysUserCacheInfo;
 import org.jeecg.modules.system.entity.SysUser;
+import org.jeecg.modules.system.vo.SysUserPage;
 
 import java.util.List;
 import java.util.Set;
@@ -133,4 +134,14 @@ public interface ISysUserService extends IService<SysUser> {
 	List<SysUser> getUserAndReferByAgent(String agentName);
 
 	List<String> getUserByRefer(String refer);
+	
+	/**
+	 * 翻页查询
+	 *
+	 * @param page         翻页对象
+	 * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
+	 */
+//	IPage<SysUser> pageUserWithPaymentInfo(IPage<SysUser> page, Wrapper<SysUser> queryWrapper);
+	
+	IPage<SysUserPage> pageUserWithPaymentInfo(Page page, SysUser user);
 }

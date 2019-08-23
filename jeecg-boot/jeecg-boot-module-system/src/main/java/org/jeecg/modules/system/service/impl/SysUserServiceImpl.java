@@ -17,10 +17,12 @@ import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.system.vo.SysUserCacheInfo;
 import org.jeecg.common.util.PasswordUtil;
 import org.jeecg.common.util.oConvertUtils;
+import org.jeecg.modules.pay.service.IUserAmountEntityService;
 import org.jeecg.modules.system.entity.*;
 import org.jeecg.modules.system.mapper.*;
 import org.jeecg.modules.system.service.ISysRoleService;
 import org.jeecg.modules.system.service.ISysUserService;
+import org.jeecg.modules.system.vo.SysUserPage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -55,6 +57,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 	private ISysBaseAPI sysBaseAPI;
 	@Autowired
 	private SysDepartMapper sysDepartMapper;
+	@Autowired
+	private IUserAmountEntityService userAmountService;
 	
 	@Override
 	public SysUser getUserByName(String username) {
@@ -74,7 +78,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 			}
 		}
 	}
-
+	
 	@Override
 	@CacheEvict(value= CacheConstant.LOGIN_USER_RULES_CACHE, allEntries=true)
 	@Transactional
@@ -90,8 +94,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 			}
 		}
 	}
-
-
+	
+	
 	@Override
 	public List<String> getRole(String username) {
 		return sysUserRoleMapper.getRoleByUserName(username);
@@ -100,7 +104,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 	/**
 	 * 通过用户名获取用户角色集合
 	 * @param username 用户名
-     * @return 角色集合
+	 * @return 角色集合
 	 */
 	@Override
 	@Cacheable(value = CacheConstant.LOGIN_USER_RULES_CACHE,key = "'Roles_'+#username")
@@ -110,7 +114,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 		log.info("-------通过数据库读取用户拥有的角色Rules------username： " + username + ",Roles size: " + (roles == null ? 0 : roles.size()));
 		return new HashSet<>(roles);
 	}
-
+	
 	/**
 	 * 通过用户名获取用户权限集合
 	 *
@@ -134,7 +138,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 		log.info("-------通过数据库读取用户拥有的权限Perms------username： "+ username+",Perms size: "+ (permissionSet==null?0:permissionSet.size()) );
 		return permissionSet;
 	}
-
+	
 	@Override
 	public SysUserCacheInfo getCacheUser(String username) {
 		SysUserCacheInfo info = new SysUserCacheInfo();
@@ -143,7 +147,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 //		info.setSysUserCode(user.getUsername());
 //		info.setSysUserName(user.getRealname());
 		
-
+		
 		LoginUser user = sysBaseAPI.getUserByName(username);
 		if(user!=null) {
 			info.setSysUserCode(user.getUsername());
@@ -169,38 +173,38 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 		
 		return info;
 	}
-
+	
 	// 根据部门Id查询
 	@Override
-	public IPage<SysUser> getUserByDepId(Page<SysUser> page, String departId,String username) {
+	public IPage<SysUser> getUserByDepId(Page<SysUser> page, String departId, String username) {
 		return userMapper.getUserByDepId(page, departId,username);
 	}
-
-
+	
+	
 	// 根据角色Id查询
 	@Override
 	public IPage<SysUser> getUserByRoleId(Page<SysUser> page, String roleId, String username) {
 		return userMapper.getUserByRoleId(page,roleId,username);
 	}
-
-
+	
+	
 	@Override
-	public void updateUserDepart(String username,String orgCode) {
+	public void updateUserDepart(String username, String orgCode) {
 		baseMapper.updateUserDepart(username, orgCode);
 	}
-
-
+	
+	
 	@Override
 	public SysUser getUserByPhone(String phone) {
 		return userMapper.getUserByPhone(phone);
 	}
-
-
+	
+	
 	@Override
 	public SysUser getUserByEmail(String email) {
 		return userMapper.getUserByEmail(email);
 	}
-
+	
 	@Override
 	@Transactional
 	public void addUserWithDepart(SysUser user, String selectedParts) {
@@ -213,8 +217,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 			}
 		}
 	}
-
-
+	
+	
 	@Override
 	@Transactional
 	@CacheEvict(value="loginUser_cacheRules", allEntries=true)
@@ -230,10 +234,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 			}
 		}
 	}
-
-
+	
+	
 	/**
-	   * 校验用户是否有效
+	 * 校验用户是否有效
 	 * @param sysUser
 	 * @return
 	 */
@@ -260,11 +264,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 		}
 		return result;
 	}
-
+	
 	public static void main(String[] args) {
 		System.out.println(UUID.randomUUID().toString().replaceAll("-","").substring(0,16));
 	}
-
+	
 	@Override
 	public void addPayMember(SysUser user, String memberType) {
 		user.setCreateTime(new Date());
@@ -302,26 +306,41 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 				break;
 			default:
 		}
+		
 		SysRole role = sysRoleService.getOne(new LambdaQueryWrapper<SysRole>().eq(SysRole::getRoleCode, roleCode));
 		Optional<SysRole> opt = Optional.ofNullable(role);
 		if (!opt.isPresent()) {
 //			result.fail("支付平台角色配置出错！");
 		}
 		this.addUserWithRole(user, opt.get().getId());
+		
+		//生成余额表
+		userAmountService.initialUserAmount(this.getUserByName(user.getUsername()));
 	}
-
+	
 	@Override
 	public List<SysUser> getUserByAgent(String agentName) {
 		return userMapper.getUserByAgent(agentName);
 	}
-
+	
 	@Override
 	public List<SysUser> getUserAndReferByAgent(String agentName) {
 		return userMapper.getUserAndReferByAgent(agentName);
 	}
-
+	
 	@Override
 	public List<String> getUserByRefer(String refer) {
 		return userMapper.getUserByRefer(refer);
 	}
+	
+	@Override
+	public IPage<SysUserPage> pageUserWithPaymentInfo(Page page, SysUser user) {
+		return userMapper.listUserWithPaymentInfo(page, user);
+	}
+
+//    @Override
+//	public IPage<List<Map<String, Object>>> pageUserWithPaymentInfo(Page page, Wrapper<SysUser> queryWrapper) {
+//		return userMapper.listUserWithPaymentInfo(page, queryWrapper);
+//}
+	
 }

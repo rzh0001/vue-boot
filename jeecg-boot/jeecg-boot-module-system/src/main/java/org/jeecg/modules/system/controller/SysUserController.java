@@ -28,6 +28,7 @@ import org.jeecg.modules.system.entity.SysUserRole;
 import org.jeecg.modules.system.model.DepartIdModel;
 import org.jeecg.modules.system.service.*;
 import org.jeecg.modules.system.vo.SysDepartUsersVO;
+import org.jeecg.modules.system.vo.SysUserPage;
 import org.jeecg.modules.system.vo.SysUserRoleVO;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
@@ -82,9 +83,9 @@ public class SysUserController {
 	private RedisUtil redisUtil;
 	
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
-	public Result<IPage<SysUser>> queryPageList(SysUser user,@RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
-									  @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,HttpServletRequest req) {
-		Result<IPage<SysUser>> result = new Result<IPage<SysUser>>();
+    public Result<IPage<SysUserPage>> queryPageList(SysUser user, @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
+                                                    @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize, HttpServletRequest req) {
+        Result<IPage<SysUserPage>> result = new Result<IPage<SysUserPage>>();
 		QueryWrapper<SysUser> queryWrapper = QueryGenerator.initQueryWrapper(user, req.getParameterMap());
         LoginUser optUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
         if (optUser.getMemberType() != null) {
@@ -98,8 +99,10 @@ public class SysUserController {
                 default:
             }
         }
-		Page<SysUser> page = new Page<SysUser>(pageNo, pageSize);
-		IPage<SysUser> pageList = sysUserService.page(page, queryWrapper);
+        Page<SysUserPage> page = new Page<SysUserPage>(pageNo, pageSize);
+        IPage<SysUserPage> pageList = sysUserService.pageUserWithPaymentInfo(page, user);
+//        Page<List<Map<String, Object>>> page = new Page<List<Map<String, Object>>>(pageNo, pageSize);
+//        IPage<List<Map<String, Object>>> pageList = sysUserService.pageUserWithPaymentInfo(page, queryWrapper);
 		result.setSuccess(true);
 		result.setResult(pageList);
 		return result;
@@ -399,7 +402,7 @@ public class SysUserController {
      * 导出excel
      *
      * @param request
-     * @param response
+     * @param sysUser
      */
     @RequestMapping(value = "/exportXls")
     public ModelAndView exportXls(SysUser sysUser,HttpServletRequest request) {
@@ -772,8 +775,8 @@ public class SysUserController {
 	}
 
 	/**
-	 * 
-	 * @param 根据用户名或手机号查询用户信息
+     *
+     * @param sysUser
 	 * @return
 	 */
 	@GetMapping("/querySysUser")
