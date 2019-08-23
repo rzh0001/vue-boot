@@ -57,7 +57,6 @@
       return {
         title:"操作",
         channels: [],
-        apikey:'',
         visible: false,
         model: {},
         labelCol: {
@@ -126,9 +125,8 @@
             let outerOrderId = Date.parse(new Date())+'abc';
             let form = Object.assign(this.model, {"callbackUrl":"http://localhost/api/callback","outerOrderId":outerOrderId});
             let data = JSON.stringify(form);
-            let key = this.apikey;
-            console.log('json字符串data:'+data);
-            console.log('json字符串data 加密：'+Encrypt(data,key));
+          var jsondata =  JSON.parse(data);
+            let key = jsondata.apikey;
           var timestamp = Date.parse(new Date());
           var sign = MD5(this.model.username+timestamp+Encrypt(data,key)+key);
           var jsonObj = {

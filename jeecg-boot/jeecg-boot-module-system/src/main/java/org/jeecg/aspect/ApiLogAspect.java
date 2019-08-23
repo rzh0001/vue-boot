@@ -76,8 +76,10 @@ public class ApiLogAspect {
             //回调是挂马回调四方，或四方本地自己补单，属于内部加密机制，使用的密钥从数据字典中获取
             if(joinPoint.getSignature().getName().equals("callback")){
                 apiKey = key;
+                log.info("系统密钥：{}",apiKey);
             }else {
                 apiKey = user.getApiKey();
+                log.info("用户密钥：{}",apiKey);
             }
             String dataStr = AES128Util.decryptBase64(data, apiKey);
             log.info("ARGS : " + Arrays.toString(joinPoint.getArgs()));

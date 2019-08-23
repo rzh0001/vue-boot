@@ -180,9 +180,14 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         String userName = (String) checkParam.get(BaseConstant.USER_NAME);
         OrderInfoEntity order = queryOrderInfoByOrderId(orderId);
         if (order == null) {
+            log.info("订单查询异常，无此订单信息:{}",orderId);
             return R.error("订单查询异常，无此订单信息");
         }
-
+        //预防多次回调
+        if(order.getStatus() == BaseConstant.ORDER_STATUS_SUCCESS){
+            log.info("该订单已经回调过了，不能重复回调:{}",order.getOrderId());
+            return R.error("该订单已经回调过了，不能重复回调");
+        }
         //2 校验订单状态 ，从挂马平台查询
         if (!orderStatusOk(orderId, payType, order.getBusinessCode())) {
             log.info("订单回调过程中，订单查询异常,orderID:{}", orderId);
@@ -190,14 +195,17 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         }
 
         SysUser user = userService.getUserByName(userName);
+        order.setStatus(BaseConstant.ORDER_STATUS_SUCCESS_NOT_RETURN);
         String submitAmount = order.getSubmitAmount().toString();
         JSONObject callobj = encryptAESData(order, user.getApiKey());
         StringBuilder msg = new StringBuilder();
         try {
+            log.info("===回调商户，url:{},param:{}",order.getSuccessCallbackUrl(), callobj.toJSONString());
             //捕获异常的目的是为了防止各种异常情况下，仍然会去修改订单状态
             //3 数据加密之后，通知下游商户
             HttpResult result = HttpUtils.doPostJson(order.getSuccessCallbackUrl(), callobj.toJSONString());
             //4、修改订单状态
+            log.info("===商户返回信息=={}",result.getBody());
             if (result.getCode() == BaseConstant.SUCCESS) {
                 CallBackResult callBackResult = JSONObject.parseObject(result.getBody(), CallBackResult.class);
                 if (callBackResult.getCode() == BaseConstant.SUCCESS) {
@@ -205,28 +213,30 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
                     log.info("通知商户成功，并且商户返回成功,orderID:{}", orderId);
                     flag = true;
                     msg.append("通知商户成功，并且商户返回成功");
+                    return R.ok(msg.toString());
                 } else {
                     log.info("通通知商户失败,orderID:{}", orderId);
                     updateOrderStatusNoBackByOrderId(orderId);
                     msg.append("通知商户失败");
+                    return R.error(msg.toString());
                 }
             } else {
                 log.info("通通知商户失败,orderID:{}", orderId);
                 updateOrderStatusNoBackByOrderId(orderId);
                 msg.append("通知商户失败");
+                return R.error(msg.toString());
             }
         } catch (Exception e) {
             log.info("订单回调商户异常，异常信息为:{}", e);
             updateOrderStatusNoBackByOrderId(orderId);
             msg.append("通知商户失败");
+            return R.error(msg.toString());
         } finally {
             if (flag) {
                 //5、只有在通知商户成功，才统计高级代理。商户。介绍人的收入情况
                 countAmount(orderId, userName, submitAmount, payType);
             }
         }
-        return R.ok(msg.toString());
-
     }
 
     /**
@@ -486,7 +496,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         String payType = (String) checkParam.get(BaseConstant.PAY_TYPE);
         String callbackUrl = (String) checkParam.get(BaseConstant.CALLBACK_URL);
         String agentName = (String) checkParam.get(BaseConstant.AGENT_NAME);
-        log.info("请求创建订单，商户单号为:{};通道为：{};用户名为:{};申请金额为:{}",new String[]{outerOrderId,payType,userName});
+        log.info("请求创建订单，商户单号为:{};通道为：{};用户名为:{};申请金额为:{}",new String[]{outerOrderId,payType,userName,submitAmount});
         //校验是否是重复订单
         if (!outerOrderIdIsOnly(outerOrderId)) {
             log.info("该订单已经创建过，无需重复创建;orderid:{}", outerOrderId);
@@ -495,7 +505,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         SysUser user = userService.getUserByName(userName);
         if (!BaseConstant.USER_MERCHANTS.equals(user.getMemberType())) {
             log.info("用户类型不是商户，无法提交订单，用户名为：{}", userName);
-            return R.error("用户类型不是商户，无法提交订单");
+            throw new RRException("用户类型不是商户，无法提交订单");
         }
         //校验用户通道是否存在
         if (!channelIsOpen(payType, userName)) {
@@ -958,6 +968,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         StringBuilder sign = new StringBuilder();
         //sign = orderID+outOrderId+submitAmount+timestamp
         sign.append(order.getOrderId()).append(order.getOuterOrderId()).append(order.getSubmitAmount()).append(timestamp);
+        log.info("===回调商户的签名信息==:{}",sign.toString());
         callbackjson.put(BaseConstant.SIGN, DigestUtils.md5Hex(sign.toString()));
         callbackjson.put(BaseConstant.DATA, data);
         callbackjson.put(BaseConstant.TIMESTAMP, timestamp);
