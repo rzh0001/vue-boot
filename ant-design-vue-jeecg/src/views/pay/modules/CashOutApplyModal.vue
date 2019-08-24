@@ -18,7 +18,8 @@
         </a-form-item>
 
         <a-form-item label="银行卡" :labelCol="labelCol" :wrapperCol="wrapperCol" v-show="statusDisabled">
-          <a-select mode="single" style="width: 100%" placeholder="请选择银行卡" v-model="selectedBankCard">
+          <a-select mode="single" style="width: 100%" placeholder="请选择银行卡" v-model="selectedBankCard"
+                    v-decorator="[ 'bankCardId', validatorRules.bankCardId]">
             <a-select-option v-for="(bankCard,bankCardindex) in bankCardList" :key="bankCardindex.toString()"
                              :value="bankCard.id">
               {{ bankCard.bankName + '|' + bankCard.accountName + '|' + bankCard.cardNumber}}
@@ -143,6 +144,14 @@
             amount: {
               rules: [{
                 required: true, message: '请输入提现金额!'
+              }
+                // {
+                //   validator: this.validateAmount()
+                // }
+              ]
+            }, bankCardId: {
+              rules: [{
+                required: true, message: '请选择银行卡!'
               }
                 // {
                 //   validator: this.validateAmount()
