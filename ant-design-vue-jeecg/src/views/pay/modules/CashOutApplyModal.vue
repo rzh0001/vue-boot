@@ -10,19 +10,15 @@
 
     <a-spin :spinning="confirmLoading">
       <a-form :form="form">
-
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="提现金额">
-          <a-input-number :disabled="!statusDisabled" v-decorator="[ 'amount', {}]"/>
+        <a-form-item>
+          <a-alert :message="'可提现金额：' + avaliableAmount" type="info" showIcon/>
         </a-form-item>
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="提现金额">
+          <a-input-number :min="0.01" :disabled="!statusDisabled" v-decorator="[ 'amount', validatorRules.amount]"/>
+        </a-form-item>
+
         <a-form-item label="银行卡" :labelCol="labelCol" :wrapperCol="wrapperCol" v-show="statusDisabled">
-          <a-select
-            mode="single"
-            style="width: 100%"
-            placeholder="请选择银行卡"
-            v-model="selectedBankCard">
+          <a-select mode="single" style="width: 100%" placeholder="请选择银行卡" v-model="selectedBankCard">
             <a-select-option v-for="(bankCard,bankCardindex) in bankCardList" :key="bankCardindex.toString()"
                              :value="bankCard.id">
               {{ bankCard.bankName + '|' + bankCard.accountName + '|' + bankCard.cardNumber}}
@@ -31,35 +27,33 @@
         </a-form-item>
 
 
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="银行名称" v-show="!statusDisabled">
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="银行名称" v-show="!statusDisabled">
           <a-input placeholder="" disabled :readOnly="true" v-decorator="['bankName', {}]"/>
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
           label="分支行" v-show="!statusDisabled">
-          <a-input placeholder="请输入分支行" disabled :readOnly="true" v-decorator="['branchName', {}]" />
+          <a-input placeholder="请输入分支行" disabled :readOnly="true" v-decorator="['branchName', {}]"/>
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
           label="账户名" v-show="!statusDisabled">
-          <a-input placeholder="请输入账户名" disabled :readOnly="true" v-decorator="['accountName', {}]" />
+          <a-input placeholder="请输入账户名" disabled :readOnly="true" v-decorator="['accountName', {}]"/>
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
           label="卡号" v-show="!statusDisabled">
-          <a-input placeholder="请输入卡号" disabled :readOnly="true" v-decorator="['cardNumber', {}]" />
+          <a-input placeholder="请输入卡号" disabled :readOnly="true" v-decorator="['cardNumber', {}]"/>
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
           label="发起时间" v-show="!statusDisabled">
-          <a-date-picker showTime format='YYYY-MM-DD HH:mm:ss' disabled :readOnly="true" v-decorator="[ 'applyTime', {}]" />
+          <a-date-picker showTime format='YYYY-MM-DD HH:mm:ss' disabled :readOnly="true"
+                         v-decorator="[ 'applyTime', {}]"/>
         </a-form-item>
         <!--                <a-form-item-->
         <!--                  :labelCol="labelCol"-->
@@ -103,6 +97,7 @@
   import pick from 'lodash.pick'
   import moment from 'moment'
   import { queryBankCard } from '@/api/api'
+  import { getAction } from '../../../api/manage'
 
   export default {
     name: 'CashOutApplyModal',
@@ -110,34 +105,56 @@
       return {
         bankCardDisabled: false,
         statusDisabled: false,
-        title: '操作',
-        visible: false,
-        model: {},
+        avaliableAmount: 0,
+        title:
+          '操作',
+        visible:
+          false,
+        model:
+          {}
+        ,
         labelCol: {
-          xs: { span: 24 },
-          sm: { span: 5 }
-        },
+          xs: {
+            span: 24
+          }
+          ,
+          sm: {
+            span: 5
+          }
+        }
+        ,
         wrapperCol: {
-          xs: { span: 24 },
-          sm: { span: 16 }
-        },
+          xs: {
+            span: 24
+          }
+          ,
+          sm: {
+            span: 16
+          }
+        }
+        ,
 
         bankCardList: [],
         selectedBankCard: [],
         confirmLoading: false,
         form: this.$form.createForm(this),
-        validatorRules: {
-          status:{
-            rules: [{
-              required: this.statusDisabled, message: '请选择操作!',
-            }, {
-              // validator: ,
-            }],
-          },
-        },
+        validatorRules:
+          {
+            amount: {
+              rules: [{
+                required: true, message: '请输入提现金额!'
+              }
+                // {
+                //   validator: this.validateAmount()
+                // }
+              ]
+            }
+          }
+        ,
         url: {
           add: '/pay/cashOutApply/add',
-          edit: '/pay/cashOutApply/edit'
+          edit: '/pay/cashOutApply/edit',
+          getMemberAvailableAmount: '/pay/userAmountEntity/getMemberAvailableAmount'
         }
       }
     },
@@ -154,6 +171,7 @@
 
 
         this.initialBankCardList()
+        this.getMemberAvailableAmount()
         this.model = Object.assign({}, record)
         this.visible = true
         this.$nextTick(() => {
@@ -186,8 +204,8 @@
             let formData = Object.assign(this.model, values)
             formData.bankCardId = this.selectedBankCard
             //时间格式化
-            formData.applyTime = formData.applyTime?formData.applyTime.format('YYYY-MM-DD HH:mm:ss'):null;
-            formData.approvalTime = formData.approvalTime?formData.approvalTime.format('YYYY-MM-DD HH:mm:ss'):null;
+            formData.applyTime = formData.applyTime ? formData.applyTime.format('YYYY-MM-DD HH:mm:ss') : null
+            formData.approvalTime = formData.approvalTime ? formData.approvalTime.format('YYYY-MM-DD HH:mm:ss') : null
 
             console.log(formData)
             httpAction(httpurl, formData, method).then((res) => {
@@ -218,6 +236,23 @@
             console.log(res.message)
           }
         })
+      },
+      getMemberAvailableAmount() {
+        getAction(this.url.getMemberAvailableAmount).then((res) => {
+          if (res.success) {
+            this.avaliableAmount = res.result
+          } else {
+            console.log(res.message)
+          }
+        })
+      },
+      validateAmount(rule, value, callback) {
+
+        // if (value > this.avaliableAmount) {
+        //   callback('提现金额大于可提现金额，请重新填写！')
+        // }
+
+        // callback()
       }
 
 

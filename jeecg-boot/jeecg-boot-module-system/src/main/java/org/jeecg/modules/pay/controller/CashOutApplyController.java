@@ -16,10 +16,13 @@ import org.jeecg.common.constant.PayConstant;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.oConvertUtils;
+import org.jeecg.modules.exception.RRException;
 import org.jeecg.modules.pay.entity.BankCard;
 import org.jeecg.modules.pay.entity.CashOutApply;
+import org.jeecg.modules.pay.entity.UserAmountEntity;
 import org.jeecg.modules.pay.service.IBankCardService;
 import org.jeecg.modules.pay.service.ICashOutApplyService;
+import org.jeecg.modules.pay.service.IUserAmountEntityService;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.service.ISysUserService;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
@@ -62,6 +65,9 @@ public class CashOutApplyController {
 	
 	 @Autowired
 	 private IBankCardService bankCardService;
+	
+	 @Autowired
+	 private IUserAmountEntityService userAmountService;
 	
 	/**
 	 * 分页列表查询
@@ -110,6 +116,18 @@ public class CashOutApplyController {
 	public Result<CashOutApply> add(@RequestBody CashOutApply cashOutApply) {
 		Result<CashOutApply> result = new Result<CashOutApply>();
 		LoginUser optUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+		
+		// 校验金额，扣除余额
+		UserAmountEntity amount = userAmountService.getUserAmountByUserName(optUser.getUsername());
+		if (amount == null || amount.getAmount().compareTo(cashOutApply.getAmount()) == -1) {
+			throw new RRException("余额不足");
+		}
+		amount.setAmount(amount.getAmount().subtract(cashOutApply.getAmount()));
+		boolean ok = userAmountService.updateById(amount);
+		
+		// 插入流水表
+		//TODO:
+		
 		cashOutApply.setUserId(optUser.getId());
 		cashOutApply.setUsername(optUser.getUsername());
 		cashOutApply.setDelFlag(CommonConstant.NOT_DELETE_FLAG);
@@ -127,6 +145,8 @@ public class CashOutApplyController {
 		cashOutApply.setCardNumber(bankCard.getCardNumber());
 		try {
 			cashOutApplyService.save(cashOutApply);
+			
+			
 			result.success("添加成功！");
 		} catch (Exception e) {
 			log.error(e.getMessage(),e);
