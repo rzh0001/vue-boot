@@ -12,6 +12,7 @@ import org.jeecg.modules.exception.RRException;
 import org.jeecg.modules.pay.entity.*;
 import org.jeecg.modules.pay.mapper.OrderInfoEntityMapper;
 import org.jeecg.modules.pay.service.*;
+import org.jeecg.modules.pay.service.requestPayUrl.impl.AliPayImpl;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.service.ISysDictService;
 import org.jeecg.modules.system.service.ISysUserService;
@@ -204,7 +205,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             //捕获异常的目的是为了防止各种异常情况下，仍然会去修改订单状态
             //3 数据加密之后，通知下游商户
             HttpResult result = HttpUtils.doPostJson(order.getSuccessCallbackUrl(), callobj.toJSONString());
-            //4、修改订单状态
+            //4、修改订单状态,同时更新订单的update_time;标示订单的回调时间
             log.info("===商户返回信息=={}",result.getBody());
             if (result.getCode() == BaseConstant.SUCCESS) {
                 CallBackResult callBackResult = JSONObject.parseObject(result.getBody(), CallBackResult.class);
@@ -552,6 +553,8 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         return requestSupport(order, userBusinessEntity, userName);
     }
 
+    @Autowired
+    private AliPayImpl aliPay;
     /**
      * 请求挂马平台
      *
@@ -563,15 +566,14 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         if (order.getPayType().equals(BaseConstant.REQUEST_ALI_ZZ)) {
             AliPayCallBackParam param = structuralAliParam(order, "text", "alipay_auto", "3", "2",
                     BaseConstant.REQUEST_ALI_ZZ, userName);
-            String payUrl = aliPayCallBack(param, aliPayUrl);
-            return R.ok().put("url", payUrl);
+            return aliPay.requestPayUrl(param,aliPayUrl,key);
+
         }
         //转卡
         if (order.getPayType().equals(BaseConstant.REQUEST_ALI_BANK)) {
             AliPayCallBackParam param = structuralAliParam(order, "text", "jdpay_auto", "3", "2",
                     BaseConstant.REQUEST_ALI_BANK, userName);
-            String payUrl = aliPayCallBack(param, bankPayUrl);
-            return R.ok().put("url", payUrl);
+            return aliPay.requestPayUrl(param,bankPayUrl,key);
         }
         //云闪付
         if (order.getPayType().equals(BaseConstant.REQUEST_YSF)) {
@@ -618,48 +620,6 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         return true;
     }
 
-    /**
-     * 支付宝转卡、转账请求挂马平台
-     *
-     * @param param
-     * @param url
-     * @throws Exception
-     */
-    private String aliPayCallBack(AliPayCallBackParam param, String url) throws Exception {
-        if (StringUtils.isBlank(url)) {
-            throw new RRException("未配置支付宝回调地址，请联系管理员配置回调地址");
-        }
-        log.info("四方回调挂马平台，加密前数据，url:{};param:{}", url, JSON.toJSONString(param));
-
-        String data = AES128Util.encryptBase64(JSON.toJSONString(param), key);
-
-        JSONObject p = new JSONObject();
-        p.put("data", data);
-        log.info("四方回调挂马平台，加密后数据，url:{};param:{}", url, p.toJSONString());
-        HttpResult result = HttpUtils.doPostJson(url, p.toJSONString());
-        String payUrl = null;
-        if (result.getCode() == BaseConstant.SUCCESS) {
-            if (StringUtils.isNotBlank(result.getBody())) {
-                log.info("四方回调挂马平台成功，返回信息：{}", result.getBody());
-                JSONObject r = JSON.parseObject(result.getBody());
-                if (r != null) {
-                    if ("200".equals(r.get("code").toString())) {
-                        payUrl = (String) r.get("msg");
-                        log.info("===请求挂码平台，返回支付链接为:{}", payUrl);
-                    }else{
-                        throw new RRException("四方回调挂马平台失败,订单创建失败：" + result.getBody());
-                    }
-                } else {
-                    throw new RRException("四方回调挂马平台失败,订单创建失败：" + result.getBody());
-                }
-            } else {
-                throw new RRException("四方回调挂马平台失败,订单创建失败：" + result.getBody());
-            }
-        } else {
-            throw new RRException("四方回调挂马平台失败,订单创建失败：" + result.getBody());
-        }
-        return payUrl;
-    }
 
     /**
      * 农信易扫请求挂马平台
@@ -779,6 +739,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         reqdata.put("clienttype", "H5");
         //这里的回调地址，是挂马回调四方的地址，配置在数据字典中
         reqdata.put("callbackurl", innerCallBackUrl);
+        log.info("===请求云闪付挂码平台的data加密之前的数据为：{}",reqdata.toJSONString());
         String data = AES128Util.encryptBase64(reqdata.toJSONString(), aesKey);
         JSONObject reqobj = new JSONObject();
         reqobj.put("agentcode", agentCode);
