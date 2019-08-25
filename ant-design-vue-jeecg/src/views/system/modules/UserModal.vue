@@ -54,7 +54,7 @@
         </a-form-item>
 
         <a-form-item v-if="model.memberType" label="会员类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-select v-decorator="[ 'memberType', {}]" placeholder="">
+          <a-select v-decorator="[ 'memberType', {}]" placeholder="" disabled>
             <a-select-option value="1">代理</a-select-option>
             <a-select-option value="2">介绍人</a-select-option>
             <a-select-option value="3">商户</a-select-option>
@@ -63,7 +63,7 @@
 
         <a-form-item v-if="model.memberType == 3" label="API KEY" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input placeholder="" :disabled="isDisabledAuth('user:form:apiKey')"
-                   v-decorator="[ 'apiKey']"/>
+                   v-decorator="[ 'apiKey']" disabled/>
         </a-form-item>
 
         <!--部门分配-->
@@ -133,15 +133,15 @@
           </a-input-group>
         </a-form-item>
 
-        <a-form-item v-if="model.memberType == 3" label="所属介绍人" :labelCol="labelCol"
+        <a-form-item v-if="model.memberType == 3 && !model.salesmanId" label="所属介绍人" :labelCol="labelCol"
                      :wrapperCol="wrapperCol">
           <a-input-group compact>
-            <a-input placeholder="" :disabled="isDisabledAuth('user:form:salesmanUsername')"
+            <a-input placeholder="" disabled
                      v-decorator="[ 'salesmanUsername']" style="width: 30%;text-align: center"
             />
-            <a-input placeholder="-" disabled
-                     style="width: 30px; border-left: 0px; pointer-events: none;background-color: #fff"/>
-            <a-input placeholder="" :disabled="isDisabledAuth('user:form:salesmanUsername')"
+            <!--            <a-input placeholder="-" disabled-->
+            <!--                     style="width: 30px; border-left: 0px; pointer-events: none;background-color: #fff"/>-->
+            <a-input placeholder="" disabled
                      v-decorator="[ 'salesmanRealname']" style="width: 30%; border-left: 0px;text-align: center"
             />
           </a-input-group>
