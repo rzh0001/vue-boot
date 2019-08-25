@@ -214,6 +214,20 @@
             }
           },
           {
+            title: '创建时间',
+            align: 'center',
+            width: 150,
+            dataIndex: 'createTime',
+            sorter: true
+          },
+          {
+            title: '成功时间',
+            align: 'center',
+            width: 150,
+            dataIndex: 'successTime',
+            sorter: true
+          },
+          {
             title: '操作',
             dataIndex: 'action',
             align: 'center',
@@ -226,6 +240,7 @@
           deleteBatch: '/pay/orderInfoEntity/deleteBatch',
           exportXlsUrl: 'pay/orderInfoEntity/exportXls',
           importExcelUrl: 'pay/orderInfoEntity/importExcel'
+
         }
       }
     },
