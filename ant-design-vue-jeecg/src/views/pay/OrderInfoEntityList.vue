@@ -224,7 +224,7 @@
             title: '成功时间',
             align: 'center',
             width: 150,
-            dataIndex: 'successTime',
+            dataIndex: 'updateTime',
             sorter: true
           },
           {

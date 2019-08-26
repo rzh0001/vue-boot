@@ -19,13 +19,13 @@
     </select>
     <update id="updateOrderStatusSuccessByOrderId" parameterType="String">
         UPDATE pay_order_info
-        SET `status` = 2,update_time=NOW()
+        SET `status` = 2,update_time=NOW(),success_time=NOW()
         WHERE
             order_id = #{orderId}
     </update>
     <update id="updateOrderStatusNoBackByOrderId" parameterType="String">
         UPDATE pay_order_info
-        SET `status` = 1,update_time=NOW()
+        SET `status` = 1,update_time=NOW(),success_time=NOW()
         WHERE
             order_id = #{orderId}
     </update>

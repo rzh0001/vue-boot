@@ -62,7 +62,7 @@ public class ApiController {
             return orderInfoService.callback(reqobj,((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest());
         } catch (Exception e) {
             log.info("订单回调异常，异常信息为：", e);
-            return R.error("订单回调异常");
+            return R.error(e.getMessage());
         }
     }
 

@@ -123,7 +123,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         if (BaseConstant.CHECK_PARAM_SUCCESS.equals(checkParam.get(BaseConstant.CODE).toString())) {
             return addOrder(checkParam);
         } else {
-            return R.error("创建订单异常");
+            return checkParam;
         }
     }
 
@@ -404,7 +404,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * @param agentName 高级代理
      * @param submit    申请金额
      */
-    private void countAgentMoney(String agentName, BigDecimal submit) {
+    private synchronized void countAgentMoney(String agentName, BigDecimal submit) {
         UserAmountEntity agent = amountService.getUserAmountByUserName(agentName);
         if (agent == null) {
             agent = new UserAmountEntity();
@@ -423,7 +423,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * @param agentName    高级代理
      * @param agentMoney   高级代理所得利润
      */
-    private void countSalesmanRate(String userName, String salesmanName, String agentName, BigDecimal agentMoney,
+    private synchronized void countSalesmanRate(String userName, String salesmanName, String agentName, BigDecimal agentMoney,
                                    String orderId, String payType) {
         //介绍人费率
         String salesmanRate = rateEntityService.getBeIntroducerRate(salesmanName, agentName, userName, payType);
@@ -458,7 +458,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * @param amount     订单申请金额
      * @param agentMoney 高级代理所得利润
      */
-    private void countUserRate(String userName, String agentName, BigDecimal amount, BigDecimal agentMoney) {
+    private synchronized void countUserRate(String userName, String agentName, BigDecimal amount, BigDecimal agentMoney) {
         UserAmountEntity user = amountService.getUserAmountByUserName(userName);
         if (user == null) {
             user = new UserAmountEntity();
@@ -826,6 +826,10 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             log.info("userName参数校验-->用户不存在，username:{}", userName);
             throw new RRException("用户不存在:" + userName);
         }
+        if(user.getStatus() != 1){
+            log.info("userName参数校验-->该用户未激活，username:{}", userName);
+            throw new RRException("该用户未激活，请联系管理员:" + userName);
+        }
         String apiKey = null;
         if (fromInner) {
             apiKey = key;
@@ -938,30 +942,35 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     }
 
     public static void main(String[] args) {
-        OrderInfoEntity order = new OrderInfoEntity();
-        order.setOrderId("111");
-        order.setOuterOrderId("222");
-        order.setSubmitAmount(new BigDecimal(0.5));
-        order.setStatus(2);
-        JSONObject callobj = new JSONObject();
-        Long timestamp = System.currentTimeMillis();
-        callobj.put(BaseConstant.ORDER_ID, order.getOrderId());
-        callobj.put(BaseConstant.OUTER_ORDER_ID, order.getOuterOrderId());
-        callobj.put(BaseConstant.SUBMIT_AMOUNT, order.getSubmitAmount());
-        callobj.put(BaseConstant.STATUS, order.getStatus());
+        String a = DigestUtils.md5Hex("zy001"+"1566805086620"+"q39k6ykfJVUo/qDaabvhvNkKdBjrDrbUjqGgw/S/PjR4uspksIZJafy+Ne706Th0UevmQ4qChja6OCqhXZCzvLwe8xuP6P5YqqgsycHfzi8KuQ1UNqr/Zcm0lPevv4K5R/bhHjj0qEyH+VgDNO0C5jS3sAIXuaIyoShraI2eIXwYW8o+Mj9RyLLb/e1OyhxAXX8HPV19xarwMX06v/9aBBwLyOPM1dHfTFmyw/fasVc="+"ec27798b41934764");
+//        OrderInfoEntity order = new OrderInfoEntity();
+//        order.setOrderId("111");
+//        order.setOuterOrderId("222");
+//        order.setSubmitAmount(new BigDecimal(0.5));
+//        order.setStatus(2);
+//        JSONObject callobj = new JSONObject();
+//        Long timestamp = System.currentTimeMillis();
+//        callobj.put(BaseConstant.ORDER_ID, order.getOrderId());
+//        callobj.put(BaseConstant.OUTER_ORDER_ID, order.getOuterOrderId());
+//        callobj.put(BaseConstant.SUBMIT_AMOUNT, order.getSubmitAmount());
+//        callobj.put(BaseConstant.STATUS, order.getStatus());
+//
+//        log.info("====回调商户加密前数据====" + callobj.toJSONString());
+//        //加密数据
+//        String data = AES128Util.encryptBase64(callobj.toJSONString(), "aaaa");
+//        JSONObject callbackjson = new JSONObject();
+//        StringBuilder sign = new StringBuilder();
+//        //sign = orderID+outOrderId+submitAmount+timestamp
+//        sign.append(order.getOrderId()).append(order.getOuterOrderId()).append(order.getSubmitAmount()).append(timestamp);
+//        callbackjson.put(BaseConstant.SIGN, DigestUtils.md5Hex(sign.toString()));
+//        callbackjson.put(BaseConstant.DATA, data);
+//        callbackjson.put(BaseConstant.TIMESTAMP, timestamp);
+//        log.info("====回调商户加密后数据====" + callbackjson);
+        Double b = 22985.020;
+        Double c =22202.050;
+        BigDecimal remain =new BigDecimal(b).subtract(new BigDecimal(c)).setScale(2,BigDecimal.ROUND_HALF_UP);
 
-        log.info("====回调商户加密前数据====" + callobj.toJSONString());
-        //加密数据
-        String data = AES128Util.encryptBase64(callobj.toJSONString(), "aaaa");
-        JSONObject callbackjson = new JSONObject();
-        StringBuilder sign = new StringBuilder();
-        //sign = orderID+outOrderId+submitAmount+timestamp
-        sign.append(order.getOrderId()).append(order.getOuterOrderId()).append(order.getSubmitAmount()).append(timestamp);
-        callbackjson.put(BaseConstant.SIGN, DigestUtils.md5Hex(sign.toString()));
-        callbackjson.put(BaseConstant.DATA, data);
-        callbackjson.put(BaseConstant.TIMESTAMP, timestamp);
-        log.info("====回调商户加密后数据====" + callbackjson);
-        System.out.println(callbackjson.toJSONString());
+        System.out.println(remain.doubleValue());
     }
 
     @Override
