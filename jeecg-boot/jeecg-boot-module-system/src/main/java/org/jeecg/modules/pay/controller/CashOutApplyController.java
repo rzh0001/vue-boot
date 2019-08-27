@@ -22,6 +22,7 @@ import org.jeecg.modules.pay.entity.CashOutApply;
 import org.jeecg.modules.pay.entity.UserAmountEntity;
 import org.jeecg.modules.pay.service.IBankCardService;
 import org.jeecg.modules.pay.service.ICashOutApplyService;
+import org.jeecg.modules.pay.service.IUserAmountDetailService;
 import org.jeecg.modules.pay.service.IUserAmountEntityService;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.service.ISysUserService;
@@ -69,7 +70,10 @@ public class CashOutApplyController {
 	 @Autowired
 	 private IUserAmountEntityService userAmountService;
 	
-	/**
+	 @Autowired
+	 private IUserAmountDetailService userAmountDetailService;
+	
+	 /**
 	 * 分页列表查询
 	 * @param cashOutApply
 	 * @param pageNo
@@ -107,44 +111,46 @@ public class CashOutApplyController {
 	
 	/**
 	 *   添加
-	 * @param cashOutApply
+	 * @param apply
 	 * @return
 	 */
 	@AutoLog(value = "提现申请-添加")
 	@ApiOperation(value = "提现申请-添加", notes = "提现申请-添加")
 	@PostMapping(value = "/add")
-	public Result<CashOutApply> add(@RequestBody CashOutApply cashOutApply) {
+	public Result<CashOutApply> add(@RequestBody CashOutApply apply) {
 		Result<CashOutApply> result = new Result<CashOutApply>();
 		LoginUser optUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+		SysUser user = sysUserService.getById(optUser.getId());
 		
 		// 校验金额，扣除余额
 		UserAmountEntity amount = userAmountService.getUserAmountByUserName(optUser.getUsername());
-		if (amount == null || amount.getAmount().compareTo(cashOutApply.getAmount()) == -1) {
+		if (amount == null || amount.getAmount().compareTo(apply.getAmount()) == -1) {
 			throw new RRException("余额不足");
 		}
-		amount.setAmount(amount.getAmount().subtract(cashOutApply.getAmount()));
-		boolean ok = userAmountService.updateById(amount);
+		boolean ok = userAmountService.changeAmount(amount.getId(), apply.getAmount().negate());
+		if (!ok) {
+			throw new RRException("更新余额失败，请确认余额");
+		}
 		
 		// 插入流水表
-		//TODO:
+		userAmountDetailService.addAmountDetail(apply.getAmount().negate(), "2", user);
 		
-		cashOutApply.setUserId(optUser.getId());
-		cashOutApply.setUsername(optUser.getUsername());
-		cashOutApply.setDelFlag(CommonConstant.NOT_DELETE_FLAG);
-		cashOutApply.setStatus("0");
-		cashOutApply.setApplyTime(new Date());
-		SysUser user = sysUserService.getById(optUser.getId());
-		cashOutApply.setAgentId(user.getAgentId());
-		cashOutApply.setAgentUsername(user.getAgentUsername());
-		cashOutApply.setAgentRealname(user.getAgentRealname());
+		apply.setUserId(optUser.getId());
+		apply.setUsername(optUser.getUsername());
+		apply.setDelFlag(CommonConstant.NOT_DELETE_FLAG);
+		apply.setStatus("0");
+		apply.setApplyTime(new Date());
+		apply.setAgentId(user.getAgentId());
+		apply.setAgentUsername(user.getAgentUsername());
+		apply.setAgentRealname(user.getAgentRealname());
 		
-		BankCard bankCard = bankCardService.getById(cashOutApply.getBankCardId());
-		cashOutApply.setBankName(bankCard.getBankName());
-		cashOutApply.setBranchName(bankCard.getBranchName());
-		cashOutApply.setAccountName(bankCard.getAccountName());
-		cashOutApply.setCardNumber(bankCard.getCardNumber());
+		BankCard bankCard = bankCardService.getById(apply.getBankCardId());
+		apply.setBankName(bankCard.getBankName());
+		apply.setBranchName(bankCard.getBranchName());
+		apply.setAccountName(bankCard.getAccountName());
+		apply.setCardNumber(bankCard.getCardNumber());
 		try {
-			cashOutApplyService.save(cashOutApply);
+			cashOutApplyService.save(apply);
 			
 			
 			result.success("添加成功！");
