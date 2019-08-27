@@ -81,7 +81,7 @@ public class UserAmountEntityController {
 		Result<BigDecimal> result = new Result<>();
 		LoginUser user = (LoginUser) SecurityUtils.getSubject().getPrincipal();
 		
-		UserAmountEntity amountEntity = userAmountEntityService.lambdaQuery().one().setUserId(user.getId());
+		UserAmountEntity amountEntity = userAmountEntityService.getOne(new QueryWrapper<UserAmountEntity>().lambda().eq(UserAmountEntity::getUserId, user.getId()));
 		result.setSuccess(true);
 		result.setResult(amountEntity.getAmount());
 		return result;
