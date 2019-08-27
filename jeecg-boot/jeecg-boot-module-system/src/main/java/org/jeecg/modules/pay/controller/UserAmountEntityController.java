@@ -37,10 +37,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @Description: 商户收入额度 @Author: jeecg-boot @Date: 2019-07-31 @Version: V1.0
+ * @Description: 用户余额
+ * @Author: jeecg-boot 
+ * @Date: 2019-07-31 
+ * @Version: V1.0
  */
 @Slf4j
-@Api(tags = "商户收入额度")
+@Api(tags = "用户余额")
 @RestController
 @RequestMapping("/pay/userAmountEntity")
 public class UserAmountEntityController {
@@ -56,8 +59,8 @@ public class UserAmountEntityController {
 	 * @param req
 	 * @return
 	 */
-	@AutoLog(value = "商户收入额度-分页列表查询")
-	@ApiOperation(value = "商户收入额度-分页列表查询", notes = "商户收入额度-分页列表查询")
+	@AutoLog(value = "用户余额-分页列表查询")
+	@ApiOperation(value = "用户余额-分页列表查询", notes = "用户余额-分页列表查询")
 	@GetMapping(value = "/list")
 	public Result<IPage<UserAmountEntity>> queryPageList(
 			UserAmountEntity userAmountEntity,
@@ -74,8 +77,8 @@ public class UserAmountEntityController {
 		return result;
 	}
 	
-	@AutoLog(value = "商户收入额度-获取会员可提现余额")
-	@ApiOperation(value = "商户收入额度-获取会员可提现余额", notes = "商户收入额度-获取会员可提现余额")
+	@AutoLog(value = "用户余额-获取会员可提现余额")
+	@ApiOperation(value = "用户余额-获取会员可提现余额", notes = "用户余额-获取会员可提现余额")
 	@GetMapping(value = "/getMemberAvailableAmount")
 	public Result<BigDecimal> getMemberAvailableAmount() {
 		Result<BigDecimal> result = new Result<>();
@@ -93,8 +96,8 @@ public class UserAmountEntityController {
 	 * @param userAmountEntity
 	 * @return
 	 */
-	@AutoLog(value = "商户收入额度-添加")
-	@ApiOperation(value = "商户收入额度-添加", notes = "商户收入额度-添加")
+	@AutoLog(value = "用户余额-添加")
+	@ApiOperation(value = "用户余额-添加", notes = "用户余额-添加")
 	@PostMapping(value = "/add")
 	public Result<UserAmountEntity> add(@RequestBody UserAmountEntity userAmountEntity) {
 		Result<UserAmountEntity> result = new Result<UserAmountEntity>();
@@ -114,8 +117,8 @@ public class UserAmountEntityController {
 	 * @param userAmountEntity
 	 * @return
 	 */
-	@AutoLog(value = "商户收入额度-编辑")
-	@ApiOperation(value = "商户收入额度-编辑", notes = "商户收入额度-编辑")
+	@AutoLog(value = "用户余额-编辑")
+	@ApiOperation(value = "用户余额-编辑", notes = "用户余额-编辑")
 	@PutMapping(value = "/edit")
 	public Result<UserAmountEntity> edit(@RequestBody UserAmountEntity userAmountEntity) {
 		Result<UserAmountEntity> result = new Result<UserAmountEntity>();
@@ -140,8 +143,8 @@ public class UserAmountEntityController {
 	 * @param id
 	 * @return
 	 */
-	@AutoLog(value = "商户收入额度-通过id删除")
-	@ApiOperation(value = "商户收入额度-通过id删除", notes = "商户收入额度-通过id删除")
+	@AutoLog(value = "用户余额-通过id删除")
+	@ApiOperation(value = "用户余额-通过id删除", notes = "用户余额-通过id删除")
 	@DeleteMapping(value = "/delete")
 	public Result<?> delete(@RequestParam(name = "id", required = true) String id) {
 		try {
@@ -159,8 +162,8 @@ public class UserAmountEntityController {
 	 * @param ids
 	 * @return
 	 */
-	@AutoLog(value = "商户收入额度-批量删除")
-	@ApiOperation(value = "商户收入额度-批量删除", notes = "商户收入额度-批量删除")
+	@AutoLog(value = "用户余额-批量删除")
+	@ApiOperation(value = "用户余额-批量删除", notes = "用户余额-批量删除")
 	@DeleteMapping(value = "/deleteBatch")
 	public Result<UserAmountEntity> deleteBatch(
 			@RequestParam(name = "ids", required = true) String ids) {
@@ -180,8 +183,8 @@ public class UserAmountEntityController {
 	 * @param id
 	 * @return
 	 */
-	@AutoLog(value = "商户收入额度-通过id查询")
-	@ApiOperation(value = "商户收入额度-通过id查询", notes = "商户收入额度-通过id查询")
+	@AutoLog(value = "用户余额-通过id查询")
+	@ApiOperation(value = "用户余额-通过id查询", notes = "用户余额-通过id查询")
 	@GetMapping(value = "/queryById")
 	public Result<UserAmountEntity> queryById(@RequestParam(name = "id", required = true) String id) {
 		Result<UserAmountEntity> result = new Result<UserAmountEntity>();
@@ -220,9 +223,9 @@ public class UserAmountEntityController {
 		ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
 		List<UserAmountEntity> pageList = userAmountEntityService.list(queryWrapper);
 		// 导出文件名称
-		mv.addObject(NormalExcelConstants.FILE_NAME, "商户收入额度列表");
+		mv.addObject(NormalExcelConstants.FILE_NAME, "用户余额列表");
 		mv.addObject(NormalExcelConstants.CLASS, UserAmountEntity.class);
-		mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("商户收入额度列表数据", "导出人:Jeecg", "导出信息"));
+		mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("用户余额列表数据", "导出人:Jeecg", "导出信息"));
 		mv.addObject(NormalExcelConstants.DATA_LIST, pageList);
 		return mv;
 	}

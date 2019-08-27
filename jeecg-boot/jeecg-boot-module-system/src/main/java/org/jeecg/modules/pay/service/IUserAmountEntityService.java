@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import org.jeecg.modules.pay.entity.UserAmountEntity;
 import org.jeecg.modules.system.entity.SysUser;
 
+import java.math.BigDecimal;
+
 /**
  * @Description: 商户收入额度
  * @Author: jeecg-boot
@@ -19,4 +21,13 @@ public interface IUserAmountEntityService extends IService<UserAmountEntity> {
      * @param user
      */
     void initialUserAmount(SysUser user);
+    
+    /**
+     * 更新余额
+     *
+     * @param id
+     * @param amount
+     * @return
+     */
+    boolean changeAmount(String id, BigDecimal amount);
 }
