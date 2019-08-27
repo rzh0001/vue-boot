@@ -1,7 +1,10 @@
 package org.jeecg.modules.pay.service;
 
-import org.jeecg.modules.pay.entity.UserAmountDetail;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.jeecg.modules.pay.entity.UserAmountDetail;
+import org.jeecg.modules.system.entity.SysUser;
+
+import java.math.BigDecimal;
 
 /**
  * @Description: 用户收入流水详情
@@ -10,5 +13,15 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @Version: V1.0
  */
 public interface IUserAmountDetailService extends IService<UserAmountDetail> {
-
+    
+    /**
+     * 创建收入流水并保存
+     *
+     * @param amount
+     * @param type
+     * @param opUser
+     * @return
+     */
+    boolean addAmountDetail(BigDecimal amount, String type, SysUser opUser);
+    
 }
