@@ -88,23 +88,10 @@
             title: '收入金额',
             align:"center",
             dataIndex: 'amount'
-           },
-		   {
-            title: '代理名称',
-            align:"center",
-            dataIndex: 'agentId'
-           },
-          {
-            title: '操作',
-            dataIndex: 'action',
-            align:"center",
-            scopedSlots: { customRender: 'action' },
-          }
+           }
         ],
 		url: {
           list: "/pay/userAmountEntity/list",
-          delete: "/pay/userAmountEntity/delete",
-          deleteBatch: "/pay/userAmountEntity/deleteBatch",
           exportXlsUrl: "pay/userAmountEntity/exportXls",
           importExcelUrl: "pay/userAmountEntity/importExcel",
        },

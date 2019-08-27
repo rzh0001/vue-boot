@@ -52,6 +52,10 @@ public class UserAmountDetail {
 	@Excel(name = "订单号", width = 15)
     @ApiModelProperty(value = "订单号")
 	private java.lang.String orderId;
+	/**订单号*/
+	@Excel(name = "通道类型", width = 15)
+	@ApiModelProperty(value = "通道类型")
+	private java.lang.String payType;
 	/**费率*/
 	@Excel(name = "费率", width = 15)
     @ApiModelProperty(value = "费率")

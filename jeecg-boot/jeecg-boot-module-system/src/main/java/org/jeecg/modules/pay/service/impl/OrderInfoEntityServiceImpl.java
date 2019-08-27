@@ -60,6 +60,8 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     private IRateLogEntityService rateLogEntityService;
     @Autowired
     private IIntroducerLogEntityService introducerLogEntityService;
+    @Autowired
+    private IUserAmountDetailService amountDetailService;
 
     private static OrderInfoEntityServiceImpl orderInfoEntityService;
     private static String aliPayUrl = null;
@@ -365,7 +367,8 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * @param payType      通道
      * @throws Exception
      */
-    private void countAmount(String orderId, String userName, String submitAmount, String payType) throws Exception {
+    @Override
+    public void countAmount(String orderId, String userName, String submitAmount, String payType) throws Exception {
         SysUser user = userService.getUserByName(userName);
         //高级代理的利润
         BigDecimal submit = new BigDecimal(submitAmount);
@@ -374,20 +377,22 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         BigDecimal userRate = new BigDecimal(rate);
         BigDecimal agentMoney = submit.multiply(userRate).setScale(2, BigDecimal.ROUND_HALF_UP);
 
-        //记录商户手续费的收取详情
-        RateLogEntity log = new RateLogEntity();
-        log.setChannelCode(payType);
-        log.setOrderId(orderId);
-        log.setUserName(userName);
-        log.setAgentName(user.getAgentUsername());
-        log.setIntroducerName(user.getSalesmanUsername());
-        log.setUserRate(rate);
-        log.setSubmitamount(submit);
-        log.setPoundage(agentMoney);
-        rateLogEntityService.save(log);
+        //记录商户从订单中的收入情况
+        UserAmountDetail detail = new UserAmountDetail();
+        detail.setUserName(userName);
+        detail.setType(BaseConstant.RATE);
+        //商户收入
+        detail.setAmount(submit.subtract(agentMoney).setScale(2, BigDecimal.ROUND_HALF_UP));
+        detail.setPayType(payType);
+        detail.setOrderId(orderId);
+        detail.setUserRate(rate);
+        detail.setAgentUsername(user.getAgentUsername());
+        detail.setSalesmanUsername(user.getSalesmanUsername());
+        detail.setCreateTime(new Date());
+        amountDetailService.save(detail);
 
         //统计高级代理所得额度
-        countAgentMoney(user.getAgentUsername(), submit);
+        countAgentMoney(user.getAgentUsername(), submit,payType,orderId);
         //统计商户的所得金额
         countUserRate(userName, user.getAgentUsername(), submit, agentMoney);
         //统计介绍人的所得金额
@@ -404,12 +409,23 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * @param agentName 高级代理
      * @param submit    申请金额
      */
-    private synchronized void countAgentMoney(String agentName, BigDecimal submit) {
+    private synchronized void countAgentMoney(String agentName, BigDecimal submit,String payType,String orderId) {
+        UserAmountDetail agentDetail = new UserAmountDetail();
+        agentDetail.setUserName(agentName);
+        agentDetail.setType(BaseConstant.RATE);
+        agentDetail.setPayType(payType);
+        agentDetail.setAmount(submit);
+        agentDetail.setOrderId(orderId);
+        agentDetail.setCreateTime(new Date());
+        amountDetailService.save(agentDetail);
+
         UserAmountEntity agent = amountService.getUserAmountByUserName(agentName);
         if (agent == null) {
             agent = new UserAmountEntity();
             agent.setAmount(new BigDecimal(0));
         }
+        SysUser user = userService.getUserByName(agentName);
+        agent.setUserId(user.getId());
         agent.setUserName(agentName);
         agent.setAmount(agent.getAmount().add(submit).setScale(2, BigDecimal.ROUND_HALF_UP));
         amountService.saveOrUpdate(agent);
@@ -432,6 +448,8 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             salesman = new UserAmountEntity();
             salesman.setAmount(new BigDecimal(0));
         }
+        SysUser sysUser = userService.getUserByName(salesmanName);
+        salesman.setUserId(sysUser.getId());
         salesman.setUserName(salesmanName);
         salesman.setAgentId(agentName);
         BigDecimal salesmanNow = agentMoney.multiply(new BigDecimal(salesmanRate)).setScale(2,
@@ -439,15 +457,15 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         salesman.setAmount(salesman.getAmount().add(salesmanNow).setScale(2, BigDecimal.ROUND_HALF_UP));
         amountService.saveOrUpdate(salesman);
         //记录介绍人收入详情日志
-        IntroducerLogEntity log = new IntroducerLogEntity();
-        log.setChannelCode(payType);
-        log.setOrderId(orderId);
-        log.setIntroducerName(salesmanName);
-        log.setAgentName(agentName);
-        log.setIntroducerRate(salesmanRate);
-        log.setAgentSubmitamount(agentMoney);
-        log.setPoundage(salesmanNow);
-        introducerLogEntityService.save(log);
+        UserAmountDetail introducerDetail = new UserAmountDetail();
+        introducerDetail.setUserName(salesmanName);
+        introducerDetail.setType(BaseConstant.RATE);
+        introducerDetail.setPayType(payType);
+        introducerDetail.setAmount(salesmanNow);
+        introducerDetail.setUserRate(salesmanRate);
+        introducerDetail.setOrderId(orderId);
+        introducerDetail.setCreateTime(new Date());
+        amountDetailService.save(introducerDetail);
     }
 
     /**
@@ -464,6 +482,8 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             user = new UserAmountEntity();
             user.setAmount(new BigDecimal(0));
         }
+        SysUser sysUser = userService.getUserByName(userName);
+        user.setUserId(sysUser.getId());
         user.setAgentId(agentName);
         user.setUserName(userName);
         BigDecimal userNow = amount.subtract(agentMoney).setScale(2, BigDecimal.ROUND_HALF_UP);
@@ -918,7 +938,8 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * @param aseKey
      * @return
      */
-    public static JSONObject encryptAESData(OrderInfoEntity order, String aseKey) throws Exception {
+    @Override
+    public JSONObject encryptAESData(OrderInfoEntity order, String aseKey) throws Exception {
         JSONObject callobj = new JSONObject();
         Long timestamp = System.currentTimeMillis();
         callobj.put(BaseConstant.ORDER_ID, order.getOrderId());
