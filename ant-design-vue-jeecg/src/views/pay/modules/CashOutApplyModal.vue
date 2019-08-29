@@ -252,6 +252,7 @@
             this.avaliableAmount = res.result
           } else {
             console.log(res.message)
+            this.$message.error(res.message)
           }
         })
       },

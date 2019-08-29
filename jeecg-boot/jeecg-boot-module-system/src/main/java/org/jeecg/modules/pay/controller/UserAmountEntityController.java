@@ -84,9 +84,13 @@ public class UserAmountEntityController {
 		Result<BigDecimal> result = new Result<>();
 		LoginUser user = (LoginUser) SecurityUtils.getSubject().getPrincipal();
 		
-		UserAmountEntity amountEntity = userAmountEntityService.getOne(new QueryWrapper<UserAmountEntity>().lambda().eq(UserAmountEntity::getUserId, user.getId()));
-		result.setSuccess(true);
-		result.setResult(amountEntity.getAmount());
+		UserAmountEntity amount = userAmountEntityService.getOne(new QueryWrapper<UserAmountEntity>().lambda().eq(UserAmountEntity::getUserId, user.getId()));
+		if (amount == null) {
+			result.error500("获取余额失败，请联系管理员");
+		} else {
+			result.setSuccess(true);
+			result.setResult(amount.getAmount());
+		}
 		return result;
 	}
 	
