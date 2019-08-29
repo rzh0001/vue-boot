@@ -66,4 +66,8 @@ public class BaseConstant {
 
     //四方回调挂马平台的返回码
     public static final int SUCCESS = 200;
+    //流水类型 流水类型 1-手续费收入 2-提现 3-冲正
+    public static final String RATE = "1";
+    public static final String WITHDRAW = "2";
+    public static final String ADD_MONEY = "3";
 }

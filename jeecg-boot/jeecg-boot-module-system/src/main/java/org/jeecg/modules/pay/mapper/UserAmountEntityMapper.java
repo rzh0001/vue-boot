@@ -1,10 +1,11 @@
 package org.jeecg.modules.pay.mapper;
 
-import java.util.List;
-
-import org.apache.ibatis.annotations.Param;
-import org.jeecg.modules.pay.entity.UserAmountEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Update;
+import org.jeecg.modules.pay.entity.UserAmountEntity;
+
+import java.math.BigDecimal;
 
 /**
  * @Description: 商户收入额度
@@ -14,5 +15,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface UserAmountEntityMapper extends BaseMapper<UserAmountEntity> {
     UserAmountEntity getUserAmountByUserName(@Param("userName")String userName);
+    
+    @Update("update sys_user_amount set amount = amount + #{newAmount} where id = #{id} and amount + #{newAmount} > 0")
+    boolean changeAmount(@Param("id") String id, @Param("newAmount") BigDecimal newAmount);
 
 }
