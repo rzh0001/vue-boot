@@ -13,7 +13,7 @@ public class BaseConstant {
     public static final String DATA="data";
     public static final String CALLBACK_URL = "callbackUrl";
     public static final String AGENT_NAME = "agentName";
-
+    public static final String REQUEST = "request";
     public static final String CHECK_PARAM_SUCCESS = "0";
     public static final String CODE = "code";
     public static final String DECRYPT_DATA = "dataObj";

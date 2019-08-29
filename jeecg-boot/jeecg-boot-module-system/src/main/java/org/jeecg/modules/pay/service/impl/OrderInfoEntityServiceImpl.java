@@ -12,6 +12,8 @@ import org.jeecg.modules.exception.RRException;
 import org.jeecg.modules.pay.entity.*;
 import org.jeecg.modules.pay.mapper.OrderInfoEntityMapper;
 import org.jeecg.modules.pay.service.*;
+import org.jeecg.modules.pay.service.factory.PayServiceFactory;
+import org.jeecg.modules.pay.service.requestPayUrl.RequestPayUrl;
 import org.jeecg.modules.pay.service.requestPayUrl.impl.AliPayImpl;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.service.ISysDictService;
@@ -40,8 +42,7 @@ import java.util.*;
 @Transactional(rollbackFor = Exception.class)
 public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMapper, OrderInfoEntity> implements IOrderInfoEntityService {
 
-    @Autowired
-    public ISysDictService dictService;
+
     @Autowired
     private IChannelEntityService chnannelDao;
     @Autowired
@@ -60,38 +61,20 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     private IRateLogEntityService rateLogEntityService;
     @Autowired
     private IIntroducerLogEntityService introducerLogEntityService;
-
-    private static OrderInfoEntityServiceImpl orderInfoEntityService;
-    private static String aliPayUrl = null;
-    private static String bankPayUrl = null;
-    private static String ysfPayUrl = null;
-    private static String nxysWxPayUrl = null;
-    private static String nxysAliPayUrl = null;
+    @Autowired
+    private PayServiceFactory factory;
+    @Autowired
+    public ISysDictService dictService;
+    /**
+     * 请求挂码平台的秘钥
+     */
     private static String key = null;
+    /**
+     * 挂码平台回调四方的地址
+     */
     private static String innerCallBackUrl = null;
-
     @PostConstruct
-    public void init() {
-        orderInfoEntityService = this;
-        orderInfoEntityService.dictService = this.dictService;
-        List<DictModel> payUrl = dictService.queryDictItemsByCode(BaseConstant.REQUEST_URL);
-        for (DictModel dict : payUrl) {
-            if (BaseConstant.REQUEST_ALI_ZZ.equals(dict.getText())) {
-                aliPayUrl = dict.getValue();
-            }
-            if (BaseConstant.REQUEST_ALI_BANK.equals(dict.getText())) {
-                bankPayUrl = dict.getValue();
-            }
-            if (BaseConstant.REQUEST_YSF.equals(dict.getText())) {
-                ysfPayUrl = dict.getValue();
-            }
-            if (BaseConstant.REQUEST_NXYS_WX.equals(dict.getText())) {
-                nxysWxPayUrl = dict.getValue();
-            }
-            if (BaseConstant.REQUEST_NXYS_ALIPAY.equals(dict.getText())) {
-                nxysAliPayUrl = dict.getValue();
-            }
-        }
+    public void init(){
         List<DictModel> apiKey = dictService.queryDictItemsByCode(BaseConstant.API_KEY);
         for (DictModel k : apiKey) {
             if (BaseConstant.API_KEY.equals(k.getText())) {
@@ -179,6 +162,8 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         String orderId = (String) checkParam.get(BaseConstant.ORDER_ID);
         String payType = (String) checkParam.get(BaseConstant.PAY_TYPE);
         String userName = (String) checkParam.get(BaseConstant.USER_NAME);
+        RequestPayUrl requestPayUrl = (RequestPayUrl)checkParam.get(BaseConstant.REQUEST);
+        String requestUrl = (String)checkParam.get(BaseConstant.REQUEST_URL);
         OrderInfoEntity order = queryOrderInfoByOrderId(orderId);
         if (order == null) {
             log.info("订单查询异常，无此订单信息:{}",orderId);
@@ -190,12 +175,15 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             return R.error("该订单已经回调过了，不能重复回调");
         }
         //2 校验订单状态 ，从挂马平台查询
+        //校验在此通道下的该商户对应的代理是否有定义挂码账号
+        SysUser user = userService.getUserByName(userName);
+        List<UserBusinessEntity> useBusinesses =
+                businessEntityService.queryBusinessCodeByUserName(user.getAgentUsername(), payType);
+        requestPayUrl.orderInfoOk(order,)
         if (!orderStatusOk(orderId, payType, order.getBusinessCode())) {
             log.info("订单回调过程中，订单查询异常,orderID:{}", orderId);
             return R.error("订单查询异常，无此订单信息");
         }
-
-        SysUser user = userService.getUserByName(userName);
         order.setStatus(BaseConstant.ORDER_STATUS_SUCCESS_NOT_RETURN);
         String submitAmount = order.getSubmitAmount().toString();
         JSONObject callobj = encryptAESData(order, user.getApiKey());
@@ -497,6 +485,8 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         String payType = (String) checkParam.get(BaseConstant.PAY_TYPE);
         String callbackUrl = (String) checkParam.get(BaseConstant.CALLBACK_URL);
         String agentName = (String) checkParam.get(BaseConstant.AGENT_NAME);
+        RequestPayUrl requestPayUrl = (RequestPayUrl)checkParam.get(BaseConstant.REQUEST);
+        String requestUrl = (String)checkParam.get(BaseConstant.REQUEST_URL);
         log.info("请求创建订单，商户单号为:{};通道为：{};用户名为:{};申请金额为:{}",new String[]{outerOrderId,payType,userName,submitAmount});
         //校验是否是重复订单
         if (!outerOrderIdIsOnly(outerOrderId)) {
@@ -550,56 +540,9 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         //保存订单信息
         this.save(order);
         //请求挂马平台
-        return requestSupport(order, userBusinessEntity, userName);
+        return requestPayUrl.requestPayUrl(order,userName,requestUrl,key,innerCallBackUrl);
     }
 
-    @Autowired
-    private AliPayImpl aliPay;
-    /**
-     * 请求挂马平台
-     *
-     * @param order
-     * @throws Exception
-     */
-    private R requestSupport(OrderInfoEntity order, UserBusinessEntity userBusinessEntity, String userName) throws Exception {
-        //支付宝转账
-        if (order.getPayType().equals(BaseConstant.REQUEST_ALI_ZZ)) {
-            AliPayCallBackParam param = structuralAliParam(order, "text", "alipay_auto", "3", "2",
-                    BaseConstant.REQUEST_ALI_ZZ, userName);
-            return aliPay.requestPayUrl(param,aliPayUrl,key);
-
-        }
-        //转卡
-        if (order.getPayType().equals(BaseConstant.REQUEST_ALI_BANK)) {
-            AliPayCallBackParam param = structuralAliParam(order, "text", "jdpay_auto", "3", "2",
-                    BaseConstant.REQUEST_ALI_BANK, userName);
-            return aliPay.requestPayUrl(param,bankPayUrl,key);
-        }
-        //云闪付
-        if (order.getPayType().equals(BaseConstant.REQUEST_YSF)) {
-            String apiKey = userBusinessEntity.getApiKey();
-            if (StringUtils.isBlank(apiKey)) {
-                log.info("云闪付通道未配置apikey");
-                throw new RRException("云闪付通道未配置apikey");
-            }
-            String[] keys = apiKey.split("=");
-            if (keys.length != 2) {
-                log.info("云闪付通道配置apikey规则不对");
-                throw new RRException("云闪付通道未配置apikey");
-            }
-            String md5Key = keys[0];
-            String aesKey = keys[1];
-            String param = structuralYsfParam(order, md5Key, aesKey, order.getBusinessCode(), userName);
-            String url = ysfCallBack(param, ysfPayUrl);
-            return R.ok().put("url", url);
-        }
-        //农信易扫
-        if (order.getPayType().equals(BaseConstant.REQUEST_NXYS_WX) || order.getPayType().equals(BaseConstant.REQUEST_NXYS_ALIPAY)) {
-            nxysCallBack(order);
-            return R.ok();
-        }
-        return R.error("无匹配通道");
-    }
 
     /**
      * 校验通道是否是开启的
@@ -628,140 +571,39 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * @throws Exception
      */
     private void nxysCallBack(OrderInfoEntity order) throws Exception {
-        NxysCallBackParam nxys = new NxysCallBackParam();
-        nxys.setMerchantid(order.getBusinessCode());
-        nxys.setOrderid(order.getOrderId());
-        nxys.setAmount(order.getSubmitAmount().toString());
-        nxys.setPaytype(order.getPayType());
-        nxys.setClient_ip("");
-        nxys.setNotify_url(innerCallBackUrl);
-        nxys.setReturn_url(innerCallBackUrl);
-        nxys.setExt(order.getOuterOrderId());
-        nxys.setSign(sign(order));
-
-        String param = JSON.toJSONString(nxys);
-        log.info("农信易扫请求挂马后台，入参：{}", param);
-        String url = nxysAliPayUrl;
-        if (order.getPayType().equals(BaseConstant.REQUEST_NXYS_WX)) {
-            url = nxysWxPayUrl;
-        }
-        if (StringUtils.isBlank(url)) {
-            throw new RRException("农信易扫未配置回调挂马地址");
-        }
-        HttpResult result = HttpUtils.doPostJson(url, param);
-        if (result.getCode() == BaseConstant.SUCCESS) {
-            log.info("农信易扫请求挂马后台;四方回调挂马平台成功");
-            JSONObject r = JSONObject.parseObject(result.getBody());
-            if ((int) r.get("code") == 0) {
-                String qrcode = (String) r.get("data");
-                //展示农信易扫的二维码
-            }
-        } else {
-            throw new RRException("农信易扫请求挂马后台;四方回调挂马平台失败");
-        }
+//        NxysCallBackParam nxys = new NxysCallBackParam();
+//        nxys.setMerchantid(order.getBusinessCode());
+//        nxys.setOrderid(order.getOrderId());
+//        nxys.setAmount(order.getSubmitAmount().toString());
+//        nxys.setPaytype(order.getPayType());
+//        nxys.setClient_ip("");
+//        nxys.setNotify_url(innerCallBackUrl);
+//        nxys.setReturn_url(innerCallBackUrl);
+//        nxys.setExt(order.getOuterOrderId());
+//        nxys.setSign(sign(order));
+//
+//        String param = JSON.toJSONString(nxys);
+//        log.info("农信易扫请求挂马后台，入参：{}", param);
+//        String url = nxysAliPayUrl;
+//        if (order.getPayType().equals(BaseConstant.REQUEST_NXYS_WX)) {
+//            url = nxysWxPayUrl;
+//        }
+//        if (StringUtils.isBlank(url)) {
+//            throw new RRException("农信易扫未配置回调挂马地址");
+//        }
+//        HttpResult result = HttpUtils.doPostJson(url, param);
+//        if (result.getCode() == BaseConstant.SUCCESS) {
+//            log.info("农信易扫请求挂马后台;四方回调挂马平台成功");
+//            JSONObject r = JSONObject.parseObject(result.getBody());
+//            if ((int) r.get("code") == 0) {
+//                String qrcode = (String) r.get("data");
+//                //展示农信易扫的二维码
+//            }
+//        } else {
+//            throw new RRException("农信易扫请求挂马后台;四方回调挂马平台失败");
+//        }
     }
 
-    /**
-     * 云闪付请求挂马平台
-     *
-     * @param param
-     * @param url
-     * @throws Exception
-     */
-    private String ysfCallBack(String param, String url) throws Exception {
-        log.info("云闪付请求挂马平台，入参为：{}", param);
-        if (StringUtils.isBlank(url)) {
-            throw new RRException("未配置云闪付回调地址，请联系管理员配置回调地址");
-        }
-        HttpResult result = HttpUtils.doPostJson(url, param);
-        if (result.getCode() == BaseConstant.SUCCESS) {
-            log.info("云闪付挂马平台返回信息为：{}", result.getBody());
-            JSONObject r = JSON.parseObject(result.getBody());
-            String resultUrl = (String) r.get("payurl");
-            log.info("===请求挂码平台，返回支付链接为:{}", resultUrl);
-            if (StringUtils.isNotBlank(resultUrl)) {
-                return resultUrl;
-            }
-        } else {
-            throw new RRException("云闪付请求挂马平台，四方回调挂马平台失败,订单创建失败：" + param);
-        }
-        return null;
-    }
-
-    /**
-     * 构造支付宝转卡转账的入参
-     *
-     * @param order
-     * @param contentType
-     * @param thoroughfare
-     * @param type
-     * @param robin
-     * @return
-     * @throws Exception
-     */
-    private AliPayCallBackParam structuralAliParam(OrderInfoEntity order, String contentType, String thoroughfare,
-                                                   String type, String robin, String payType, String userName) throws Exception {
-        AliPayCallBackParam param = new AliPayCallBackParam();
-        param.setAccount_id(order.getBusinessCode());
-        param.setContent_type(contentType);
-        param.setThoroughfare(thoroughfare);
-        param.setType(type);
-        param.setOut_trade_no(order.getOrderId());
-        param.setRobin(robin);
-        param.setKeyId("");
-        param.setAmount(order.getSubmitAmount().toString());
-        param.setCallback_url(innerCallBackUrl);
-        param.setPayType(payType);
-        param.setUserName(userName);
-        param.setSign(sign(order));
-        return param;
-    }
-
-    /**
-     * @param order
-     * @param md5Key
-     * @param aesKey
-     * @param agentCode
-     * @param userName
-     * @return
-     */
-    private String structuralYsfParam(OrderInfoEntity order, String md5Key, String aesKey, String agentCode,
-                                      String userName) {
-        Long timestamp = System.currentTimeMillis() / 1000;
-        String sign = DigestUtils.md5Hex(agentCode + timestamp + md5Key);
-
-        JSONObject reqdata = new JSONObject(true);
-        reqdata.put("orderchannel", 3);
-        reqdata.put("trscode", "dynamicunionpay");
-        reqdata.put("agentorderid", order.getOrderId());
-        reqdata.put("applyamount", order.getSubmitAmount());
-        reqdata.put("web_username", userName);
-        reqdata.put("clienttype", "H5");
-        //这里的回调地址，是挂马回调四方的地址，配置在数据字典中
-        reqdata.put("callbackurl", innerCallBackUrl);
-        log.info("===请求云闪付挂码平台的data加密之前的数据为：{}",reqdata.toJSONString());
-        String data = AES128Util.encryptBase64(reqdata.toJSONString(), aesKey);
-        JSONObject reqobj = new JSONObject();
-        reqobj.put("agentcode", agentCode);
-        reqobj.put("timestamp", timestamp);
-        reqobj.put("sign", sign);
-        reqobj.put("data", data);
-        return reqobj.toJSONString();
-    }
-
-    /**
-     * businessCode+submitAmount+apiKey 进行MD5
-     *
-     * @param order
-     * @return
-     * @throws Exception
-     */
-    private String sign(OrderInfoEntity order) throws Exception {
-        StringBuilder sign = new StringBuilder();
-        sign.append(key).append(order.getSubmitAmount()).append(order.getOrderId());
-        log.info("===支付宝签名内容===》：{}",sign.toString());
-        return DigestUtils.md5Hex(sign.toString());
-    }
 
     /**
      * 生成四方系统的订单号
@@ -839,18 +681,24 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         R decryptData = decryptData(data, userName, timestamp, sign, apiKey);
         if (BaseConstant.CHECK_PARAM_SUCCESS.equals(decryptData.get(BaseConstant.CODE).toString())) {
             JSONObject dataObj = (JSONObject) decryptData.get(BaseConstant.DECRYPT_DATA);
+            RequestPayUrl request = factory.getPay(dataObj.getString(BaseConstant.PAY_TYPE));
+            String requestUrl = factory.getRequestUrl(dataObj.getString(BaseConstant.PAY_TYPE));
             if (!createOrder) {
                 return R.ok().put(BaseConstant.ORDER_ID, dataObj.getString(BaseConstant.ORDER_ID))
                         .put(BaseConstant.USER_NAME, user.getUsername())
                         .put(BaseConstant.AGENT_NAME, user.getAgentUsername())
-                        .put(BaseConstant.PAY_TYPE, dataObj.getString(BaseConstant.PAY_TYPE));
+                        .put(BaseConstant.PAY_TYPE, dataObj.getString(BaseConstant.PAY_TYPE))
+                        .put(BaseConstant.REQUEST,request)
+                        .put(BaseConstant.REQUEST_URL,requestUrl);
             }
             return R.ok().put(BaseConstant.OUTER_ORDER_ID, dataObj.getString(BaseConstant.OUTER_ORDER_ID))
                     .put(BaseConstant.USER_NAME, dataObj.getString(BaseConstant.USER_NAME))
                     .put(BaseConstant.SUBMIT_AMOUNT, dataObj.getString(BaseConstant.SUBMIT_AMOUNT))
                     .put(BaseConstant.PAY_TYPE, dataObj.getString(BaseConstant.PAY_TYPE))
                     .put(BaseConstant.CALLBACK_URL, dataObj.getString(BaseConstant.CALLBACK_URL))
-                    .put(BaseConstant.AGENT_NAME, user.getAgentUsername());
+                    .put(BaseConstant.AGENT_NAME, user.getAgentUsername())
+                    .put(BaseConstant.REQUEST,request)
+                    .put(BaseConstant.REQUEST_URL,requestUrl);
         } else {
             return decryptData;
         }
