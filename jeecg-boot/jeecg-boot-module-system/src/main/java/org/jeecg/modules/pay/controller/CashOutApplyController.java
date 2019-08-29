@@ -197,13 +197,21 @@ public class CashOutApplyController {
 	 public Result<CashOutApply> approval(@RequestBody JSONObject jsonObject) {
 		
 		 Result<CashOutApply> result = new Result<CashOutApply>();
-		 CashOutApply cashOutApplyEntity = cashOutApplyService.getById(jsonObject.getString("id"));
-		 if (cashOutApplyEntity == null) {
+		 CashOutApply apply = cashOutApplyService.getById(jsonObject.getString("id"));
+		 if (apply == null) {
 			 result.error500("未找到对应实体");
 		 } else {
-			 cashOutApplyEntity.setStatus(jsonObject.getString("status"));
-			 cashOutApplyEntity.setApprovalTime(new Date());
-			 boolean ok = cashOutApplyService.updateById(cashOutApplyEntity);
+			 apply.setStatus(jsonObject.getString("status"));
+			 apply.setApprovalTime(new Date());
+			 boolean ok = cashOutApplyService.updateById(apply);
+			
+			 // 审核拒绝须冲正余额
+			 if ("3".equals(jsonObject.getString("status"))) {
+				 userAmountService.changeAmount(apply.getUserId(), apply.getAmount());
+				
+				 // 插入流水表
+				 userAmountDetailService.addAmountDetail(apply.getAmount(), "3", sysUserService.getById(apply.getUserId()));
+			 }
 			 //TODO 返回false说明什么？
 			 if (ok) {
 				 result.success("修改成功!");
