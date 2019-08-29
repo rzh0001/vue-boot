@@ -27,7 +27,16 @@ public class AliPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
 
     @Override
     public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key,String callbackUrl,UserBusinessEntity userBusinessEntity) throws Exception {
-        AliPayCallBackParam param = structuralAliParam(order, "text", "alipay_auto", "3", "2",
+        String type = null;
+        if(userBusinessEntity.getChannelCode().equals(BaseConstant.REQUEST_ALI_ZZ)){
+            type = "alipay_auto";
+        }else if(userBusinessEntity.getChannelCode().equals(BaseConstant.REQUEST_ALI_BANK)){
+            type = "jdpay_auto";
+        }
+        if(StringUtils.isEmpty(type)){
+            throw new RRException("请求支付宝通道不对");
+        }
+        AliPayCallBackParam param = structuralAliParam(order, "text", type, "3", "2",
                 BaseConstant.REQUEST_ALI_ZZ, userName,callbackUrl,key);
         if (StringUtils.isBlank(url)) {
             throw new RRException("未配置支付宝回调地址，请联系管理员配置回调地址");

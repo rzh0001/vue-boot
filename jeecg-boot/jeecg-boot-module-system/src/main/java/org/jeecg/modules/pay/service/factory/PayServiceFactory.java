@@ -19,12 +19,14 @@ public class PayServiceFactory {
     @Autowired
     public ISysDictService dictService;
     private static PayServiceFactory factory;
+    /**
+     * 请求挂马平台的地址
+     */
     private static String aliPayUrl = null;
     private static String bankPayUrl = null;
     private static String ysfPayUrl = null;
     private static String nxysWxPayUrl = null;
     private static String nxysAliPayUrl = null;
-
 
     @PostConstruct
     public void init() {
