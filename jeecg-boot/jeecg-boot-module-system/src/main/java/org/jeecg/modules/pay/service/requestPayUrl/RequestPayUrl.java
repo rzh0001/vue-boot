@@ -14,6 +14,7 @@ public interface RequestPayUrl<O ,N ,U,K,C,B> {
      * @param url 支付地址
      * @param key 秘钥
      * @param callbackUrl 回调地址
+     * @param userBusiness
      * @return
      * @throws Exception
      */

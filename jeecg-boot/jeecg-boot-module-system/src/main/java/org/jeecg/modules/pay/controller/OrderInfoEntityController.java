@@ -310,6 +310,7 @@ public class OrderInfoEntityController {
         boolean flag = false;
         OrderInfoEntity order = orderInfoEntityService.queryOrderInfoByOrderId(id);
         try {
+            //手动补单，密钥取订单中用户的密钥
             LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
             SysUser sysUser = userService.getUserByName(loginUser.getUsername());
             log.info("补单操作==补单操作人：{}；单号为：{}", sysUser.getUsername(), id);
@@ -320,7 +321,8 @@ public class OrderInfoEntityController {
                 return R.error("订单不存在");
             }
             StringBuilder msg = new StringBuilder();
-            JSONObject callobj = orderInfoEntityService.encryptAESData(order, sysUser.getApiKey());
+            SysUser orderUser = userService.getUserByName(order.getUserName());
+            JSONObject callobj = orderInfoEntityService.encryptAESData(order, orderUser.getApiKey());
             log.info("===回调商户，url:{},param:{}", order.getSuccessCallbackUrl(), callobj.toJSONString());
             HttpResult result = HttpUtils.doPostJson(order.getSuccessCallbackUrl(), callobj.toJSONString());
             log.info("===商户返回信息=={}", result.getBody());
@@ -346,6 +348,7 @@ public class OrderInfoEntityController {
             }
         } catch (Exception e) {
             log.info("补单失败，失败原因：{}", e);
+            return R.error("通知商户失败");
         } finally {
             if (flag) {
                 //5、只有在通知商户成功，才统计高级代理。商户。介绍人的收入情况
@@ -357,8 +360,5 @@ public class OrderInfoEntityController {
                 }
             }
         }
-
-        return R.ok("补单成功");
     }
-
 }

@@ -11,6 +11,8 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * @title:
@@ -59,7 +61,8 @@ public class ApiController {
     @ResponseBody
     public R callback(@RequestBody JSONObject reqobj) {
         try {
-            return orderInfoService.callback(reqobj,((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest());
+            return orderInfoService.callback(reqobj,
+                    ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest());
         } catch (Exception e) {
             log.info("订单回调异常，异常信息为：", e);
             return R.error(e.getMessage());
@@ -77,5 +80,9 @@ public class ApiController {
     @ResponseBody
     public R queryOrder(@RequestBody JSONObject reqobj) {
         return orderInfoService.queryOrderInfo(reqobj);
+    }
+    @PostMapping("/test")
+    public void test(HttpServletResponse response) throws IOException {
+        response.getWriter().print("{'a':1}");
     }
 }

@@ -37,7 +37,6 @@ import java.util.*;
  */
 @Slf4j
 @Service
-@Transactional(rollbackFor = Exception.class)
 public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMapper, OrderInfoEntity> implements IOrderInfoEntityService {
 
 
@@ -50,15 +49,9 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     @Autowired
     private IUserRateEntityService rateEntityService;
     @Autowired
-    private IChannelBusinessEntityService channelBusinessEntityService;
-    @Autowired
     private ISysUserService userService;
     @Autowired
     private IUserAmountEntityService amountService;
-    @Autowired
-    private IRateLogEntityService rateLogEntityService;
-    @Autowired
-    private IIntroducerLogEntityService introducerLogEntityService;
     @Autowired
     private PayServiceFactory factory;
     @Autowired
@@ -102,8 +95,9 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public R createOrder(JSONObject reqobj) throws Exception {
-        R checkParam = checkParam(reqobj, true, false);
+        R checkParam = checkParam(reqobj, true, false, false);
         if (BaseConstant.CHECK_PARAM_SUCCESS.equals(checkParam.get(BaseConstant.CODE).toString())) {
             return addOrder(checkParam);
         } else {
@@ -114,7 +108,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     @Override
     public R queryOrderInfo(JSONObject reqobj) {
         try {
-            R checkParam = checkParam(reqobj, false, false);
+            R checkParam = checkParam(reqobj, false, false, true);
             if (BaseConstant.CHECK_PARAM_SUCCESS.equals(checkParam.get(BaseConstant.CODE).toString())) {
                 String orderId = (String) checkParam.get(BaseConstant.ORDER_ID);
                 OrderInfoEntity order = queryOrderInfoByOrderId(orderId);
@@ -156,7 +150,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         if (!checkIpOk(req)) {
             throw new RRException("IP非法");
         }
-        R checkParam = checkParam(reqobj, false, true);
+        R checkParam = checkParam(reqobj, false, true, false);
         if (!BaseConstant.CHECK_PARAM_SUCCESS.equals(checkParam.get(BaseConstant.CODE).toString())) {
             return checkParam;
         }
@@ -191,11 +185,13 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         if (StringUtils.isBlank(queryUrl)) {
             throw new RRException("未配置四方系统查询挂马平台的订单状态地址,单号：" + orderId + ";通道为：" + payType);
         }
-        if(!requestPayUrl.orderInfoOk(order, queryUrl, useBusinesses.get(0))){
+        if (!requestPayUrl.orderInfoOk(order, queryUrl, useBusinesses.get(0))) {
             log.info("订单回调过程中，订单查询异常,orderID:{}", orderId);
             return R.error("订单查询异常，无此订单信息");
         }
         order.setStatus(BaseConstant.ORDER_STATUS_SUCCESS_NOT_RETURN);
+        //更新订单状态
+        updateOrderStatusNoBackByOrderId(orderId);
         String submitAmount = order.getSubmitAmount().toString();
         JSONObject callobj = encryptAESData(order, user.getApiKey());
         StringBuilder msg = new StringBuilder();
@@ -596,7 +592,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * @param reqobj
      * @return
      */
-    private R checkParam(JSONObject reqobj, boolean createOrder, boolean fromInner) throws Exception {
+    private R checkParam(JSONObject reqobj, boolean createOrder, boolean fromInner, boolean isQuery) throws Exception {
         //时间戳
         Long timestamp = reqobj.getLong(BaseConstant.TIMESTAMP);
         //MD5值
@@ -629,8 +625,12 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         R decryptData = decryptData(data, userName, timestamp, sign, apiKey);
         if (BaseConstant.CHECK_PARAM_SUCCESS.equals(decryptData.get(BaseConstant.CODE).toString())) {
             JSONObject dataObj = (JSONObject) decryptData.get(BaseConstant.DECRYPT_DATA);
-            RequestPayUrl request = factory.getPay(dataObj.getString(BaseConstant.PAY_TYPE));
-            String requestUrl = factory.getRequestUrl(dataObj.getString(BaseConstant.PAY_TYPE));
+            RequestPayUrl request = null;
+            String requestUrl = null;
+            if (!isQuery) {
+                request = factory.getPay(dataObj.getString(BaseConstant.PAY_TYPE));
+                requestUrl = factory.getRequestUrl(dataObj.getString(BaseConstant.PAY_TYPE));
+            }
             if (!createOrder) {
                 return R.ok().put(BaseConstant.ORDER_ID, dataObj.getString(BaseConstant.ORDER_ID))
                         .put(BaseConstant.USER_NAME, user.getUsername())
@@ -734,15 +734,20 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         callbackjson.put(BaseConstant.SIGN, DigestUtils.md5Hex(sign.toString()));
         callbackjson.put(BaseConstant.DATA, data);
         callbackjson.put(BaseConstant.TIMESTAMP, timestamp);
+        callbackjson.put(BaseConstant.USER_NAME, order.getUserName());
         log.info("====回调商户加密后数据====" + callbackjson);
         return callbackjson;
     }
 
     public static void main(String[] args) {
-        String a = DigestUtils.md5Hex("zy001" + "1566805086620" + "q39k6ykfJVUo/qDaabvhvNkKdBjrDrbUjqGgw/S" +
-                "/PjR4uspksIZJafy+Ne706Th0UevmQ4qChja6OCqhXZCzvLwe8xuP6P5YqqgsycHfzi8KuQ1UNqr/Zcm0lPevv4K5R" +
-                "/bhHjj0qEyH+VgDNO0C5jS3sAIXuaIyoShraI2eIXwYW8o+Mj9RyLLb/e1OyhxAXX8HPV19xarwMX06v/9aBBwLyOPM1dHfTFmyw" +
-                "/fasVc=" + "ec27798b41934764");
+//        String a = DigestUtils.md5Hex("zy001" + "1566805086620" + "q39k6ykfJVUo/qDaabvhvNkKdBjrDrbUjqGgw/S" +
+//                "/PjR4uspksIZJafy+Ne706Th0UevmQ4qChja6OCqhXZCzvLwe8xuP6P5YqqgsycHfzi8KuQ1UNqr/Zcm0lPevv4K5R" +
+//                "/bhHjj0qEyH+VgDNO0C5jS3sAIXuaIyoShraI2eIXwYW8o+Mj9RyLLb/e1OyhxAXX8HPV19xarwMX06v
+// /9aBBwLyOPM1dHfTFmyw" +
+//                "/fasVc=" + "ec27798b41934764");
+
+        String b = AES128Util.decryptBase64("ewEEEv1xmS+NYpg8DyqzwetQP3gaCCdtqHaA43HR6TpdUoT3J7iT92Umc3ijkzea3YaZLx" +
+                "+XF2gU2QgLg1Zr3hSh45K4Y1w0wdr7Fxh932WBzp9ogXx/zyxCF+EOBesI", "a01d43d25c6c41f5");
 //        OrderInfoEntity order = new OrderInfoEntity();
 //        order.setOrderId("111");
 //        order.setOuterOrderId("222");
@@ -767,11 +772,11 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
 //        callbackjson.put(BaseConstant.DATA, data);
 //        callbackjson.put(BaseConstant.TIMESTAMP, timestamp);
 //        log.info("====回调商户加密后数据====" + callbackjson);
-        Double b = 22985.020;
-        Double c = 22202.050;
-        BigDecimal remain = new BigDecimal(b).subtract(new BigDecimal(c)).setScale(2, BigDecimal.ROUND_HALF_UP);
+//        Double b = 22985.020;
+//        Double c = 22202.050;
+//        BigDecimal remain = new BigDecimal(b).subtract(new BigDecimal(c)).setScale(2, BigDecimal.ROUND_HALF_UP);
 
-        System.out.println(remain.doubleValue());
+        System.out.println(b);
     }
 
     @Override
