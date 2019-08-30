@@ -81,8 +81,12 @@ public class ApiController {
     public R queryOrder(@RequestBody JSONObject reqobj) {
         return orderInfoService.queryOrderInfo(reqobj);
     }
-    @PostMapping("/test")
-    public void test(HttpServletResponse response) throws IOException {
-        response.getWriter().print("{'a':1}");
+    @PostMapping("/testCallBack")
+    @ResponseBody
+    public String testCallBack(){
+        JSONObject result = new JSONObject();
+        result.put("code",200);
+        result.put("msg","success");
+        return result.toJSONString();
     }
 }
