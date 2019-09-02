@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.pay.mapper.DailyIncomeSummaryMapper">
+
+
+    <select id="pageSummary" parameterType="Map" resultType="org.jeecg.modules.pay.vo.DailyIncomeSummaryVO">
+        select user_id,user_name,user_realname,
+                count(1) as totalOrderCount,sum(submit_amount) as totalOrderAmount,
+                count( case when status = 3 then 1 else null end) as paidOrderCount,
+                sum( case when status = 3 then submit_amount else 0 end) as paidOrderAmount,
+                count( case when status != 3 then 1 else null end) as unpaidOrderCount,
+                sum( case when status != 3 then submit_amount else 0 end) as unpaidOrderAmount,
+                sum(case when status = 3 then poundage else 0 end) as feeIncome
+        from pay_order_info
+        where to_days(success_time) = to_days(#{map.date})
+
+            <if test="map.username!=null and map.username!=''">
+                and user_name = #{map.username}
+            </if>
+            <if test="map.userRealname!=null and map.userRealname!=''">
+                and user_realname = #{map.userRealname}
+            </if>
+        group by user_id,user_name,user_realname
+
+    </select>
+</mapper>
