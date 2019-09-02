@@ -1,12 +1,8 @@
 package org.jeecg.modules.pay.vo;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.jeecgframework.poi.excel.annotation.Excel;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import java.util.Date;
 
 /**
  * @Description: 今日交易统计
@@ -17,9 +13,6 @@ import java.util.Date;
 @Data
 public class DailyIncomeSummaryVO {
 	
-	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
-	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
-	private Date date;
 	/**用户id*/
 	@Excel(name = "用户id", width = 15)
     @ApiModelProperty(value = "用户id")
@@ -88,4 +81,10 @@ public class DailyIncomeSummaryVO {
 	@Excel(name = "介绍人姓名", width = 15)
     @ApiModelProperty(value = "介绍人姓名")
 	private java.lang.String salesmanRealname;
+	
+	//	@Excel(name = "日期", width = 20, format = "YYYY-MM-dd")
+//	@JsonFormat(timezone = "GMT+8", pattern = "YYYY-MM-dd")
+//	@DateTimeFormat(pattern = "YYYY-MM-dd")
+	@ApiModelProperty(value = "日期")
+	private String transTime;
 }

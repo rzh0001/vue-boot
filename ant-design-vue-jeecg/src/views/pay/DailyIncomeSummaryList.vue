@@ -23,7 +23,7 @@
 <!--          </a-col>-->
 <!--          <a-col :span="12">日期选择框(v-model)：{{ jdate.value }}</a-col>-->
           <a-form-item label="日期" >
-            <a-date-picker v-model="queryParam.date"  showTime format='YYYY-MM-DD HH:mm:ss' />
+            <a-date-picker v-model="queryParam.transTime"  showTime format='YYYY-MM-DD' />
           </a-form-item>
         </a-row>
 
@@ -130,6 +130,8 @@
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
   import JDate from '@/components/jeecg/JDate'
   import moment from 'moment'
+  import { filterObj } from '@/utils/util';
+
 
 
   export default {
@@ -256,7 +258,18 @@
       }
     },
     methods: {
-      moment
+      moment,
+      getQueryParams(){
+        console.log(this.queryParam.transTime)
+        var param = Object.assign({}, this.queryParam,this.isorter);
+        param.field = this.getQueryField();
+        param.pageNo = this.ipagination.current;
+        param.pageSize = this.ipagination.pageSize;
+        param.transTime = moment(this.queryParam.transTime).format("YYYY-MM-DD")
+        // delete param.transTime
+        // param.transTime = moment().format("YYYY-MM-DD")
+        return filterObj(param);
+      }
     }
   }
 </script>

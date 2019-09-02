@@ -1,6 +1,7 @@
 package org.jeecg.modules.pay.controller;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -54,7 +55,7 @@ public class DailyIncomeSummaryController {
 	
 	/**
 	 * 分页列表查询
-	 * @param dailyIncomeSummaryVO
+	 * @param queryParams
 	 * @param pageNo
 	 * @param pageSize
 	 * @param req
@@ -69,8 +70,10 @@ public class DailyIncomeSummaryController {
 															 HttpServletRequest req) {
 		Result<IPage<DailyIncomeSummaryVO>> result = new Result<IPage<DailyIncomeSummaryVO>>();
 		Map<String, Object> map = BeanUtil.beanToMap(queryParams);
-		if (ObjectUtil.isNull(map.get("date"))){
+		if (ObjectUtil.isNull(map.get("transTime"))) {
 			map.put("date", new Date());
+		} else {
+			map.put("date", DateUtil.parse(queryParams.getTransTime()));
 		}
 		
 		LoginUser opUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();

@@ -14,6 +14,12 @@
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
+          label="日期">
+          <a-date-picker showTime format='YYYY-MM-DD HH:mm:ss' v-decorator="[ 'date', {}]" />
+        </a-form-item>
+        <a-form-item
+          :labelCol="labelCol"
+          :wrapperCol="wrapperCol"
           label="用户id">
           <a-input placeholder="请输入用户id" v-decorator="['userId', {}]" />
         </a-form-item>
@@ -145,8 +151,8 @@
         unpaidOrderAmount:{rules: [{ required: true, message: '请输入未付订单金额!' }]},
         },
         url: {
-          add: "/pay/dailyIncomeSummaryVO/add",
-          edit: "/pay/dailyIncomeSummaryVO/edit",
+          add: "/pay/dailyIncomeSummary/add",
+          edit: "/pay/dailyIncomeSummary/edit",
         },
       }
     },
@@ -163,6 +169,7 @@
         this.$nextTick(() => {
           this.form.setFieldsValue(pick(this.model,'userId','username','realname','totalOrderCount','totalOrderAmount','paidOrderCount','paidOrderAmount','unpaidOrderCount','unpaidOrderAmount','feeIncome','agentId','agentUsername','agentRealname','salesmanId','salesmanUsername','salesmanRealname'))
 		  //时间格式化
+          this.form.setFieldsValue({date:this.model.date?moment(this.model.date):null})
         });
 
       },
@@ -187,6 +194,7 @@
             }
             let formData = Object.assign(this.model, values);
             //时间格式化
+            formData.date = formData.date?formData.date.format('YYYY-MM-DD HH:mm:ss'):null;
             
             console.log(formData)
             httpAction(httpurl,formData,method).then((res)=>{

@@ -7,17 +7,22 @@
         <a-row :gutter="24">
 
           <a-col :md="6" :sm="8">
+            <a-form-item label="日期">
+              <a-input placeholder="请输入日期" v-model="queryParam.date"></a-input>
+            </a-form-item>
+          </a-col>
+          <a-col :md="6" :sm="8">
             <a-form-item label="用户id">
               <a-input placeholder="请输入用户id" v-model="queryParam.userId"></a-input>
             </a-form-item>
           </a-col>
-          <a-col :md="6" :sm="8">
+        <template v-if="toggleSearchStatus">
+        <a-col :md="6" :sm="8">
             <a-form-item label="用户名">
               <a-input placeholder="请输入用户名" v-model="queryParam.username"></a-input>
             </a-form-item>
           </a-col>
-        <template v-if="toggleSearchStatus">
-        <a-col :md="6" :sm="8">
+          <a-col :md="6" :sm="8">
             <a-form-item label="用户名称">
               <a-input placeholder="请输入用户名称" v-model="queryParam.realname"></a-input>
             </a-form-item>
@@ -25,11 +30,6 @@
           <a-col :md="6" :sm="8">
             <a-form-item label="总订单数">
               <a-input placeholder="请输入总订单数" v-model="queryParam.totalOrderCount"></a-input>
-            </a-form-item>
-          </a-col>
-          <a-col :md="6" :sm="8">
-            <a-form-item label="总订单金额">
-              <a-input placeholder="请输入总订单金额" v-model="queryParam.totalOrderAmount"></a-input>
             </a-form-item>
           </a-col>
           </template>
@@ -103,7 +103,7 @@
     <!-- table区域-end -->
 
     <!-- 表单区域 -->
-    <dailyIncomeSummaryVO-modal ref="modalForm" @ok="modalFormOk"></dailyIncomeSummaryVO-modal>
+    <dailyIncomeSummary-modal ref="modalForm" @ok="modalFormOk"></dailyIncomeSummary-modal>
   </a-card>
 </template>
 
@@ -131,6 +131,11 @@
             customRender:function (t,r,index) {
               return parseInt(index)+1;
             }
+           },
+		   {
+            title: '日期',
+            align:"center",
+            dataIndex: 'date'
            },
 		   {
             title: '用户id',
@@ -220,11 +225,11 @@
           }
         ],
 		url: {
-          list: "/pay/dailyIncomeSummaryVO/list",
-          delete: "/pay/dailyIncomeSummaryVO/delete",
-          deleteBatch: "/pay/dailyIncomeSummaryVO/deleteBatch",
-          exportXlsUrl: "pay/dailyIncomeSummaryVO/exportXls",
-          importExcelUrl: "pay/dailyIncomeSummaryVO/importExcel",
+          list: "/pay/dailyIncomeSummary/list",
+          delete: "/pay/dailyIncomeSummary/delete",
+          deleteBatch: "/pay/dailyIncomeSummary/deleteBatch",
+          exportXlsUrl: "pay/dailyIncomeSummary/exportXls",
+          importExcelUrl: "pay/dailyIncomeSummary/importExcel",
        },
     }
   },
