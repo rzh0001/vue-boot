@@ -9,6 +9,7 @@ import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.vo.SysUserPage;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -143,5 +144,5 @@ public interface ISysUserService extends IService<SysUser> {
 	 */
 //	IPage<SysUser> pageUserWithPaymentInfo(IPage<SysUser> page, Wrapper<SysUser> queryWrapper);
 	
-	IPage<SysUserPage> pageUserWithPaymentInfo(Page page, SysUser user);
+	IPage<SysUserPage> pageUserWithPaymentInfo(Page page, Map<String, Object> map);
 }

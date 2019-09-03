@@ -8,6 +8,7 @@ import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.vo.SysUserPage;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -31,7 +32,7 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
      * @param user
      * @return
      */
-    IPage<SysUserPage> listUserWithPaymentInfo(Page page, SysUser user);
+    IPage<SysUserPage> listUserWithPaymentInfo(Page page, @Param("map") Map<String, Object> map);
     
     /**
      * 根据部门Id查询用户信息

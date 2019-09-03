@@ -1,6 +1,7 @@
 package org.jeecg.modules.system.controller;
 
 
+import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -86,21 +87,22 @@ public class SysUserController {
     public Result<IPage<SysUserPage>> queryPageList(SysUser user, @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
                                                     @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize, HttpServletRequest req) {
         Result<IPage<SysUserPage>> result = new Result<IPage<SysUserPage>>();
-		QueryWrapper<SysUser> queryWrapper = QueryGenerator.initQueryWrapper(user, req.getParameterMap());
-        LoginUser optUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
-        if (optUser.getMemberType() != null) {
-            switch (optUser.getMemberType()) {
+        Map<String, Object> map = BeanUtil.beanToMap(user);
+        
+        LoginUser opUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+        if (opUser.getMemberType() != null) {
+            switch (opUser.getMemberType()) {
                 case PayConstant.MEMBER_TYPE_AGENT:
-                    queryWrapper.lambda().eq(SysUser::getAgentId, optUser.getId());
+                    map.put("agentId", opUser.getId());
                     break;
                 case PayConstant.MEMBER_TYPE_SALESMAN:
-                    queryWrapper.lambda().eq(SysUser::getSalesmanId, optUser.getId());
+                    map.put("salesmanId", opUser.getId());
                     break;
                 default:
             }
         }
         Page<SysUserPage> page = new Page<SysUserPage>(pageNo, pageSize);
-        IPage<SysUserPage> pageList = sysUserService.pageUserWithPaymentInfo(page, user);
+        IPage<SysUserPage> pageList = sysUserService.pageUserWithPaymentInfo(page, map);
 //        Page<List<Map<String, Object>>> page = new Page<List<Map<String, Object>>>(pageNo, pageSize);
 //        IPage<List<Map<String, Object>>> pageList = sysUserService.pageUserWithPaymentInfo(page, queryWrapper);
 		result.setSuccess(true);

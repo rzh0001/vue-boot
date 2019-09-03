@@ -334,8 +334,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 	}
 	
 	@Override
-	public IPage<SysUserPage> pageUserWithPaymentInfo(Page page, SysUser user) {
-		return userMapper.listUserWithPaymentInfo(page, user);
+	public IPage<SysUserPage> pageUserWithPaymentInfo(Page page, Map<String, Object> map) {
+		return userMapper.listUserWithPaymentInfo(page, map);
 	}
 
 //    @Override
