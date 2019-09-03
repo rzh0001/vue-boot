@@ -45,6 +45,10 @@ public class OrderInfoEntity {
 	@Excel(name = "用户名", width = 15)
 	@ApiModelProperty(value = "用户名")
 	private java.lang.String userName;
+	/**真实姓名*/
+	@Excel(name = "真实姓名", width = 15)
+	@ApiModelProperty(value = "真实姓名")
+	private java.lang.String userRealname;
 	/**上级用户id*/
 	@Excel(name = "上级用户id", width = 15)
     @ApiModelProperty(value = "上级用户id")
@@ -93,6 +97,32 @@ public class OrderInfoEntity {
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	@ApiModelProperty(value = "成功时间")
 	private java.util.Date successTime;
+
+	/**代理ID*/
+	@Excel(name = "代理ID", width = 15)
+	@ApiModelProperty(value = "代理ID")
+	private java.lang.String agentId;
+	/**代理帐号*/
+	@Excel(name = "代理帐号", width = 15)
+	@ApiModelProperty(value = "代理帐号")
+	private java.lang.String agentUsername;
+	/**代理姓名*/
+	@Excel(name = "代理姓名", width = 15)
+	@ApiModelProperty(value = "代理姓名")
+	private java.lang.String agentRealname;
+	/**介绍人ID*/
+	@Excel(name = "介绍人ID", width = 15)
+	@ApiModelProperty(value = "介绍人ID")
+	private java.lang.String salesmanId;
+	/**介绍人帐号*/
+	@Excel(name = "介绍人帐号", width = 15)
+	@ApiModelProperty(value = "介绍人帐号")
+	private java.lang.String salesmanUsername;
+	/**介绍人姓名*/
+	@Excel(name = "介绍人姓名", width = 15)
+	@ApiModelProperty(value = "介绍人姓名")
+	private java.lang.String salesmanRealname;
+
 	/**创建人*/
 	@Excel(name = "创建人", width = 15)
     @ApiModelProperty(value = "创建人")

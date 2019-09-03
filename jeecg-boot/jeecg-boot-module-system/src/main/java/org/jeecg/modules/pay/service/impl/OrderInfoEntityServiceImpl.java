@@ -481,6 +481,15 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         order.setCreateTime(new Date());
         order.setCreateBy("api");
         order.setParentUser(agentName);
+        //冗余字段
+        order.setUserId(user.getId());
+        order.setUserRealname(user.getRealname());
+        order.setAgentId(user.getAgentId());
+        order.setAgentUsername(user.getAgentUsername());
+        order.setAgentRealname(user.getAgentRealname());
+        order.setSalesmanId(user.getSalesmanId());
+        order.setSalesmanUsername(user.getSalesmanUsername());
+        order.setSalesmanRealname(user.getSalesmanRealname());
         //保存订单信息
         this.save(order);
         //请求挂马平台
