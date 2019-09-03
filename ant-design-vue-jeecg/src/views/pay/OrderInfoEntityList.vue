@@ -25,18 +25,31 @@
             <a-col :md="6" :sm="8">
               <a-form-item label="支付通道">
                 <a-select v-model="queryParam.payType" placeholder="">
-                  <a-select-option v-for="option in channels"  :value="option.channelCode">
+                  <a-select-option v-for="option in channels" :key="option.toString()" :value="option.channelCode">
                     {{ option.channelName }}
                   </a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
+<!--            <a-col :md="6" :sm="8">-->
+<!--              <a-form-item label="订单状态">-->
+<!--                <a-select v-model="queryParam.status" placeholder="">-->
+<!--&lt;!&ndash;                  <a-select-option v-for="option in orderStatus"  :value="option.code">&ndash;&gt;-->
+<!--&lt;!&ndash;                    {{ option.name }}&ndash;&gt;-->
+<!--&lt;!&ndash;                  </a-select-option>&ndash;&gt;-->
+<!--&lt;!&ndash;                  <a-select-option value=""></a-select-option>&ndash;&gt;-->
+
+<!--                </a-select>-->
+<!--              </a-form-item>-->
+<!--            </a-col>-->
             <a-col :md="6" :sm="8">
-              <a-form-item label="订单状态">
+              <a-form-item label="状态">
                 <a-select v-model="queryParam.status" placeholder="">
-                  <a-select-option v-for="option in orderStatus"  :value="option.code">
-                    {{ option.name }}
-                  </a-select-option>
+                  <a-select-option value="">全部</a-select-option>
+                  <a-select-option value="0">未支付</a-select-option>
+                  <a-select-option value="1">成功，未返回</a-select-option>
+                  <a-select-option value="2">成功，已返回</a-select-option>
+                  <a-select-option value="-1">失效</a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
