@@ -24,25 +24,25 @@
             </a-col>
             <a-col :md="6" :sm="8">
               <a-form-item label="支付通道">
-                <select v-model="queryParam.payType">
-                  <option v-for="option in channels" v-bind:value="option.channelCode">
-                    {{ option.channelName}}
-                  </option>
-                </select>
+                <a-select v-model="queryParam.payType" placeholder="">
+                  <a-select-option v-for="option in channels"  :value="option.channelCode">
+                    {{ option.channelName }}
+                  </a-select-option>
+                </a-select>
               </a-form-item>
             </a-col>
             <a-col :md="6" :sm="8">
               <a-form-item label="订单状态">
-                <select v-model="queryParam.status">
-                  <option v-for="option in orderStatus" v-bind:value="option.code">
-                    {{ option.name}}
-                  </option>
-                </select>
+                <a-select v-model="queryParam.status" placeholder="">
+                  <a-select-option v-for="option in orderStatus"  :value="option.code">
+                    {{ option.name }}
+                  </a-select-option>
+                </a-select>
               </a-form-item>
-
             </a-col>
-            <a-col :md="6" :sm="8">
-              <a-form-item label="订单创建时间">
+
+            <a-col :md="8" :sm="10">
+              <a-form-item label="起始时间">
                 <j-date v-model="queryParam.createTime_begin" :showTime="true" dateFormat="YYYY-MM-DD HH:mm:ss"/>
               </a-form-item>
             </a-col>

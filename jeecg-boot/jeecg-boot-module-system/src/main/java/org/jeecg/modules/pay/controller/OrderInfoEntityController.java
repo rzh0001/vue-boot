@@ -1,28 +1,23 @@
 package org.jeecg.modules.pay.controller;
 
-import java.util.*;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.shiro.SecurityUtils;
-import org.jeecg.common.api.vo.Result;
-import org.jeecg.common.system.query.QueryGenerator;
-import org.jeecg.common.aspect.annotation.AutoLog;
-import org.jeecg.common.system.vo.LoginUser;
-import org.jeecg.common.util.oConvertUtils;
-import org.jeecg.modules.exception.RRException;
-import org.jeecg.modules.pay.entity.CallBackResult;
-import org.jeecg.modules.pay.entity.OrderInfoEntity;
-import org.jeecg.modules.pay.service.IOrderInfoEntityService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-
+import org.apache.shiro.SecurityUtils;
+import org.jeecg.common.api.vo.Result;
+import org.jeecg.common.aspect.annotation.AutoLog;
+import org.jeecg.common.constant.PayConstant;
+import org.jeecg.common.system.query.QueryGenerator;
+import org.jeecg.common.system.vo.LoginUser;
+import org.jeecg.common.util.oConvertUtils;
+import org.jeecg.modules.pay.entity.CallBackResult;
+import org.jeecg.modules.pay.entity.OrderInfoEntity;
+import org.jeecg.modules.pay.service.IOrderInfoEntityService;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.service.ISysUserService;
 import org.jeecg.modules.util.BaseConstant;
@@ -34,16 +29,20 @@ import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
 import org.jeecgframework.poi.excel.entity.ImportParams;
 import org.jeecgframework.poi.excel.view.JeecgEntityExcelView;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
-import com.alibaba.fastjson.JSON;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @Description: 订单信息
@@ -78,54 +77,27 @@ public class OrderInfoEntityController {
                                                         @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
                                                         HttpServletRequest req) {
         Result<IPage<OrderInfoEntity>> result = new Result<IPage<OrderInfoEntity>>();
-        //获取系统用户
         LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
-        SysUser sysUser = userService.getUserByName(loginUser.getUsername());
+        SysUser opUser = userService.getUserByName(loginUser.getUsername());
 
         QueryWrapper<OrderInfoEntity> queryWrapper = QueryGenerator.initQueryWrapper(orderInfoEntity,
                 req.getParameterMap());
+        if (opUser.getMemberType() != null) {
+            switch (opUser.getMemberType()) {
+                case PayConstant.MEMBER_TYPE_AGENT:
+                    queryWrapper.lambda().eq(OrderInfoEntity::getAgentId, opUser.getId());
+                    break;
+                case PayConstant.MEMBER_TYPE_SALESMAN:
+                    queryWrapper.lambda().eq(OrderInfoEntity::getSalesmanId, opUser.getId());
+                    break;
+                case PayConstant.MEMBER_TYPE_MEMBER:
+                    queryWrapper.lambda().eq(OrderInfoEntity::getUserId, opUser.getId());
+                    break;
+                default:
+            }
+        }
         Page<OrderInfoEntity> page = new Page<OrderInfoEntity>(pageNo, pageSize);
         IPage<OrderInfoEntity> pageList = orderInfoEntityService.page(page, queryWrapper);
-        List<OrderInfoEntity> db = pageList.getRecords();
-        List<OrderInfoEntity> newList = new ArrayList<>();
-        if (BaseConstant.USER_AGENT.equals(sysUser.getMemberType())) {
-            //代理能看到该代理下面的商户
-            //获取该代理下的商户
-            List<SysUser> users = userService.getUserByAgent(sysUser.getUsername());
-            List<String> userNames = new ArrayList<>();
-            if (!CollectionUtils.isEmpty(users)) {
-                for (SysUser u : users) {
-                    userNames.add(u.getUsername());
-                }
-            }
-            for (OrderInfoEntity order : db) {
-                if (userNames.contains(order.getUserName())) {
-                    newList.add(order);
-                    continue;
-                }
-            }
-            pageList.setRecords(newList);
-        } else if (BaseConstant.USER_MERCHANTS.equals(sysUser.getMemberType())) {
-            //商户只能看到自己的订单;
-            for (OrderInfoEntity order : db) {
-                if (sysUser.getUsername().equals(order.getUserName())) {
-                    newList.add(order);
-                    continue;
-                }
-            }
-            pageList.setRecords(newList);
-        } else if (BaseConstant.USER_REFERENCES.equals(sysUser.getMemberType())) {
-            //介绍人能看到介绍的商户的订单
-            //获取介绍人介绍的商户的名称
-            List<String> users = userService.getUserByRefer(sysUser.getUsername());
-            for (OrderInfoEntity order : db) {
-                if (users.contains(order.getUserName())) {
-                    newList.add(order);
-                    continue;
-                }
-            }
-            pageList.setRecords(newList);
-        }
         result.setSuccess(true);
         result.setResult(pageList);
         return result;
