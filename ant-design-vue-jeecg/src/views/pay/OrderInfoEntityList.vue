@@ -22,6 +22,30 @@
                 <a-input placeholder="请输入商户" v-model="queryParam.userName"></a-input>
               </a-form-item>
             </a-col>
+            <a-col :md="6" :sm="8">
+              <a-form-item label="支付通道">
+                <select v-model="queryParam.payType">
+                  <option v-for="option in channels" v-bind:value="option.channelCode">
+                    {{ option.channelName}}
+                  </option>
+                </select>
+              </a-form-item>
+            </a-col>
+            <a-col :md="6" :sm="8">
+              <a-form-item label="订单状态">
+                <select v-model="queryParam.status">
+                  <option v-for="option in orderStatus" v-bind:value="option.code">
+                    {{ option.name}}
+                  </option>
+                </select>
+              </a-form-item>
+
+            </a-col>
+            <a-col :md="6" :sm="8">
+              <a-form-item label="订单创建时间">
+                <j-date v-model="queryParam.createTime_begin" :showTime="true" dateFormat="YYYY-MM-DD HH:mm:ss"/>
+              </a-form-item>
+            </a-col>
           </template>
           <a-col :md="6" :sm="8">
             <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
@@ -75,18 +99,38 @@
 </template>
 
 <script>
+  import JDate from '@/components/jeecg/JDate'
   import OrderInfoEntityModal from './modules/OrderInfoEntityModal'
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
   import { getAction } from '@/api/manage'
-
   export default {
     name: 'OrderInfoEntityList',
     mixins: [JeecgListMixin],
     components: {
+      JDate,
       OrderInfoEntityModal
     },
     data() {
       return {
+        channels: [],
+        orderStatus:[
+          {
+            "code":-1,
+            "name":"无效"
+          },
+          {
+            "code":0,
+            "name":"未支付"
+          },
+          {
+            "code":1,
+            "name":"成功，未返回"
+          },
+          {
+            "code":2,
+            "name":"成功，已返回"
+          }
+        ],
         description: '订单信息管理页面',
         // 表头
         columns: [
@@ -208,7 +252,8 @@
           deleteBatch: '/pay/orderInfoEntity/deleteBatch',
           exportXlsUrl: 'pay/orderInfoEntity/exportXls',
           importExcelUrl: 'pay/orderInfoEntity/importExcel',
-          againRequest: 'pay/orderInfoEntity/againRequest'
+          againRequest: 'pay/orderInfoEntity/againRequest',
+          channel: "/pay/channelEntity/channel"
 
         }
       }
@@ -218,12 +263,24 @@
         return `${window._CONFIG['domianURL']}/${this.url.importExcelUrl}`
       }
     },
+    mounted:function () {
+      this.channel();
+    },
     methods: {
       againRequest(orderId){
         getAction(this.url.againRequest,{id:orderId}).then((res)=>{
           alert(res.msg)
       })
-      }
+      },
+      channel(){
+        getAction(this.url.channel,null).then((res)=>{
+          if(res.success){
+          this.channels = res.result;
+        }else{
+          this.$message.warning(res.message);
+        }
+      })
+      },
     }
   }
 </script>
