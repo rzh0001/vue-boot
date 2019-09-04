@@ -31,11 +31,12 @@ public class JaveDemo {
         data.put(BaseConstant.SUBMIT_AMOUNT,"111");
         data.put(BaseConstant.PAY_TYPE,"ysf");
         data.put(BaseConstant.CALLBACK_URL,"http://localhost/api/callback");
+        //加密数据
         String dataEn = AES128Util.encryptBase64(data.toJSONString(), "1234123412ABCDEF");
         StringBuilder sign = new StringBuilder();
         //userId+timestamp+data
         Long time = new Date().getTime();
-        sign.append("www").append(time).append(dataEn).append("abc123#@!");
+        sign.append("www").append(time).append(dataEn).append("1234123412ABCDEF");
 
         req.put(BaseConstant.SIGN, DigestUtils.md5Hex(sign.toString()));
         req.put(BaseConstant.TIMESTAMP,time);

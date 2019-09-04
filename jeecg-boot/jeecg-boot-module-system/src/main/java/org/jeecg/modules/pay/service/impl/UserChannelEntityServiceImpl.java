@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
+import java.util.List;
+
 /**
  * @Description: 用户关联通道
  * @Author: jeecg-boot
@@ -18,5 +20,10 @@ public class UserChannelEntityServiceImpl extends ServiceImpl<UserChannelEntityM
     @Override
     public UserChannelEntity queryChannelAndUserName(String channelCode, String userName) {
         return baseMapper.queryChannelAndUser(channelCode,userName);
+    }
+
+    @Override
+    public List<UserChannelEntity> queryChannelByUserName(String username) {
+        return baseMapper.queryChannelByUserName(username);
     }
 }

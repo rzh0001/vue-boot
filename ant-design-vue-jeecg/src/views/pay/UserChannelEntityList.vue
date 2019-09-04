@@ -40,7 +40,6 @@
 
     <!-- table区域-begin -->
     <div>
-
       <a-table
         ref="table"
         size="middle"
@@ -68,7 +67,6 @@
             </a-menu>
           </a-dropdown>
         </span>
-
       </a-table>
     </div>
     <!-- table区域-end -->

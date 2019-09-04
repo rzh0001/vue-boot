@@ -3,6 +3,8 @@ package org.jeecg.modules.pay.service;
 import org.jeecg.modules.pay.entity.UserChannelEntity;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+
 /**
  * @Description: 用户关联通道
  * @Author: jeecg-boot
@@ -11,4 +13,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IUserChannelEntityService extends IService<UserChannelEntity> {
     UserChannelEntity queryChannelAndUserName(String channelCode, String userName);
+    List<UserChannelEntity> queryChannelByUserName(String username);
 }

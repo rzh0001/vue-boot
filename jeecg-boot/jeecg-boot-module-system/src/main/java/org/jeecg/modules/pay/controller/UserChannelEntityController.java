@@ -108,7 +108,12 @@ public class UserChannelEntityController {
 		result.setResult(pageList);
 		return result;
 	}
-	
+	 @GetMapping(value = "/queryChannelByUserName")
+	public Result<List<UserChannelEntity>> queryChannelByUserName(@RequestParam(name="username") String username){
+		 Result<List<UserChannelEntity>> result = new Result<List<UserChannelEntity>>();
+		 result.setResult(userChannelEntityService.queryChannelByUserName(username));
+		return result;
+	}
 	/**
 	  *   代理和商户才能关联通道
 	 * @param userChannelEntity

@@ -176,37 +176,11 @@
             <a-menu slot="overlay">
 
               <a-menu-item>
-                              <a @click="handleDetail(record)">详情</a>
-                            </a-menu-item>
-              <!--                            <a-menu-item>-->
-              <!--                <a @click="handleEdit(record)">编辑</a>-->
-              <!--              </a-menu-item>-->
-              <!--              <a-menu-item>-->
-              <!--                <a href="javascript:;" @click="handleChangePassword(record.username)">密码</a>-->
-              <!--              </a-menu-item>-->
-
-              <!--              <a-menu-item>-->
-              <!--                <a-popconfirm title="确定删除吗?" @confirm="() => handleDelete(record.id)">-->
-              <!--                  <a>删除</a>-->
-              <!--                </a-popconfirm>-->
-              <!--              </a-menu-item>-->
-
-              <!--              <a-menu-item v-if="record.status==1">-->
-              <!--                <a-popconfirm title="确定冻结吗?" @confirm="() => handleFrozen(record.id,2)">-->
-              <!--                  <a>冻结</a>-->
-              <!--                </a-popconfirm>-->
-              <!--              </a-menu-item>-->
-
-              <!--              <a-menu-item v-if="record.status==2">-->
-              <!--                <a-popconfirm title="确定解冻吗?" @confirm="() => handleFrozen(record.id,1)">-->
-              <!--                  <a>解冻</a>-->
-              <!--                </a-popconfirm>-->
-              <!--              </a-menu-item>-->
-
-              <!--              <a-menu-item>-->
-              <!--                <a href="javascript:;" @click="handleAgentSettings(record.username)">代理人</a>-->
-              <!--              </a-menu-item>-->
-
+                <a @click="channelDetail(record)">已配置通道</a>
+              </a-menu-item>
+              <a-menu-item>
+                <a @click="addChannel(record)">添加通道</a>
+              </a-menu-item>
             </a-menu>
           </a-dropdown>
         </span>
@@ -225,6 +199,7 @@
     <password-modal ref="passwordmodal" @ok="passwordModalOk"></password-modal>
 
     <sys-user-agent-modal ref="sysUserAgentModal"></sys-user-agent-modal>
+    <user-channel-modal ref="userChannelModal"></user-channel-modal>
   </a-card>
 </template>
 
@@ -238,6 +213,7 @@
   import { frozenBatch } from '@/api/api'
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
   import SysUserAgentModal from './modules/SysUserAgentModal'
+  import UserChannelModal from './modules/UserChannelModal'
 
   export default {
     name: 'UserList',
@@ -248,23 +224,14 @@
       UserAgentModal,
       UserSalesmanModal,
       UserMemberModal,
-      PasswordModal
+      PasswordModal,
+      UserChannelModal,
     },
     data() {
       return {
         description: '这是用户管理页面',
         queryParam: {},
         columns: [
-          /*{
-            title: '#',
-            dataIndex: '',
-            key:'rowIndex',
-            width:60,
-            align:"center",
-            customRender:function (t,r,index) {
-              return parseInt(index)+1;
-            }
-          },*/
           {
             title: '用户账号',
             align: 'center',
@@ -360,6 +327,12 @@
       }
     },
     methods: {
+      channelDetail: function(record){
+        this.$refs.userChannelModal.detail(record);
+      },
+      addChannel: function(record){
+        this.$refs.userChannelModal.addChannel(record);
+      },
       getAvatarView: function(avatar) {
         return this.url.imgerver + '/' + avatar
       },
@@ -406,22 +379,6 @@
         this.$refs.memberModalForm.title = '新增商户'
         this.$refs.memberModalForm.disableSubmit = false
       },
-      // handleDetail: function(record) {
-      //   if (record.memberType === 1) {
-      //     this.$refs.agentModalForm.edit(record)
-      //     this.$refs.agentModalForm.title = '详情'
-      //     this.$refs.agentModalForm.disableSubmit = true
-      //   } else if (record.memberType === 2) {
-      //     this.$refs.salesmanModalForm.edit(record)
-      //     this.$refs.salesmanModalForm.title = '详情'
-      //     this.$refs.salesmanModalForm.disableSubmit = true
-      //   } else if (record.memberType === 3) {
-      //     this.$refs.memberModalForm.edit(record)
-      //     this.$refs.memberModalForm.title = '详情'
-      //     this.$refs.memberModalForm.disableSubmit = true
-      //   }
-      //
-      // },
       handleMenuClick(e) {
         if (e.key == 1) {
           this.batchDel()
