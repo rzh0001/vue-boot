@@ -22,10 +22,11 @@
 <!--            </a-form-item>-->
 <!--          </a-col>-->
 <!--          <a-col :span="12">日期选择框(v-model)：{{ jdate.value }}</a-col>-->
-          <a-form-item label="日期" >
-            <a-date-picker v-model="queryParam.transTime"  showTime format='YYYY-MM-DD' />
-          </a-form-item>
-        </a-row>
+          <a-col :md="6" :sm="8">
+            <a-form-item label="日期" >
+              <a-date-picker v-model="queryParam.transTime"  showTime format='YYYY-MM-DD' />
+            </a-form-item>
+          </a-col>
 
           <template v-if="toggleSearchStatus">
             <a-col :md="6" :sm="8">
@@ -48,10 +49,10 @@
             <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
               <a-button type="primary" @click="searchQuery" icon="search">查询</a-button>
               <a-button type="primary" @click="searchReset" icon="reload" style="margin-left: 8px">重置</a-button>
-              <a @click="handleToggleSearch" style="margin-left: 8px">
-                {{ toggleSearchStatus ? '收起' : '展开' }}
-                <a-icon :type="toggleSearchStatus ? 'up' : 'down'"/>
-              </a>
+<!--              <a @click="handleToggleSearch" style="margin-left: 8px">-->
+<!--                {{ toggleSearchStatus ? '收起' : '展开' }}-->
+<!--                <a-icon :type="toggleSearchStatus ? 'up' : 'down'"/>-->
+<!--              </a>-->
             </span>
           </a-col>
 
@@ -177,24 +178,24 @@
             dataIndex: 'totalOrderCount'
           },
           {
-            title: '总订单金额',
-            align: 'center',
-            dataIndex: 'totalOrderAmount'
-          },
-          {
             title: '已付订单数',
             align: 'center',
             dataIndex: 'paidOrderCount'
           },
           {
-            title: '已付订单金额',
-            align: 'center',
-            dataIndex: 'paidOrderAmount'
-          },
-          {
             title: '未付订单数',
             align: 'center',
             dataIndex: 'unpaidOrderCount'
+          },
+          {
+            title: '总订单金额',
+            align: 'center',
+            dataIndex: 'totalOrderAmount'
+          },
+          {
+            title: '已付订单金额',
+            align: 'center',
+            dataIndex: 'paidOrderAmount'
           },
           {
             title: '未付订单金额',

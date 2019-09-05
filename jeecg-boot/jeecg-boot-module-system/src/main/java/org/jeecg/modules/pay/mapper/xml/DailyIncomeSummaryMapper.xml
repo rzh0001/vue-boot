@@ -20,6 +20,18 @@
             <if test="map.userRealname!=null and map.userRealname!=''">
                 and user_realname = #{map.userRealname}
             </if>
+        <if test="map.agentId!=null and map.agentId!=''">
+            and agent_id = #{map.agentId}
+        </if>
+        <if test="map.salesmanId!=null and map.salesmanId!=''">
+            and salesman_Id = #{map.salesmanId}
+        </if>
+        <if test="map.userId!=null and map.userId!=''">
+            and user_id = #{map.userId}
+        </if>
+        <if test="map.username!=null and map.username!=''">
+            and user_name = #{map.username}
+        </if>
         group by user_id,user_name,user_realname
 
     </select>
