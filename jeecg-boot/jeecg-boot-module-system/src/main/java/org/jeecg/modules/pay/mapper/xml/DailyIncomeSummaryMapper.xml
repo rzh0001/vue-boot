@@ -6,10 +6,10 @@
     <select id="pageSummary" parameterType="Map" resultType="org.jeecg.modules.pay.vo.DailyIncomeSummaryVO">
         select user_id,user_name,user_realname,
                 count(1) as totalOrderCount,sum(submit_amount) as totalOrderAmount,
-        count( case when status = 2 then 1 else null end) as paidOrderCount,
-        sum( case when status = 2 then submit_amount else 0 end) as paidOrderAmount,
-        count( case when status != 2 then 1 else null end) as unpaidOrderCount,
-        sum( case when status != 2 then submit_amount else 0 end) as unpaidOrderAmount,
+        count( case when status = 2 || status = 1 then 1 else null end) as paidOrderCount,
+        sum( case when status = 2 || status = 1 then submit_amount else 0 end) as paidOrderAmount,
+        count( case when status != 2 || status != 1 then 1 else null end) as unpaidOrderCount,
+        sum( case when status != 2 || status != 1 then submit_amount else 0 end) as unpaidOrderAmount,
         sum(case when status = 2 then poundage else 0 end) as feeIncome
         from pay_order_info
         where to_days(success_time) = to_days(#{map.date})

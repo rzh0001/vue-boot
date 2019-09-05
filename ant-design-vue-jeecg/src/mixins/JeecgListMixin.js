@@ -79,7 +79,7 @@ export const JeecgListMixin = {
       })
     },
     initDictConfig(){
-      console.log("--这是一个假的方法!")
+      // console.log("--这是一个假的方法!")
     },
     handleSuperQuery(arg) {
       //高级查询方法
