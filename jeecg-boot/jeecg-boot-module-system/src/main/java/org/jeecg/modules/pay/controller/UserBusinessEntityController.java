@@ -100,7 +100,20 @@ public class UserBusinessEntityController {
         result.setResult(pageList);
         return result;
     }
-
+    @GetMapping(value = "/queryUserBusiness")
+    public Result<List<UserBusinessEntity>> queryUserBusiness(@RequestParam(name="username") String username){
+        Result<List<UserBusinessEntity>> result = new Result<List<UserBusinessEntity>>();
+        result.setResult(userBusinessEntityService.queryUserBusiness(username));
+        return result;
+    }
+    @PostMapping(value = "/deleteUserBusiness")
+    public Result<Boolean> deleteUserBusiness(@RequestBody UserBusinessEntity userBusinessEntity){
+        Result<Boolean> result = new Result<Boolean>();
+        userBusinessEntityService.deleteUserBusiness(userBusinessEntity);
+        result.setResult(true);
+        result.setMessage("删除成功");
+        return result;
+    }
     /**
      * 添加
      *
@@ -117,8 +130,9 @@ public class UserBusinessEntityController {
             LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
             SysUser user = userService.getUserByName(loginUser.getUsername());
             String userName = userBusinessEntity.getUserName();
-            if (user == null) {
-                result.error500("代理账号不存在");
+            SysUser addUser = userService.getUserByName(userName);
+            if (addUser == null) {
+                result.error500("商户不存在");
                 return result;
             }
             //当前登录的用户如果是代理，则只能添加自己

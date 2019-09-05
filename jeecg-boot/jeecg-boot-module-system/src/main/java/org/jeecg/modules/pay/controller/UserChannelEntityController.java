@@ -114,6 +114,14 @@ public class UserChannelEntityController {
 		 result.setResult(userChannelEntityService.queryChannelByUserName(username));
 		return result;
 	}
+	 @PostMapping(value = "/deleteUserChannel")
+	public Result<Boolean> deleteUserChannel(@RequestBody UserChannelEntity dto){
+		 Result<Boolean> result = new Result<Boolean>();
+		 userChannelEntityService.deleteUserChannel(dto.getUserName(),dto.getChannelCode());
+		 result.setResult(true);
+		 result.setMessage("删除成功");
+		 return result;
+	}
 	/**
 	  *   代理和商户才能关联通道
 	 * @param userChannelEntity

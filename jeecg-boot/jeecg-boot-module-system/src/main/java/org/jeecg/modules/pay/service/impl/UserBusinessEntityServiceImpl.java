@@ -22,4 +22,14 @@ public class UserBusinessEntityServiceImpl extends ServiceImpl<UserBusinessEntit
     public List<UserBusinessEntity> queryBusinessCodeByUserName(String userName, String channelCode) {
         return baseMapper.queryBusinessCodeByUserName(userName,channelCode);
     }
+
+    @Override
+    public List<UserBusinessEntity> queryUserBusiness(String username) {
+        return baseMapper.queryUserBusiness(username);
+    }
+
+    @Override
+    public void deleteUserBusiness(UserBusinessEntity userBusinessEntity) {
+        baseMapper.deleteUserBusiness(userBusinessEntity);
+    }
 }

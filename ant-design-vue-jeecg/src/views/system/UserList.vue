@@ -159,27 +159,31 @@
                   <a>解冻</a>
                 </a-popconfirm>
               </a-menu-item>
-
-              <!--              <a-menu-item>-->
-              <!--                <a href="javascript:;" @click="handleAgentSettings(record.username)">代理人</a>-->
-              <!--              </a-menu-item>-->
-
             </a-menu>
           </a-dropdown>
           <a-dropdown>
-<!--            <a class="ant-dropdown-link">-->
-            <!--              更多 <a-icon type="down"/>-->
-            <!--            </a>-->
             <a-button>
               通道配置
             </a-button>
             <a-menu slot="overlay">
-
               <a-menu-item>
                 <a @click="channelDetail(record)">已配置通道</a>
               </a-menu-item>
               <a-menu-item>
                 <a @click="addChannel(record)">添加通道</a>
+              </a-menu-item>
+            </a-menu>
+          </a-dropdown>
+          <a-dropdown>
+            <a-button v-show="isAgent">
+              关联挂马
+            </a-button>
+            <a-menu slot="overlay">
+              <a-menu-item>
+                <a @click="businessDeatil(record)">已关联挂马</a>
+              </a-menu-item>
+              <a-menu-item>
+                <a @click="addBusiness(record)">添加挂马账号</a>
               </a-menu-item>
             </a-menu>
           </a-dropdown>
@@ -200,6 +204,7 @@
 
     <sys-user-agent-modal ref="sysUserAgentModal"></sys-user-agent-modal>
     <user-channel-modal ref="userChannelModal"></user-channel-modal>
+    <user-business-modal ref="userBusinessModal"></user-business-modal>
   </a-card>
 </template>
 
@@ -214,6 +219,7 @@
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
   import SysUserAgentModal from './modules/SysUserAgentModal'
   import UserChannelModal from './modules/UserChannelModal'
+  import UserBusinessModal from './modules/UserBusinessModal'
 
   export default {
     name: 'UserList',
@@ -226,11 +232,13 @@
       UserMemberModal,
       PasswordModal,
       UserChannelModal,
+      UserBusinessModal,
     },
     data() {
       return {
         description: '这是用户管理页面',
         queryParam: {},
+        isAgent:true,
         columns: [
           {
             title: '用户账号',
@@ -252,6 +260,7 @@
             key: 'memberType',
             customRender: function(text) {
               if (text == 1) {
+
                 return '代理'
               } else if (text == 2) {
                 return '介绍人'
@@ -327,6 +336,22 @@
       }
     },
     methods: {
+      businessDeatil:function(record){
+        if(record.memberType != "1"){
+          alert("会员类型不是代理，无挂马信息");
+          return;
+        }
+        this.$refs.userBusinessModal.title='已添加挂马详情';
+        this.$refs.userBusinessModal.detail(record);
+      },
+      addBusiness:function(record){
+        if(record.memberType != "1"){
+          alert("会员类型不是代理，无挂马信息");
+          return;
+        }
+        this.$refs.userBusinessModal.title='添加挂马信息';
+        this.$refs.userBusinessModal.addUserBusiness(record);
+      },
       channelDetail: function(record){
         this.$refs.userChannelModal.detail(record);
       },

@@ -26,4 +26,9 @@ public class UserChannelEntityServiceImpl extends ServiceImpl<UserChannelEntityM
     public List<UserChannelEntity> queryChannelByUserName(String username) {
         return baseMapper.queryChannelByUserName(username);
     }
+
+    @Override
+    public void deleteUserChannel(String userName, String channelCode) {
+        baseMapper.deleteUserChannel(userName,channelCode);
+    }
 }

@@ -12,6 +12,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.experimental.FieldNameConstants;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.jeecgframework.poi.excel.annotation.Excel;
 
@@ -76,4 +77,9 @@ public class UserBusinessEntity {
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "更新时间")
 	private java.util.Date updateTime;
+	/**
+	 * 前端展示用
+	 */
+	@TableField(exist = false)
+	private boolean editable = false;
 }

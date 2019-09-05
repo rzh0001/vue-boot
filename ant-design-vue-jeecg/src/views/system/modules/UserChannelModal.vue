@@ -16,7 +16,7 @@
                 <template v-if="record.editable">
                 </template>
                 <span v-else>
-                  <a-popconfirm title="是否要删除此行？" @confirm="removeRow(record.key)"><a>删除</a></a-popconfirm>
+                  <a-popconfirm title="是否要删除此通道？" @confirm="removeRow(record)"><a>删除</a></a-popconfirm>
                 </span>
               </template>
             </a-table>
@@ -106,10 +106,14 @@
         data:[],
         confirmLoading: false,
         form: this.$form.createForm(this),
-        validatorRules: {},
+        validatorRules:{
+          channelCode:{rules: [{ required: true, message: '请选择通道!' }]}
+        },
         url: {
           queryChannelByUserName: "/pay/userChannelEntity/queryChannelByUserName",
           channel: "/pay/channelEntity/channel",
+          deleteUserChannel:"/pay/userChannelEntity/deleteUserChannel",
+          addUserChannel:"/pay/userChannelEntity/add",
         },
       }
     },
@@ -146,21 +150,13 @@
         // 触发表单验证
         this.form.validateFields((err, values) => {
           if (!err) {
+          console.log(values);
           that.confirmLoading = true;
-          let httpurl = '';
-          let method = '';
-          if(!this.model.id){
-            httpurl+=this.url.add;
-            method = 'post';
-          }else{
-            httpurl+=this.url.edit;
-            method = 'put';
-          }
           let formData = Object.assign(this.model, values);
+          formData.userName=this.userName;
+          console.log(formData);
           //时间格式化
-
-          console.log(formData)
-          httpAction(httpurl,formData,method).then((res)=>{
+          httpAction(this.url.addUserChannel,formData,"post").then((res)=>{
             if(res.success){
             that.$message.success(res.message);
             that.$emit('ok');
@@ -169,11 +165,8 @@
           }
         }).finally(() => {
             that.confirmLoading = false;
-          that.close();
+          that.close4Add();
         })
-
-
-
         }
       })
       },
@@ -188,9 +181,26 @@
       handleCancel() {
         this.close()
       },
-      removeRow (key) {
-        const newData = this.data.filter(item => item.key !== key)
-        this.data = newData
+      //删除通道
+      removeRow (record) {
+        const that = this;
+       let userName = record.userName;
+       let channelCode = record.channelCode;
+        var params = {
+          userName:userName,
+          channelCode:channelCode
+        };
+        httpAction(this.url.deleteUserChannel,params,"post").then((res)=>{
+          if(res.success){
+          that.$message.success(res.message);
+          that.close();
+        }else{
+          that.$message.warning(res.message);
+        }
+      }).finally(() => {
+          that.confirmLoading = false;
+          that.close();
+      })
       },
     }
   }
