@@ -14,7 +14,9 @@ import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.aspect.annotation.AutoLog;
 import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.oConvertUtils;
+import org.jeecg.modules.pay.entity.UserBusinessEntity;
 import org.jeecg.modules.pay.entity.UserChannelEntity;
+import org.jeecg.modules.pay.service.IUserBusinessEntityService;
 import org.jeecg.modules.pay.service.IUserChannelEntityService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -54,6 +56,8 @@ public class UserChannelEntityController {
 	private IUserChannelEntityService userChannelEntityService;
 	 @Autowired
 	 private ISysUserService userService;
+	 @Autowired
+	 private IUserBusinessEntityService userBusinessEntityService;
 	/**
 	  * 分页列表查询
 	 * @param userChannelEntity
@@ -116,9 +120,19 @@ public class UserChannelEntityController {
 		return result;
 	}
 	 @PostMapping(value = "/deleteUserChannel")
+	 @RequiresPermissions("channel::delete")
 	public Result<Boolean> deleteUserChannel(@RequestBody UserChannelEntity dto){
 		 Result<Boolean> result = new Result<Boolean>();
+		 SysUser user = userService.getUserByName(dto.getUserName());
 		 userChannelEntityService.deleteUserChannel(dto.getUserName(),dto.getChannelCode());
+		 if(user.getMemberType().equals(BaseConstant.USER_AGENT)){
+			 //代理删除，需要删除对应的挂马信息
+			 UserBusinessEntity userBusinessEntity = new UserBusinessEntity();
+			 userBusinessEntity.setChannelCode(dto.getChannelCode());
+			 userBusinessEntity.setUserName(dto.getUserName());
+			 userBusinessEntity.setBusinessCode(dto.getBusinessCode());
+			 userBusinessEntityService.deleteUserBusiness(userBusinessEntity);
+		 }
 		 result.setResult(true);
 		 result.setMessage("删除成功");
 		 return result;
@@ -149,6 +163,16 @@ public class UserChannelEntityController {
 			if(channel != null){
 				result.error500("该用户已经添加过通道");
 				return result;
+			}
+			if(user.getMemberType().equals(BaseConstant.USER_AGENT)){
+				//如果是代理，则需要设置和挂马账号的关联关系
+				UserBusinessEntity business = new UserBusinessEntity();
+				business.setUserId(user.getId());
+				business.setUserName(userChannelEntity.getUserName());
+				business.setChannelCode(userChannelEntity.getChannelCode());
+				business.setApiKey(userChannelEntity.getApiKey());
+				business.setBusinessCode(userChannelEntity.getBusinessCode());
+				userBusinessEntityService.add(business);
 			}
 			userChannelEntity.setMemberType(user.getMemberType());
 			userChannelEntityService.save(userChannelEntity);

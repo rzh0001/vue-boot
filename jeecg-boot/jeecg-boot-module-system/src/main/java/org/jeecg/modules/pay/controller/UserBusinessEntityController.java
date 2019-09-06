@@ -129,28 +129,7 @@ public class UserBusinessEntityController {
     public Result<UserBusinessEntity> add(@RequestBody UserBusinessEntity userBusinessEntity) {
         Result<UserBusinessEntity> result = new Result<UserBusinessEntity>();
         try {
-            LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
-            SysUser user = userService.getUserByName(loginUser.getUsername());
-            String userName = userBusinessEntity.getUserName();
-            SysUser addUser = userService.getUserByName(userName);
-            if (addUser == null) {
-                result.error500("商户不存在");
-                return result;
-            }
-            //当前登录的用户如果是代理，则只能添加自己
-            if (BaseConstant.USER_AGENT.equals(user.getMemberType()) && !user.getUsername().equals(userName)) {
-                result.error500("没有权限为代理名称为："+userName+"添加挂马信息，请联系管理员添加");
-                return result;
-            }
-            //校验在该通道下的该代理是否已经关联过挂码账号
-            List<UserBusinessEntity> list = userBusinessEntityService.queryBusinessCodeByUserName(userName,
-                    userBusinessEntity.getChannelCode());
-            if (!CollectionUtils.isEmpty(list) && list.get(0).getBusinessCode().equals(userBusinessEntity.getBusinessCode())) {
-                result.error500("通道：" + userBusinessEntity.getChannelCode() + "下，该代理：" + userName + "已经关联过挂马账号：" + userBusinessEntity.getBusinessCode());
-                return result;
-            }
-            userBusinessEntityService.save(userBusinessEntity);
-            result.success("添加成功！");
+            result = userBusinessEntityService.add(userBusinessEntity);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             result.error500("操作失败");

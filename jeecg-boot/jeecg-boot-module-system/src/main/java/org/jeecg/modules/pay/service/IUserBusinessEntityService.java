@@ -1,8 +1,10 @@
 package org.jeecg.modules.pay.service;
 
 import org.apache.ibatis.annotations.Param;
+import org.jeecg.common.api.vo.Result;
 import org.jeecg.modules.pay.entity.UserBusinessEntity;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -20,4 +22,6 @@ public interface IUserBusinessEntityService extends IService<UserBusinessEntity>
     List<UserBusinessEntity> queryUserBusiness( String username);
 
     void deleteUserBusiness( UserBusinessEntity userBusinessEntity);
+
+    Result<UserBusinessEntity> add(UserBusinessEntity userBusinessEntity);
 }
