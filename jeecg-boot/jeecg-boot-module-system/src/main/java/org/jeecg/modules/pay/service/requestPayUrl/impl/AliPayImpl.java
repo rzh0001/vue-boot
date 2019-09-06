@@ -10,11 +10,14 @@ import org.jeecg.modules.pay.entity.AliPayCallBackParam;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import org.jeecg.modules.pay.entity.QueryOrderStatusResult;
 import org.jeecg.modules.pay.entity.UserBusinessEntity;
+import org.jeecg.modules.pay.service.IOrderInfoEntityService;
 import org.jeecg.modules.pay.service.requestPayUrl.RequestPayUrl;
 import org.jeecg.modules.util.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +28,8 @@ import java.util.Map;
 @Slf4j
 public class AliPayImpl implements RequestPayUrl<OrderInfoEntity, String, String, String,String,UserBusinessEntity> {
 
+    @Autowired
+    private IOrderInfoEntityService orderInfoEntityService;
     @Override
     public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key,String callbackUrl,UserBusinessEntity userBusinessEntity) throws Exception {
         String type = null;
@@ -83,6 +88,9 @@ public class AliPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
             QueryOrderStatusResult orderStatusResult = JSONObject.parseObject(result, QueryOrderStatusResult.class);
             if (orderStatusResult != null && orderStatusResult.getCode() == BaseConstant.SUCCESS) {
                 if (BaseConstant.QUERY_ORDER_STATUS_SUCCESS.equals(orderStatusResult.getData().getStatus())) {
+                    order.setStatus(BaseConstant.ORDER_STATUS_SUCCESS_NOT_RETURN);
+                    order.setPaymentAmount(new BigDecimal(orderStatusResult.getData().getAmount()));
+                    orderInfoEntityService.updateById(order);
                     return true;
                 }
             } else {

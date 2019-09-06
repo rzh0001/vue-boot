@@ -10,15 +10,20 @@ import org.jeecg.modules.pay.entity.ChannelBusinessEntity;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import org.jeecg.modules.pay.entity.UserBusinessEntity;
 import org.jeecg.modules.pay.entity.YsfQueryOrderResult;
+import org.jeecg.modules.pay.service.IOrderInfoEntityService;
 import org.jeecg.modules.pay.service.requestPayUrl.RequestPayUrl;
 import org.jeecg.modules.util.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URISyntaxException;
 @Service
 @Slf4j
 public class YsfPayImpl implements RequestPayUrl<OrderInfoEntity, String, String, String,String, UserBusinessEntity> {
+    @Autowired
+    private IOrderInfoEntityService orderInfoEntityService;
     @Override
     public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key, String callbackUrl,UserBusinessEntity userBusinessEntity) throws Exception {
         String ysfKey = userBusinessEntity.getApiKey();
@@ -72,6 +77,9 @@ public class YsfPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
                 //云闪付状态是成功已返回或成功未返回才能回调
                 if (BaseConstant.ORDER_STATUS_SUCCESS_NOT_RETURN == orderStatusResult.getData().get(0).getStatus() ||
                         BaseConstant.ORDER_STATUS_SUCCESS == orderStatusResult.getData().get(0).getStatus()) {
+                    order.setStatus(BaseConstant.ORDER_STATUS_SUCCESS_NOT_RETURN);
+                    order.setPaymentAmount(new BigDecimal(orderStatusResult.getData().get(0).getApplyamount()));
+                    orderInfoEntityService.updateById(order);
                     return true;
                 }
             } else {

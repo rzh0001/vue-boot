@@ -50,15 +50,7 @@
         <a-form :form="form">
           <a-form-item
             label="商户">
-            <a-input placeholder="商户" style="width:200px;" readonly="true" v-model="userName"/>
-          </a-form-item>
-          <a-form-item
-            label="挂码账号">
-            <a-input placeholder="挂码账号" style="width:200px;" v-decorator="['businessCode', validatorRules.businessCode]"/>
-          </a-form-item>
-          <a-form-item
-            label="秘钥">
-            <a-input placeholder="秘钥" style="width:200px;" v-decorator="['apiKey', validatorRules.apiKey]" />
+            <a-input placeholder="商户" style="width:200px;" readonly="true" v-model="userName" />
           </a-form-item>
           <a-form-item
             label="通道">
@@ -67,6 +59,19 @@
                 {{ option.channelName}}
               </option>
             </select>
+          </a-form-item>
+          <a-form-item
+            v-show="isIntroducer"
+            label="被介绍人名称">
+            <select v-decorator="['beIntroducerName', validatorRules.beIntroducerName ]">
+              <option v-for="option in BeIntroducerName" v-bind:value="option">
+                {{ option}}
+              </option>
+            </select>
+          </a-form-item>
+          <a-form-item
+            label="费率">
+            <a-input placeholder="请输入费率，如千分三，则输入0.003" v-decorator="['userRate', validatorRules.userRate ]" />
           </a-form-item>
         </a-form>
       </a-spin>
@@ -77,10 +82,12 @@
 <script>
   import {getAction,httpAction} from '@/api/manage'
   export default {
-    name: "UserBusinessModal",
+    name: "UserRateModal",
     data() {
       return {
         userName: '',
+        isIntroducer: false,
+        BeIntroducerName:[],
         title: "挂马详情",
         title4add:"添加",
         visible: false,
@@ -89,23 +96,13 @@
         model: {},
         columns: [
           {
-            title: '商户',
+            title: '用户名',
             align:"center",
             dataIndex: 'userName'
           },
           {
-            title: '挂码账号',
-            align:"center",
-            dataIndex: 'businessCode'
-          },
-          {
-            title: '秘钥',
-            align:"center",
-            dataIndex: 'apiKey'
-          },
-          {
             title: '通道',
-            align: "center",
+            align:"center",
             dataIndex: 'channelCode',
             key: 'channelCode',
             customRender: function (text) {
@@ -125,6 +122,21 @@
             }
           },
           {
+            title: '费率',
+            align:"center",
+            dataIndex: 'userRate'
+          },
+          {
+            title: '高级代理名称',
+            align:"center",
+            dataIndex: 'agentId'
+          },
+          {
+            title: '被介绍人名称',
+            align:"center",
+            dataIndex: 'beIntroducerName'
+          },
+          {
             title: '操作',
             key: 'action',
             scopedSlots: {customRender: 'operation'}
@@ -135,13 +147,15 @@
         form: this.$form.createForm(this),
         validatorRules:{
           channelCode:{rules: [{ required: true, message: '请选择通道!' }]},
-          businessCode:{rules: [{ required: true, message: '请输入挂码账号!' }]}
+          userRate:{rules: [{ required: true, message: '请输入费率!' }]},
+          beIntroducerName:{rules: [{ required: true, message: '请选择被介绍人!' }]}
         },
         url: {
-          queryUserBusiness: "/pay/userBusinessEntity/queryUserBusiness",
+          queryUserRate: "/pay/userRateEntity/queryUserRate",
           channel: "/pay/channelEntity/channel",
-          deleteUserBusiness:"/pay/userBusinessEntity/deleteUserBusiness",
-          addUserBusiness:"/pay/userBusinessEntity/add",
+          deleteUserRate:"/pay/userRateEntity/deleteUserRate",
+          addUserRate:"/pay/userRateEntity/add",
+          getBeIntroducerName:"/pay/userRateEntity/getBeIntroducerName",
         },
       }
     },
@@ -149,6 +163,16 @@
       this.channel();
     },
     methods: {
+      getBeIntroducerName(name){
+        var params = {username:name};//查询条件
+        getAction(this.url.getBeIntroducerName,params).then((res)=>{
+          if(res.success){
+          this.BeIntroducerName = res.result;
+        }else{
+          this.$message.warning(res.message);
+        }
+      })
+      },
       channel(){
         httpAction(this.url.channel,null,'get').then((res)=>{
           if(res.success){
@@ -161,16 +185,21 @@
       detail:function(record) {
         this.visible = true;
         var params = {username:record.username};//查询条件
-        getAction(this.url.queryUserBusiness,params).then((res)=>{
+        getAction(this.url.queryUserRate,params).then((res)=>{
           if(res.success){
           this.data = res.result;
         }else{
         }
       })
       },
-      addUserBusiness:function(record){
+      addRate:function(record){
+        this.isIntroducer = false;
         this.visible4Add=true;
         console.log(record);
+        if(record.memberType === "2"){
+          this.isIntroducer = true;
+          this.getBeIntroducerName(record.username);
+        }
         this.userName = record.username;
       },
       handleOk () {
@@ -184,7 +213,7 @@
           formData.userName=this.userName;
           console.log(formData);
           //时间格式化
-          httpAction(this.url.addUserBusiness,formData,"post").then((res)=>{
+          httpAction(this.url.addUserRate,formData,"post").then((res)=>{
             if(res.success){
             that.$message.success(res.message);
             that.$emit('ok');
@@ -215,13 +244,13 @@
         const that = this;
         let userName = record.userName;
         let channelCode = record.channelCode;
-        let businessCode = record.businessCode;
+        let userRate = record.userRate;
         var params = {
           userName:userName,
           channelCode:channelCode,
-          businessCode:businessCode
+          userRate:userRate
         };
-        httpAction(this.url.deleteUserBusiness,params,"post").then((res)=>{
+        httpAction(this.url.deleteUserRate,params,"post").then((res)=>{
           if(res.success){
           that.$message.success(res.message);
           that.close();

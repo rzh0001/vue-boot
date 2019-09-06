@@ -109,6 +109,7 @@ public class UserChannelEntityController {
 		return result;
 	}
 	 @GetMapping(value = "/queryChannelByUserName")
+	 @RequiresPermissions("channel::detail")
 	public Result<List<UserChannelEntity>> queryChannelByUserName(@RequestParam(name="username") String username){
 		 Result<List<UserChannelEntity>> result = new Result<List<UserChannelEntity>>();
 		 result.setResult(userChannelEntityService.queryChannelByUserName(username));

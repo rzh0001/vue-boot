@@ -101,12 +101,14 @@ public class UserBusinessEntityController {
         return result;
     }
     @GetMapping(value = "/queryUserBusiness")
+    @RequiresPermissions("user::business::detail")
     public Result<List<UserBusinessEntity>> queryUserBusiness(@RequestParam(name="username") String username){
         Result<List<UserBusinessEntity>> result = new Result<List<UserBusinessEntity>>();
         result.setResult(userBusinessEntityService.queryUserBusiness(username));
         return result;
     }
     @PostMapping(value = "/deleteUserBusiness")
+    @RequiresPermissions("user::business::delete")
     public Result<Boolean> deleteUserBusiness(@RequestBody UserBusinessEntity userBusinessEntity){
         Result<Boolean> result = new Result<Boolean>();
         userBusinessEntityService.deleteUserBusiness(userBusinessEntity);

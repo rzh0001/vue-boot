@@ -3,6 +3,9 @@ package org.jeecg.modules.pay.service;
 import org.apache.ibatis.annotations.Param;
 import org.jeecg.modules.pay.entity.UserRateEntity;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 /**
  * @Description: 用户在指定通道下的费率
@@ -21,4 +24,9 @@ public interface IUserRateEntityService extends IService<UserRateEntity> {
      * @return
      */
     String getBeIntroducerRate(String userName,String agentUsername,String beIntroducerName, String payType);
+
+    List<UserRateEntity> queryUserRate(String username);
+
+    void deleteUserRate(UserRateEntity dto);
+    List<String> getBeIntroducerName(String userName);
 }

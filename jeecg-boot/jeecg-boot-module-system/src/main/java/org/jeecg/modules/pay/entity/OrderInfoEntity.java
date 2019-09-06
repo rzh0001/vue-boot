@@ -12,6 +12,8 @@ import lombok.experimental.Accessors;
 import org.jeecgframework.poi.excel.annotation.Excel;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.math.BigDecimal;
+
 /**
  * @Description: 订单信息
  * @Author: jeecg-boot
@@ -143,4 +145,18 @@ public class OrderInfoEntity {
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "更新时间")
 	private java.util.Date updateTime;
+	/**
+	 * 是否补单 1:是 2：否
+	 */
+	/**介绍人姓名*/
+	@Excel(name = "是否补单", width = 15)
+	@ApiModelProperty(value = "是否补单")
+	private String replacementOrder;
+
+	/**
+	 * 支付金额
+	 */
+	@Excel(name = "支付金额", width = 15)
+	@ApiModelProperty(value = "支付金额")
+	private BigDecimal paymentAmount;
 }
