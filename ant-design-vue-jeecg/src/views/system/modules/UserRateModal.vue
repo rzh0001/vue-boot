@@ -148,7 +148,6 @@
         validatorRules:{
           channelCode:{rules: [{ required: true, message: '请选择通道!' }]},
           userRate:{rules: [{ required: true, message: '请输入费率!' }]},
-          beIntroducerName:{rules: [{ required: true, message: '请选择被介绍人!' }]}
         },
         url: {
           queryUserRate: "/pay/userRateEntity/queryUserRate",

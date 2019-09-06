@@ -37,7 +37,7 @@
       <a-form :form="form">
         <a-form-item
           label="商户">
-          <a-input placeholder="商户" style="width:200px;" readonly="true" v-model="userName"/>
+            <a-input placeholder="商户" style="width:200px;" readonly=true v-model="userName"/>
         </a-form-item>
         <a-form-item
           v-show="isAgent"
@@ -128,7 +128,7 @@
         form: this.$form.createForm(this),
         validatorRules:{
           channelCode:{rules: [{ required: true, message: '请选择通道!' }]},
-          businessCode:{rules: [{ required: true, message: '请输入挂马账号!' }]},
+
         },
         url: {
           queryChannelByUserName: "/pay/userChannelEntity/queryChannelByUserName",

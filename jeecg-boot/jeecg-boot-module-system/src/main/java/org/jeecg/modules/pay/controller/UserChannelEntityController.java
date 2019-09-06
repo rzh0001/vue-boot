@@ -7,6 +7,7 @@ import java.net.URLDecoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.jeecg.common.api.vo.Result;
@@ -166,6 +167,10 @@ public class UserChannelEntityController {
 			}
 			if(user.getMemberType().equals(BaseConstant.USER_AGENT)){
 				//如果是代理，则需要设置和挂马账号的关联关系
+				if(StringUtils.isEmpty(userChannelEntity.getBusinessCode())){
+					result.error500("挂马账号不能为空");
+					return result;
+				}
 				UserBusinessEntity business = new UserBusinessEntity();
 				business.setUserId(user.getId());
 				business.setUserName(userChannelEntity.getUserName());
