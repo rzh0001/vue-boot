@@ -18,4 +18,6 @@ public interface OrderInfoEntityMapper extends BaseMapper<OrderInfoEntity> {
     OrderInfoEntity queryOrderByOrderId(@Param("orderId") String orderId);
     void updateOrderStatusSuccessByOrderId(@Param("orderId") String orderId);
     void updateOrderStatusNoBackByOrderId(@Param("orderId") String orderId);
+
+    int updateOrderStatusBatch(@Param("orderIds") List<String> orderIds);
 }

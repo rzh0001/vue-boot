@@ -67,4 +67,10 @@
         WHERE
             order_id = #{orderId}
     </update>
+    <update id="updateOrderStatusBatch">
+        update pay_order_info set status=-1,update_time=NOW() where order_id in
+        <foreach item="orderid" collection="orderIds" open="(" separator="," close=")">
+            #{orderid}
+        </foreach>
+    </update>
 </mapper>
