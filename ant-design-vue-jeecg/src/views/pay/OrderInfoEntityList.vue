@@ -31,17 +31,17 @@
                 </a-select>
               </a-form-item>
             </a-col>
-<!--            <a-col :md="6" :sm="8">-->
-<!--              <a-form-item label="订单状态">-->
-<!--                <a-select v-model="queryParam.status" placeholder="">-->
-<!--&lt;!&ndash;                  <a-select-option v-for="option in orderStatus"  :value="option.code">&ndash;&gt;-->
-<!--&lt;!&ndash;                    {{ option.name }}&ndash;&gt;-->
-<!--&lt;!&ndash;                  </a-select-option>&ndash;&gt;-->
-<!--&lt;!&ndash;                  <a-select-option value=""></a-select-option>&ndash;&gt;-->
+            <!--            <a-col :md="6" :sm="8">-->
+            <!--              <a-form-item label="订单状态">-->
+            <!--                <a-select v-model="queryParam.status" placeholder="">-->
+            <!--&lt;!&ndash;                  <a-select-option v-for="option in orderStatus"  :value="option.code">&ndash;&gt;-->
+            <!--&lt;!&ndash;                    {{ option.name }}&ndash;&gt;-->
+            <!--&lt;!&ndash;                  </a-select-option>&ndash;&gt;-->
+            <!--&lt;!&ndash;                  <a-select-option value=""></a-select-option>&ndash;&gt;-->
 
-<!--                </a-select>-->
-<!--              </a-form-item>-->
-<!--            </a-col>-->
+            <!--                </a-select>-->
+            <!--              </a-form-item>-->
+            <!--            </a-col>-->
             <a-col :md="6" :sm="8">
               <a-form-item label="状态">
                 <a-select v-model="queryParam.status" placeholder="">
@@ -62,7 +62,7 @@
           </template>
           <a-col :md="6" :sm="8">
             <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
-              <a-button type="primary" @click="searchQuery" icon="search">查询</a-button>
+              <a-button type="primary" @click="searchQueryLocal" icon="search">查询</a-button>
               <a-button type="primary" @click="searchReset" icon="reload" style="margin-left: 8px">重置</a-button>
               <a @click="handleToggleSearch" style="margin-left: 8px">
                 {{ toggleSearchStatus ? '收起' : '展开' }}
@@ -76,6 +76,15 @@
     </div>
 
     <div>
+      <div class="ant-alert ant-alert-info" style="margin-bottom: 16px;">
+        <!--        <i class="anticon anticon-info-circle ant-alert-icon"></i>-->
+        提交订单数：{{summary.totalCount}} 订单总金额：{{summary.totalCount}} 已付订单数：{{summary.totalCount}}
+        已付总金额：{{summary.totalCount}}
+        预计收入：{{summary.totalCount}} 预计手续费：{{summary.totalCount}} 未付订单数：{{summary.totalCount}} 未付总金额
+        {{summary.totalCount}}
+        <a style="font-weight: 600">{{selectedRowKeys.length }}</a>项
+        <!--        <a style="margin-left: 24px" @click="onClearSelected">清空</a>-->
+      </div>
 
       <a-table
         ref="table"
@@ -86,7 +95,6 @@
         :dataSource="dataSource"
         :pagination="ipagination"
         :loading="loading"
-        :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
         @change="handleTableChange">
 
         <span slot="action" slot-scope="text, record">
@@ -116,6 +124,7 @@
   import OrderInfoEntityModal from './modules/OrderInfoEntityModal'
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
   import { getAction } from '@/api/manage'
+
   export default {
     name: 'OrderInfoEntityList',
     mixins: [JeecgListMixin],
@@ -126,25 +135,8 @@
     data() {
       return {
         channels: [],
-        orderStatus:[
-          {
-            "code":-1,
-            "name":"无效"
-          },
-          {
-            "code":0,
-            "name":"未支付"
-          },
-          {
-            "code":1,
-            "name":"成功，未返回"
-          },
-          {
-            "code":2,
-            "name":"成功，已返回"
-          }
-        ],
         description: '订单信息管理页面',
+        summary: {},
         // 表头
         columns: [
           // {
@@ -266,7 +258,8 @@
           exportXlsUrl: 'pay/orderInfoEntity/exportXls',
           importExcelUrl: 'pay/orderInfoEntity/importExcel',
           againRequest: 'pay/orderInfoEntity/againRequest',
-          channel: "/pay/channelEntity/channel"
+          channel: '/pay/channelEntity/channel',
+          summaryUrl: '/pay/orderInfoEntity/summary'
 
         }
       }
@@ -276,24 +269,37 @@
         return `${window._CONFIG['domianURL']}/${this.url.importExcelUrl}`
       }
     },
-    mounted:function () {
-      this.channel();
+    mounted: function() {
+      this.channel()
     },
     methods: {
-      againRequest(orderId){
-        getAction(this.url.againRequest,{id:orderId}).then((res)=>{
+      againRequest(orderId) {
+        getAction(this.url.againRequest, { id: orderId }).then((res) => {
           alert(res.msg)
-      })
+        })
       },
-      channel(){
-        getAction(this.url.channel,null).then((res)=>{
-          if(res.success){
-          this.channels = res.result;
-        }else{
-          this.$message.warning(res.message);
-        }
-      })
+      channel() {
+        getAction(this.url.channel, null).then((res) => {
+          if (res.success) {
+            this.channels = res.result
+          } else {
+            this.$message.warning(res.message)
+          }
+        })
       },
+      searchQueryLocal(){
+        this.searchQuery()
+        var params = this.getQueryParams();
+        getAction(this.url.summaryUrl, this.queryParam).then((res) => {
+          if (res.success) {
+            this.summary = res.result;
+          }
+          if(res.code===510){
+            this.$message.warning(res.message)
+          }
+          this.loading = false;
+        })
+      }
     }
   }
 </script>
