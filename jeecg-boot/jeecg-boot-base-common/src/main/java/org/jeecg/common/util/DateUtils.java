@@ -9,6 +9,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import org.joda.time.DateTime;
 import org.springframework.util.StringUtils;
 
 /**
@@ -617,6 +618,17 @@ public class DateUtils extends PropertyEditorSupport {
 		GregorianCalendar calendar = new GregorianCalendar();
 		calendar.setTime(getDate());
 		return calendar.get(Calendar.YEAR);
+	}
+	/**
+	 * 对日期的【分钟】进行加/减
+	 *
+	 * @param date 日期
+	 * @param minutes 分钟数，负数为减
+	 * @return 加/减几分钟后的日期
+	 */
+	public static Date addDateMinutes(Date date, int minutes) {
+		DateTime dateTime = new DateTime(date);
+		return dateTime.plusMinutes(minutes).toDate();
 	}
 
 }

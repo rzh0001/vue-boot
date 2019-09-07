@@ -48,9 +48,14 @@
         <commons.version>2.6</commons.version>
         <aliyun-java-sdk-core.version>3.2.3</aliyun-java-sdk-core.version>
 		<aliyun-java-sdk-dysmsapi.version>1.0.0</aliyun-java-sdk-dysmsapi.version>
+		<joda.time.version>2.9.9</joda.time.version>
     </properties>
     
 	<dependencies>
+		<dependency>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+		</dependency>
 		<!--集成springmvc框架并实现自动配置 -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

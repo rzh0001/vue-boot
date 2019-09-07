@@ -314,6 +314,11 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
 
     }
 
+    @Override
+    public int updateOrderStatusBatch(List<String> orderIds) {
+        return baseMapper.updateOrderStatusBatch(orderIds);
+    }
+
     /**
      * 统计高级代理所得总额
      *

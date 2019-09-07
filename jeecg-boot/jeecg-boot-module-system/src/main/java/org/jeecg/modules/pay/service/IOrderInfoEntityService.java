@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import org.jeecg.modules.util.R;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * @Description: 订单信息
@@ -49,5 +50,8 @@ public interface IOrderInfoEntityService extends IService<OrderInfoEntity> {
     void updateOrderStatusNoBackByOrderId(@Param("orderId") String orderId);
 
     JSONObject encryptAESData(OrderInfoEntity order, String aseKey) throws Exception;
+
     void countAmount(String orderId, String userName, String submitAmount, String payType) throws Exception;
+
+    int updateOrderStatusBatch(List<String> orderIds);
 }
