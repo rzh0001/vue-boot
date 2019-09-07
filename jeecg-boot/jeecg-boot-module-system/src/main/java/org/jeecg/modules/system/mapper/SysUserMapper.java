@@ -29,7 +29,7 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
     
     /**
      * @param page
-     * @param user
+     * @param map
      * @return
      */
     IPage<SysUserPage> listUserWithPaymentInfo(Page page, @Param("map") Map<String, Object> map);
