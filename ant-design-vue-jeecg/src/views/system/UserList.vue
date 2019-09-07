@@ -174,8 +174,8 @@
               </a-menu-item>
             </a-menu>
           </a-dropdown>
-          <a-dropdown>
-            <a-button v-show="isAgent">
+        <!--  <a-dropdown>
+            <a-button >
               关联挂马
             </a-button>
             <a-menu slot="overlay">
@@ -184,6 +184,19 @@
               </a-menu-item>
               <a-menu-item>
                 <a @click="addBusiness(record)">添加挂马账号</a>
+              </a-menu-item>
+            </a-menu>
+          </a-dropdown>-->
+            <a-dropdown>
+            <a-button>
+              费率设置
+            </a-button>
+            <a-menu slot="overlay">
+              <a-menu-item>
+                <a @click="rateDeatil(record)">已设置费率</a>
+              </a-menu-item>
+              <a-menu-item>
+                <a @click="addRate(record)">添加费率</a>
               </a-menu-item>
             </a-menu>
           </a-dropdown>
@@ -205,6 +218,7 @@
     <sys-user-agent-modal ref="sysUserAgentModal"></sys-user-agent-modal>
     <user-channel-modal ref="userChannelModal"></user-channel-modal>
     <user-business-modal ref="userBusinessModal"></user-business-modal>
+    <user-rate-modal ref="userRateModal"></user-rate-modal>
   </a-card>
 </template>
 
@@ -220,6 +234,7 @@
   import SysUserAgentModal from './modules/SysUserAgentModal'
   import UserChannelModal from './modules/UserChannelModal'
   import UserBusinessModal from './modules/UserBusinessModal'
+  import UserRateModal from './modules/UserRateModal'
 
   export default {
     name: 'UserList',
@@ -233,6 +248,7 @@
       PasswordModal,
       UserChannelModal,
       UserBusinessModal,
+      UserRateModal,
     },
     data() {
       return {
@@ -244,7 +260,7 @@
             title: '用户账号',
             align: 'center',
             dataIndex: 'username',
-            width: 120
+            width: 80
           },
           {
             title: '真实姓名',
@@ -255,7 +271,7 @@
           {
             title: '会员类型',
             align: 'center',
-            width: 120,
+            width: 80,
             dataIndex: 'memberType',
             key: 'memberType',
             customRender: function(text) {
@@ -275,47 +291,35 @@
           {
             title: '上级代理',
             align: 'center',
-            width: 100,
+            width: 80,
             dataIndex: 'agentRealname',
             sorter: true
           },
           {
             title: '介绍人',
             align: 'center',
-            width: 100,
+            width: 80,
             dataIndex: 'salesmanRealname'
           },
           {
             title: '可提现金额',
             align: 'center',
-            width: 100,
+            width: 80,
             dataIndex: 'amount'
           },
-          // {
-          //   title: '邮箱',
-          //   align: 'center',
-          //   dataIndex: 'email'
-          // },
           {
             title: '状态',
             align: 'center',
-            width: 80,
+            width: 60,
             dataIndex: 'status_dictText'
           },
-          /* {
-             title: '创建时间',
-             align: "center",
-             width: 150,
-             dataIndex: 'createTime',
-             sorter: true
-           },*/
           {
             title: '操作',
             // fixed: 'right',
             dataIndex: 'action',
             scopedSlots: { customRender: 'action' },
             align: 'center',
-            width: 200
+            width: 300
           }
 
         ],
@@ -336,6 +340,14 @@
       }
     },
     methods: {
+      rateDeatil:function(record){
+        this.$refs.userRateModal.title='已添加费率详情';
+        this.$refs.userRateModal.detail(record);
+      },
+      addRate: function(record){
+        this.$refs.userRateModal.title='添加费率';
+        this.$refs.userRateModal.addRate(record);
+      },
       businessDeatil:function(record){
         if(record.memberType != "1"){
           alert("会员类型不是代理，无挂马信息");

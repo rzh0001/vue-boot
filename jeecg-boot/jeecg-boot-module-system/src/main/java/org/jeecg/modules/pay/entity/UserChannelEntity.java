@@ -76,4 +76,16 @@ public class UserChannelEntity {
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "更新时间")
 	private java.util.Date updateTime;
+
+	//高级代理才有的字段
+	/**商户code*/
+	@Excel(name = "商户code", width = 15)
+	@ApiModelProperty(value = "商户code")
+	@TableField(exist = false)
+	private java.lang.String businessCode;
+	/**秘钥*/
+	@Excel(name = "秘钥", width = 15)
+	@ApiModelProperty(value = "秘钥")
+	@TableField(exist = false)
+	private java.lang.String apiKey;
 }

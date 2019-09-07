@@ -15,6 +15,7 @@ import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.aspect.annotation.AutoLog;
 import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.oConvertUtils;
+import org.jeecg.modules.pay.entity.UserBusinessEntity;
 import org.jeecg.modules.pay.entity.UserRateEntity;
 import org.jeecg.modules.pay.service.IUserRateEntityService;
 
@@ -108,7 +109,28 @@ public class UserRateEntityController {
         result.setResult(pageList);
         return result;
     }
-
+    @GetMapping(value = "/queryUserRate")
+    @RequiresPermissions("rate::detail")
+    public Result<List<UserRateEntity>> queryUserRate(@RequestParam(name="username") String username){
+        Result<List<UserRateEntity>> result = new Result<List<UserRateEntity>>();
+        result.setResult(userRateEntityService.queryUserRate(username));
+        return result;
+    }
+    @GetMapping(value = "/getBeIntroducerName")
+    public Result<List<String>> getBeIntroducerName(@RequestParam(name="username") String username){
+        Result<List<String>> result = new Result<List<String>>();
+        result.setResult(userRateEntityService.getBeIntroducerName(username));
+        return result;
+    }
+    @PostMapping(value = "/deleteUserRate")
+    @RequiresPermissions("rate::delete")
+    public Result<Boolean> deleteUserRate(@RequestBody UserRateEntity dto){
+        Result<Boolean> result = new Result<Boolean>();
+        userRateEntityService.deleteUserRate(dto);
+        result.setResult(true);
+        result.setMessage("删除成功");
+        return result;
+    }
     /**
      * 添加
      *
@@ -133,6 +155,7 @@ public class UserRateEntityController {
                 result.error500("添加的商户或介绍人不存在");
                 return result;
             }
+            userRateEntity.setAgentId(user.getAgentUsername());
             if (BaseConstant.USER_AGENT.equals(sysUser.getMemberType())){
                 //当前登录的用户如果是代理，则只能添加该代理下的介绍人或商户
                 List<SysUser> dbusers = userService.getUserAndReferByAgent(sysUser.getUsername());

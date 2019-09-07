@@ -325,12 +325,14 @@ public class OrderInfoEntityController {
             if (order == null) {
                 return R.error("订单不存在");
             }
+            order.setReplacementOrder("1");
+            orderInfoEntityService.updateById(order);
             StringBuilder msg = new StringBuilder();
             SysUser orderUser = userService.getUserByName(order.getUserName());
             JSONObject callobj = orderInfoEntityService.encryptAESData(order, orderUser.getApiKey());
-            log.info("===回调商户，url:{},param:{}", order.getSuccessCallbackUrl(), callobj.toJSONString());
+            log.info("===补单回调商户，url:{},param:{}", order.getSuccessCallbackUrl(), callobj.toJSONString());
             HttpResult result = HttpUtils.doPostJson(order.getSuccessCallbackUrl(), callobj.toJSONString());
-            log.info("===商户返回信息=={}", result.getBody());
+            log.info("===补单商户返回信息=={}", result.getBody());
             if (result.getCode() == BaseConstant.SUCCESS) {
                 CallBackResult callBackResult = JSONObject.parseObject(result.getBody(), CallBackResult.class);
                 if (callBackResult.getCode() == BaseConstant.SUCCESS) {
@@ -340,20 +342,20 @@ public class OrderInfoEntityController {
                     flag = true;
                     return R.ok(msg.toString());
                 } else {
-                    msg.append("通知商户失败");
+                    msg.append("通知商户失败,原因：").append(callBackResult.getMsg());
                     log.info("通通知商户失败,orderID:{}", id);
                     orderInfoEntityService.updateOrderStatusNoBackByOrderId(id);
                     return R.error(msg.toString());
                 }
             } else {
-                msg.append("通知商户失败");
+                msg.append("通知商户失败,返回的状态码为：").append(result.getCode());
                 log.info("通通知商户失败,orderID:{}", id);
                 orderInfoEntityService.updateOrderStatusNoBackByOrderId(id);
                 return R.error(msg.toString());
             }
         } catch (Exception e) {
             log.info("补单失败，失败原因：{}", e);
-            return R.error("通知商户失败");
+            return R.error("通知商户失败，原因：商户未返回json格式数据");
         } finally {
             if (flag) {
                 //5、只有在通知商户成功，才统计高级代理。商户。介绍人的收入情况

@@ -189,19 +189,21 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             log.info("订单回调过程中，订单查询异常,orderID:{}", orderId);
             return R.error("订单查询异常，无此订单信息");
         }
-        order.setStatus(BaseConstant.ORDER_STATUS_SUCCESS_NOT_RETURN);
         //更新订单状态
-        updateOrderStatusNoBackByOrderId(orderId);
+//        order.setStatus(BaseConstant.ORDER_STATUS_SUCCESS_NOT_RETURN);
+//        updateOrderStatusNoBackByOrderId(orderId);
         String submitAmount = order.getSubmitAmount().toString();
         JSONObject callobj = encryptAESData(order, user.getApiKey());
         StringBuilder msg = new StringBuilder();
+        String body = null;
         try {
             log.info("===回调商户，url:{},param:{}", order.getSuccessCallbackUrl(), callobj.toJSONString());
             //捕获异常的目的是为了防止各种异常情况下，仍然会去修改订单状态
             //3 数据加密之后，通知下游商户
             HttpResult result = HttpUtils.doPostJson(order.getSuccessCallbackUrl(), callobj.toJSONString());
             //4、修改订单状态,同时更新订单的update_time;标示订单的回调时间
-            log.info("===商户返回信息=={}", result.getBody());
+            body =  result.getBody();
+            log.info("===商户返回信息=={}",body);
             if (result.getCode() == BaseConstant.SUCCESS) {
                 CallBackResult callBackResult = JSONObject.parseObject(result.getBody(), CallBackResult.class);
                 if (callBackResult.getCode() == BaseConstant.SUCCESS) {
@@ -213,19 +215,19 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
                 } else {
                     log.info("通通知商户失败,orderID:{}", orderId);
                     updateOrderStatusNoBackByOrderId(orderId);
-                    msg.append("通知商户失败");
+                    msg.append("通知商户失败，原因：").append(callBackResult.getMsg());
                     return R.error(msg.toString());
                 }
             } else {
                 log.info("通通知商户失败,orderID:{}", orderId);
                 updateOrderStatusNoBackByOrderId(orderId);
-                msg.append("通知商户失败");
+                msg.append("通知商户失败，返回状态码为：").append(result.getCode());
                 return R.error(msg.toString());
             }
         } catch (Exception e) {
             log.info("订单回调商户异常，异常信息为:{}", e);
             updateOrderStatusNoBackByOrderId(orderId);
-            msg.append("通知商户失败");
+            msg.append("通知商户失败，原因：商户未返回json格式数据,返回内容：").append(body);
             return R.error(msg.toString());
         } finally {
             if (flag) {

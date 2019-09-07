@@ -37,7 +37,17 @@
       <a-form :form="form">
         <a-form-item
           label="商户">
-          <a-input placeholder="商户" style="width:200px;" readonly="true" v-model="userName"/>
+            <a-input placeholder="商户" style="width:200px;" readonly=true v-model="userName"/>
+        </a-form-item>
+        <a-form-item
+          v-show="isAgent"
+          label="挂码账号">
+          <a-input placeholder="挂码账号" style="width:200px;" v-decorator="['businessCode', validatorRules.businessCode]"/>
+        </a-form-item>
+        <a-form-item
+          v-show="isAgent"
+          label="秘钥">
+          <a-input placeholder="秘钥" style="width:200px;" v-decorator="['apiKey', validatorRules.apiKey]" />
         </a-form-item>
         <a-form-item
           label="通道">
@@ -59,6 +69,7 @@
     name: "UserChannelModal",
     data() {
       return {
+        isAgent:false,
         userName: '',
         title: "通道详细",
         title4add:"添加",
@@ -74,7 +85,6 @@
             width: '20%',
             scopedSlots: {customRender: 'userName'}
           },
-
           {
             title: '通道',
             dataIndex: 'channelCode',
@@ -98,6 +108,16 @@
             }
           },
           {
+            title: '挂码账号',
+            align:"center",
+            dataIndex: 'businessCode'
+          },
+          {
+            title: '秘钥',
+            align:"center",
+            dataIndex: 'apiKey'
+          },
+          {
             title: '操作',
             key: 'action',
             scopedSlots: {customRender: 'operation'}
@@ -107,7 +127,8 @@
         confirmLoading: false,
         form: this.$form.createForm(this),
         validatorRules:{
-          channelCode:{rules: [{ required: true, message: '请选择通道!' }]}
+          channelCode:{rules: [{ required: true, message: '请选择通道!' }]},
+
         },
         url: {
           queryChannelByUserName: "/pay/userChannelEntity/queryChannelByUserName",
@@ -141,8 +162,12 @@
       })
       },
       addChannel:function(record){
+        this.isAgent=false;
         this.visible4Add=true;
         console.log(record);
+        if(record.memberType==="1"){
+          this.isAgent=true;
+        }
         this.userName = record.username;
       },
       handleOk () {
@@ -186,9 +211,11 @@
         const that = this;
        let userName = record.userName;
        let channelCode = record.channelCode;
+       let businessCode = record.businessCode;
         var params = {
           userName:userName,
-          channelCode:channelCode
+          channelCode:channelCode,
+          businessCode:businessCode
         };
         httpAction(this.url.deleteUserChannel,params,"post").then((res)=>{
           if(res.success){
