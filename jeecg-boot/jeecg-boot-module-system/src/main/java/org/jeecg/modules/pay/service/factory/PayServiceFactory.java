@@ -27,6 +27,7 @@ public class PayServiceFactory {
     private static String ysfPayUrl = null;
     private static String nxysWxPayUrl = null;
     private static String nxysAliPayUrl = null;
+    private static String wechatBank = null;
 
     @PostConstruct
     public void init() {
@@ -49,6 +50,9 @@ public class PayServiceFactory {
             if (BaseConstant.REQUEST_NXYS_ALIPAY.equals(dict.getText())) {
                 nxysAliPayUrl = dict.getValue();
             }
+            if (BaseConstant.REQUEST_WECHAT_BANK.equals(dict.getText())) {
+                wechatBank = dict.getValue();
+            }
         }
 
     }
@@ -63,6 +67,8 @@ public class PayServiceFactory {
                 return bankPayUrl;
             case BaseConstant.REQUEST_ALI_ZZ:
                 return aliPayUrl;
+            case BaseConstant.REQUEST_WECHAT_BANK:
+                return wechatBank;
             default:
                 return null;
         }
@@ -75,6 +81,8 @@ public class PayServiceFactory {
             case BaseConstant.REQUEST_ALI_BANK:
                 return applicationContext.getBean(AliPayImpl.class);
             case BaseConstant.REQUEST_ALI_ZZ:
+                return applicationContext.getBean(AliPayImpl.class);
+            case BaseConstant.REQUEST_WECHAT_BANK:
                 return applicationContext.getBean(AliPayImpl.class);
             default:
                 return null;

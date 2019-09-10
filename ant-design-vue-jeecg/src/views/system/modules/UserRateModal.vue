@@ -116,6 +116,8 @@
                 return '农信易扫微信'
               }else if (text == 'nxys_alipay') {
                 return '农信易扫支付宝'
+              } else if (text == 'wechat_bank') {
+                return '微信转卡'
               } else {
                 return text
               }

@@ -63,7 +63,8 @@ public class BaseConstant {
     public static final String REQUEST_NXYS_WX = "nxys_wx";
     //农信 支付宝
     public static final String REQUEST_NXYS_ALIPAY = "nxys_alipay";
-
+    //微信转卡
+    public static final String REQUEST_WECHAT_BANK = "wechat_bank";
     //四方回调挂马平台的返回码
     public static final int SUCCESS = 200;
     //流水类型 流水类型 1-手续费收入 2-提现 3-冲正
