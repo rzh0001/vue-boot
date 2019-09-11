@@ -1,6 +1,5 @@
 package org.jeecg.modules.pay.controller;
 
-import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -106,31 +105,30 @@ public class OrderInfoEntityController {
     }
     
     @GetMapping(value = "/summary")
-    public Result<Map<String, Object>> summary(OrderInfoEntity orderInfoEntity, HttpServletRequest req) {
+    public Result<Map<String, Object>> summary(Map<String, Object> param, HttpServletRequest req) {
         Result<Map<String, Object>> result = new Result<>();
         LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
         SysUser opUser = userService.getUserByName(loginUser.getUsername());
-        QueryWrapper<OrderInfoEntity> queryWrapper = QueryGenerator.initQueryWrapper(orderInfoEntity,
-                req.getParameterMap());
-        Map<String, Object> map = BeanUtil.beanToMap(orderInfoEntity);
         if (opUser.getMemberType() != null) {
             switch (opUser.getMemberType()) {
                 case PayConstant.MEMBER_TYPE_AGENT:
-                    map.put("agentId", opUser.getId());
+                    param.put("agentId", opUser.getId());
                     break;
                 case PayConstant.MEMBER_TYPE_SALESMAN:
-                    map.put("salesmanId", opUser.getId());
+                    param.put("salesmanId", opUser.getId());
                     break;
                 case PayConstant.MEMBER_TYPE_MEMBER:
-                    map.put("user_id", opUser.getId());
+                    param.put("user_id", opUser.getId());
                     break;
                 default:
             }
         }
+    
+        Map<String, Object> map = orderInfoEntityService.summary(param);
         Map<String, Object> map1 = new HashMap<>();
         map.put("totalCount", 5);
-        
-        result.setResult(map1);
+    
+        result.setResult(map);
         result.setSuccess(true);
         
         return result;

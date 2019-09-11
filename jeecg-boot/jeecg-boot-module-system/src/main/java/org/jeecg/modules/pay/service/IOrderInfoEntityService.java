@@ -1,13 +1,14 @@
 package org.jeecg.modules.pay.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.extension.service.IService;
 import org.apache.ibatis.annotations.Param;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
-import com.baomidou.mybatisplus.extension.service.IService;
 import org.jeecg.modules.util.R;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Description: 订单信息
@@ -54,4 +55,6 @@ public interface IOrderInfoEntityService extends IService<OrderInfoEntity> {
     void countAmount(String orderId, String userName, String submitAmount, String payType) throws Exception;
 
     int updateOrderStatusBatch(List<String> orderIds);
+    
+    Map<String, Object> summary(Map<String, Object> param);
 }

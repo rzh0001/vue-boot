@@ -22,7 +22,8 @@
         FROM pay_order_info
         WHERE outer_order_id = #{outerOrderId}
     </select>
-    <select id="summary" parameterType="Map" resultType="Map">
+
+    <select id="summary" parameterType="map" resultType="map">
         select user_id,user_name,user_realname,
         count(1) as totalOrderCount,sum(submit_amount) as totalOrderAmount,
         count( case when status = 2 || status = 1 then 1 else null end) as paidOrderCount,
@@ -31,7 +32,7 @@
         sum( case when status != 2 || status != 1 then submit_amount else 0 end) as unpaidOrderAmount,
         sum(case when status = 2 then poundage else 0 end) as feeIncome
         from pay_order_info
-        where to_days(success_time) = to_days(#{map.date})
+        where 1=1
 
         <if test="map.username!=null and map.username!=''">
             and user_name = #{map.username}

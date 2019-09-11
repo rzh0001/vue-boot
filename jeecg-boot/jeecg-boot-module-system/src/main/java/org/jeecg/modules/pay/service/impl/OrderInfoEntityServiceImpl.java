@@ -1,6 +1,7 @@
 package org.jeecg.modules.pay.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -12,6 +13,7 @@ import org.jeecg.modules.pay.entity.*;
 import org.jeecg.modules.pay.mapper.OrderInfoEntityMapper;
 import org.jeecg.modules.pay.service.*;
 import org.jeecg.modules.pay.service.factory.PayServiceFactory;
+import org.jeecg.modules.pay.service.requestPayUrl.RequestPayUrl;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.service.ISysDictService;
 import org.jeecg.modules.system.service.ISysUserService;
@@ -19,10 +21,8 @@ import org.jeecg.modules.system.util.IPUtils;
 import org.jeecg.modules.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.jeecg.modules.pay.service.requestPayUrl.RequestPayUrl;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
@@ -318,7 +318,12 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     public int updateOrderStatusBatch(List<String> orderIds) {
         return baseMapper.updateOrderStatusBatch(orderIds);
     }
-
+    
+    @Override
+    public Map<String, Object> summary(Map<String, Object> param) {
+        return baseMapper.summary(param);
+    }
+    
     /**
      * 统计高级代理所得总额
      *

@@ -62,7 +62,8 @@
           </template>
           <a-col :md="6" :sm="8">
             <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
-              <a-button type="primary" @click="searchQueryLocal" icon="search">查询</a-button>
+              <a-button type="primary" @click="searchQuery" icon="search">查询</a-button>
+<!--              <a-button type="primary" @click="searchQueryLocal" icon="search">查询</a-button>-->
               <a-button type="primary" @click="searchReset" icon="reload" style="margin-left: 8px">重置</a-button>
               <a @click="handleToggleSearch" style="margin-left: 8px">
                 {{ toggleSearchStatus ? '收起' : '展开' }}
@@ -76,15 +77,12 @@
     </div>
 
     <div>
-      <div class="ant-alert ant-alert-info" style="margin-bottom: 16px;">
-        <!--        <i class="anticon anticon-info-circle ant-alert-icon"></i>-->
-        提交订单数：{{summary.totalCount}} 订单总金额：{{summary.totalCount}} 已付订单数：{{summary.totalCount}}
-        已付总金额：{{summary.totalCount}}
-        预计收入：{{summary.totalCount}} 预计手续费：{{summary.totalCount}} 未付订单数：{{summary.totalCount}} 未付总金额
-        {{summary.totalCount}}
-        <a style="font-weight: 600">{{selectedRowKeys.length }}</a>项
-        <!--        <a style="margin-left: 24px" @click="onClearSelected">清空</a>-->
-      </div>
+<!--      <div class="ant-alert ant-alert-info" style="margin-bottom: 16px;">-->
+<!--        提交订单数：{{summary.totalOrderCount}} 订单总金额：{{summary.totalOrderAmount}} 已付订单数：{{summary.paidOrderCount}}-->
+<!--        已付总金额：{{summary.paidOrderAmount}}-->
+<!--        预计收入：{{summary.totalCount}} 预计手续费：{{summary.feeIncome}} 未付订单数：{{summary.unpaidOrderCount}} 未付总金额-->
+<!--        {{summary.unpaidOrderAmount}}-->
+<!--      </div>-->
 
       <a-table
         ref="table"

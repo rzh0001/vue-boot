@@ -1,10 +1,11 @@
 package org.jeecg.modules.pay.mapper;
 
-import java.util.List;
-
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @Description: 订单信息
@@ -20,4 +21,6 @@ public interface OrderInfoEntityMapper extends BaseMapper<OrderInfoEntity> {
     void updateOrderStatusNoBackByOrderId(@Param("orderId") String orderId);
 
     int updateOrderStatusBatch(@Param("orderIds") List<String> orderIds);
+    
+    Map<String, Object> summary(@Param("map") Map<String, Object> param);
 }
