@@ -1,24 +1,24 @@
 <template>
   <div class="page-header-index-wide">
     <a-row :gutter="24">
-      <a-col :sm="24" :md="12" :xl="6" :style="{ marginBottom: '24px' }">
-        <chart-card :loading="loading" title="今日订单" :total="'￥' + data.todayPaidAmount">
-          <a-tooltip title="指标说明" slot="action">
-            <a-icon type="info-circle-o" />
-          </a-tooltip>
-          <div>
-            <trend flag="up" style="margin-right: 16px;">
-              <span slot="term">笔数</span>
-              {{data.todayOrderCount}}
-            </trend>
-            <trend flag="down">
-              <span slot="term">成功率</span>
-              {{data.todayPaidRate}}
-            </trend>
-          </div>
-          <template slot="footer">日均销售额<span>￥ 234.56</span></template>
-        </chart-card>
-      </a-col>
+<!--      <a-col :sm="24" :md="12" :xl="6" :style="{ marginBottom: '24px' }">-->
+<!--        <chart-card :loading="loading" title="今日订单" :total="'￥' + data.todayPaidAmount">-->
+<!--          <a-tooltip title="指标说明" slot="action">-->
+<!--            <a-icon type="info-circle-o" />-->
+<!--          </a-tooltip>-->
+<!--          <div>-->
+<!--            <trend flag="up" style="margin-right: 16px;">-->
+<!--              <span slot="term">笔数</span>-->
+<!--              {{data.todayOrderCount}}-->
+<!--            </trend>-->
+<!--            <trend flag="down">-->
+<!--              <span slot="term">成功率</span>-->
+<!--              {{data.todayPaidRate}}-->
+<!--            </trend>-->
+<!--          </div>-->
+<!--          <template slot="footer">日均销售额<span>￥ 234.56</span></template>-->
+<!--        </chart-card>-->
+<!--      </a-col>-->
 <!--      <a-col :sm="24" :md="12" :xl="6" :style="{ marginBottom: '24px' }">-->
 <!--        <chart-card :loading="loading" title="访问量" :total="8846 | NumberFormat">-->
 <!--          <a-tooltip title="指标说明" slot="action">-->
@@ -54,13 +54,13 @@
 <!--            <mini-progress color="rgb(19, 194, 194)" :target="80" :percentage="78" :height="8" />-->
 <!--          </div>-->
           <template slot="footer">
-            <trend flag="down" style="margin-right: 16px;">
+            <trend style="margin-right: 16px;">
               <span slot="term">总收入</span>
-              12%
+              {{data.totalIncome}}
             </trend>
-            <trend flag="up">
-              <span slot="term">账户余额</span>
-              80%
+            <trend >
+              <span slot="term">可提现金额</span>
+              {{data.userAmount}}
             </trend>
           </template>
         </chart-card>
@@ -153,6 +153,7 @@
 
   import Trend from '@/components/Trend'
   import { getLoginfo, getVisitInfo } from '@/api/api'
+  import { getAction } from '../../api/manage'
 
   const rankList = []
   for (let i = 0; i < 7; i++) {
@@ -195,8 +196,8 @@
         visitInfo: [],
         indicator: <a-icon type="loading" style="font-size: 24px" spin />,
         url: {
-        homepageSummary: ''
-      }
+          homepageSummary: '/sys/homepage/homepageSummary'
+        }
     }
     },
     created() {
@@ -221,6 +222,17 @@
             this.visitInfo = res.result
           }
         })
+
+        this.getSummary()
+      },
+
+      getSummary(){
+        getAction(this.url.homepageSummary, {}).then(res =>{
+            if (res.success){
+              this.data = res.result
+            }
+          }
+        )
       }
     }
   }

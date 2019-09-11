@@ -24,4 +24,19 @@ public interface IUserAmountDetailService extends IService<UserAmountDetail> {
      */
     boolean addAmountDetail(BigDecimal amount, String type, SysUser opUser);
     
+    /**
+     * 获取用户总收入
+     *
+     * @param userId
+     * @return
+     */
+    BigDecimal getTotalIncome(String userId);
+    
+    /**
+     * 获取用户今日收入
+     *
+     * @param userId
+     * @return
+     */
+    BigDecimal getTodayIncome(String userId);
 }

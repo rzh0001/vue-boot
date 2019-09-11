@@ -35,4 +35,14 @@ public class UserAmountDetailServiceImpl extends ServiceImpl<UserAmountDetailMap
         detail.setSalesmanRealname(opUser.getSalesmanRealname());
         return save(detail);
     }
+    
+    @Override
+    public BigDecimal getTotalIncome(String userId) {
+        return baseMapper.getTotalIncome(userId);
+    }
+    
+    @Override
+    public BigDecimal getTodayIncome(String userId) {
+        return baseMapper.getTodayIncome(userId);
+    }
 }
