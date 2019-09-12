@@ -195,13 +195,13 @@
             key: 'status',
             customRender: function(text) {
               if (text == -1) {
-                return '无效'
+                return <a-tag color="red">无效</a-tag>
               } else if (text == 0) {
-                return '未支付'
+                return  <a-tag color="red">未支付</a-tag>
               } else if (text == 1) {
-                return '成功，未返回'
+                return <a-tag color="red">成功，未返回</a-tag>
               } else if (text == 2) {
-                return '成功，已返回'
+                return <a-tag color="cyan">成功，已返回</a-tag>
               } else {
                 return text
               }
@@ -223,7 +223,9 @@
                 return '农信易扫微信'
               } else if (text == 'nxys_alipay') {
                 return '农信易扫支付宝'
-              } else {
+              } else if (text == 'wechat_bank') {
+                return '微信转卡'
+              }  else {
                 return text
               }
             }
