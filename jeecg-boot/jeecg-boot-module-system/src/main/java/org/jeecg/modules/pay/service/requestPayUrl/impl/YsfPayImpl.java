@@ -40,6 +40,9 @@ public class YsfPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
         String aesKey = keys[1];
         String param = structuralYsfParam(order, md5Key, aesKey, order.getBusinessCode(), userName,callbackUrl);
         String payUrl = ysfCallBack(param, url);
+        if(StringUtils.isEmpty(payUrl)){
+            throw new RRException("设备产码失败，请联系商户，查看设置状态");
+        }
         return R.ok().put("url", payUrl);
     }
 

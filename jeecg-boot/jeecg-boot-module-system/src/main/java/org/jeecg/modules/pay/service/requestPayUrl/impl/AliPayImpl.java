@@ -81,6 +81,9 @@ public class AliPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
         } else {
             throw new RRException("四方回调挂马平台失败,订单创建失败：" + result.getBody());
         }
+        if(StringUtils.isEmpty(payUrl)){
+            throw new RRException("设备产码失败，请联系商户，查看设置状态");
+        }
         return R.ok().put("url", payUrl);
     }
 
