@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.util.StringUtil;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.jeecg.common.api.vo.Result;
@@ -175,25 +176,9 @@ public class UserRateEntityController {
                     result.error500("高级代理名称不匹配");
                     return result;
                 }
-                if(StringUtils.isNotBlank(userRateEntity.getBeIntroducerName())){
-                    SysUser be = userService.getUserByName(userRateEntity.getBeIntroducerName());
-                    if(!userRateEntity.getAgentId().equals(be.getAgentUsername())){
-                        result.error500("被介绍人不属于此代理");
-                        return result;
-                    }
-                }
             }
-            //2、如果添加的是普通商户，则必须填写高级代理
+            //2、添加的是普通商户，校验该商户是否已经添加过
             if (BaseConstant.USER_MERCHANTS.equals(user.getMemberType())) {
-                if (StringUtils.isBlank(userRateEntity.getAgentId())) {
-                    result.error500("普通商户的高级代理必填");
-                    return result;
-                }
-                SysUser agent = userService.getUserByName(userRateEntity.getAgentId());
-                if (agent == null) {
-                    result.error500("高级代理不存在");
-                    return result;
-                }
                 //判断该高级代理下的该用户，是否已经添加过费率
                 String rate = userRateEntityService.getUserRateByUserNameAndAngetCode(userName,
                         userRateEntity.getAgentId(), userRateEntity.getChannelCode());
@@ -202,39 +187,10 @@ public class UserRateEntityController {
                     return result;
                 }
             }
-            //添加的是介绍人
-            if (BaseConstant.USER_REFERENCES.equals(user.getMemberType())) {
-                if (StringUtils.isBlank(userRateEntity.getAgentId())) {
-                    result.error500("介绍人的高级代理必填");
-                    return result;
-                }
-                if (StringUtils.isBlank(userRateEntity.getBeIntroducerName())) {
-                    result.error500("被介绍人姓名必填");
-                    return result;
-                }
-
-                //被介绍人
-                SysUser beIntroducer = userService.getUserByName(userRateEntity.getBeIntroducerName());
-                if (beIntroducer == null) {
-                    result.error500("被介绍人不存在");
-                    return result;
-                }
-                if(!userName.equals(beIntroducer.getSalesmanUsername())){
-                    result.error500("被介绍人与介绍人的关系不存在");
-                    return result;
-                }
-                SysUser agent = userService.getUserByName(userRateEntity.getAgentId());
-                if (agent == null) {
-                    result.error500("高级代理不存在");
-                    return result;
-                }
-                if(!userRateEntity.getAgentId().equals(beIntroducer.getAgentUsername())){
-                    result.error500("介绍人与高级代理关系不存在");
-                    return result;
-                }
-                //验证介绍人是否已经添加过费率
+            //添加商户存在介绍人，则校验该介绍人下的商户是否已经添加过
+            if (!org.springframework.util.StringUtils.isEmpty(user.getSalesmanUsername())) {
                 String rate = userRateEntityService.getBeIntroducerRate(userName, userRateEntity.getAgentId(),
-                        userRateEntity.getBeIntroducerName(), userRateEntity.getChannelCode());
+                        userRateEntity.getIntroducerName(), userRateEntity.getChannelCode());
                 if (StringUtils.isNotBlank(rate)) {
                     result.error500("该介绍人已经添加过费率，不能重复添加");
                     return result;

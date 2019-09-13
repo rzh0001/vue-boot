@@ -17,7 +17,7 @@ import java.util.Map;
  * @Version: V1.0
  */
 public interface IOrderInfoEntityService extends IService<OrderInfoEntity> {
-    R createOrder(JSONObject reqobj) throws Exception;
+    R createOrder(JSONObject reqobj, HttpServletRequest req) throws Exception;
 
     /**
      * 查询订单信息

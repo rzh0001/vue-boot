@@ -76,8 +76,8 @@ public class UserRateEntity {
 	@Excel(name = "高级代理id", width = 15)
     @ApiModelProperty(value = "高级代理id")
 	private java.lang.String agentId;
-	/**被介绍人名称*/
-	@Excel(name = "被介绍人名称", width = 15)
-	@ApiModelProperty(value = "被介绍人名称")
-	private String beIntroducerName;
+	/**介绍人名称*/
+	@Excel(name = "介绍人名称", width = 15)
+	@ApiModelProperty(value = "介绍人名称")
+	private String introducerName;
 }

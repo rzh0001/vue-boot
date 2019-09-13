@@ -159,4 +159,9 @@ public class OrderInfoEntity {
 	@Excel(name = "支付金额", width = 15)
 	@ApiModelProperty(value = "支付金额")
 	private BigDecimal paymentAmount;
+
+
+	@Excel(name = "ip", width = 15)
+	@ApiModelProperty(value = "ip")
+	private String ip;
 }

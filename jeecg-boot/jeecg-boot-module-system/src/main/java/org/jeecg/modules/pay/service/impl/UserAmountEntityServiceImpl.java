@@ -46,4 +46,9 @@ public class UserAmountEntityServiceImpl extends ServiceImpl<UserAmountEntityMap
     public boolean changeAmount(String id, BigDecimal amount) {
         return mapper.changeAmount(id, amount);
     }
+
+    @Override
+    public void changeAmountByUserName(String userName, BigDecimal amount) {
+        mapper.changeAmountByUserName(userName,amount);
+    }
 }

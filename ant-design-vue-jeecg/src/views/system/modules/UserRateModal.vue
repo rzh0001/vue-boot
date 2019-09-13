@@ -29,7 +29,7 @@
               <span v-else>
                 <!--<a @click="editRow(record.channelCode)">编辑</a>
                 <a-divider type="vertical" />-->
-                <a-popconfirm title="是否要删除此通道？" @confirm="removeRow(record)"><a>删除</a></a-popconfirm>
+                <a-popconfirm title="是否要删除此费率？" @confirm="removeRow(record)"><a>删除</a></a-popconfirm>
                 </span>
             </template>
           </a-table>
@@ -53,19 +53,15 @@
             <a-input placeholder="商户" style="width:200px;" readonly="true" v-model="userName" />
           </a-form-item>
           <a-form-item
+            v-show="isIntroducer"
+            label="介绍人">
+            <a-input placeholder="介绍人" style="width:200px;" readonly="true" v-model="introducerName" />
+          </a-form-item>
+          <a-form-item
             label="通道">
             <select v-decorator="['channelCode', validatorRules.channelCode ]">
               <option v-for="option in channels" v-bind:value="option.channelCode">
                 {{ option.channelName}}
-              </option>
-            </select>
-          </a-form-item>
-          <a-form-item
-            v-show="isIntroducer"
-            label="被介绍人名称">
-            <select v-decorator="['beIntroducerName', validatorRules.beIntroducerName ]">
-              <option v-for="option in BeIntroducerName" v-bind:value="option">
-                {{ option}}
               </option>
             </select>
           </a-form-item>
@@ -86,6 +82,7 @@
     data() {
       return {
         userName: '',
+        salesmanRealname:'',
         isIntroducer: false,
         BeIntroducerName:[],
         title: "挂马详情",
@@ -134,9 +131,9 @@
             dataIndex: 'agentId'
           },
           {
-            title: '被介绍人名称',
+            title: '介绍人名称',
             align:"center",
-            dataIndex: 'beIntroducerName'
+            dataIndex: 'introducerName'
           },
           {
             title: '操作',
@@ -164,16 +161,6 @@
       this.channel();
     },
     methods: {
-      getBeIntroducerName(name){
-        var params = {username:name};//查询条件
-        getAction(this.url.getBeIntroducerName,params).then((res)=>{
-          if(res.success){
-          this.BeIntroducerName = res.result;
-        }else{
-          this.$message.warning(res.message);
-        }
-      })
-      },
       channel(){
         httpAction(this.url.channel,null,'get').then((res)=>{
           if(res.success){
@@ -196,12 +183,15 @@
       addRate:function(record){
         this.isIntroducer = false;
         this.visible4Add=true;
+        this.introducerName = null;
         console.log(record);
-        if(record.memberType === "2"){
+        //介绍人不为空，则展示介绍人
+        if(record.salesmanUsername != null){
           this.isIntroducer = true;
-          this.getBeIntroducerName(record.username);
+          this.introducerName = record.salesmanUsername;
         }
         this.userName = record.username;
+        this.agentId = record.agentUsername;
       },
       handleOk () {
         const that = this;
@@ -212,6 +202,7 @@
           that.confirmLoading = true;
           let formData = Object.assign(this.model, values);
           formData.userName=this.userName;
+          formData.introducerName=this.introducerName;
           console.log(formData);
           //时间格式化
           httpAction(this.url.addUserRate,formData,"post").then((res)=>{

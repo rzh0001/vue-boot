@@ -30,4 +30,6 @@ public interface IUserAmountEntityService extends IService<UserAmountEntity> {
      * @return
      */
     boolean changeAmount(String id, BigDecimal amount);
+
+    void changeAmountByUserName(String userName,BigDecimal amount);
 }

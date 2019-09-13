@@ -96,10 +96,10 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public R createOrder(JSONObject reqobj) throws Exception {
+    public R createOrder(JSONObject reqobj, HttpServletRequest req) throws Exception {
         R checkParam = checkParam(reqobj, true, false, false);
         if (BaseConstant.CHECK_PARAM_SUCCESS.equals(checkParam.get(BaseConstant.CODE).toString())) {
-            return addOrder(checkParam);
+            return addOrder(checkParam,req);
         } else {
             return checkParam;
         }
@@ -202,8 +202,8 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             //3 数据加密之后，通知下游商户
             HttpResult result = HttpUtils.doPostJson(order.getSuccessCallbackUrl(), callobj.toJSONString());
             //4、修改订单状态,同时更新订单的update_time;标示订单的回调时间
-            body =  result.getBody();
-            log.info("===商户返回信息=={}",body);
+            body = result.getBody();
+            log.info("===商户返回信息=={}", body);
             if (result.getCode() == BaseConstant.SUCCESS) {
                 CallBackResult callBackResult = JSONObject.parseObject(result.getBody(), CallBackResult.class);
                 if (callBackResult.getCode() == BaseConstant.SUCCESS) {
@@ -263,14 +263,15 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     }
 
     /**
-     * * 校验商户信息
-     * * 1、查看该商户的类型，是普通商户还是高级代理
-     * * 高级代理
-     * *
-     * * 普通商户
-     * * 是否有推荐人，如果有推荐人，则需要给推荐人返点
-     * * 2、限额：
-     * * 查看该用户提交金额，是否在限额范围内
+     * 统计规则：
+     * 查看订单的商户是否存在介绍人：
+     * 存在介绍人：
+     * 介绍人收入=订单金额*（介绍人费率-代理费率）
+     * 代理收入 = 订单金额*代理费率
+     * 商户收入 = 订单金额 - 介绍人收入
+     * 不存在介绍人：
+     * 代理收入 = 订单金额 * 商户费率
+     * 商户收入 = 订单金额 - 代理收入
      *
      * @param orderId      四方系统的订单id
      * @param userName     用户
@@ -281,35 +282,82 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     @Override
     public void countAmount(String orderId, String userName, String submitAmount, String payType) throws Exception {
         SysUser user = userService.getUserByName(userName);
-        //高级代理的利润
         BigDecimal submit = new BigDecimal(submitAmount);
-        //获取对应通道下的高级代理对应的商户的费率
-        String rate = rateEntityService.getUserRateByUserNameAndAngetCode(userName, user.getAgentUsername(), payType);
-        BigDecimal userRate = new BigDecimal(rate);
-        BigDecimal agentMoney = submit.multiply(userRate).setScale(2, BigDecimal.ROUND_HALF_UP);
+        //介绍人为空
+        if (org.springframework.util.StringUtils.isEmpty(user.getSalesmanUsername())) {
+            String rateString = rateEntityService.getUserRateByUserNameAndAngetCode(userName,
+                    user.getAgentId(), payType);
+            BigDecimal rate = new BigDecimal(rateString);
+            UserAmountEntity agent = amountService.getUserAmountByUserName(user.getAgentUsername());
+            //代理获利
+            BigDecimal agentAmount = submit.multiply(rate).setScale(2, BigDecimal.ROUND_HALF_UP);
+            changeAmount(user.getAgentUsername(), user.getAgentId(), agentAmount, agent, null, orderId, payType);
+            //商户收入
+            UserAmountEntity customer = amountService.getUserAmountByUserName(userName);
+            changeAmount(userName, user.getId(), submit.subtract(agentAmount), customer, user.getAgentId(), orderId, payType);
+        } else {
+            //介绍人不为空
+            //介绍人对商户设置的费率
+            String introducerRate = rateEntityService.getBeIntroducerRate(userName, user.getAgentId(),
+                    user.getSalesmanUsername(), payType);
+            //代理对介绍人设置的费率
+            SysUser sale = userService.getUserByName(user.getSalesmanUsername());
+            String agentRate = rateEntityService.getUserRateByUserNameAndAngetCode(user.getSalesmanUsername(),
+                    sale.getAgentId(), payType);
+            //介绍人对商户设置的费率 - 代理对介绍人的费率 = 介绍人的利率
+            BigDecimal rateDifference = new BigDecimal(introducerRate).subtract(new BigDecimal(agentRate));
+            //介绍人获利 = 订单金额*（介绍人费率-代理费率）
+            BigDecimal saleAmount = submit.multiply(rateDifference).setScale(2, BigDecimal.ROUND_HALF_UP);
+            UserAmountEntity saleDbAmount = amountService.getUserAmountByUserName(user.getSalesmanUsername());
+            changeAmount(user.getSalesmanUsername(), sale.getId(), saleAmount, saleDbAmount, sale.getAgentId(), orderId, payType);
 
-        //记录商户从订单中的收入情况
-        UserAmountDetail detail = new UserAmountDetail();
-        detail.setUserName(userName);
-        detail.setType(BaseConstant.RATE);
-        //商户收入
-        detail.setAmount(submit.subtract(agentMoney).setScale(2, BigDecimal.ROUND_HALF_UP));
-        detail.setPayType(payType);
-        detail.setOrderId(orderId);
-        detail.setUserRate(rate);
-        detail.setAgentUsername(user.getAgentUsername());
-        detail.setSalesmanUsername(user.getSalesmanUsername());
-        detail.setCreateTime(new Date());
-        amountDetailService.save(detail);
+            //代理获利 = 订单金额*代理费率
+            BigDecimal agentAmout = submit.multiply(new BigDecimal(agentRate)).setScale(2, BigDecimal.ROUND_HALF_UP);
+            UserAmountEntity agentDbAmount = amountService.getUserAmountByUserName(user.getAgentUsername());
+            changeAmount(user.getAgentUsername(), user.getAgentId(), agentAmout, agentDbAmount, null, orderId, payType);
 
-        //统计高级代理所得额度
-        countAgentMoney(user.getAgentUsername(), submit, payType, orderId);
-        //统计商户的所得金额
-        countUserRate(userName, user.getAgentUsername(), submit, agentMoney);
-        //统计介绍人的所得金额
-        if (!StringUtils.isBlank(user.getSalesmanUsername())) {
-            countSalesmanRate(userName, user.getSalesmanUsername(), user.getAgentUsername(), agentMoney, orderId,
-                    payType);
+            //商户金额 =  订单金额 - 介绍人收入
+            BigDecimal customerAmount = submit.subtract(submit.multiply(new BigDecimal(introducerRate))).setScale(2, BigDecimal.ROUND_HALF_UP);
+            UserAmountEntity customerDbAmount = amountService.getUserAmountByUserName(userName);
+            changeAmount(userName, user.getId(), customerAmount, customerDbAmount, user.getAgentId(), orderId, payType);
+        }
+    }
+
+    /**
+     * 更新收入金额和记录流水
+     * @param name
+     * @param userId
+     * @param amount
+     * @param userAmountEntity
+     * @param agentId
+     * @param orderId
+     * @param payType
+     * @throws Exception
+     */
+    private void changeAmount(String name, String userId, BigDecimal amount, UserAmountEntity userAmountEntity, String agentId, String orderId, String payType) throws Exception {
+        //记录明细
+        UserAmountDetail agentDetail = new UserAmountDetail();
+        agentDetail.setUserName(name);
+        agentDetail.setType(BaseConstant.RATE);
+        agentDetail.setPayType(payType);
+        agentDetail.setAmount(amount);
+        agentDetail.setOrderId(orderId);
+        agentDetail.setCreateTime(new Date());
+        amountDetailService.save(agentDetail);
+
+        if (userAmountEntity == null) {
+            //第一次插入，无值
+            userAmountEntity = new UserAmountEntity();
+            userAmountEntity.setUserId(userId);
+            userAmountEntity.setUserName(name);
+            userAmountEntity.setAmount(amount);
+            userAmountEntity.setCreateTime(new Date());
+            userAmountEntity.setAgentId(agentId);
+            amountService.save(userAmountEntity);
+        } else {
+            synchronized (this) {
+                amountService.changeAmountByUserName(name, amount);
+            }
         }
 
     }
@@ -318,101 +366,13 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     public int updateOrderStatusBatch(List<String> orderIds) {
         return baseMapper.updateOrderStatusBatch(orderIds);
     }
-    
+
     @Override
     public Map<String, Object> summary(Map<String, Object> param) {
         return baseMapper.summary(param);
     }
-    
-    /**
-     * 统计高级代理所得总额
-     *
-     * @param agentName 高级代理
-     * @param submit    申请金额
-     */
-    private synchronized void countAgentMoney(String agentName, BigDecimal submit, String payType, String orderId) {
-        UserAmountDetail agentDetail = new UserAmountDetail();
-        agentDetail.setUserName(agentName);
-        agentDetail.setType(BaseConstant.RATE);
-        agentDetail.setPayType(payType);
-        agentDetail.setAmount(submit);
-        agentDetail.setOrderId(orderId);
-        agentDetail.setCreateTime(new Date());
-        amountDetailService.save(agentDetail);
 
-        UserAmountEntity agent = amountService.getUserAmountByUserName(agentName);
-        if (agent == null) {
-            agent = new UserAmountEntity();
-            agent.setAmount(new BigDecimal(0));
-        }
-        SysUser user = userService.getUserByName(agentName);
-        agent.setUserId(user.getId());
-        agent.setUserName(agentName);
-        agent.setAmount(agent.getAmount().add(submit).setScale(2, BigDecimal.ROUND_HALF_UP));
-        amountService.saveOrUpdate(agent);
-    }
 
-    /**
-     * 介绍人的所得额度 = 高级代理所得额度 * 介绍人的rate
-     *
-     * @param userName     被介绍人
-     * @param salesmanName 介绍人
-     * @param agentName    高级代理
-     * @param agentMoney   高级代理所得利润
-     */
-    private synchronized void countSalesmanRate(String userName, String salesmanName, String agentName,
-                                                BigDecimal agentMoney,
-                                                String orderId, String payType) {
-        //介绍人费率
-        String salesmanRate = rateEntityService.getBeIntroducerRate(salesmanName, agentName, userName, payType);
-        UserAmountEntity salesman = amountService.getUserAmountByUserName(salesmanName);
-        if (salesman == null) {
-            salesman = new UserAmountEntity();
-            salesman.setAmount(new BigDecimal(0));
-        }
-        SysUser sysUser = userService.getUserByName(salesmanName);
-        salesman.setUserId(sysUser.getId());
-        salesman.setUserName(salesmanName);
-        salesman.setAgentId(agentName);
-        BigDecimal salesmanNow = agentMoney.multiply(new BigDecimal(salesmanRate)).setScale(2,
-                BigDecimal.ROUND_HALF_UP);
-        salesman.setAmount(salesman.getAmount().add(salesmanNow).setScale(2, BigDecimal.ROUND_HALF_UP));
-        amountService.saveOrUpdate(salesman);
-        //记录介绍人收入详情日志
-        UserAmountDetail introducerDetail = new UserAmountDetail();
-        introducerDetail.setUserName(salesmanName);
-        introducerDetail.setType(BaseConstant.RATE);
-        introducerDetail.setPayType(payType);
-        introducerDetail.setAmount(salesmanNow);
-        introducerDetail.setUserRate(salesmanRate);
-        introducerDetail.setOrderId(orderId);
-        introducerDetail.setCreateTime(new Date());
-        amountDetailService.save(introducerDetail);
-    }
-
-    /**
-     * 商户的所得额度 = 申请金额 - 高级代理所得额度
-     *
-     * @param userName   商户
-     * @param agentName  高级代理
-     * @param amount     订单申请金额
-     * @param agentMoney 高级代理所得利润
-     */
-    private synchronized void countUserRate(String userName, String agentName, BigDecimal amount,
-                                            BigDecimal agentMoney) {
-        UserAmountEntity user = amountService.getUserAmountByUserName(userName);
-        if (user == null) {
-            user = new UserAmountEntity();
-            user.setAmount(new BigDecimal(0));
-        }
-        SysUser sysUser = userService.getUserByName(userName);
-        user.setUserId(sysUser.getId());
-        user.setAgentId(agentName);
-        user.setUserName(userName);
-        BigDecimal userNow = amount.subtract(agentMoney).setScale(2, BigDecimal.ROUND_HALF_UP);
-        user.setAmount(userNow.add(user.getAmount()).setScale(2, BigDecimal.ROUND_HALF_UP));
-        amountService.saveOrUpdate(user);
-    }
 
     /**
      * 校验外部订单是否已经创建过
@@ -433,7 +393,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      *
      * @param checkParam
      */
-    private R addOrder(R checkParam) throws Exception {
+    private R addOrder(R checkParam, HttpServletRequest req) throws Exception {
         String outerOrderId = (String) checkParam.get(BaseConstant.OUTER_ORDER_ID);
         String userName = (String) checkParam.get(BaseConstant.USER_NAME);
         String submitAmount = (String) checkParam.get(BaseConstant.SUBMIT_AMOUNT);
@@ -493,6 +453,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         order.setCreateTime(new Date());
         order.setCreateBy("api");
         order.setParentUser(agentName);
+        order.setIp(IPUtils.getIpAddr(req));
         //冗余字段
         order.setUserId(user.getId());
         order.setUserRealname(user.getRealname());

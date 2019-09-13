@@ -1,6 +1,7 @@
 package org.jeecg.modules.pay.entity;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -90,4 +91,12 @@ public class UserAmountDetail {
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "创建时间")
 	private java.util.Date createTime;
+
+	@Excel(name = "初始金额", width = 15)
+	@ApiModelProperty(value = "初始金额")
+	private BigDecimal initialAmount;
+
+	@Excel(name = "更新后金额", width = 15)
+	@ApiModelProperty(value = "更新后金额")
+	private BigDecimal updateAmount;
 }

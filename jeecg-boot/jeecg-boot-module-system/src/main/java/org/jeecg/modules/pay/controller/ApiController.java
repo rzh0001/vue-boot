@@ -42,7 +42,7 @@ public class ApiController {
     @ResponseBody
     public R create(@RequestBody JSONObject reqobj) {
         try {
-            return orderInfoService.createOrder(reqobj);
+            return orderInfoService.createOrder(reqobj, ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest());
         } catch (Exception e) {
             log.info("创建订单异常，异常信息为：", e);
             return R.error(e.getMessage());
@@ -81,12 +81,13 @@ public class ApiController {
     public R queryOrder(@RequestBody JSONObject reqobj) {
         return orderInfoService.queryOrderInfo(reqobj);
     }
+
     @PostMapping("/testCallBack")
     @ResponseBody
-    public String testCallBack(){
+    public String testCallBack() {
         JSONObject result = new JSONObject();
-        result.put("code",200);
-        result.put("msg","success");
+        result.put("code", 200);
+        result.put("msg", "success");
         return result.toJSONString();
     }
 }
