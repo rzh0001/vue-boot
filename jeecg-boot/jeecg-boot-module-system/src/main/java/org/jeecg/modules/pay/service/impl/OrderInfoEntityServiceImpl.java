@@ -99,7 +99,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     public R createOrder(JSONObject reqobj, HttpServletRequest req) throws Exception {
         R checkParam = checkParam(reqobj, true, false, false);
         if (BaseConstant.CHECK_PARAM_SUCCESS.equals(checkParam.get(BaseConstant.CODE).toString())) {
-            return addOrder(checkParam,req);
+            return addOrder(checkParam, req);
         } else {
             return checkParam;
         }
@@ -325,6 +325,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
 
     /**
      * 更新收入金额和记录流水
+     *
      * @param name
      * @param userId
      * @param amount
@@ -344,7 +345,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         agentDetail.setOrderId(orderId);
         agentDetail.setCreateTime(new Date());
         BigDecimal initialAmount = new BigDecimal(0.00);
-        if(userAmountEntity != null){
+        if (userAmountEntity != null) {
             initialAmount = userAmountEntity.getAmount();
         }
         agentDetail.setInitialAmount(initialAmount);
@@ -379,7 +380,6 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     }
 
 
-
     /**
      * 校验外部订单是否已经创建过
      *
@@ -395,11 +395,37 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     }
 
     /**
+     * 校验是否在IP黑名单中
+     *
+     * @param ip
+     * @return
+     */
+    public boolean isIpBlacklist(String ip) {
+        List<DictModel> IpBlacklist = dictService.queryDictItemsByCode(BaseConstant.IP_BLACK_LIST);
+        List<String> ips = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(IpBlacklist)) {
+            for (DictModel dictModel : IpBlacklist) {
+                ips.add(dictModel.getValue());
+            }
+            if (!CollectionUtils.isEmpty(ips) && ips.contains(ip)) {
+                log.info("ip黑名单为：{}", ips.toArray());
+                log.info("创建订单拦截IP --》非法访问ip，ip={}", ip);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * 添加订单信息
      *
      * @param checkParam
      */
     private R addOrder(R checkParam, HttpServletRequest req) throws Exception {
+        String ip = IPUtils.getIpAddr(req);
+        if(isIpBlacklist(ip)){
+            throw new RRException("非法访问，请联系管理员" );
+        }
         String outerOrderId = (String) checkParam.get(BaseConstant.OUTER_ORDER_ID);
         String userName = (String) checkParam.get(BaseConstant.USER_NAME);
         String submitAmount = (String) checkParam.get(BaseConstant.SUBMIT_AMOUNT);
@@ -459,7 +485,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         order.setCreateTime(new Date());
         order.setCreateBy("api");
         order.setParentUser(agentName);
-        order.setIp(IPUtils.getIpAddr(req));
+        order.setIp(ip);
         //冗余字段
         order.setUserId(user.getId());
         order.setUserRealname(user.getRealname());
