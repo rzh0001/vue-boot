@@ -343,6 +343,12 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         agentDetail.setAmount(amount);
         agentDetail.setOrderId(orderId);
         agentDetail.setCreateTime(new Date());
+        BigDecimal initialAmount = new BigDecimal(0.00);
+        if(userAmountEntity != null){
+            initialAmount = userAmountEntity.getAmount();
+        }
+        agentDetail.setInitialAmount(initialAmount);
+        agentDetail.setUpdateAmount(amount.add(initialAmount));
         amountDetailService.save(agentDetail);
 
         if (userAmountEntity == null) {
