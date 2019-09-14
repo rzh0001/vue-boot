@@ -21,12 +21,14 @@ import java.math.BigDecimal;
 public class UserAmountDetailServiceImpl extends ServiceImpl<UserAmountDetailMapper, UserAmountDetail> implements IUserAmountDetailService {
     
     @Override
-    public boolean addAmountDetail(BigDecimal amount, String type, SysUser opUser) {
+    public boolean addAmountDetail(BigDecimal amount, BigDecimal originalAmount, String type, SysUser opUser) {
         UserAmountDetail detail = new UserAmountDetail();
         detail.setUserId(opUser.getId());
         detail.setUserName(opUser.getUsername());
         detail.setType(type);
         detail.setAmount(amount);
+        detail.setInitialAmount(originalAmount);
+        detail.setUpdateAmount(amount.add(originalAmount));
         detail.setAgentId(opUser.getAgentId());
         detail.setAgentUsername(opUser.getAgentUsername());
         detail.setAgentRealname(opUser.getAgentRealname());

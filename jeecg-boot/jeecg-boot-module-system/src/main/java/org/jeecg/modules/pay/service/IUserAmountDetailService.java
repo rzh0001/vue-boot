@@ -22,7 +22,7 @@ public interface IUserAmountDetailService extends IService<UserAmountDetail> {
      * @param opUser
      * @return
      */
-    boolean addAmountDetail(BigDecimal amount, String type, SysUser opUser);
+    boolean addAmountDetail(BigDecimal amount, BigDecimal originalAmount, String type, SysUser opUser);
     
     /**
      * 获取用户总收入

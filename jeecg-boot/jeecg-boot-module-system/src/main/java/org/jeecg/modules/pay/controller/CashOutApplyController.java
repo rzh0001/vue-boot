@@ -132,7 +132,7 @@ public class CashOutApplyController {
 		userAmountService.changeAmount(user.getId(), apply.getAmount().negate());
 		
 		// 插入流水表
-		userAmountDetailService.addAmountDetail(apply.getAmount().negate(), "2", user);
+		userAmountDetailService.addAmountDetail(apply.getAmount().negate(), amount.getAmount(), "2", user);
 		
 		apply.setUserId(optUser.getId());
 		apply.setUsername(optUser.getUsername());
@@ -207,10 +207,11 @@ public class CashOutApplyController {
 			
 			 // 审核拒绝须冲正余额
 			 if ("3".equals(jsonObject.getString("status"))) {
+				 UserAmountEntity amount = userAmountService.getUserAmountByUserName(apply.getUsername());
 				 userAmountService.changeAmount(apply.getUserId(), apply.getAmount());
 				
 				 // 插入流水表
-				 userAmountDetailService.addAmountDetail(apply.getAmount(), "3", sysUserService.getById(apply.getUserId()));
+				 userAmountDetailService.addAmountDetail(apply.getAmount(), amount.getAmount(), "3", sysUserService.getById(apply.getUserId()));
 			 }
 			 //TODO 返回false说明什么？
 			 if (ok) {
