@@ -32,6 +32,7 @@ import org.jeecgframework.poi.excel.entity.ExportParams;
 import org.jeecgframework.poi.excel.entity.ImportParams;
 import org.jeecgframework.poi.excel.view.JeecgEntityExcelView;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -117,6 +118,7 @@ public class CashOutApplyController {
 	@AutoLog(value = "提现申请-添加")
 	@ApiOperation(value = "提现申请-添加", notes = "提现申请-添加")
 	@PostMapping(value = "/add")
+	@Transactional
 	public Result<CashOutApply> add(@RequestBody CashOutApply apply) {
 		Result<CashOutApply> result = new Result<CashOutApply>();
 		LoginUser optUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
@@ -127,10 +129,7 @@ public class CashOutApplyController {
 		if (amount == null || amount.getAmount().compareTo(apply.getAmount()) == -1) {
 			throw new RRException("余额不足");
 		}
-		boolean ok = userAmountService.changeAmount(amount.getId(), apply.getAmount().negate());
-		if (!ok) {
-			throw new RRException("更新余额失败，请确认余额");
-		}
+		userAmountService.changeAmount(user.getId(), apply.getAmount().negate());
 		
 		// 插入流水表
 		userAmountDetailService.addAmountDetail(apply.getAmount().negate(), "2", user);
@@ -194,6 +193,7 @@ public class CashOutApplyController {
 	 @AutoLog(value = "提现申请-审核")
 	 @ApiOperation(value = "提现申请-审核", notes = "提现申请-审核")
 	 @PutMapping(value = "/approval")
+	 @Transactional
 	 public Result<CashOutApply> approval(@RequestBody JSONObject jsonObject) {
 		
 		 Result<CashOutApply> result = new Result<CashOutApply>();

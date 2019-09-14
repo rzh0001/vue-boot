@@ -3,6 +3,7 @@ package org.jeecg.modules.pay.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.constant.PayConstant;
+import org.jeecg.modules.exception.RRException;
 import org.jeecg.modules.pay.entity.UserAmountEntity;
 import org.jeecg.modules.pay.mapper.UserAmountEntityMapper;
 import org.jeecg.modules.pay.service.IUserAmountEntityService;
@@ -43,8 +44,12 @@ public class UserAmountEntityServiceImpl extends ServiceImpl<UserAmountEntityMap
     }
     
     @Override
-    public boolean changeAmount(String id, BigDecimal amount) {
-        return mapper.changeAmount(id, amount);
+    public boolean changeAmount(String userId, BigDecimal amount) {
+        boolean ok = mapper.changeAmount(userId, amount);
+        if (!ok) {
+            throw new RRException("更新余额失败");
+        }
+        return true;
     }
 
     @Override

@@ -16,8 +16,9 @@ import java.math.BigDecimal;
 public interface UserAmountEntityMapper extends BaseMapper<UserAmountEntity> {
     UserAmountEntity getUserAmountByUserName(@Param("userName")String userName);
     
-    @Update("update sys_user_amount set amount = amount + #{newAmount} where id = #{id} and amount + #{newAmount} > 0")
+    @Update("update sys_user_amount set amount = amount + #{newAmount} where user_id = #{id} and amount + #{newAmount} > 0")
     boolean changeAmount(@Param("id") String id, @Param("newAmount") BigDecimal newAmount);
+    
     @Update("update sys_user_amount set amount = amount + #{newAmount} where user_name = #{userName}")
     void changeAmountByUserName(@Param("userName")String userName, @Param("newAmount")BigDecimal amount);
 }
