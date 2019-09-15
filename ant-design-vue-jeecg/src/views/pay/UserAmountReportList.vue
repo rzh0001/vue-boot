@@ -136,15 +136,15 @@
           //   dataIndex: 'userId'
           // },
           {
-            title: '用户',
-            align: 'center',
-            dataIndex: 'userName'
-          },
-          {
             title: '报表日期',
             align: 'center',
             width: 120,
             dataIndex: 'reportDate'
+          },
+          {
+            title: '商户',
+            align: 'center',
+            dataIndex: 'userName'
           },
           {
             title: '期初金额',

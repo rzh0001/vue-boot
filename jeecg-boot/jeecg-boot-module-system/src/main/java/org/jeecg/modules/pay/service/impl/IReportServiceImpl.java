@@ -1,6 +1,5 @@
 package org.jeecg.modules.pay.service.impl;
 
-import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
@@ -45,8 +44,7 @@ public class IReportServiceImpl implements IReportService {
     private IUserAmountReportService reportService;
     
     @Override
-    public boolean generateFinancialStatement() {
-        DateTime yesterday = DateUtil.yesterday();
+    public boolean generateFinancialStatement(String dateStr) {
         
         QueryWrapper<SysUser> wrapper = new QueryWrapper<>();
         wrapper.lambda().eq(SysUser::getMemberType, PayConstant.MEMBER_TYPE_MEMBER);
@@ -59,16 +57,18 @@ public class IReportServiceImpl implements IReportService {
         for (SysUser user : users) {
             
             QueryWrapper<UserAmountReport> rw = new QueryWrapper<>();
-            rw.lambda().eq(UserAmountReport::getReportDate, DateUtil.formatDate(yesterday)).eq(UserAmountReport::getUserId, user.getId());
+            rw.lambda()
+                    .eq(UserAmountReport::getReportDate, dateStr)
+                    .eq(UserAmountReport::getUserId, user.getId());
             UserAmountReport report = reportService.getOne(rw);
-            
-            Map<String, Object> orderAmount = orderService.summaryUserTodayOrderAmount(user.getId(), yesterday);
+    
+            Map<String, Object> orderAmount = orderService.summaryUserTodayOrderAmount(user.getId(), DateUtil.parseDate(dateStr));
             
             report.setPaidAmount((BigDecimal) orderAmount.get("paidAmount"));
             report.setPayFee((BigDecimal) orderAmount.get("payFee"));
-            
-            
-            Map<String, Object> cashOutAmount = cashOutApplyService.summaryUserTodayCashOutAmount(user.getId(), yesterday);
+    
+    
+            Map<String, Object> cashOutAmount = cashOutApplyService.summaryUserTodayCashOutAmount(user.getId(), DateUtil.parseDate(dateStr));
             report.setCashOutAmount((BigDecimal) cashOutAmount.get("cashOutAmount"));
             
             

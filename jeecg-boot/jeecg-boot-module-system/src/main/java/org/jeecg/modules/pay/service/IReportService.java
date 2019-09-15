@@ -11,7 +11,7 @@ public interface IReportService {
      *
      * @return
      */
-    boolean generateFinancialStatement();
+    boolean generateFinancialStatement(String dateStr);
     
     /**
      * 生成用户每日期初金额
