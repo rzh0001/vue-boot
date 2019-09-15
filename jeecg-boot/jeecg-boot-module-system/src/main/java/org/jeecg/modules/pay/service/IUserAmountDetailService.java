@@ -39,4 +39,13 @@ public interface IUserAmountDetailService extends IService<UserAmountDetail> {
      * @return
      */
     BigDecimal getTodayIncome(String userId);
+    
+    /**
+     * 获取用户期初余额
+     *
+     * @param userId
+     * @param dateStr
+     * @return
+     */
+    UserAmountDetail getUserOriginalAmount(String userId, String dateStr);
 }

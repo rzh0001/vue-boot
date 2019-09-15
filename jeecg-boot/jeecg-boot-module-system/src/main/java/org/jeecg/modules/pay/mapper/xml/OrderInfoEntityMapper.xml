@@ -2,14 +2,11 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.jeecg.modules.pay.mapper.OrderInfoEntityMapper">
     <select id="queryOrderByOuterOrderId" resultType="String" parameterType="String">
-        SELECT
-            order_id
-        FROM
-            pay_order_info
-        WHERE
-            outer_order_id = #{outerOrderId}
+        SELECT order_id
+        FROM pay_order_info
+        WHERE outer_order_id = #{outerOrderId}
     </select>
-    <select id="queryOrderByOrderId"  parameterType="String" resultType="org.jeecg.modules.pay.entity.OrderInfoEntity">
+    <select id="queryOrderByOrderId" parameterType="String" resultType="org.jeecg.modules.pay.entity.OrderInfoEntity">
         select
           *
         from
@@ -55,6 +52,19 @@
         group by user_id,user_name,user_realname
 
     </select>
+
+    <!--    <select id="summaryUserTodayOrderAmount" parameterType="map" resultType="map">-->
+    <!--        select user_id,-->
+    <!--               user_name,-->
+    <!--               user_realname,-->
+    <!--               count(1)           as paidCount,-->
+    <!--               sum(submit_amount) as paidAmount,-->
+    <!--               sum(poundage)      as payFee-->
+    <!--        from pay_order_info-->
+    <!--        where status = '3'-->
+    <!--          and user_id = #{map.userId}-->
+    <!--          and to_days(success_time) = to_days(#{map.date})-->
+    <!--    </select>-->
 
     <update id="updateOrderStatusSuccessByOrderId" parameterType="String">
         UPDATE pay_order_info

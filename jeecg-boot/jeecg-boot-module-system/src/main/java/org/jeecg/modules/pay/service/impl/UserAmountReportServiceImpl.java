@@ -10,7 +10,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 /**
  * @Description: 用户余额报表-期初余额 每天0点更新
  * @Author: jeecg-boot
- * @Date:   2019-09-11
+ * @Date:   2019-09-15
  * @Version: V1.0
  */
 @Service

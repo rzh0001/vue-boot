@@ -1,7 +1,10 @@
 package org.jeecg.modules.pay.service;
 
-import org.jeecg.modules.pay.entity.CashOutApply;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.jeecg.modules.pay.entity.CashOutApply;
+
+import java.util.Date;
+import java.util.Map;
 
 /**
  * @Description: 提现申请
@@ -10,5 +13,13 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @Version: V1.0
  */
 public interface ICashOutApplyService extends IService<CashOutApply> {
-
+    
+    /**
+     * 统计用户今日提现金额
+     *
+     * @param userId
+     * @param date
+     * @return
+     */
+    Map<String, Object> summaryUserTodayCashOutAmount(String userId, Date date);
 }

@@ -375,8 +375,26 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     public Map<String, Object> summary(Map<String, Object> param) {
         return baseMapper.summary(param);
     }
-
-
+    
+    @Override
+    public Map<String, Object> summaryUserTodayOrderAmount(String userId, Date date) {
+        Map<String, Object> resultMap = baseMapper.summaryUserTodayOrderAmount(userId, date);
+        BigDecimal paidAmount = (BigDecimal) resultMap.get("paidAmount");
+        if (paidAmount == null) {
+            resultMap.put("paidAmount", BigDecimal.ZERO);
+        }
+        Long paidCount = (Long) resultMap.get("paidCount");
+        if (paidCount == null) {
+            resultMap.put("paidCount", 0);
+        }
+        BigDecimal payFee = (BigDecimal) resultMap.get("payFee");
+        if (payFee == null) {
+            resultMap.put("payFee", BigDecimal.ZERO);
+        }
+        return resultMap;
+    }
+    
+    
     /**
      * 校验外部订单是否已经创建过
      *

@@ -51,7 +51,16 @@ public class UserAmountEntityServiceImpl extends ServiceImpl<UserAmountEntityMap
         }
         return true;
     }
-
+    
+    @Override
+    public BigDecimal getUserAmount(String userId) {
+        UserAmountEntity amount = baseMapper.getByUserId(userId);
+        if (amount == null) {
+            throw new RRException("获取余额失败");
+        }
+        return amount.getAmount();
+    }
+    
     @Override
     public void changeAmountByUserName(String userName, BigDecimal amount) {
         mapper.changeAmountByUserName(userName,amount);

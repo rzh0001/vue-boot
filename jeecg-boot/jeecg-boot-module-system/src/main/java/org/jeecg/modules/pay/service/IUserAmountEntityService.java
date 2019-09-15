@@ -25,11 +25,19 @@ public interface IUserAmountEntityService extends IService<UserAmountEntity> {
     /**
      * 更新余额
      *
-     * @param id
+     * @param userId
      * @param amount
      * @return
      */
     boolean changeAmount(String userId, BigDecimal amount);
+    
+    /**
+     * 获取用户余额
+     *
+     * @param userId
+     * @return
+     */
+    BigDecimal getUserAmount(String userId);
 
     void changeAmountByUserName(String userName,BigDecimal amount);
 }

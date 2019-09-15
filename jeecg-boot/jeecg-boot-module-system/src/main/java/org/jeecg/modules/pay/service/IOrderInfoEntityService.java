@@ -7,6 +7,7 @@ import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import org.jeecg.modules.util.R;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -57,4 +58,8 @@ public interface IOrderInfoEntityService extends IService<OrderInfoEntity> {
     int updateOrderStatusBatch(List<String> orderIds);
     
     Map<String, Object> summary(Map<String, Object> param);
+    
+    Map<String, Object> summaryUserTodayOrderAmount(String userId, Date date);
+    
+    
 }

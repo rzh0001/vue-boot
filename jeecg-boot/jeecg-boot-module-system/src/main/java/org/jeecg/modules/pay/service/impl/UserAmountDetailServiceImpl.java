@@ -1,5 +1,6 @@
 package org.jeecg.modules.pay.service.impl;
 
+import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.modules.pay.entity.UserAmountDetail;
@@ -46,5 +47,10 @@ public class UserAmountDetailServiceImpl extends ServiceImpl<UserAmountDetailMap
     @Override
     public BigDecimal getTodayIncome(String userId) {
         return baseMapper.getTodayIncome(userId);
+    }
+    
+    @Override
+    public UserAmountDetail getUserOriginalAmount(String userId, String dateStr) {
+        return baseMapper.getUserOriginalAmount(userId, DateUtil.parseDate(dateStr));
     }
 }
