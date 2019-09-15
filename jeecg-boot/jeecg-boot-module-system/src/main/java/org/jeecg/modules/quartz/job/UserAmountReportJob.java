@@ -3,7 +3,6 @@ package org.jeecg.modules.quartz.job;
 import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.modules.pay.entity.UserAmountEntity;
-import org.jeecg.modules.pay.entity.UserAmountReport;
 import org.jeecg.modules.pay.service.IUserAmountEntityService;
 import org.jeecg.modules.pay.service.IUserAmountReportService;
 import org.quartz.Job;
@@ -35,24 +34,10 @@ public class UserAmountReportJob implements Job {
         log.info("======》 定时任务[生成用户余额报表-期初余额] 开始执行 《=======");
         log.info("======》 定时任务[生成用户余额报表-期初余额] {} 《=======", today);
         List<UserAmountEntity> userAmountList = amountService.list();
-        
-        if (!userAmountList.isEmpty()) {
-            for (UserAmountEntity amount : userAmountList) {
-                UserAmountReport report = generateReport(amount);
-                report.setReportDate(today);
-                reportService.save(report);
-            }
-        }
-        
+    
+    
         log.info("======》 定时任务[生成用户余额报表-期初余额] 执行完毕 《=======");
     }
     
-    private UserAmountReport generateReport(UserAmountEntity amount) {
-        UserAmountReport report = new UserAmountReport();
-        report.setUserId(amount.getUserId());
-        report.setUserName(amount.getUserName());
-        report.setAmount(amount.getAmount());
-        report.setAgentId(amount.getAgentId());
-        return report;
-    }
+    
 }
