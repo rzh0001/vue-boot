@@ -18,7 +18,7 @@ import org.jeecgframework.poi.excel.annotation.Excel;
 /**
  * @Description: 用户余额报表-期初余额 每天0点更新
  * @Author: jeecg-boot
- * @Date:   2019-09-11
+ * @Date:   2019-09-15
  * @Version: V1.0
  */
 @Data
@@ -44,10 +44,30 @@ public class UserAmountReport {
 	@Excel(name = "报表日期", width = 15)
     @ApiModelProperty(value = "报表日期")
 	private java.lang.String reportDate;
-	/**收入金额*/
-	@Excel(name = "收入金额", width = 15)
-    @ApiModelProperty(value = "收入金额")
-	private java.math.BigDecimal amount;
+	/**期初金额*/
+	@Excel(name = "期初金额", width = 15)
+    @ApiModelProperty(value = "期初金额")
+	private java.math.BigDecimal originalamount;
+	/**支付类型*/
+	@Excel(name = "支付类型", width = 15)
+    @ApiModelProperty(value = "支付类型")
+	private java.lang.String payType;
+	/**今日入金*/
+	@Excel(name = "今日入金", width = 15)
+    @ApiModelProperty(value = "今日入金")
+	private java.math.BigDecimal paidAmount;
+	/**今日下发*/
+	@Excel(name = "今日下发", width = 15)
+    @ApiModelProperty(value = "今日下发")
+	private java.math.BigDecimal cashOutAmount;
+	/**剩余可提现金额*/
+	@Excel(name = "剩余可提现金额", width = 15)
+    @ApiModelProperty(value = "剩余可提现金额")
+	private java.math.BigDecimal availableAmount;
+	/**通道手续费*/
+	@Excel(name = "通道手续费", width = 15)
+    @ApiModelProperty(value = "通道手续费")
+	private java.math.BigDecimal payFee;
 	/**代理ID*/
 	@Excel(name = "代理ID", width = 15)
     @ApiModelProperty(value = "代理ID")
