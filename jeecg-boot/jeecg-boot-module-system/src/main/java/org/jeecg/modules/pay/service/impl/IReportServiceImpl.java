@@ -114,6 +114,11 @@ public class IReportServiceImpl implements IReportService {
         report.setUserName(user.getUsername());
         report.setOriginalamount(originalAmount);
         report.setAgentId(user.getAgentId());
+        report.setAgentUsername(user.getAgentUsername());
+        report.setAgentRealname(user.getAgentRealname());
+        report.setSalesmanId(user.getSalesmanId());
+        report.setSalesmanUsername(user.getSalesmanUsername());
+        report.setSalesmanRealname(user.getSalesmanRealname());
         return report;
     }
     
