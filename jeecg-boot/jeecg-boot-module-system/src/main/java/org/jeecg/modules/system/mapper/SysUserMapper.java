@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.vo.SysUserPage;
 
@@ -26,7 +27,9 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
      * @return
      */
     public SysUser getUserByName(@Param("username") String username);
-    
+
+    @Select("select * from sys_user where id = #{id}")
+    public SysUser  getUserById(@Param("id")String id);
     /**
      * @param page
      * @param map

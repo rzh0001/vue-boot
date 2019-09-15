@@ -23,7 +23,8 @@ import java.util.Set;
 public interface ISysUserService extends IService<SysUser> {
 	
 	public SysUser getUserByName(String username);
-	
+
+	public SysUser getUserById(String id);
 	/**
 	 * 添加用户和用户角色关系
 	 * @param user

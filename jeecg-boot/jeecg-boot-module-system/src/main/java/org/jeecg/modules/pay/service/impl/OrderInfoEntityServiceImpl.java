@@ -290,10 +290,10 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             UserAmountEntity agent = amountService.getUserAmountByUserName(user.getAgentUsername());
             //代理获利
             BigDecimal agentAmount = submit.multiply(rate).setScale(2, BigDecimal.ROUND_HALF_UP);
-            changeAmount(user.getAgentUsername(), user.getAgentId(), agentAmount, agent, null, orderId, payType);
+            changeAmount(user.getAgentUsername(), user.getAgentId(), agentAmount, agent, null, orderId, payType,null);
             //商户收入
             UserAmountEntity customer = amountService.getUserAmountByUserName(userName);
-            changeAmount(userName, user.getId(), submit.subtract(agentAmount), customer, user.getAgentId(), orderId, payType);
+            changeAmount(userName, user.getId(), submit.subtract(agentAmount), customer, user.getAgentId(), orderId, payType,null);
         } else {
             //介绍人不为空
             //介绍人对商户设置的费率
@@ -308,17 +308,17 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             //介绍人获利 = 订单金额*（介绍人费率-代理费率）
             BigDecimal saleAmount = submit.multiply(rateDifference).setScale(2, BigDecimal.ROUND_HALF_UP);
             UserAmountEntity saleDbAmount = amountService.getUserAmountByUserName(user.getSalesmanUsername());
-            changeAmount(user.getSalesmanUsername(), sale.getId(), saleAmount, saleDbAmount, sale.getAgentId(), orderId, payType);
+            changeAmount(user.getSalesmanUsername(), sale.getId(), saleAmount, saleDbAmount, sale.getAgentId(), orderId, payType,null);
 
             //代理获利 = 订单金额*代理费率
             BigDecimal agentAmout = submit.multiply(new BigDecimal(agentRate)).setScale(2, BigDecimal.ROUND_HALF_UP);
             UserAmountEntity agentDbAmount = amountService.getUserAmountByUserName(user.getAgentUsername());
-            changeAmount(user.getAgentUsername(), user.getAgentId(), agentAmout, agentDbAmount, null, orderId, payType);
+            changeAmount(user.getAgentUsername(), user.getAgentId(), agentAmout, agentDbAmount, null, orderId, payType,null);
 
             //商户金额 =  订单金额 - 介绍人收入
             BigDecimal customerAmount = submit.subtract(submit.multiply(new BigDecimal(introducerRate))).setScale(2, BigDecimal.ROUND_HALF_UP);
             UserAmountEntity customerDbAmount = amountService.getUserAmountByUserName(userName);
-            changeAmount(userName, user.getId(), customerAmount, customerDbAmount, user.getAgentId(), orderId, payType);
+            changeAmount(userName, user.getId(), customerAmount, customerDbAmount, user.getAgentId(), orderId, payType,user.getSalesmanUsername());
         }
     }
 
@@ -334,21 +334,35 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * @param payType
      * @throws Exception
      */
-    private synchronized void changeAmount(String name, String userId, BigDecimal amount, UserAmountEntity userAmountEntity, String agentId, String orderId, String payType) throws Exception {
+    private synchronized void changeAmount(String name, String userId, BigDecimal amount, UserAmountEntity userAmountEntity, String agentId, String orderId, String payType,String saleUserNmae) throws Exception {
         //记录明细
         UserAmountDetail agentDetail = new UserAmountDetail();
+        agentDetail.setUserId(userId);
         agentDetail.setUserName(name);
         agentDetail.setType(BaseConstant.RATE);
         agentDetail.setPayType(payType);
         agentDetail.setAmount(amount);
         agentDetail.setOrderId(orderId);
         agentDetail.setCreateTime(new Date());
-        BigDecimal initialAmount = new BigDecimal(0.00);
+        BigDecimal initialAmount = new BigDecimal("0.00");
         if (userAmountEntity != null) {
             initialAmount = userAmountEntity.getAmount();
         }
         agentDetail.setInitialAmount(initialAmount);
         agentDetail.setUpdateAmount(amount.add(initialAmount));
+
+        if(!org.springframework.util.StringUtils.isEmpty(agentId)){
+            SysUser agent = userService.getUserById(agentId);
+            agentDetail.setAgentId(agentId);
+            agentDetail.setAgentUsername(agent.getUsername());
+            agentDetail.setAgentRealname(agent.getRealname());
+        }
+        if(!org.springframework.util.StringUtils.isEmpty(saleUserNmae)){
+            SysUser sale = userService.getUserByName(saleUserNmae);
+            agentDetail.setSalesmanId(sale.getId());
+            agentDetail.setSalesmanUsername(saleUserNmae);
+            agentDetail.setSalesmanRealname(sale.getRealname());
+        }
         amountDetailService.save(agentDetail);
 
         if (userAmountEntity == null) {
