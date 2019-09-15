@@ -86,7 +86,7 @@ public class UserAmountReportController {
 			}
 		}
 		if (StringUtils.isBlank(report.getReportDate())) {
-			report.setReportDate(DateUtil.formatDate(DateUtil.yesterday()));
+			queryWrapper.lambda().eq(UserAmountReport::getReportDate, DateUtil.formatDate(DateUtil.yesterday()));
 		}
 		IPage<UserAmountReport> pageList = userAmountReportService.page(page, queryWrapper);
 		result.setSuccess(true);
