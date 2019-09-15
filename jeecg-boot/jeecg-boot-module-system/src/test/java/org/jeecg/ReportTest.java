@@ -1,5 +1,6 @@
 package org.jeecg;
 
+import cn.hutool.core.date.DateUtil;
 import org.jeecg.modules.pay.service.IReportService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,6 +26,6 @@ public class ReportTest {
     
     @Test
     public void testReport2() {
-        service.generateFinancialStatement();
+        service.generateFinancialStatement(DateUtil.today());
     }
 }
