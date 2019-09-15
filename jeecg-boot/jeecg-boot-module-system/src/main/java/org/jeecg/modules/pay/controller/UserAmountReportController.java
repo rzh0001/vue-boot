@@ -1,5 +1,6 @@
 package org.jeecg.modules.pay.controller;
 
+import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -7,6 +8,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.aspect.annotation.AutoLog;
@@ -52,7 +54,7 @@ public class UserAmountReportController {
 	
 	/**
 	 * 分页列表查询
-	 * @param userAmountReport
+	 * @param report
 	 * @param pageNo
 	 * @param pageSize
 	 * @param req
@@ -61,12 +63,12 @@ public class UserAmountReportController {
 	@AutoLog(value = "用户余额报表-期初余额 每天0点更新-分页列表查询")
 	@ApiOperation(value="用户余额报表-期初余额 每天0点更新-分页列表查询", notes="用户余额报表-期初余额 每天0点更新-分页列表查询")
 	@GetMapping(value = "/list")
-	public Result<IPage<UserAmountReport>> queryPageList(UserAmountReport userAmountReport,
-									  @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
-									  @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
-									  HttpServletRequest req) {
+	public Result<IPage<UserAmountReport>> queryPageList(UserAmountReport report,
+														 @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
+														 @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
+														 HttpServletRequest req) {
 		Result<IPage<UserAmountReport>> result = new Result<IPage<UserAmountReport>>();
-		QueryWrapper<UserAmountReport> queryWrapper = QueryGenerator.initQueryWrapper(userAmountReport, req.getParameterMap());
+		QueryWrapper<UserAmountReport> queryWrapper = QueryGenerator.initQueryWrapper(report, req.getParameterMap());
 		Page<UserAmountReport> page = new Page<UserAmountReport>(pageNo, pageSize);
 		LoginUser optUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
 		if (optUser.getMemberType() != null) {
@@ -82,6 +84,9 @@ public class UserAmountReportController {
 					break;
 				default:
 			}
+		}
+		if (StringUtils.isBlank(report.getReportDate())) {
+			report.setReportDate(DateUtil.formatDate(DateUtil.yesterday()));
 		}
 		IPage<UserAmountReport> pageList = userAmountReportService.page(page, queryWrapper);
 		result.setSuccess(true);
