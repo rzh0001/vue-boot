@@ -407,8 +407,13 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         }
         return resultMap;
     }
-    
-    
+
+    @Override
+    public List<String> getOrderByTime(String time) {
+        return baseMapper.getOrderByTime(time);
+    }
+
+
     /**
      * 校验外部订单是否已经创建过
      *

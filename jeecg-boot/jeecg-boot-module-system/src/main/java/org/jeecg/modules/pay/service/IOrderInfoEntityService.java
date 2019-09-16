@@ -61,5 +61,5 @@ public interface IOrderInfoEntityService extends IService<OrderInfoEntity> {
     
     Map<String, Object> summaryUserTodayOrderAmount(String userId, Date date);
     
-    
+    List<String> getOrderByTime(String time);
 }

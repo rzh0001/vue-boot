@@ -19,6 +19,8 @@ import java.util.Map;
  */
 public interface OrderInfoEntityMapper extends BaseMapper<OrderInfoEntity> {
 
+    @Select("select order_id from pay_order_info where status in(-1,0) and create_time<#{time}")
+    List<String> getOrderByTime(@Param("time")String time);
     String queryOrderByOuterOrderId(@Param("outerOrderId") String outerOrderId);
     OrderInfoEntity queryOrderByOrderId(@Param("orderId") String orderId);
     void updateOrderStatusSuccessByOrderId(@Param("orderId") String orderId);
