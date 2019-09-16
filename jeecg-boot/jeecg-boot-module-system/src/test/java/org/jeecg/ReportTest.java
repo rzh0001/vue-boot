@@ -26,6 +26,6 @@ public class ReportTest {
     
     @Test
     public void testReport2() {
-        service.generateFinancialStatement(DateUtil.today());
+        service.generateFinancialStatement(DateUtil.formatDate(DateUtil.yesterday()));
     }
 }

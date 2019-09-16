@@ -92,10 +92,10 @@ public class IReportServiceImpl implements IReportService {
             
             UserAmountDetail amountDetail = amountDetailService.getUserOriginalAmount(user.getId(), dateStr);
             BigDecimal originalAmount;
-            if (amountDetail == null) {
-                originalAmount = amountService.getUserAmount(user.getId());
-            } else {
+            if (amountDetail != null && amountDetail.getInitialAmount() != null) {
                 originalAmount = amountDetail.getInitialAmount();
+            } else {
+                originalAmount = amountService.getUserAmount(user.getId());
             }
             
             

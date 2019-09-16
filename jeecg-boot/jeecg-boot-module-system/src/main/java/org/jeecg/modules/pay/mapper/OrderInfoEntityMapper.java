@@ -31,8 +31,8 @@ public interface OrderInfoEntityMapper extends BaseMapper<OrderInfoEntity> {
     @Select("select count(1) as paidCount,sum(submit_amount) as paidAmount, " +
             "sum(poundage) as payFee " +
             "from pay_order_info " +
-            "where status = '3' and user_id = #{userId} " +
+            "where status = '2' and user_id = #{userId} " +
             "and to_days(success_time) = to_days(#{date})")
     @ResultType(HashMap.class)
-    Map<String, Object> summaryUserTodayOrderAmount(String userId, Date date);
+    Map<String, Object> summaryUserTodayOrderAmount(@Param("userId") String userId, @Param("date") Date date);
 }
