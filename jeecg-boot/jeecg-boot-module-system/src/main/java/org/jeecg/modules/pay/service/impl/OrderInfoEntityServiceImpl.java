@@ -1,5 +1,6 @@
 package org.jeecg.modules.pay.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -407,8 +408,29 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         }
         return resultMap;
     }
-    
-    
+
+    @Override
+    public boolean notifyOrderFinish(String orderId, String payType) throws Exception {
+        List<DictModel> notifyUrls = dictService.queryDictItemsByCode(BaseConstant.NOTIFY_ORDER_FINISH_URL);
+        String url = null;
+        for (DictModel model : notifyUrls) {
+            if (payType.equals(model.getText())) {
+                url = model.getValue();
+                break;
+            }
+        }
+        if(org.springframework.util.StringUtils.isEmpty(url)){
+            throw new RRException("未配置通知挂马平台地址,key={}"+payType);
+        }
+        OrderInfoEntity order = queryOrderInfoByOrderId(orderId);
+        SysUser user = userService.getUserByName(order.getUserName());
+        List<UserBusinessEntity> useBusinesses =
+                businessEntityService.queryBusinessCodeByUserName(user.getAgentUsername(), payType);
+        RequestPayUrl request = factory.getPay(payType);
+        return  request.notifyOrderFinish(order,key,useBusinesses,url);
+    }
+
+
     /**
      * 校验外部订单是否已经创建过
      *

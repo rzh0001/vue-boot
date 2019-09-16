@@ -53,6 +53,7 @@ public class BaseConstant {
     public static final String INNER_CALL_BACK_URL= "innerCallBackUrl";
     public static final String REQUEST_URL = "requestPay";
     public static final String QUERY_ORDER_STATUS_URL = "queryOrderStatusUrl";
+    public static final String NOTIFY_ORDER_FINISH_URL = "notifyOrderFinishUrl";
     //支付通道
     //云闪付
     public static final String REQUEST_YSF = "ysf";

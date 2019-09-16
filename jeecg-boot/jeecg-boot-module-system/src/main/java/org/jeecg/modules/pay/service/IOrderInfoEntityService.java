@@ -60,6 +60,12 @@ public interface IOrderInfoEntityService extends IService<OrderInfoEntity> {
     Map<String, Object> summary(Map<String, Object> param);
     
     Map<String, Object> summaryUserTodayOrderAmount(String userId, Date date);
-    
+
+    /**
+     * 通知挂马扣除手续费
+     * @param orderId
+     * @param payType
+     */
+    boolean notifyOrderFinish(String orderId,String payType) throws Exception;
     
 }
