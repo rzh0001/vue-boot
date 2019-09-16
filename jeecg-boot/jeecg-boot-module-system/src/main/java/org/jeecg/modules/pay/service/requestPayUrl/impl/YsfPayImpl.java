@@ -91,6 +91,35 @@ public class YsfPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
         }
         return false;
     }
+
+    @Override
+    public boolean notifyOrderFinish(OrderInfoEntity order, String key, UserBusinessEntity userBusiness,String url) throws Exception {
+        JSONObject param = new JSONObject();
+        param.put("orderId",order.getOrderId());
+        log.info("==>手动补单，回调挂马平台url：{}，param:{}",url,param.toJSONString());
+        String apiKey = userBusiness.getApiKey();
+        String[] keys = apiKey.split("=");
+        if (keys.length != 2) {
+            log.info("云闪付通道配置apikey规则不对");
+            throw new RRException("云闪付通道未配置apikey,通道为："+order.getPayType());
+        }
+        String md5Key = keys[0];
+        String aesKey = keys[1];
+        String data = AES128Util.encryptBase64(param.toJSONString(), aesKey);
+        JSONObject requestParam = new JSONObject();
+        requestParam.put("data",data);
+        log.info("==>手动补单，回调挂马平台，加密后的入参为：{}",requestParam.toJSONString());
+        HttpResult result = HttpUtils.doPostJson(url, requestParam.toJSONString());
+        log.info("==>手动补单，挂马平台返回状态码为：{}；内容为为：{}",result.getCode(),result.getBody());
+        if(result.getCode() == BaseConstant.SUCCESS ){
+            JSONObject r = JSON.parseObject(result.getBody());
+            if("200".equals(r.get("code").toString())){
+                return true;
+            }
+        }
+        return false;
+    }
+
     private String structuralYsfParam(OrderInfoEntity order, String md5Key, String aesKey, String agentCode,
                                       String userName,String innerCallBackUrl) {
         Long timestamp = System.currentTimeMillis() / 1000;

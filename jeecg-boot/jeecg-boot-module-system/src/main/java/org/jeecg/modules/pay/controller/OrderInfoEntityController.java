@@ -323,6 +323,9 @@ public class OrderInfoEntityController {
             if (order == null) {
                 return R.error("订单不存在");
             }
+            if(!orderInfoEntityService.notifyOrderFinish(id,order.getPayType())){
+                return R.error("通知挂马平台失败，请联系管理员");
+            }
             order.setReplacementOrder("1");
             orderInfoEntityService.updateById(order);
             StringBuilder msg = new StringBuilder();
@@ -366,4 +369,6 @@ public class OrderInfoEntityController {
             }
         }
     }
+
+
 }

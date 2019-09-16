@@ -112,6 +112,26 @@ public class AliPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
         return false;
     }
 
+    @Override
+    public boolean notifyOrderFinish(OrderInfoEntity order, String key, UserBusinessEntity userBusiness,String url) throws Exception {
+        JSONObject param = new JSONObject();
+        param.put("orderId",order.getOrderId());
+        log.info("==>手动补单，回调挂马平台url：{}，param:{}",url,param.toJSONString());
+        String data = AES128Util.encryptBase64(param.toJSONString(), key);
+        JSONObject requestParam = new JSONObject();
+        requestParam.put("data",data);
+        log.info("==>手动补单，回调挂马平台，加密后的入参为：{}",requestParam.toJSONString());
+        HttpResult result = HttpUtils.doPostJson(url, requestParam.toJSONString());
+        log.info("==>手动补单，挂马平台返回状态码为：{}；内容为为：{}",result.getCode(),result.getBody());
+        if(result.getCode() == BaseConstant.SUCCESS ){
+            JSONObject r = JSON.parseObject(result.getBody());
+            if("200".equals(r.get("code").toString())){
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     private AliPayCallBackParam structuralAliParam(OrderInfoEntity order, String contentType, String thoroughfare,
                                                    String type, String robin, String payType, String userName,String callbackUrl,String key) throws Exception {
