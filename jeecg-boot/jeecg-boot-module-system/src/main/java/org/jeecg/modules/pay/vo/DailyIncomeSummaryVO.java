@@ -29,6 +29,7 @@ public class DailyIncomeSummaryVO {
 	 * 会员类型(1：代理  2：介绍人 3：商户）
 	 */
 	private String memberType;
+	private String payType;
 	/**总订单数*/
 	@Excel(name = "总订单数", width = 15)
     @ApiModelProperty(value = "总订单数")
@@ -54,9 +55,9 @@ public class DailyIncomeSummaryVO {
     @ApiModelProperty(value = "未付订单金额")
 	private java.math.BigDecimal unpaidOrderAmount;
 	/**收入*/
-	@Excel(name = "收入", width = 15)
-    @ApiModelProperty(value = "收入")
-	private java.math.BigDecimal feeIncome;
+	@Excel(name = "手续费", width = 15)
+	@ApiModelProperty(value = "手续费")
+	private java.math.BigDecimal payFee;
 	/**代理ID*/
 	@Excel(name = "代理ID", width = 15)
     @ApiModelProperty(value = "代理ID")

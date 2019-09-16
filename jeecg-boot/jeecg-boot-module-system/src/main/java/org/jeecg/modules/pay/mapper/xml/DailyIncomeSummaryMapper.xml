@@ -4,35 +4,33 @@
 
 
     <select id="pageSummary" parameterType="Map" resultType="org.jeecg.modules.pay.vo.DailyIncomeSummaryVO">
-        select user_id,user_name,user_realname,
-                count(1) as totalOrderCount,sum(submit_amount) as totalOrderAmount,
+        select user_id,user_name,user_realname,pay_type,
+        count(1) as totalOrderCount,
+        sum(submit_amount) as totalOrderAmount,
         count( case when status = 2 || status = 1 then 1 else null end) as paidOrderCount,
         sum( case when status = 2 || status = 1 then submit_amount else 0 end) as paidOrderAmount,
-        count( case when status != 2 and status != 1 then 1 else null end) as unpaidOrderCount,
-        sum( case when status != 2 and status != 1 then submit_amount else 0 end) as unpaidOrderAmount,
-        sum(case when status = 2 then poundage else 0 end) as feeIncome
+        count( case when status = 0 || status = -1 then 1 else null end) as unpaidOrderCount,
+        sum( case when status = 0 || status = -1 then submit_amount else 0 end) as unpaidOrderAmount,
+        sum(case when status = 2 then poundage else 0 end) as payFee
         from pay_order_info
-        where to_days(success_time) = to_days(#{map.date})
+        where ((status != 2 and to_days(create_time) = to_days(#{map.date}))
+        or (status = 2 and to_days(success_time) = to_days(#{map.date})))
 
-            <if test="map.username!=null and map.username!=''">
-                and user_name = #{map.username}
-            </if>
-            <if test="map.userRealname!=null and map.userRealname!=''">
-                and user_realname = #{map.userRealname}
-            </if>
+        <if test="map.username!=null and map.username!=''">
+            and user_name = #{map.username}
+        </if>
+
+        <if test="map.userId!=null and map.userId!=''">
+            and user_id = #{map.userId}
+        </if>
         <if test="map.agentId!=null and map.agentId!=''">
             and agent_id = #{map.agentId}
         </if>
         <if test="map.salesmanId!=null and map.salesmanId!=''">
             and salesman_Id = #{map.salesmanId}
         </if>
-        <if test="map.userId!=null and map.userId!=''">
-            and user_id = #{map.userId}
-        </if>
-        <if test="map.username!=null and map.username!=''">
-            and user_name = #{map.username}
-        </if>
-        group by user_id,user_name,user_realname
 
+        group by user_id,user_name,user_realname,pay_type
+        order by user_name
     </select>
 </mapper>
