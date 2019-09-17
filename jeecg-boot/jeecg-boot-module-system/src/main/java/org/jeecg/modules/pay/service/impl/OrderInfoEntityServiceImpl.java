@@ -734,12 +734,19 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             throw new RRException("用户未配置费率，请联系管理员配置");
         }
         if (StringUtils.isNotBlank(user.getSalesmanUsername())) {
-            //介绍人
+            //介绍人不为空
+            //介绍人对商户设置的费率
+            String introducerRate = rateEntityService.getBeIntroducerRate(user.getUsername(), user.getAgentUsername(),
+                    user.getSalesmanUsername(), payType);
+            if (StringUtils.isBlank(introducerRate)) {
+                throw new RRException("介绍人未对商户设置费率，请联系管理员");
+            }
+            //代理对介绍人设置的费率
             SysUser sale = userService.getUserByName(user.getSalesmanUsername());
-            String salesRate = rateEntityService.getBeIntroducerRate(user.getSalesmanUsername(),
-                    sale.getAgentUsername(), user.getUsername(), payType);
-            if (StringUtils.isBlank(salesRate)) {
-                throw new RRException("用户的介绍人未配置费率，请联系管理员配置");
+            String agentRate = rateEntityService.getUserRateByUserNameAndAngetCode(user.getSalesmanUsername(),
+                    sale.getAgentUsername(), payType);
+            if (StringUtils.isBlank(agentRate)) {
+                throw new RRException("代理未对介绍人设置费率，请联系管理员");
             }
         }
     }

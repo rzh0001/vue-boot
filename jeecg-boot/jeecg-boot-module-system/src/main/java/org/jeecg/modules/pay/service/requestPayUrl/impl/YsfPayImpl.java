@@ -108,6 +108,7 @@ public class YsfPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
         String data = AES128Util.encryptBase64(param.toJSONString(), aesKey);
         JSONObject requestParam = new JSONObject();
         requestParam.put("data",data);
+        requestParam.put("businessCode",userBusiness.getBusinessCode());
         log.info("==>手动补单，回调挂马平台，加密后的入参为：{}",requestParam.toJSONString());
         HttpResult result = HttpUtils.doPostJson(url, requestParam.toJSONString());
         log.info("==>手动补单，挂马平台返回状态码为：{}；内容为为：{}",result.getCode(),result.getBody());
