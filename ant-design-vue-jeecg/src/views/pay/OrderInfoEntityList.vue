@@ -122,6 +122,7 @@
   import OrderInfoEntityModal from './modules/OrderInfoEntityModal'
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
   import { getAction } from '@/api/manage'
+  import { colAuthFilter } from "@/utils/authFilter"
 
   export default {
     name: 'OrderInfoEntityList',
@@ -264,6 +265,11 @@
         }
       }
     },
+    created() {
+      this.columns = colAuthFilter(this.columns,'orderList:');
+      this.loadData();
+      this.initDictConfig();
+    },
     computed: {
       importExcelUrl: function() {
         return `${window._CONFIG['domianURL']}/${this.url.importExcelUrl}`
@@ -299,7 +305,8 @@
           }
           this.loading = false;
         })
-      }
+      },
+
     }
   }
 </script>
