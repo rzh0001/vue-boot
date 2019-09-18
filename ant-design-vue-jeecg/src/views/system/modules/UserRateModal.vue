@@ -125,7 +125,7 @@
             align:"center",
             dataIndex: 'userRate'
           },
-          {
+          /*{
             title: '高级代理名称',
             align:"center",
             dataIndex: 'agentId'
@@ -134,7 +134,7 @@
             title: '介绍人名称',
             align:"center",
             dataIndex: 'introducerName'
-          },
+          },*/
           {
             title: '操作',
             key: 'action',
