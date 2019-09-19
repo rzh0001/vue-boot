@@ -136,6 +136,13 @@ public class LoginController {
 		if(!result.isSuccess()) {
 			return result;
 		}
+		//2. 校验用户名或密码是否正确
+		String userpassword = PasswordUtil.encrypt(username, password, sysUser.getSalt());
+		String syspassword = sysUser.getPassword();
+		if (!syspassword.equals(userpassword)) {
+			result.error500("用户名或密码错误");
+			return result;
+		}
 		if(StringUtils.isEmpty(sysUser.getGoogleSecretKey())){
 			//谷歌密钥为空，则需要先绑定谷歌验证码
 			request.getSession().setAttribute("username",username);
@@ -173,14 +180,6 @@ public class LoginController {
 	 * @return
 	 */
 	private Result<JSONObject> checkPassword(String username,String password,SysUser sysUser,Result<JSONObject> result){
-		//2. 校验用户名或密码是否正确
-		String userpassword = PasswordUtil.encrypt(username, password, sysUser.getSalt());
-		String syspassword = sysUser.getPassword();
-		if (!syspassword.equals(userpassword)) {
-			result.error500("用户名或密码错误");
-			return result;
-		}
-
 		//用户登录信息
 		userInfo(sysUser, result);
 		sysBaseAPI.addLog("用户名: " + username + ",登录成功！", CommonConstant.LOG_TYPE_1, null);
