@@ -3,6 +3,10 @@ package org.jeecg.modules.system.controller;
 import cn.hutool.core.util.RandomUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.aliyuncs.exceptions.ClientException;
+import com.warrenstrange.googleauth.GoogleAuthenticator;
+import com.warrenstrange.googleauth.GoogleAuthenticatorConfig;
+import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
+import com.warrenstrange.googleauth.GoogleAuthenticatorQRGenerator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -20,13 +24,16 @@ import org.jeecg.common.util.encryption.AesEncryptUtil;
 import org.jeecg.common.util.encryption.EncryptedString;
 import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.shiro.vo.DefContants;
+import org.jeecg.modules.system.entity.GoogleEntity;
 import org.jeecg.modules.system.entity.SysDepart;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.model.SysLoginModel;
 import org.jeecg.modules.system.service.ISysDepartService;
 import org.jeecg.modules.system.service.ISysLogService;
 import org.jeecg.modules.system.service.ISysUserService;
+import org.jeecg.modules.util.R;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -53,9 +60,71 @@ public class LoginController {
 	@Autowired
     private ISysDepartService sysDepartService;
 
+	/**
+	 * 获取谷歌
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping("/getGoogle")
+	public Result<GoogleEntity> getGoogleKey(HttpServletRequest request,HttpServletResponse response){
+		Result<GoogleEntity> result = new Result<GoogleEntity>();
+		GoogleAuthenticatorConfig config =
+				new GoogleAuthenticatorConfig.GoogleAuthenticatorConfigBuilder()
+						.build();
+		GoogleAuthenticator authenticator = new GoogleAuthenticator();
+		String googleKey = authenticator.createCredentials().getKey();
+		GoogleAuthenticatorKey credentials =
+				new GoogleAuthenticatorKey
+						.Builder(googleKey)
+						.setConfig(config)
+						.setVerificationCode(123456)
+						.setScratchCodes(new ArrayList<Integer>())
+						.build();
+		request.getSession().setAttribute("googleKey", googleKey);
+		String userName = (String) request.getSession().getAttribute("username");
+		String url = GoogleAuthenticatorQRGenerator.getOtpAuthURL("快乐", "用户名:"+userName, credentials);
+		GoogleEntity googleEntity = new GoogleEntity();
+		googleEntity.setGoogleKey(googleKey);
+		googleEntity.setGoogleUrl(url);
+		result.setResult(googleEntity);
+		return result;
+	}
+
+	/**
+	 * 绑定谷歌
+	 * @param googleCode
+	 * @param request
+	 * @return
+	 */
+	@ResponseBody
+	@PostMapping(value = "/bind")
+	public Result<JSONObject> bindGoogle(@RequestBody String googleCode,HttpServletRequest request){
+		Result<JSONObject> result = new Result<JSONObject>();
+		JSONObject param = JSONObject.parseObject(googleCode);
+		String googleKey =(String)  request.getSession().getAttribute("googleKey");
+		GoogleAuthenticator authenticator = new GoogleAuthenticator();
+		try{
+			boolean checkGoogle = authenticator.authorize(googleKey,Integer.parseInt(param.getString("googleCode")));
+			if(!checkGoogle){
+				result.error500("输入的谷歌验证码有误");
+				return result;
+			}
+		}catch (Exception e){
+			log.info("谷歌验证码，验证失败，失败信息为：{}",e);
+			result.error500("输入的谷歌验证码有误");
+			return result;
+		}
+		String userName = (String)  request.getSession().getAttribute("username");
+		String passWord = (String)  request.getSession().getAttribute("password");
+		sysUserService.updateUserGoogleKey(userName,googleKey);
+		SysUser sysUser = sysUserService.getUserByName(userName);
+		return checkPassword( userName, passWord, sysUser, result);
+	}
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	@ApiOperation("登录接口")
-	public Result<JSONObject> login(@RequestBody SysLoginModel sysLoginModel) throws Exception {
+	public Result<JSONObject> login(@RequestBody SysLoginModel sysLoginModel,HttpServletRequest request) throws Exception {
 		Result<JSONObject> result = new Result<JSONObject>();
 		String username = sysLoginModel.getUsername();
 		String password = sysLoginModel.getPassword();
@@ -67,7 +136,43 @@ public class LoginController {
 		if(!result.isSuccess()) {
 			return result;
 		}
-		
+		if(StringUtils.isEmpty(sysUser.getGoogleSecretKey())){
+			//谷歌密钥为空，则需要先绑定谷歌验证码
+			request.getSession().setAttribute("username",username);
+			request.getSession().setAttribute("password",password);
+			result.setCode(302);
+			return result;
+		}else {
+			String googleCode = sysLoginModel.getGoogleCode();
+			if(StringUtils.isEmpty(googleCode)){
+				result.error500("谷歌验证码不能为空");
+				return result;
+			}
+			//校验谷歌验证码
+			GoogleAuthenticator authenticator = new GoogleAuthenticator();
+			try{
+				boolean checkGoogle = authenticator.authorize(sysUser.getGoogleSecretKey(),Integer.parseInt(googleCode));
+				if(!checkGoogle){
+					result.error500("输入的谷歌验证码有误");
+					return result;
+				}
+			}catch (Exception e){
+				result.error500("输入的谷歌验证码有误");
+				return result;
+			}
+			return checkPassword(username, password, sysUser,result);
+
+		}
+	}
+
+	/**
+	 * 校验密码
+	 * @param username
+	 * @param password
+	 * @param sysUser
+	 * @return
+	 */
+	private Result<JSONObject> checkPassword(String username,String password,SysUser sysUser,Result<JSONObject> result){
 		//2. 校验用户名或密码是否正确
 		String userpassword = PasswordUtil.encrypt(username, password, sysUser.getSalt());
 		String syspassword = sysUser.getPassword();
@@ -75,14 +180,12 @@ public class LoginController {
 			result.error500("用户名或密码错误");
 			return result;
 		}
-				
+
 		//用户登录信息
 		userInfo(sysUser, result);
 		sysBaseAPI.addLog("用户名: " + username + ",登录成功！", CommonConstant.LOG_TYPE_1, null);
-
 		return result;
 	}
-	
 	/**
 	 * 退出登录
 	 * @param request

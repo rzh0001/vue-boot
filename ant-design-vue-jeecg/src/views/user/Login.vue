@@ -26,7 +26,15 @@
               <a-icon slot="prefix" type="lock" :style="{ color: 'rgba(0,0,0,.25)' }"/>
             </a-input>
           </a-form-item>
-
+          <a-form-item>
+            <a-input
+              size="large"
+              v-decorator="['googleCode',validatorRules.googleCode]"
+              type="input"
+              placeholder="请输入谷歌验证码,未绑定谷歌，则不需要输入">
+              <a-icon slot="prefix" type="user" :style="{ color: 'rgba(0,0,0,.25)' }"/>
+            </a-input>
+          </a-form-item>
           <a-row :gutter="0">
             <a-col :span="14">
               <a-form-item>
@@ -45,52 +53,11 @@
               <j-graphic-code @success="generateCode" style="float: right"></j-graphic-code>
             </a-col>
           </a-row>
-
-
         </a-tab-pane>
-        <!--<a-tab-pane key="tab2" tab="手机号登陆">
-          <a-form-item>
-            <a-input
-              v-decorator="['mobile',validatorRules.mobile]"
-              size="large"
-              type="text"
-              placeholder="手机号">
-              <a-icon slot="prefix" type="mobile" :style="{ color: 'rgba(0,0,0,.25)' }"/>
-            </a-input>
-          </a-form-item>
-
-          <a-row :gutter="16">
-            <a-col class="gutter-row" :span="16">
-              <a-form-item>
-                <a-input
-                  v-decorator="['captcha',validatorRules.captcha]"
-                  size="large"
-                  type="text"
-                  placeholder="请输入验证码">
-                  <a-icon slot="prefix" type="mail" :style="{ color: 'rgba(0,0,0,.25)' }"/>
-                </a-input>
-              </a-form-item>
-            </a-col>
-            <a-col class="gutter-row" :span="8">
-              <a-button
-                class="getCaptcha"
-                tabindex="-1"
-                :disabled="state.smsSendBtn"
-                @click.stop.prevent="getCaptcha"
-                v-text="!state.smsSendBtn && '获取验证码' || (state.time+' s')"></a-button>
-            </a-col>
-          </a-row>
-        </a-tab-pane>-->
       </a-tabs>
 
       <a-form-item>
         <a-checkbox v-model="formLogin.rememberMe">自动登陆</a-checkbox>
-        <!--<router-link :to="{ name: 'alteration'}" class="forge-password" style="float: right;">
-          忘记密码
-        </router-link>
-        <router-link :to="{ name: 'register'}" class="forge-password" style="float: right;margin-right: 10px" >
-          注册账户
-        </router-link>-->
       </a-form-item>
 
       <a-form-item style="margin-top:24px">
@@ -105,15 +72,6 @@
         </a-button>
       </a-form-item>
 
-      <!-- <div class="user-login-other">
-        <span>其他登陆方式</span>
-        <a><a-icon class="item-icon" type="alipay-circle"></a-icon></a>
-        <a><a-icon class="item-icon" type="taobao-circle"></a-icon></a>
-        <a><a-icon class="item-icon" type="weibo-circle"></a-icon></a>
-        <router-link class="register" :to="{ name: 'register' }">
-          注册账户
-        </router-link>
-      </div>-->
     </a-form>
 
     <two-step-captcha
@@ -123,45 +81,38 @@
       @cancel="stepCaptchaCancel"></two-step-captcha>
 
     <a-modal
-      title="登录部门选择"
-      :width="450"
-      :visible="departVisible"
-      :closable="false"
-      :maskClosable="false">
+      :visible="showGoogle"
+      :title="googleTile"
+      :width="800"
+      :confirmLoading="confirmLoading"
+      @ok="bindGoogle"
+      @cancel="closeGoogle"
+      cancelText="关闭">
+      <a-spin :spinning="confirmLoading">
+        <div >
+          <p class="login-box-msg">绑定步骤</p>
+          <ol>
+            <li>下载APP，APP名称为[Google Authenticator]</li>
+            <li>使用Google Authenticator 进行扫描绑定</li>
+            <li>输入谷歌验证码进行绑定</li>
+          </ol>
+          <span style='color:red' >安卓手机如果无法扫描，请通过手动输入以下验证码进行绑定：{{googleKey}}</span>
 
-      <template slot="footer">
-        <a-button type="primary" @click="departOk">确认</a-button>
-      </template>
-
-      <a-form>
-        <a-form-item
-          :labelCol="{span:4}"
-          :wrapperCol="{span:20}"
-          style="margin-bottom:10px"
-          :validate-status="validate_status">
-          <a-tooltip placement="topLeft" >
-            <template slot="title">
-              <span>您隶属于多部门，请选择登录部门</span>
-            </template>
-            <a-avatar style="backgroundColor:#87d068" icon="gold" />
-          </a-tooltip>
-          <a-select @change="departChange" :class="{'valid-error':validate_status=='error'}" placeholder="请选择登录部门" style="margin-left:10px;width: 80%">
-            <a-icon slot="suffixIcon" type="gold" />
-            <a-select-option
-              v-for="d in departList"
-              :key="d.id"
-              :value="d.orgCode">
-              {{ d.departName }}
-            </a-select-option>
-          </a-select>
-        </a-form-item>
-      </a-form>
-
-
-
+          <div class="form-group has-feedback">
+            <img :src="googleSrc" >
+          </div>
+        </div>
+        <a-form :form="form">
+          <a-form-item
+            label="谷歌验证码">
+            <a-input placeholder="谷歌验证码" style="width:200px;"  v-model="googleCode"/>
+          </a-form-item>
+        </a-form>
+      </a-spin>
     </a-modal>
+    </div>
 
-  </div>
+
 </template>
 
 <script>
@@ -175,16 +126,21 @@
   import JGraphicCode from '@/components/jeecg/JGraphicCode'
   import { putAction } from '@/api/manage'
   import { postAction } from '@/api/manage'
-  import { getAction} from '@/api/manage'
+  import { httpAction,getAction} from '@/api/manage'
   import { encryption } from '@/utils/encryption/aesEncrypt'
-
   export default {
     components: {
       TwoStepCaptcha,
-      JGraphicCode
+      JGraphicCode,
     },
     data () {
       return {
+        googleTile:'添加google',
+        confirmLoading: false,
+        showGoogle:false,
+        googleCode: '',
+        googleSrc:'',
+        googleKey:'',
         customActiveKey: "tab1",
         loginBtn: false,
         // login type: 0 email, 1 username, 2 telephone
@@ -200,6 +156,7 @@
           username: "",
           password: "",
           captcha: "",
+          googleCode:"",
           mobile: "",
           rememberMe: true
         },
@@ -236,7 +193,21 @@
 
     },
     methods: {
-      ...mapActions([ "Login", "Logout","PhoneLogin" ]),
+      ...mapActions([ "Login", "Logout","PhoneLogin","BindGoogle" ]),
+    closeGoogle(){
+        this.showGoogle=false;
+    },
+      getGoogle(){
+        httpAction('/sys/getGoogle',null,'get').then((res)=>{
+          if(res.success){
+            console.log(res);
+          this.googleSrc = res.result.googleUrl;
+          this.googleKey = res.result.googleKey;
+        }else{
+          this.$message.warning(res.message);
+        }
+      })
+      },
       // handler
       handleUsernameOrEmail (rule, value, callback) {
         const regex = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+((\.[a-zA-Z0-9_-]{2,3}){1,2})$/;
@@ -251,6 +222,28 @@
         this.customActiveKey = key
         // this.form.resetFields()
       },
+    bindGoogle(){
+      this.showGoogle=false;
+      let googlecode = this.googleCode;
+      console.log(googlecode);
+      var params = {googleCode:googlecode}
+      let that = this
+      that.BindGoogle(params).then((res) => {
+        this.departConfirm(res)
+    }).catch((err) => {
+        that.requestFailed(err);
+    })
+
+     /* getAction('/sys/bind',params).then((res)=>{
+        if(res.success){
+        this.departConfirm(res);
+      }else{
+        this.$message.warning(res.message);
+      }
+    }).catch((err) => {
+        that.requestFailed(err);
+    });*/
+    },
       handleSubmit () {
         let that = this
         let loginParams = {
@@ -259,12 +252,13 @@
 
         // 使用账户密码登陆
         if (that.customActiveKey === 'tab1') {
-          that.form.validateFields([ 'username', 'password','inputCode' ], { force: true }, (err, values) => {
+          that.form.validateFields([ 'username', 'password','googleCode','inputCode' ], { force: true }, (err, values) => {
             if (!err) {
               getAction("/sys/getEncryptedString",{}).then((res)=>{
                 loginParams.username = values.username
                 //loginParams.password = md5(values.password)
                 loginParams.password = encryption(values.password,res.result.key,res.result.iv)
+                loginParams.googleCode = values.googleCode
                 that.Login(loginParams).then((res) => {
                   this.departConfirm(res)
                 }).catch((err) => {
@@ -357,6 +351,13 @@
         });
       },
       requestFailed (err) {
+        console.log(err);
+        if(err.code === 302){
+          this.loginBtn = false;
+          this.showGoogle = true;
+          this.getGoogle();
+          return;
+        }
         this.$notification[ 'error' ]({
           message: '登录失败',
           description: ((err.response || {}).data || {}).message || err.message || "请求出现错误，请稍后再试",
@@ -392,6 +393,7 @@
         }
       },
       departConfirm(res){
+        console.log(res);
         if(res.success){
           let multi_depart = res.result.multi_depart
           //0:无部门 1:一个部门 2:多个部门

@@ -67,5 +67,5 @@ public interface IOrderInfoEntityService extends IService<OrderInfoEntity> {
      * @param payType
      */
     boolean notifyOrderFinish(String orderId,String payType) throws Exception;
-    
+    List<String> getOrderByTime(String time);
 }

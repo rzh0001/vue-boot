@@ -1,5 +1,6 @@
 const api = {
     Login: '/sys/login',
+    BindGoogle: '/sys/bind',
     Logout: '/sys/logout',
     ForgePassword: '/auth/forge-password',
     Register: '/auth/register',

@@ -59,7 +59,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 	private SysDepartMapper sysDepartMapper;
 	@Autowired
 	private IUserAmountEntityService userAmountService;
-	
+
+	@Override
+	public void updateUserGoogleKey(String userName, String googleKey) {
+		userMapper.updateUserGoogleKey(userName,googleKey);
+	}
+
 	@Override
 	public SysUser getUserByName(String username) {
 		return userMapper.getUserByName(username);

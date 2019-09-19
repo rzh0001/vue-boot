@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.vo.SysUserPage;
 
@@ -20,6 +21,9 @@ import java.util.Map;
  * @since 2018-12-20
  */
 public interface SysUserMapper extends BaseMapper<SysUser> {
+
+    @Update("update sys_user set google_secret_key=#{googleKey} where username=#{userName}")
+    void updateUserGoogleKey(@Param("userName")String userName, @Param("googleKey")String googleKey);
     /**
      * 通过用户账号查询用户信息
      *
