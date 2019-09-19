@@ -31,17 +31,6 @@
                 </a-select>
               </a-form-item>
             </a-col>
-            <!--            <a-col :md="6" :sm="8">-->
-            <!--              <a-form-item label="订单状态">-->
-            <!--                <a-select v-model="queryParam.status" placeholder="">-->
-            <!--&lt;!&ndash;                  <a-select-option v-for="option in orderStatus"  :value="option.code">&ndash;&gt;-->
-            <!--&lt;!&ndash;                    {{ option.name }}&ndash;&gt;-->
-            <!--&lt;!&ndash;                  </a-select-option>&ndash;&gt;-->
-            <!--&lt;!&ndash;                  <a-select-option value=""></a-select-option>&ndash;&gt;-->
-
-            <!--                </a-select>-->
-            <!--              </a-form-item>-->
-            <!--            </a-col>-->
             <a-col :md="6" :sm="8">
               <a-form-item label="状态">
                 <a-select v-model="queryParam.status" placeholder="">
@@ -138,16 +127,6 @@
         summary: {},
         // 表头
         columns: [
-          // {
-          //   title: '#',
-          //   dataIndex: '',
-          //   key: 'rowIndex',
-          //   width: 60,
-          //   align: 'center',
-          //   customRender: function(t, r, index) {
-          //     return parseInt(index) + 1
-          //   }
-          // },
           {
             title: '四方系统订单号',
             align: 'center',
@@ -164,11 +143,11 @@
             align: 'center',
             dataIndex: 'userName'
           },
-          {
+          /*{
             title: '代理',
             align: 'center',
             dataIndex: 'parentUser'
-          },
+          },*/
           {
             title: '商户编号',
             align: 'center',

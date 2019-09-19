@@ -120,21 +120,6 @@
         description: '用户余额报表-期初余额 每天0点更新管理页面',
         // 表头
         columns: [
-          // {
-          //   title: '#',
-          //   dataIndex: '',
-          //   key: 'rowIndex',
-          //   width: 60,
-          //   align: 'center',
-          //   customRender: function(t, r, index) {
-          //     return parseInt(index) + 1
-          //   }
-          // },
-          // {
-          //   title: '用户id',
-          //   align: 'center',
-          //   dataIndex: 'userId'
-          // },
           {
             title: '报表日期',
             align: 'center',
@@ -181,11 +166,11 @@
           //   align: 'center',
           //   dataIndex: 'agentId'
           // },
-          {
+         /* {
             title: '代理',
             align: 'center',
             dataIndex: 'agentUsername'
-          },
+          },*/
           // {
           //   title: '代理姓名',
           //   align: 'center',
@@ -196,11 +181,11 @@
           //   align: 'center',
           //   dataIndex: 'salesmanId'
           // },
-          {
+         /* {
             title: '介绍人',
             align: 'center',
             dataIndex: 'salesmanUsername'
-          }
+          }*/
           // {
           //   title: '介绍人姓名',
           //   align: 'center',
