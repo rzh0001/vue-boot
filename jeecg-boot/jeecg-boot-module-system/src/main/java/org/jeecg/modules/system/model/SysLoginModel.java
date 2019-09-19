@@ -18,6 +18,16 @@ public class SysLoginModel {
 	@ApiModelProperty(value = "验证码")
     private String captcha;
 
+	private String googleCode;
+
+    public String getGoogleCode() {
+        return googleCode;
+    }
+
+    public void setGoogleCode(String googleCode) {
+        this.googleCode = googleCode;
+    }
+
     public String getUsername() {
         return username;
     }
