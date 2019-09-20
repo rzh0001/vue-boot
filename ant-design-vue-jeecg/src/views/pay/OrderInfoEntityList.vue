@@ -128,7 +128,7 @@
         // 表头
         columns: [
           {
-            title: '四方系统订单号',
+            title: '系统订单号',
             align: 'center',
             dataIndex: 'orderId'
           },
@@ -222,6 +222,13 @@
             align: 'center',
             width: 150,
             dataIndex: 'successTime',
+            sorter: true
+          },
+          {
+            title: 'IP',
+            align: 'center',
+            width: 150,
+            dataIndex: 'ip',
             sorter: true
           },
           {
