@@ -31,17 +31,6 @@
                 </a-select>
               </a-form-item>
             </a-col>
-            <!--            <a-col :md="6" :sm="8">-->
-            <!--              <a-form-item label="订单状态">-->
-            <!--                <a-select v-model="queryParam.status" placeholder="">-->
-            <!--&lt;!&ndash;                  <a-select-option v-for="option in orderStatus"  :value="option.code">&ndash;&gt;-->
-            <!--&lt;!&ndash;                    {{ option.name }}&ndash;&gt;-->
-            <!--&lt;!&ndash;                  </a-select-option>&ndash;&gt;-->
-            <!--&lt;!&ndash;                  <a-select-option value=""></a-select-option>&ndash;&gt;-->
-
-            <!--                </a-select>-->
-            <!--              </a-form-item>-->
-            <!--            </a-col>-->
             <a-col :md="6" :sm="8">
               <a-form-item label="状态">
                 <a-select v-model="queryParam.status" placeholder="">
@@ -63,7 +52,7 @@
           <a-col :md="6" :sm="8">
             <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
               <a-button type="primary" @click="searchQuery" icon="search">查询</a-button>
-<!--              <a-button type="primary" @click="searchQueryLocal" icon="search">查询</a-button>-->
+              <!--              <a-button type="primary" @click="searchQueryLocal" icon="search">查询</a-button>-->
               <a-button type="primary" @click="searchReset" icon="reload" style="margin-left: 8px">重置</a-button>
               <a @click="handleToggleSearch" style="margin-left: 8px">
                 {{ toggleSearchStatus ? '收起' : '展开' }}
@@ -77,12 +66,12 @@
     </div>
 
     <div>
-<!--      <div class="ant-alert ant-alert-info" style="margin-bottom: 16px;">-->
-<!--        提交订单数：{{summary.totalOrderCount}} 订单总金额：{{summary.totalOrderAmount}} 已付订单数：{{summary.paidOrderCount}}-->
-<!--        已付总金额：{{summary.paidOrderAmount}}-->
-<!--        预计收入：{{summary.totalCount}} 预计手续费：{{summary.feeIncome}} 未付订单数：{{summary.unpaidOrderCount}} 未付总金额-->
-<!--        {{summary.unpaidOrderAmount}}-->
-<!--      </div>-->
+      <!--      <div class="ant-alert ant-alert-info" style="margin-bottom: 16px;">-->
+      <!--        提交订单数：{{summary.totalOrderCount}} 订单总金额：{{summary.totalOrderAmount}} 已付订单数：{{summary.paidOrderCount}}-->
+      <!--        已付总金额：{{summary.paidOrderAmount}}-->
+      <!--        预计收入：{{summary.totalCount}} 预计手续费：{{summary.feeIncome}} 未付订单数：{{summary.unpaidOrderCount}} 未付总金额-->
+      <!--        {{summary.unpaidOrderAmount}}-->
+      <!--      </div>-->
 
       <a-table
         ref="table"
@@ -122,6 +111,7 @@
   import OrderInfoEntityModal from './modules/OrderInfoEntityModal'
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
   import { getAction } from '@/api/manage'
+  import { colAuthFilter } from "@/utils/authFilter"
 
   export default {
     name: 'OrderInfoEntityList',
@@ -137,18 +127,8 @@
         summary: {},
         // 表头
         columns: [
-          // {
-          //   title: '#',
-          //   dataIndex: '',
-          //   key: 'rowIndex',
-          //   width: 60,
-          //   align: 'center',
-          //   customRender: function(t, r, index) {
-          //     return parseInt(index) + 1
-          //   }
-          // },
           {
-            title: '四方系统订单号',
+            title: '系统订单号',
             align: 'center',
             dataIndex: 'orderId'
           },
@@ -163,11 +143,11 @@
             align: 'center',
             dataIndex: 'userName'
           },
-          {
+          /*{
             title: '代理',
             align: 'center',
             dataIndex: 'parentUser'
-          },
+          },*/
           {
             title: '商户编号',
             align: 'center',
@@ -245,6 +225,13 @@
             sorter: true
           },
           {
+            title: 'IP',
+            align: 'center',
+            width: 150,
+            dataIndex: 'ip',
+            sorter: true
+          },
+          {
             title: '操作',
             dataIndex: 'action',
             align: 'center',
@@ -264,6 +251,11 @@
         }
       }
     },
+    created() {
+      this.columns = colAuthFilter(this.columns,'orderList:');
+      this.loadData();
+      this.initDictConfig();
+    },
     computed: {
       importExcelUrl: function() {
         return `${window._CONFIG['domianURL']}/${this.url.importExcelUrl}`
@@ -276,30 +268,31 @@
       againRequest(orderId) {
         getAction(this.url.againRequest, { id: orderId }).then((res) => {
           alert(res.msg)
-        })
+      })
       },
       channel() {
         getAction(this.url.channel, null).then((res) => {
           if (res.success) {
-            this.channels = res.result
-          } else {
-            this.$message.warning(res.message)
-          }
-        })
+          this.channels = res.result
+        } else {
+          this.$message.warning(res.message)
+        }
+      })
       },
       searchQueryLocal(){
         this.searchQuery()
         var params = this.getQueryParams();
         getAction(this.url.summaryUrl, this.queryParam).then((res) => {
           if (res.success) {
-            this.summary = res.result;
-          }
-          if(res.code===510){
-            this.$message.warning(res.message)
-          }
-          this.loading = false;
-        })
-      }
+          this.summary = res.result;
+        }
+        if(res.code===510){
+          this.$message.warning(res.message)
+        }
+        this.loading = false;
+      })
+      },
+
     }
   }
 </script>
