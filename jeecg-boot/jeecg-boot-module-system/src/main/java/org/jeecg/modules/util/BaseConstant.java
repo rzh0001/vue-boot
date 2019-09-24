@@ -49,11 +49,12 @@ public class BaseConstant {
     //数据字典配置的挂马平台的地址
     public static final String API_KEY = "apiKey";
     public static final String IP_WHITE_LIST= "ipWhiteList";
-    public static final String IP_BLACK_LIST = "ipBlacklist";
     public static final String SKIP_GOOGLE_CHECK_NAMES = "skipGoogleCheckNames";
+    public static final String IP_BLACK_LIST = "ipBlacklist";
     public static final String INNER_CALL_BACK_URL= "innerCallBackUrl";
     public static final String REQUEST_URL = "requestPay";
     public static final String QUERY_ORDER_STATUS_URL = "queryOrderStatusUrl";
+    public static final String NOTIFY_ORDER_FINISH_URL = "notifyOrderFinishUrl";
     //支付通道
     //云闪付
     public static final String REQUEST_YSF = "ysf";

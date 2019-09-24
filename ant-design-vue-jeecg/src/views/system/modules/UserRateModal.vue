@@ -125,7 +125,7 @@
             align:"center",
             dataIndex: 'userRate'
           },
-         /* {
+          /*{
             title: '高级代理名称',
             align:"center",
             dataIndex: 'agentId'

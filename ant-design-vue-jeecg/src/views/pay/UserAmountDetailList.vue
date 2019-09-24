@@ -173,30 +173,40 @@
             }
           },
           {
-            title: '金额',
+            title: '初始金额',
+            align: 'center',
+            dataIndex: 'initialAmount'
+          },
+          {
+            title: '变动金额',
             align: 'center',
             dataIndex: 'amount'
+          },
+          {
+            title: '变动后金额',
+            align: 'center',
+            dataIndex: 'updateAmount'
           },
           {
             title: '订单号',
             align: 'center',
             dataIndex: 'orderId'
           },
-          {
-            title: '费率',
-            align: 'center',
-            dataIndex: 'userRate'
-          },
+          // {
+          //   title: '费率',
+          //   align: 'center',
+          //   dataIndex: 'userRate'
+          // },
           // {
           //   title: '代理ID',
           //   align: 'center',
           //   dataIndex: 'agentId'
           // },
-          {
-            title: '代理',
-            align: 'center',
-            dataIndex: 'agentUsername'
-          },
+          // {
+          //   title: '代理',
+          //   align: 'center',
+          //   dataIndex: 'agentUsername'
+          // },
           // {
           //   title: '代理姓名',
           //   align: 'center',
@@ -207,11 +217,11 @@
           //   align: 'center',
           //   dataIndex: 'salesmanId'
           // },
-          {
-            title: '介绍人',
-            align: 'center',
-            dataIndex: 'salesmanUsername'
-          },
+          // {
+          //   title: '介绍人',
+          //   align: 'center',
+          //   dataIndex: 'salesmanUsername'
+          // },
           // {
           //   title: '介绍人姓名',
           //   align: 'center',

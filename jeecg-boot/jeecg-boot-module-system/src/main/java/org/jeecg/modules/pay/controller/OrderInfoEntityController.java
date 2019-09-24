@@ -316,12 +316,15 @@ public class OrderInfoEntityController {
             //手动补单，密钥取订单中用户的密钥
             LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
             SysUser sysUser = userService.getUserByName(loginUser.getUsername());
-            log.info("补单操作==补单操作人：{}；单号为：{}", sysUser.getUsername(), id);
+            log.info("==》补单操作==补单操作人：{}；单号为：{}", sysUser.getUsername(), id);
             if (order.getStatus() == BaseConstant.ORDER_STATUS_SUCCESS) {
                 return R.error("订单状态是已成功状态，不能补单");
             }
             if (order == null) {
                 return R.error("订单不存在");
+            }
+            if(!orderInfoEntityService.notifyOrderFinish(id,order.getPayType())){
+                return R.error("通知挂马平台失败，请联系管理员");
             }
             order.setReplacementOrder("1");
             orderInfoEntityService.updateById(order);
@@ -346,7 +349,7 @@ public class OrderInfoEntityController {
                     return R.error(msg.toString());
                 }
             } else {
-                msg.append("通知商户失败,返回的状态码为：").append(result.getCode());
+                msg.append("通知商户失败,返回信息：").append(result.getBody());
                 log.info("通通知商户失败,orderID:{}", id);
                 orderInfoEntityService.updateOrderStatusNoBackByOrderId(id);
                 return R.error(msg.toString());
@@ -366,4 +369,6 @@ public class OrderInfoEntityController {
             }
         }
     }
+
+
 }

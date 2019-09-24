@@ -12,8 +12,8 @@
 <!--            </a-form-item>-->
 <!--          </a-col>-->
           <a-col :md="6" :sm="8">
-            <a-form-item label="用户名">
-              <a-input placeholder="请输入用户名" v-model="queryParam.username"></a-input>
+            <a-form-item label="商户">
+              <a-input placeholder="" v-model="queryParam.username"></a-input>
             </a-form-item>
           </a-col>
 <!--          <a-col :md="6" :sm="8">-->
@@ -24,7 +24,7 @@
 <!--          <a-col :span="12">日期选择框(v-model)：{{ jdate.value }}</a-col>-->
           <a-col :md="6" :sm="8">
             <a-form-item label="日期" >
-              <a-date-picker v-model="queryParam.transTime"  showTime format='YYYY-MM-DD' />
+              <j-date v-model="queryParam.transTime"></j-date>
             </a-form-item>
           </a-col>
 
@@ -166,14 +166,19 @@
           //   dataIndex: 'userId'
           // },
           {
-            title: '用户名',
+            title: '商户',
             align: 'center',
             dataIndex: 'username'
           },
+          // {
+          //   title: '用户名称',
+          //   align: 'center',
+          //   dataIndex: 'userRealname'
+          // },
           {
-            title: '用户名称',
+            title: '支付通道',
             align: 'center',
-            dataIndex: 'userRealname'
+            dataIndex: 'payType'
           },
           {
             title: '总订单数',
@@ -191,24 +196,24 @@
             dataIndex: 'unpaidOrderCount'
           },
           {
-            title: '总订单金额',
+            title: '总金额',
             align: 'center',
             dataIndex: 'totalOrderAmount'
           },
           {
-            title: '已付订单金额',
+            title: '已付金额',
             align: 'center',
             dataIndex: 'paidOrderAmount'
           },
           {
-            title: '未付订单金额',
+            title: '未付金额',
             align: 'center',
             dataIndex: 'unpaidOrderAmount'
           },
           {
-            title: '收入',
+            title: '手续费',
             align: 'center',
-            dataIndex: 'feeIncome'
+            dataIndex: 'payFee'
           },
           // {
           //   title: '代理ID',
@@ -263,17 +268,6 @@
     },
     methods: {
       moment,
-      getQueryParams(){
-        console.log(this.queryParam.transTime)
-        var param = Object.assign({}, this.queryParam,this.isorter);
-        param.field = this.getQueryField();
-        param.pageNo = this.ipagination.current;
-        param.pageSize = this.ipagination.pageSize;
-        param.transTime = moment(this.queryParam.transTime).format("YYYY-MM-DD")
-        // delete param.transTime
-        // param.transTime = moment().format("YYYY-MM-DD")
-        return filterObj(param);
-      }
     }
   }
 </script>
