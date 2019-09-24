@@ -476,8 +476,9 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * @param checkParam
      */
     private R addOrder(R checkParam, HttpServletRequest req) throws Exception {
-        String ip = IPUtils.getIpAddr(req);
-        if(isIpBlacklist(ip)){
+        String ip = (String) checkParam.get(BaseConstant.IP);
+        //String ip = IPUtils.getIpAddr(req);
+        if(!org.springframework.util.StringUtils.isEmpty(ip) && isIpBlacklist(ip)){
             throw new RRException("非法访问，请联系管理员" );
         }
         String outerOrderId = (String) checkParam.get(BaseConstant.OUTER_ORDER_ID);
@@ -712,6 +713,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
                     .put(BaseConstant.SUBMIT_AMOUNT, dataObj.getString(BaseConstant.SUBMIT_AMOUNT))
                     .put(BaseConstant.PAY_TYPE, dataObj.getString(BaseConstant.PAY_TYPE))
                     .put(BaseConstant.CALLBACK_URL, dataObj.getString(BaseConstant.CALLBACK_URL))
+                    .put(BaseConstant.IP, dataObj.getString(BaseConstant.IP))
                     .put(BaseConstant.AGENT_NAME, user.getAgentUsername())
                     .put(BaseConstant.REQUEST, request)
                     .put(BaseConstant.REQUEST_URL, requestUrl);
