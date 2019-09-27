@@ -61,6 +61,8 @@ public class BaseConstant {
     public static final String REQUEST_YSF = "ysf";
     //支付宝转账
     public static final String REQUEST_ALI_ZZ = "ali_zz";
+    //淘宝
+    public static final String  REQUEST_ALI_TT= "ali_taobao";
     //支付宝转卡
     public static final String REQUEST_ALI_BANK = "ali_bank";
     //农信 微信

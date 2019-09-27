@@ -240,25 +240,20 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     /**
      * 校验申请金额
      *
-     * @param userName
      * @param submitAmount
      * @return
      */
-    private void checkAmountValidity(String userName, String submitAmount) {
-        SysUser user = userService.getUserByName(userName);
-        if (user.getMemberType().equals(BaseConstant.USER_MERCHANTS) && StringUtils.isNotBlank(user.getAgentUsername())) {
-            //是普通商户且存在高级代理，验证才能通过
-            //验证金额是否符合上下线要求
-            if (user.getUpperLimit() != null && Double.parseDouble(submitAmount) > user.getUpperLimit().doubleValue()) {
-                throw new RRException("非法请求，申请金额超出申请上限");
-            }
-            if (user.getLowerLimit() != null && Double.parseDouble(submitAmount) < user.getLowerLimit().doubleValue()) {
-                throw new RRException("非法请求，申请金额低于申请下限");
-            }
-        } else {
-            throw new RRException("非法请求，请求类型不是商户" + userName);
+    private void checkAmountValidity(String userName,String submitAmount, String payType) {
+        UserChannelEntity channel = channelUserDao.queryChannelAndUserName(payType,userName);
+        if (channel == null) {
+            throw new RRException("用户通道通道不存在:" + payType);
         }
-
+        if (channel.getUpperLimit() != null && channel.getUpperLimit().doubleValue() < Double.parseDouble(submitAmount)) {
+            throw new RRException("非法请求，申请金额超出申请上限");
+        }
+        if (channel.getLowerLimit() != null && channel.getLowerLimit().doubleValue() > Double.parseDouble(submitAmount)) {
+            throw new RRException("非法请求，申请金额低于申请下限");
+        }
     }
 
     /**
@@ -291,10 +286,11 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             UserAmountEntity agent = amountService.getUserAmountByUserName(user.getAgentUsername());
             //代理获利
             BigDecimal agentAmount = submit.multiply(rate).setScale(2, BigDecimal.ROUND_HALF_UP);
-            changeAmount(user.getAgentUsername(), user.getAgentId(), agentAmount, agent, null, orderId, payType,null);
+            changeAmount(user.getAgentUsername(), user.getAgentId(), agentAmount, agent, null, orderId, payType, null);
             //商户收入
             UserAmountEntity customer = amountService.getUserAmountByUserName(userName);
-            changeAmount(userName, user.getId(), submit.subtract(agentAmount), customer, user.getAgentId(), orderId, payType,null);
+            changeAmount(userName, user.getId(), submit.subtract(agentAmount), customer, user.getAgentId(), orderId,
+                    payType, null);
         } else {
             //介绍人不为空
             //介绍人对商户设置的费率
@@ -309,17 +305,21 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             //介绍人获利 = 订单金额*（介绍人费率-代理费率）
             BigDecimal saleAmount = submit.multiply(rateDifference).setScale(2, BigDecimal.ROUND_HALF_UP);
             UserAmountEntity saleDbAmount = amountService.getUserAmountByUserName(user.getSalesmanUsername());
-            changeAmount(user.getSalesmanUsername(), sale.getId(), saleAmount, saleDbAmount, sale.getAgentId(), orderId, payType,null);
+            changeAmount(user.getSalesmanUsername(), sale.getId(), saleAmount, saleDbAmount, sale.getAgentId(),
+                    orderId, payType, null);
 
             //代理获利 = 订单金额*代理费率
             BigDecimal agentAmout = submit.multiply(new BigDecimal(agentRate)).setScale(2, BigDecimal.ROUND_HALF_UP);
             UserAmountEntity agentDbAmount = amountService.getUserAmountByUserName(user.getAgentUsername());
-            changeAmount(user.getAgentUsername(), user.getAgentId(), agentAmout, agentDbAmount, null, orderId, payType,null);
+            changeAmount(user.getAgentUsername(), user.getAgentId(), agentAmout, agentDbAmount, null, orderId,
+                    payType, null);
 
             //商户金额 =  订单金额 - 介绍人收入
-            BigDecimal customerAmount = submit.subtract(submit.multiply(new BigDecimal(introducerRate))).setScale(2, BigDecimal.ROUND_HALF_UP);
+            BigDecimal customerAmount = submit.subtract(submit.multiply(new BigDecimal(introducerRate))).setScale(2,
+                    BigDecimal.ROUND_HALF_UP);
             UserAmountEntity customerDbAmount = amountService.getUserAmountByUserName(userName);
-            changeAmount(userName, user.getId(), customerAmount, customerDbAmount, user.getAgentId(), orderId, payType,user.getSalesmanUsername());
+            changeAmount(userName, user.getId(), customerAmount, customerDbAmount, user.getAgentId(), orderId,
+                    payType, user.getSalesmanUsername());
         }
     }
 
@@ -335,7 +335,9 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * @param payType
      * @throws Exception
      */
-    private synchronized void changeAmount(String name, String userId, BigDecimal amount, UserAmountEntity userAmountEntity, String agentId, String orderId, String payType,String saleUserNmae) throws Exception {
+    private synchronized void changeAmount(String name, String userId, BigDecimal amount,
+                                           UserAmountEntity userAmountEntity, String agentId, String orderId,
+                                           String payType, String saleUserNmae) throws Exception {
         //记录明细
         UserAmountDetail agentDetail = new UserAmountDetail();
         agentDetail.setUserId(userId);
@@ -352,13 +354,13 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         agentDetail.setInitialAmount(initialAmount);
         agentDetail.setUpdateAmount(amount.add(initialAmount));
 
-        if(!org.springframework.util.StringUtils.isEmpty(agentId)){
+        if (!org.springframework.util.StringUtils.isEmpty(agentId)) {
             SysUser agent = userService.getUserById(agentId);
             agentDetail.setAgentId(agentId);
             agentDetail.setAgentUsername(agent.getUsername());
             agentDetail.setAgentRealname(agent.getRealname());
         }
-        if(!org.springframework.util.StringUtils.isEmpty(saleUserNmae)){
+        if (!org.springframework.util.StringUtils.isEmpty(saleUserNmae)) {
             SysUser sale = userService.getUserByName(saleUserNmae);
             agentDetail.setSalesmanId(sale.getId());
             agentDetail.setSalesmanUsername(saleUserNmae);
@@ -390,7 +392,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     public Map<String, Object> summary(Map<String, Object> param) {
         return baseMapper.summary(param);
     }
-    
+
     @Override
     public Map<String, Object> summaryUserTodayOrderAmount(String userId, Date date) {
         Map<String, Object> resultMap = baseMapper.summaryUserTodayOrderAmount(userId, date);
@@ -419,21 +421,22 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
                 break;
             }
         }
-        if(org.springframework.util.StringUtils.isEmpty(url)){
-            throw new RRException("未配置通知挂马平台地址,key={}"+payType);
+        if (org.springframework.util.StringUtils.isEmpty(url)) {
+            throw new RRException("未配置通知挂马平台地址,key={}" + payType);
         }
         OrderInfoEntity order = queryOrderInfoByOrderId(orderId);
         SysUser user = userService.getUserByName(order.getUserName());
         List<UserBusinessEntity> useBusinesses =
                 businessEntityService.queryBusinessCodeByUserName(user.getAgentUsername(), payType);
         RequestPayUrl request = factory.getPay(payType);
-        return  request.notifyOrderFinish(order,key,useBusinesses,url);
+        return request.notifyOrderFinish(order, key, useBusinesses, url);
     }
 
-	@Override
+    @Override
     public List<String> getOrderByTime(String time) {
         return baseMapper.getOrderByTime(time);
     }
+
     /**
      * 校验外部订单是否已经创建过
      *
@@ -455,10 +458,10 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * @return
      */
     public boolean isIpBlacklist(String ip) {
-        List<DictModel> IpBlacklist = dictService.queryDictItemsByCode(BaseConstant.IP_BLACK_LIST);
+        List<DictModel> ipBlacklist = dictService.queryDictItemsByCode(BaseConstant.IP_BLACK_LIST);
         List<String> ips = new ArrayList<>();
-        if (!CollectionUtils.isEmpty(IpBlacklist)) {
-            for (DictModel dictModel : IpBlacklist) {
+        if (!CollectionUtils.isEmpty(ipBlacklist)) {
+            for (DictModel dictModel : ipBlacklist) {
                 ips.add(dictModel.getValue());
             }
             if (!CollectionUtils.isEmpty(ips) && ips.contains(ip)) {
@@ -478,8 +481,8 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     private R addOrder(R checkParam, HttpServletRequest req) throws Exception {
         String ip = (String) checkParam.get(BaseConstant.IP);
         //String ip = IPUtils.getIpAddr(req);
-        if(!org.springframework.util.StringUtils.isEmpty(ip) && isIpBlacklist(ip)){
-            throw new RRException("非法访问，请联系管理员" );
+        if (!org.springframework.util.StringUtils.isEmpty(ip) && isIpBlacklist(ip)) {
+            throw new RRException("非法访问，请联系管理员");
         }
         String outerOrderId = (String) checkParam.get(BaseConstant.OUTER_ORDER_ID);
         String userName = (String) checkParam.get(BaseConstant.USER_NAME);
@@ -518,7 +521,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         }
         UserBusinessEntity userBusinessEntity = useBusinesses.get(0);
         //校验金额的合法性
-        checkAmountValidity(userName, submitAmount);
+        checkAmountValidity(userName,submitAmount, payType);
         //校验用户费率是否有填写
         checkRate(user, payType);
 

@@ -1,3 +1,8 @@
 alter table sys_user_amount_detail add initial_amount decimal(10,2) default NULL;
 alter table sys_user_amount_detail add update_amount decimal(10,2) default NULL;
 alter table pay_order_info add ip VARCHAR(32) default NULL;
+
+
+#20190927
+alter table sys_user_channel add upper_limit decimal(7,2) default NULL COMMENT '单笔金额上限';
+alter table sys_user_channel add lower_limit decimal(7,2) default NULL COMMENT '单笔金额下限';
