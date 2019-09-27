@@ -1,6 +1,7 @@
 package org.jeecg.modules.pay.entity;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -88,4 +89,13 @@ public class UserChannelEntity {
 	@ApiModelProperty(value = "秘钥")
 	@TableField(exist = false)
 	private java.lang.String apiKey;
+
+	/**单笔金额上限*/
+	@Excel(name = "单笔金额上限", width = 15)
+	@ApiModelProperty(value = "单笔金额上限")
+	private BigDecimal upperLimit;
+	/**单笔金额下限*/
+	@Excel(name = "单笔金额下限", width = 15)
+	@ApiModelProperty(value = "单笔金额下限")
+	private BigDecimal lowerLimit;
 }

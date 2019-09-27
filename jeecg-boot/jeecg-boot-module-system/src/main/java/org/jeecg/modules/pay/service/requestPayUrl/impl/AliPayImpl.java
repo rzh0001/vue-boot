@@ -43,6 +43,9 @@ public class AliPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
         }else if(userBusinessEntity.getChannelCode().equals(BaseConstant.REQUEST_WECHAT_BANK)){
             type = "wechat_auto";
             payType = BaseConstant.REQUEST_WECHAT_BANK;
+        }else if(userBusinessEntity.getChannelCode().equals(BaseConstant.REQUEST_ALI_TT)){
+            type = "alipay_auto";
+            payType=BaseConstant.REQUEST_ALI_TT;
         }
         if(StringUtils.isEmpty(type)){
             throw new RRException("请求支付宝通道不对");

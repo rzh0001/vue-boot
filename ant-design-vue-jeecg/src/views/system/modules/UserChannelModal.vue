@@ -49,6 +49,18 @@
           label="秘钥">
           <a-input placeholder="秘钥" style="width:200px;" v-decorator="['apiKey', validatorRules.apiKey]" />
         </a-form-item>
+        <a-form-item label="单笔金额限制" v-show="isMenber">
+          <a-input-group compact>
+            <a-input-number placeholder="下限"
+                            v-decorator="[ 'lowerLimit']" style="width: 30%;text-align: center"
+                            min="0.01"/>
+            <a-input placeholder="~" disabled
+                     style="width: 35px; border-left: 0px; pointer-events: none;background-color: #fff;text-align: center"/>
+            <a-input-number placeholder="上限"
+                            v-decorator="[ 'upperLimit']" style="width: 35%; border-left: 0px;text-align: center"
+                            min="0.01"/>
+          </a-input-group>
+        </a-form-item>
         <a-form-item
           label="通道">
           <select v-decorator="['channelCode', validatorRules.channelCode ]">
@@ -70,6 +82,7 @@
     data() {
       return {
         isAgent:false,
+        isMenber:true,
         userName: '',
         title: "通道详细",
         title4add:"添加",
@@ -82,14 +95,12 @@
             title: '商户',
             dataIndex: 'userName',
             key: 'userName',
-            width: '20%',
             scopedSlots: {customRender: 'userName'}
           },
           {
             title: '通道',
             dataIndex: 'channelCode',
             key: 'channelCode',
-            width: '40%',
             scopedSlots: {customRender: 'channelCode'},
             customRender: function (text) {
               if (text == 'ysf') {
@@ -118,6 +129,16 @@
             title: '秘钥',
             align:"center",
             dataIndex: 'apiKey'
+          },
+          {
+            title: '支付金额下限',
+            align:"center",
+            dataIndex: 'lowerLimit'
+          },
+          {
+            title: '支付金额上限',
+            align:"center",
+            dataIndex: 'upperLimit'
           },
           {
             title: '操作',
@@ -165,10 +186,12 @@
       },
       addChannel:function(record){
         this.isAgent=false;
+        this.isMenber = true;
         this.visible4Add=true;
         console.log(record);
         if(record.memberType==="1"){
           this.isAgent=true;
+          this.isMenber = false;
         }
         this.userName = record.username;
       },
