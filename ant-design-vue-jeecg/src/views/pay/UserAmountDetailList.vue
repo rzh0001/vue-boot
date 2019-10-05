@@ -158,7 +158,7 @@
             width: 90,
             customRender: function(text) {
               if (text == 1) {
-                return '手续费收入'
+                return '收入'
               } else if (text == 2) {
                 return '提现'
               } else if (text == 3) {
