@@ -1,7 +1,6 @@
 package org.jeecg.modules.pay.controller;
 
 import cn.hutool.core.date.DateUtil;
-import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -15,7 +14,6 @@ import org.jeecg.common.aspect.annotation.AutoLog;
 import org.jeecg.common.constant.PayConstant;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.vo.LoginUser;
-import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.pay.entity.UserAmountReport;
 import org.jeecg.modules.pay.service.IUserAmountReportService;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
@@ -32,8 +30,6 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -70,17 +66,17 @@ public class UserAmountReportController {
 		Result<IPage<UserAmountReport>> result = new Result<IPage<UserAmountReport>>();
 		QueryWrapper<UserAmountReport> queryWrapper = QueryGenerator.initQueryWrapper(report, req.getParameterMap());
 		Page<UserAmountReport> page = new Page<UserAmountReport>(pageNo, pageSize);
-		LoginUser optUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
-		if (optUser.getMemberType() != null) {
-			switch (optUser.getMemberType()) {
+		LoginUser opUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+		if (opUser.getMemberType() != null) {
+			switch (opUser.getMemberType()) {
 				case PayConstant.MEMBER_TYPE_AGENT:
-					queryWrapper.lambda().eq(UserAmountReport::getAgentId, optUser.getId());
+					queryWrapper.lambda().eq(UserAmountReport::getAgentId, opUser.getId());
 					break;
 				case PayConstant.MEMBER_TYPE_SALESMAN:
-					queryWrapper.lambda().eq(UserAmountReport::getSalesmanId, optUser.getId());
+					queryWrapper.lambda().eq(UserAmountReport::getSalesmanId, opUser.getId());
 					break;
 				case PayConstant.MEMBER_TYPE_MEMBER:
-					queryWrapper.lambda().eq(UserAmountReport::getUserId, optUser.getId());
+					queryWrapper.lambda().eq(UserAmountReport::getUserId, opUser.getId());
 					break;
 				default:
 			}
@@ -202,27 +198,35 @@ public class UserAmountReportController {
    * @param response
    */
   @RequestMapping(value = "/exportXls")
-  public ModelAndView exportXls(HttpServletRequest request, HttpServletResponse response) {
+  public ModelAndView exportXls(UserAmountReport report, HttpServletRequest request, HttpServletResponse response) {
       // Step.1 组装查询条件
-      QueryWrapper<UserAmountReport> queryWrapper = null;
-      try {
-          String paramsStr = request.getParameter("paramsStr");
-          if (oConvertUtils.isNotEmpty(paramsStr)) {
-              String deString = URLDecoder.decode(paramsStr, "UTF-8");
-              UserAmountReport userAmountReport = JSON.parseObject(deString, UserAmountReport.class);
-              queryWrapper = QueryGenerator.initQueryWrapper(userAmountReport, request.getParameterMap());
-          }
-      } catch (UnsupportedEncodingException e) {
-          e.printStackTrace();
-      }
-
-      //Step.2 AutoPoi 导出Excel
+	  QueryWrapper<UserAmountReport> queryWrapper = QueryGenerator.initQueryWrapper(report, request.getParameterMap());
+	  LoginUser opUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+	  if (opUser.getMemberType() != null) {
+		  switch (opUser.getMemberType()) {
+			  case PayConstant.MEMBER_TYPE_AGENT:
+				  queryWrapper.lambda().eq(UserAmountReport::getAgentId, opUser.getId());
+				  break;
+			  case PayConstant.MEMBER_TYPE_SALESMAN:
+				  queryWrapper.lambda().eq(UserAmountReport::getSalesmanId, opUser.getId());
+				  break;
+			  case PayConstant.MEMBER_TYPE_MEMBER:
+				  queryWrapper.lambda().eq(UserAmountReport::getUserId, opUser.getId());
+				  break;
+			  default:
+		  }
+	  }
+	  if (StringUtils.isBlank(report.getReportDate())) {
+		  queryWrapper.lambda().eq(UserAmountReport::getReportDate, DateUtil.formatDate(DateUtil.yesterday()));
+	  }
+	
+	  //Step.2 AutoPoi 导出Excel
       ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
       List<UserAmountReport> pageList = userAmountReportService.list(queryWrapper);
       //导出文件名称
       mv.addObject(NormalExcelConstants.FILE_NAME, "用户余额报表-期初余额 每天0点更新列表");
       mv.addObject(NormalExcelConstants.CLASS, UserAmountReport.class);
-      mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("用户余额报表-期初余额 每天0点更新列表数据", "导出人:Jeecg", "导出信息"));
+	  mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("用户余额报表-期初余额 每天0点更新列表数据", "导出人:" + opUser.getUsername(), "导出信息"));
       mv.addObject(NormalExcelConstants.DATA_LIST, pageList);
       return mv;
   }
