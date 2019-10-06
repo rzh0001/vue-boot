@@ -39,15 +39,12 @@ public class SysUser {
     @ApiModelProperty(value = "真实姓名")
 	private java.lang.String realname;
 	/**密码*/
-	@Excel(name = "密码", width = 15)
     @ApiModelProperty(value = "密码")
 	private java.lang.String password;
 	/**密码*/
-	@Excel(name = "api密钥", width = 15)
 	@ApiModelProperty(value = "api密钥")
 	private java.lang.String apiKey;
 	/**md5密码盐*/
-	@Excel(name = "md5密码盐", width = 15)
     @ApiModelProperty(value = "md5密码盐")
 	private java.lang.String salt;
 	/**头像*/
@@ -123,7 +120,6 @@ public class SysUser {
     @ApiModelProperty(value = "单笔金额下限")
 	private java.math.BigDecimal lowerLimit;
 	/**代理ID*/
-	@Excel(name = "代理ID", width = 15)
     @ApiModelProperty(value = "代理ID")
 	private java.lang.String agentId;
 	/**代理帐号*/
@@ -135,7 +131,6 @@ public class SysUser {
     @ApiModelProperty(value = "代理姓名")
 	private java.lang.String agentRealname;
 	/**介绍人ID*/
-	@Excel(name = "介绍人ID", width = 15)
     @ApiModelProperty(value = "介绍人ID")
 	private java.lang.String salesmanId;
 	/**介绍人帐号*/
@@ -147,11 +142,9 @@ public class SysUser {
     @ApiModelProperty(value = "介绍人姓名")
 	private java.lang.String salesmanRealname;
 	/**谷歌密钥*/
-	@Excel(name = "谷歌密钥", width = 15)
     @ApiModelProperty(value = "谷歌密钥")
 	private java.lang.String googleSecretKey;
 	/**支付密码*/
-	@Excel(name = "支付密码", width = 15)
 	@ApiModelProperty(value = "支付密码")
 	private java.lang.String paymentPassword;
 	/**IP白名单开关*/
