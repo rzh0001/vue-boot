@@ -140,10 +140,8 @@ public interface ISysUserService extends IService<SysUser> {
 	/**
 	 * 翻页查询
 	 *
-	 * @param page         翻页对象
-	 * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
+	 * @param page 翻页对象
+	 * @param map
 	 */
-//	IPage<SysUser> pageUserWithPaymentInfo(IPage<SysUser> page, Wrapper<SysUser> queryWrapper);
-	
 	IPage<SysUserPage> pageUserWithPaymentInfo(Page page, Map<String, Object> map);
 }
