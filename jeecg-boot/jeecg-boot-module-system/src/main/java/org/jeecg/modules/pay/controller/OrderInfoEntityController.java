@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.aspect.annotation.AutoLog;
@@ -78,12 +79,22 @@ public class OrderInfoEntityController {
                                                         @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
                                                         HttpServletRequest req) {
         Result<IPage<OrderInfoEntity>> result = new Result<IPage<OrderInfoEntity>>();
+        QueryWrapper<OrderInfoEntity> queryWrapper = initQueryCondition(orderInfoEntity, req);
+        Page<OrderInfoEntity> page = new Page<OrderInfoEntity>(pageNo, pageSize);
+        IPage<OrderInfoEntity> pageList = orderInfoEntityService.page(page, queryWrapper);
+        result.setSuccess(true);
+        result.setResult(pageList);
+        return result;
+    }
+    
+    // 查询条件独立成方法，查询、统计、导出 三个接口使用
+    private QueryWrapper<OrderInfoEntity> initQueryCondition(OrderInfoEntity orderInfoEntity, HttpServletRequest req) {
         LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
         SysUser opUser = userService.getUserByName(loginUser.getUsername());
-
+        
         QueryWrapper<OrderInfoEntity> queryWrapper = QueryGenerator.initQueryWrapper(orderInfoEntity,
                 req.getParameterMap());
-        if (opUser.getMemberType() != null) {
+        if (StringUtils.isNotBlank(opUser.getMemberType())) {
             switch (opUser.getMemberType()) {
                 case PayConstant.MEMBER_TYPE_AGENT:
                     queryWrapper.lambda().eq(OrderInfoEntity::getAgentId, opUser.getId());
@@ -97,34 +108,15 @@ public class OrderInfoEntityController {
                 default:
             }
         }
-        Page<OrderInfoEntity> page = new Page<OrderInfoEntity>(pageNo, pageSize);
-        IPage<OrderInfoEntity> pageList = orderInfoEntityService.page(page, queryWrapper);
-        result.setSuccess(true);
-        result.setResult(pageList);
-        return result;
+        return queryWrapper;
     }
     
     @GetMapping(value = "/summary")
-    public Result<Map<String, Object>> summary(Map<String, Object> param, HttpServletRequest req) {
+    public Result<Map<String, Object>> summary(OrderInfoEntity orderInfoEntity, HttpServletRequest req) {
         Result<Map<String, Object>> result = new Result<>();
-        LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
-        SysUser opUser = userService.getUserByName(loginUser.getUsername());
-        if (opUser.getMemberType() != null) {
-            switch (opUser.getMemberType()) {
-                case PayConstant.MEMBER_TYPE_AGENT:
-                    param.put("agentId", opUser.getId());
-                    break;
-                case PayConstant.MEMBER_TYPE_SALESMAN:
-                    param.put("salesmanId", opUser.getId());
-                    break;
-                case PayConstant.MEMBER_TYPE_MEMBER:
-                    param.put("user_id", opUser.getId());
-                    break;
-                default:
-            }
-        }
+        QueryWrapper<OrderInfoEntity> queryWrapper = initQueryCondition(orderInfoEntity, req);
     
-        Map<String, Object> map = orderInfoEntityService.summary(param);
+        Map<String, Object> map = orderInfoEntityService.summary(queryWrapper);
         Map<String, Object> map1 = new HashMap<>();
         map.put("totalCount", 5);
     

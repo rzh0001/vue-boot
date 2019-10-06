@@ -7,13 +7,13 @@
         <a-row :gutter="24">
 
           <a-col :md="6" :sm="8">
-            <a-form-item label="四方系统订单号">
-              <a-input placeholder="请输入四方系统订单号" v-model="queryParam.orderId"></a-input>
+            <a-form-item label="订单号">
+              <a-input placeholder="" v-model="queryParam.orderId"></a-input>
             </a-form-item>
           </a-col>
           <a-col :md="6" :sm="8">
             <a-form-item label="外部订单号">
-              <a-input placeholder="请输入外部订单号" v-model="queryParam.outerOrderId"></a-input>
+              <a-input placeholder="" v-model="queryParam.outerOrderId"></a-input>
             </a-form-item>
           </a-col>
           <template v-if="toggleSearchStatus">
@@ -51,8 +51,8 @@
           </template>
           <a-col :md="6" :sm="8">
             <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
-              <a-button type="primary" @click="searchQuery" icon="search">查询</a-button>
-<!--              <a-button type="primary" @click="searchQueryLocal" icon="search">查询</a-button>-->
+<!--              <a-button type="primary" @click="searchQuery" icon="search">查询</a-button>-->
+              <a-button type="primary" @click="searchQueryLocal" icon="search">查询</a-button>
               <a-button type="primary" @click="searchReset" icon="reload" style="margin-left: 8px">重置</a-button>
               <a @click="handleToggleSearch" style="margin-left: 8px">
                 {{ toggleSearchStatus ? '收起' : '展开' }}
@@ -66,12 +66,16 @@
     </div>
 
     <div>
-<!--      <div class="ant-alert ant-alert-info" style="margin-bottom: 16px;">-->
-<!--        提交订单数：{{summary.totalOrderCount}} 订单总金额：{{summary.totalOrderAmount}} 已付订单数：{{summary.paidOrderCount}}-->
-<!--        已付总金额：{{summary.paidOrderAmount}}-->
-<!--        预计收入：{{summary.totalCount}} 预计手续费：{{summary.feeIncome}} 未付订单数：{{summary.unpaidOrderCount}} 未付总金额-->
-<!--        {{summary.unpaidOrderAmount}}-->
-<!--      </div>-->
+      <div class="ant-alert ant-alert-info" style="margin-bottom: 16px;">
+        总订单数：<a-tag color="cyan">{{summary.totalOrderCount}} </a-tag>
+        成功订单数：<a-tag color="cyan">{{summary.paidOrderCount}} </a-tag>
+        失败订单数：<a-tag color="red">{{summary.unpaidOrderCount}} </a-tag>
+        总金额：<a-tag color="cyan">{{summary.totalOrderAmount}}元 </a-tag>
+        成功金额：<a-tag color="cyan">{{summary.paidOrderAmount}}元 </a-tag>
+        失败金额：<a-tag color="red">{{summary.unpaidOrderAmount}}元 </a-tag>
+        预计收入：<a-tag color="cyan">{{summary.income}}元 </a-tag>
+        预计手续费：<a-tag color="cyan">{{summary.fee}}元 </a-tag>
+      </div>
 
       <a-table
         ref="table"
@@ -128,7 +132,7 @@
         // 表头
         columns: [
           {
-            title: '系统订单号',
+            title: '订单号',
             align: 'center',
             dataIndex: 'orderId'
           },
@@ -253,7 +257,7 @@
     },
     created() {
       this.columns = colAuthFilter(this.columns,'orderList:');
-      this.loadData();
+      this.searchQueryLocal();
       this.initDictConfig();
     },
     computed: {

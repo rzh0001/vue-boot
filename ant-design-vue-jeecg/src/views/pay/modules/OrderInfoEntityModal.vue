@@ -14,14 +14,14 @@
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
-          label="四方系统订单号">
-          <a-input placeholder="请输入四方系统订单号" v-decorator="['orderId', {}]" />
+          label="订单号">
+          <a-input placeholder="" v-decorator="['orderId', {}]" />
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
           label="外部订单号">
-          <a-input placeholder="请输入外部订单号" v-decorator="['outerOrderId', {}]" />
+          <a-input placeholder="" v-decorator="['outerOrderId', {}]" />
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"

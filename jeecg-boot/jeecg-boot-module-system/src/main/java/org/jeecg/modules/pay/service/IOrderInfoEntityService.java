@@ -1,6 +1,7 @@
 package org.jeecg.modules.pay.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.apache.ibatis.annotations.Param;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
@@ -57,7 +58,7 @@ public interface IOrderInfoEntityService extends IService<OrderInfoEntity> {
 
     int updateOrderStatusBatch(List<String> orderIds);
     
-    Map<String, Object> summary(Map<String, Object> param);
+    Map<String, Object> summary(Wrapper wrapper);
     
     Map<String, Object> summaryUserTodayOrderAmount(String userId, Date date);
 
