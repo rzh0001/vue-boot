@@ -29,6 +29,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -347,10 +348,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 	public IPage<SysUserPage> pageUserWithPaymentInfo(Page page, Map<String, Object> map) {
 		return userMapper.listUserWithPaymentInfo(page, map);
 	}
-
-//    @Override
-//	public IPage<List<Map<String, Object>>> pageUserWithPaymentInfo(Page page, Wrapper<SysUser> queryWrapper) {
-//		return userMapper.listUserWithPaymentInfo(page, queryWrapper);
-//}
+	
+	@Override
+	public boolean adjustAmount(String username, BigDecimal adjustAmount) {
+		SysUser user = getUserByName(username);
+		return userAmountService.adjustAmount(username, adjustAmount, user);
+	}
+	
 	
 }

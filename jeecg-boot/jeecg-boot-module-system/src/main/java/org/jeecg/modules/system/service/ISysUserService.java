@@ -8,6 +8,7 @@ import org.jeecg.common.system.vo.SysUserCacheInfo;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.vo.SysUserPage;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -144,4 +145,13 @@ public interface ISysUserService extends IService<SysUser> {
 	 * @param map
 	 */
 	IPage<SysUserPage> pageUserWithPaymentInfo(Page page, Map<String, Object> map);
+    
+    /**
+     * 手工调账
+     *
+     * @param username
+     * @param adjustAmount
+     * @return
+     */
+    boolean adjustAmount(String username, BigDecimal adjustAmount);
 }

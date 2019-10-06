@@ -163,6 +163,8 @@
                 return '提现'
               } else if (text == 3) {
                 return '冲正'
+              }  else if (text == 4) {
+                return '手工调账'
               } else {
                 return text
               }

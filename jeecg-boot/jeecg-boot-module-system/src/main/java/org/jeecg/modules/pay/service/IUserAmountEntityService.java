@@ -38,6 +38,15 @@ public interface IUserAmountEntityService extends IService<UserAmountEntity> {
      * @return
      */
     BigDecimal getUserAmount(String userId);
+    
+    /**
+     * 手工调账
+     *
+     * @param username
+     * @param adjustAmount
+     * @return
+     */
+    boolean adjustAmount(String username, BigDecimal adjustAmount, SysUser user);
 
     void changeAmountByUserName(String userName,BigDecimal amount);
 }
