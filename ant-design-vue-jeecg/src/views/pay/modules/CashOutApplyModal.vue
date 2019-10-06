@@ -94,11 +94,10 @@
 </template>
 
 <script>
-  import { httpAction } from '@/api/manage'
+  import { httpAction, getAction } from '@/api/manage'
   import pick from 'lodash.pick'
   import moment from 'moment'
   import { queryBankCard } from '@/api/api'
-  import { getAction } from '../../../api/manage'
 
   export default {
     name: 'CashOutApplyModal',
@@ -107,13 +106,9 @@
         bankCardDisabled: false,
         statusDisabled: false,
         avaliableAmount: 0,
-        title:
-          '操作',
-        visible:
-          false,
-        model:
-          {}
-        ,
+        title: '操作',
+        visible: false,
+        model: {},
         labelCol: {
           xs: {
             span: 24
