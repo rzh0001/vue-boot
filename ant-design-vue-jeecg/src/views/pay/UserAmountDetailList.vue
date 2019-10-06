@@ -191,15 +191,15 @@
             dataIndex: 'orderId'
           },
           {
+            title: '备注',
+            align: 'center',
+            dataIndex: 'remark'
+          },
+          {
             title: '时间',
             align: 'center',
             dataIndex: 'createTime'
           },
-          // {
-          //   title: '代理ID',
-          //   align: 'center',
-          //   dataIndex: 'agentId'
-          // },
           // {
           //   title: '代理',
           //   align: 'center',

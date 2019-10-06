@@ -46,7 +46,7 @@ public interface IUserAmountEntityService extends IService<UserAmountEntity> {
      * @param adjustAmount
      * @return
      */
-    boolean adjustAmount(String username, BigDecimal adjustAmount, SysUser user);
+    boolean adjustAmount(String username, BigDecimal adjustAmount, String remark, SysUser user);
 
     void changeAmountByUserName(String userName,BigDecimal amount);
 }

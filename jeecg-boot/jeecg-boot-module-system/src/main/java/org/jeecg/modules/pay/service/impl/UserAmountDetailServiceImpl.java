@@ -23,6 +23,11 @@ public class UserAmountDetailServiceImpl extends ServiceImpl<UserAmountDetailMap
     
     @Override
     public boolean addAmountDetail(BigDecimal amount, BigDecimal originalAmount, String type, SysUser opUser) {
+        return addAmountDetail(amount, originalAmount, "", type, opUser);
+    }
+    
+    @Override
+    public boolean addAmountDetail(BigDecimal amount, BigDecimal originalAmount, String remark, String type, SysUser opUser) {
         UserAmountDetail detail = new UserAmountDetail();
         detail.setUserId(opUser.getId());
         detail.setUserName(opUser.getUsername());
@@ -30,6 +35,7 @@ public class UserAmountDetailServiceImpl extends ServiceImpl<UserAmountDetailMap
         detail.setAmount(amount);
         detail.setInitialAmount(originalAmount);
         detail.setUpdateAmount(amount.add(originalAmount));
+        detail.setRemark(remark);
         detail.setAgentId(opUser.getAgentId());
         detail.setAgentUsername(opUser.getAgentUsername());
         detail.setAgentRealname(opUser.getAgentRealname());

@@ -23,6 +23,9 @@
         <a-form-item label="金额" :labelCol="labelCol" :wrapperCol="wrapperCol" hasFeedback>
           <a-input-number  v-decorator="[ 'amount', validatorRules.amount]"/>
         </a-form-item>
+        <a-form-item label="备注" :labelCol="labelCol" :wrapperCol="wrapperCol" hasFeedback>
+          <a-input  v-decorator="[ 'remark', validatorRules.remark]"/>
+        </a-form-item>
 
       </a-form>
     </a-spin>
@@ -49,6 +52,15 @@
           amount: {
             rules: [{
               required: true, message: '请输入金额!'
+            }
+              // {
+              //   validator: this.validateAmount()
+              // }
+            ]
+          },
+          remark: {
+            rules: [{
+              required: true, message: '请输入备注!'
             }
               // {
               //   validator: this.validateAmount()

@@ -1,20 +1,18 @@
 package org.jeecg.modules.pay.entity;
 
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.util.Date;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.TableField;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.jeecgframework.poi.excel.annotation.Excel;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.math.BigDecimal;
 
 /**
  * @Description: 用户收入流水详情
@@ -99,4 +97,8 @@ public class UserAmountDetail {
 	@Excel(name = "更新后金额", width = 15)
 	@ApiModelProperty(value = "更新后金额")
 	private BigDecimal updateAmount;
+	
+	@Excel(name = "备注", width = 15)
+	@ApiModelProperty(value = "备注")
+	private String remark;
 }

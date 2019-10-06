@@ -350,9 +350,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 	}
 	
 	@Override
-	public boolean adjustAmount(String username, BigDecimal adjustAmount) {
+	public boolean adjustAmount(String username, BigDecimal adjustAmount, String remark) {
 		SysUser user = getUserByName(username);
-		return userAmountService.adjustAmount(username, adjustAmount, user);
+		return userAmountService.adjustAmount(username, adjustAmount, remark, user);
 	}
 	
 	

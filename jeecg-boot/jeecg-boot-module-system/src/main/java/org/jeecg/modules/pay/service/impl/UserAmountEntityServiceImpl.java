@@ -66,7 +66,7 @@ public class UserAmountEntityServiceImpl extends ServiceImpl<UserAmountEntityMap
     
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean adjustAmount(String username, BigDecimal adjustAmount, SysUser user) {
+    public boolean adjustAmount(String username, BigDecimal adjustAmount, String remark, SysUser user) {
         
         UserAmountEntity userAmountEntity = baseMapper.getUserAmountByUserName(username);
         if (BeanUtil.isEmpty(userAmountEntity)) {
@@ -78,9 +78,9 @@ public class UserAmountEntityServiceImpl extends ServiceImpl<UserAmountEntityMap
         }
         
         changeAmountByUserName(username, adjustAmount);
-        
-        
-        amountDetailService.addAmountDetail(adjustAmount, userAmountEntity.getAmount(), "4", user);
+    
+    
+        amountDetailService.addAmountDetail(adjustAmount, userAmountEntity.getAmount(), remark, "4", user);
         
         return true;
     }

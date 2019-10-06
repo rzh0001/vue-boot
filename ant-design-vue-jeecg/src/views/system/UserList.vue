@@ -158,6 +158,9 @@
                   <a>解冻</a>
                 </a-popconfirm>
               </a-menu-item>
+            <a-menu-item>
+                <a href="javascript:;" @click="handleChangeAmount(record.username)">资金</a>
+              </a-menu-item>
             </a-menu>
           </a-dropdown>
           <a-dropdown>
@@ -213,6 +216,7 @@
     <user-member-modal ref="memberModalForm" @ok="modalFormOk"></user-member-modal>
 
     <password-modal ref="passwordmodal" @ok="passwordModalOk"></password-modal>
+    <user-amount-modal ref="userAmountModal" @ok="modalFormOk"></user-amount-modal>
 
     <sys-user-agent-modal ref="sysUserAgentModal"></sys-user-agent-modal>
     <user-channel-modal ref="userChannelModal"></user-channel-modal>
@@ -227,6 +231,7 @@
   import UserSalesmanModal from './modules/UserSalesmanModal'
   import UserMemberModal from './modules/UserMemberModal'
   import PasswordModal from './modules/PasswordModal'
+  import UserAmountModal from './modules/UserAmountModal'
   import { putAction } from '@/api/manage'
   import { frozenBatch } from '@/api/api'
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
@@ -248,6 +253,7 @@
       UserChannelModal,
       UserBusinessModal,
       UserRateModal,
+      UserAmountModal
     },
     data() {
       return {
@@ -437,6 +443,9 @@
       },
       handleChangePassword(username) {
         this.$refs.passwordmodal.show(username)
+      },
+      handleChangeAmount(username) {
+        this.$refs.userAmountModal.show(username)
       },
       handleAgentSettings(username) {
         this.$refs.sysUserAgentModal.agentSettings(username)
