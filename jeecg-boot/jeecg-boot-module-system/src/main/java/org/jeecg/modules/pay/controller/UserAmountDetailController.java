@@ -1,6 +1,5 @@
 package org.jeecg.modules.pay.controller;
 
-import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -13,7 +12,6 @@ import org.jeecg.common.aspect.annotation.AutoLog;
 import org.jeecg.common.constant.PayConstant;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.vo.LoginUser;
-import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.pay.entity.UserAmountDetail;
 import org.jeecg.modules.pay.service.IUserAmountDetailService;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
@@ -30,8 +28,6 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -197,27 +193,32 @@ public class UserAmountDetailController {
    * @param response
    */
   @RequestMapping(value = "/exportXls")
-  public ModelAndView exportXls(HttpServletRequest request, HttpServletResponse response) {
+  public ModelAndView exportXls(UserAmountDetail userAmountDetail, HttpServletRequest request, HttpServletResponse response) {
       // Step.1 组装查询条件
-      QueryWrapper<UserAmountDetail> queryWrapper = null;
-      try {
-          String paramsStr = request.getParameter("paramsStr");
-          if (oConvertUtils.isNotEmpty(paramsStr)) {
-              String deString = URLDecoder.decode(paramsStr, "UTF-8");
-              UserAmountDetail userAmountDetail = JSON.parseObject(deString, UserAmountDetail.class);
-              queryWrapper = QueryGenerator.initQueryWrapper(userAmountDetail, request.getParameterMap());
-          }
-      } catch (UnsupportedEncodingException e) {
-          e.printStackTrace();
-      }
+	  QueryWrapper<UserAmountDetail> queryWrapper = QueryGenerator.initQueryWrapper(userAmountDetail, request.getParameterMap());
+	  LoginUser optUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+	  if (optUser.getMemberType() != null) {
+		  switch (optUser.getMemberType()) {
+			  case PayConstant.MEMBER_TYPE_AGENT:
+				  queryWrapper.lambda().eq(UserAmountDetail::getAgentId, optUser.getId());
+				  break;
+			  case PayConstant.MEMBER_TYPE_SALESMAN:
+				  queryWrapper.lambda().eq(UserAmountDetail::getSalesmanId, optUser.getId());
+				  break;
+			  case PayConstant.MEMBER_TYPE_MEMBER:
+				  queryWrapper.lambda().eq(UserAmountDetail::getUserId, optUser.getId());
+				  break;
+			  default:
+		  }
+	  }
 
       //Step.2 AutoPoi 导出Excel
       ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
       List<UserAmountDetail> pageList = userAmountDetailService.list(queryWrapper);
       //导出文件名称
-      mv.addObject(NormalExcelConstants.FILE_NAME, "用户收入流水详情列表");
+	  mv.addObject(NormalExcelConstants.FILE_NAME, "用户收入流水");
       mv.addObject(NormalExcelConstants.CLASS, UserAmountDetail.class);
-      mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("用户收入流水详情列表数据", "导出人:Jeecg", "导出信息"));
+	  mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("用户收入流水", "导出人:Jeecg", "导出信息"));
       mv.addObject(NormalExcelConstants.DATA_LIST, pageList);
       return mv;
   }
