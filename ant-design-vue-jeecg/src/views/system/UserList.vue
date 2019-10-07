@@ -173,19 +173,16 @@
               </a-menu-item>
             </a-menu>
           </a-dropdown>
-        <!--  <a-dropdown>
+         <a-dropdown>
             <a-button >
-              关联挂马
+              关联子账号
             </a-button>
             <a-menu slot="overlay">
               <a-menu-item>
-                <a @click="businessDeatil(record)">已关联挂马</a>
-              </a-menu-item>
-              <a-menu-item>
-                <a @click="addBusiness(record)">添加挂马账号</a>
+                <a @click="activeBusiness(record)">关联子账号</a>
               </a-menu-item>
             </a-menu>
-          </a-dropdown>-->
+          </a-dropdown>
             <a-dropdown>
             <a-button>
               费率设置
@@ -218,6 +215,7 @@
     <user-channel-modal ref="userChannelModal"></user-channel-modal>
     <user-business-modal ref="userBusinessModal"></user-business-modal>
     <user-rate-modal ref="userRateModal"></user-rate-modal>
+    <active-business-modal ref="activeBusinessModal"></active-business-modal>
   </a-card>
 </template>
 
@@ -234,6 +232,7 @@
   import UserChannelModal from './modules/UserChannelModal'
   import UserBusinessModal from './modules/UserBusinessModal'
   import UserRateModal from './modules/UserRateModal'
+  import ActiveBusinessModal from './modules/ActiveBusinessModal'
 
   export default {
     name: 'UserList',
@@ -248,6 +247,7 @@
       UserChannelModal,
       UserBusinessModal,
       UserRateModal,
+      ActiveBusinessModal
     },
     data() {
       return {
@@ -368,6 +368,9 @@
       },
       addChannel: function(record){
         this.$refs.userChannelModal.addChannel(record);
+      },
+      activeBusiness: function(record){
+        this.$refs.activeBusinessModal.active(record);
       },
       getAvatarView: function(avatar) {
         return this.url.imgerver + '/' + avatar
