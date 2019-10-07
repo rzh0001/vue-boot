@@ -7,13 +7,8 @@
         <a-row :gutter="24">
 
           <a-col :md="6" :sm="8">
-            <a-form-item label="用户ID">
-              <a-input placeholder="请输入用户ID" v-model="queryParam.userId"></a-input>
-            </a-form-item>
-          </a-col>
-          <a-col :md="6" :sm="8">
             <a-form-item label="登录账号">
-              <a-input placeholder="请输入登录账号" v-model="queryParam.username"></a-input>
+              <a-input placeholder="" v-model="queryParam.username"></a-input>
             </a-form-item>
           </a-col>
           <template v-if="toggleSearchStatus">
@@ -71,11 +66,6 @@
 
     <!-- table区域-begin -->
     <div>
-      <div class="ant-alert ant-alert-info" style="margin-bottom: 16px;">
-        <i class="anticon anticon-info-circle ant-alert-icon"></i> 已选择 <a style="font-weight: 600">{{
-        selectedRowKeys.length }}</a>项
-        <a style="margin-left: 24px" @click="onClearSelected">清空</a>
-      </div>
 
       <a-table
         ref="table"
@@ -86,7 +76,6 @@
         :dataSource="dataSource"
         :pagination="ipagination"
         :loading="loading"
-        :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
         @change="handleTableChange">
 
         <span slot="action" slot-scope="text, record">
