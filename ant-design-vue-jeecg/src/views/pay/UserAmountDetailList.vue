@@ -77,11 +77,6 @@
 
     <!-- table区域-begin -->
     <div>
-      <div class="ant-alert ant-alert-info" style="margin-bottom: 16px;">
-        <i class="anticon anticon-info-circle ant-alert-icon"></i> 已选择 <a style="font-weight: 600">{{
-        selectedRowKeys.length }}</a>项
-        <a style="margin-left: 24px" @click="onClearSelected">清空</a>
-      </div>
 
       <a-table
         ref="table"
@@ -92,7 +87,6 @@
         :dataSource="dataSource"
         :pagination="ipagination"
         :loading="loading"
-        :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
         @change="handleTableChange">
 
         <span slot="action" slot-scope="text, record">
@@ -133,6 +127,8 @@
     data() {
       return {
         description: '用户收入流水详情管理页面',
+        hiddenHeaderContent: true,
+        hideHeader: true,
         // 表头
         columns: [
           // {
@@ -162,11 +158,13 @@
             width: 90,
             customRender: function(text) {
               if (text == 1) {
-                return '手续费收入'
+                return '收入'
               } else if (text == 2) {
                 return '提现'
               } else if (text == 3) {
                 return '冲正'
+              }  else if (text == 4) {
+                return '手工调账'
               } else {
                 return text
               }
@@ -192,16 +190,16 @@
             align: 'center',
             dataIndex: 'orderId'
           },
-          // {
-          //   title: '费率',
-          //   align: 'center',
-          //   dataIndex: 'userRate'
-          // },
-          // {
-          //   title: '代理ID',
-          //   align: 'center',
-          //   dataIndex: 'agentId'
-          // },
+          {
+            title: '备注',
+            align: 'center',
+            dataIndex: 'remark'
+          },
+          {
+            title: '时间',
+            align: 'center',
+            dataIndex: 'createTime'
+          },
           // {
           //   title: '代理',
           //   align: 'center',

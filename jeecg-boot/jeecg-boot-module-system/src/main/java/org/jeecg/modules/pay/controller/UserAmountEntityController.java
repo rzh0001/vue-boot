@@ -1,12 +1,15 @@
 package org.jeecg.modules.pay.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.annotations.Param;
 import org.apache.shiro.SecurityUtils;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.aspect.annotation.AutoLog;
@@ -80,11 +83,17 @@ public class UserAmountEntityController {
 	@AutoLog(value = "用户余额-获取会员可提现余额")
 	@ApiOperation(value = "用户余额-获取会员可提现余额", notes = "用户余额-获取会员可提现余额")
 	@GetMapping(value = "/getMemberAvailableAmount")
-	public Result<BigDecimal> getMemberAvailableAmount() {
+	public Result<BigDecimal> getMemberAvailableAmount(@Param("username") String username) {
 		Result<BigDecimal> result = new Result<>();
-		LoginUser user = (LoginUser) SecurityUtils.getSubject().getPrincipal();
-		
-		UserAmountEntity amount = userAmountEntityService.getOne(new QueryWrapper<UserAmountEntity>().lambda().eq(UserAmountEntity::getUserId, user.getId()));
+		String name;
+		if (StringUtils.isNotBlank(username)) {
+			name = username;
+		} else {
+			LoginUser opUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+			name = opUser.getUsername();
+		}
+		LambdaQueryWrapper<UserAmountEntity> wrapper = new QueryWrapper<UserAmountEntity>().lambda().eq(UserAmountEntity::getUserName, name);
+		UserAmountEntity amount = userAmountEntityService.getOne(wrapper);
 		if (amount == null) {
 			result.error500("获取余额失败，请联系管理员");
 		} else {
@@ -93,6 +102,7 @@ public class UserAmountEntityController {
 		}
 		return result;
 	}
+	
 	
 	/**
 	 * 添加
@@ -110,7 +120,7 @@ public class UserAmountEntityController {
 			result.success("添加成功！");
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
-			result.error500("操作失败");
+			result.error500("操作失败," + e.getMessage());
 		}
 		return result;
 	}

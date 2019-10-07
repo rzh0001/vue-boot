@@ -1,15 +1,18 @@
 package org.jeecg.modules.pay.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.constant.PayConstant;
 import org.jeecg.modules.exception.RRException;
 import org.jeecg.modules.pay.entity.UserAmountEntity;
 import org.jeecg.modules.pay.mapper.UserAmountEntityMapper;
+import org.jeecg.modules.pay.service.IUserAmountDetailService;
 import org.jeecg.modules.pay.service.IUserAmountEntityService;
 import org.jeecg.modules.system.entity.SysUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
@@ -24,7 +27,7 @@ import java.math.BigDecimal;
 public class UserAmountEntityServiceImpl extends ServiceImpl<UserAmountEntityMapper, UserAmountEntity> implements IUserAmountEntityService {
     
     @Autowired
-    private UserAmountEntityMapper mapper;
+    private IUserAmountDetailService amountDetailService;
     
     
     @Override
@@ -45,7 +48,7 @@ public class UserAmountEntityServiceImpl extends ServiceImpl<UserAmountEntityMap
     
     @Override
     public boolean changeAmount(String userId, BigDecimal amount) {
-        boolean ok = mapper.changeAmount(userId, amount);
+        boolean ok = baseMapper.changeAmount(userId, amount);
         if (!ok) {
             throw new RRException("更新余额失败");
         }
@@ -62,7 +65,28 @@ public class UserAmountEntityServiceImpl extends ServiceImpl<UserAmountEntityMap
     }
     
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean adjustAmount(String username, BigDecimal adjustAmount, String remark, SysUser user) {
+        
+        UserAmountEntity userAmountEntity = baseMapper.getUserAmountByUserName(username);
+        if (BeanUtil.isEmpty(userAmountEntity)) {
+            throw new RRException("内部错误!请联系管理员！");
+        }
+        
+        if (adjustAmount.compareTo(userAmountEntity.getAmount()) > 0) {
+            throw new RRException("余额不足！");
+        }
+        
+        changeAmountByUserName(username, adjustAmount);
+    
+    
+        amountDetailService.addAmountDetail(adjustAmount, userAmountEntity.getAmount(), remark, "4", user);
+        
+        return true;
+    }
+    
+    @Override
     public void changeAmountByUserName(String userName, BigDecimal amount) {
-        mapper.changeAmountByUserName(userName,amount);
+        baseMapper.changeAmountByUserName(userName, amount);
     }
 }

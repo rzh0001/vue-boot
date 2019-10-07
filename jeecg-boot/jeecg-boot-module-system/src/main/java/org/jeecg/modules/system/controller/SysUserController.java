@@ -9,10 +9,12 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.common.aspect.annotation.AutoLog;
 import org.jeecg.common.constant.CommonConstant;
 import org.jeecg.common.constant.PayConstant;
 import org.jeecg.common.system.api.ISysBaseAPI;
@@ -22,6 +24,7 @@ import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.PasswordUtil;
 import org.jeecg.common.util.RedisUtil;
 import org.jeecg.common.util.oConvertUtils;
+import org.jeecg.modules.pay.entity.UserAmountEntity;
 import org.jeecg.modules.system.entity.SysDepart;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.entity.SysUserDepart;
@@ -45,6 +48,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -966,6 +970,48 @@ public class SysUserController {
                                 .eq(SysUser::getDelFlag, CommonConstant.NOT_DELETE_FLAG));
         
         result.setResult(list);
+        result.setSuccess(true);
+        
+        return result;
+    }
+    
+    /**
+     * 手工调账
+     *
+     * @param params
+     * @param request
+     * @return
+     */
+    @AutoLog(value = "用户余额-手工调账")
+    @ApiOperation(value = "用户余额-手工调账", notes = "用户余额-手工调账")
+    @PostMapping(value = "/adjust")
+    public Result<UserAmountEntity> adjust(@RequestBody JSONObject params, HttpServletRequest request) {
+        Result<UserAmountEntity> result = new Result<UserAmountEntity>();
+        String username = params.getString("userName");
+        String remark = params.getString("remark");
+        BigDecimal amount = params.getBigDecimal("amount");
+        try {
+            sysUserService.adjustAmount(username, amount, remark);
+            result.success("操作成功！");
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            result.error500("操作失败," + e.getMessage());
+        }
+        return result;
+    }
+    
+    
+    @GetMapping(value = "/getApiKey")
+    public Result<String> getApiKey(HttpServletRequest req, HttpServletResponse res) {
+        Result<String> result = new Result<>();
+        LoginUser optUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+        
+        SysUser user = sysUserService.getOne(
+                new QueryWrapper<SysUser>()
+                        .lambda()
+                        .eq(SysUser::getId, optUser.getId()));
+        
+        result.setResult(user.getApiKey());
         result.setSuccess(true);
         
         return result;

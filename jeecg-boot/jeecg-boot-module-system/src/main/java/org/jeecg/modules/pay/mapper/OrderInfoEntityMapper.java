@@ -1,6 +1,8 @@
 package org.jeecg.modules.pay.mapper;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.toolkit.Constants;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.ResultType;
 import org.apache.ibatis.annotations.Select;
@@ -28,7 +30,7 @@ public interface OrderInfoEntityMapper extends BaseMapper<OrderInfoEntity> {
 
     int updateOrderStatusBatch(@Param("orderIds") List<String> orderIds);
     
-    Map<String, Object> summary(@Param("map") Map<String, Object> param);
+    Map<String, Object> summary(@Param(Constants.WRAPPER) Wrapper wrapper);
     
     @Select("select count(1) as paidCount,sum(submit_amount) as paidAmount, " +
             "sum(poundage) as payFee " +

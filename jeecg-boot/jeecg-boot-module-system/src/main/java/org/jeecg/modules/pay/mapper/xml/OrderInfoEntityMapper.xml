@@ -21,35 +21,15 @@
     </select>
 
     <select id="summary" parameterType="map" resultType="map">
-        select user_id,user_name,user_realname,
-        count(1) as totalOrderCount,sum(submit_amount) as totalOrderAmount,
-        count( case when status = 2 || status = 1 then 1 else null end) as paidOrderCount,
-        sum( case when status = 2 || status = 1 then submit_amount else 0 end) as paidOrderAmount,
-        count( case when status != 2 || status != 1 then 1 else null end) as unpaidOrderCount,
-        sum( case when status != 2 || status != 1 then submit_amount else 0 end) as unpaidOrderAmount,
-        sum(case when status = 2 then poundage else 0 end) as feeIncome
-        from pay_order_info
-        where 1=1
-
-        <if test="map.username!=null and map.username!=''">
-            and user_name = #{map.username}
-        </if>
-        <if test="map.userRealname!=null and map.userRealname!=''">
-            and user_realname = #{map.userRealname}
-        </if>
-        <if test="map.agentId!=null and map.agentId!=''">
-            and agent_id = #{map.agentId}
-        </if>
-        <if test="map.salesmanId!=null and map.salesmanId!=''">
-            and salesman_Id = #{map.salesmanId}
-        </if>
-        <if test="map.userId!=null and map.userId!=''">
-            and user_id = #{map.userId}
-        </if>
-        <if test="map.username!=null and map.username!=''">
-            and user_name = #{map.username}
-        </if>
-        group by user_id,user_name,user_realname
+        select count(1)                                                                 as totalOrderCount,
+               count(case when status = 2 || status = 1 then 1 else null end)           as paidOrderCount,
+               count(case when status != 2 and status != 1 then 1 else null end)        as unpaidOrderCount,
+               sum(submit_amount)                                                       as totalOrderAmount,
+               sum(case when status = 2 || status = 1 then submit_amount else 0 end)    as paidOrderAmount,
+               sum(case when status != 2 and status != 1 then submit_amount else 0 end) as unpaidOrderAmount,
+               sum(case when status = 2 || status = 1 then poundage else 0 end)         as fee,
+               sum(case when status = 2 || status = 1 then actual_amount else 0 end)    as income
+        from pay_order_info ${ew.customSqlSegment}
 
     </select>
 

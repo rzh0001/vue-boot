@@ -8,6 +8,7 @@ import org.jeecg.common.system.vo.SysUserCacheInfo;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.vo.SysUserPage;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -140,10 +141,17 @@ public interface ISysUserService extends IService<SysUser> {
 	/**
 	 * 翻页查询
 	 *
-	 * @param page         翻页对象
-	 * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
+	 * @param page 翻页对象
+	 * @param map
 	 */
-//	IPage<SysUser> pageUserWithPaymentInfo(IPage<SysUser> page, Wrapper<SysUser> queryWrapper);
-	
 	IPage<SysUserPage> pageUserWithPaymentInfo(Page page, Map<String, Object> map);
+    
+    /**
+     * 手工调账
+     *
+     * @param username
+     * @param adjustAmount
+     * @return
+     */
+	boolean adjustAmount(String username, BigDecimal adjustAmount, String remark);
 }
