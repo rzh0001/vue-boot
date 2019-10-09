@@ -2,6 +2,7 @@ package org.jeecg.modules.pay.service;
 
 import org.apache.ibatis.annotations.Param;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import org.jeecg.modules.pay.entity.UserBusinessEntity;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,4 +31,7 @@ public interface IUserBusinessEntityService extends IService<UserBusinessEntity>
     void activeBusiness(String userName,String channelCode,String[] codes);
     void disableBusiness(String userName,String channelCode,String[] codes);
     void disableAllBusiness(String userName,String channelCode);
+
+    void updateBusinessTodayAmount(OrderInfoEntity order);
+    void updateBusinessTodayAmount();
 }

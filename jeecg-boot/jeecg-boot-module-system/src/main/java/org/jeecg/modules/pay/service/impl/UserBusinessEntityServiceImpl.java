@@ -3,6 +3,7 @@ package org.jeecg.modules.pay.service.impl;
 import org.apache.shiro.SecurityUtils;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.vo.LoginUser;
+import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import org.jeecg.modules.pay.entity.UserBusinessEntity;
 import org.jeecg.modules.pay.mapper.UserBusinessEntityMapper;
 import org.jeecg.modules.pay.service.IUserBusinessEntityService;
@@ -90,5 +91,15 @@ public class UserBusinessEntityServiceImpl extends ServiceImpl<UserBusinessEntit
     @Override
     public void disableAllBusiness(String userName, String channelCode) {
         baseMapper.disableAllBusiness(userName,channelCode);
+    }
+
+    @Override
+    public void updateBusinessTodayAmount(OrderInfoEntity order) {
+        baseMapper.updateBusinessTodayAmount(order);
+    }
+
+    @Override
+    public void updateBusinessTodayAmount() {
+        baseMapper.updateBusinessTodayAmount();
     }
 }

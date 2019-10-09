@@ -94,4 +94,8 @@ public class UserBusinessEntity {
 	@Excel(name = "当天交易金额上限", width = 15)
 	@ApiModelProperty(value = "当天交易金额上限")
 	private BigDecimal todayMaxAmount;
+
+	@Excel(name = "当天该账号的收入", width = 15)
+	@ApiModelProperty(value = "当天该账号的收入")
+	private BigDecimal todayAmount;
 }

@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import org.jeecg.modules.pay.entity.UserBusinessEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
@@ -32,4 +33,10 @@ public interface UserBusinessEntityMapper extends BaseMapper<UserBusinessEntity>
     void disableBusiness(@Param("userName")String userName,@Param("channelCode")String channelCode,@Param("codes")String[] codes);
     @Update("update sys_user_business set active='0' where user_name=#{userName} and channel_code=#{channelCode}")
     void disableAllBusiness(@Param("userName")String userName,@Param("channelCode")String channelCode);
+
+    @Update("update sys_user_business set today_amount=today_amount+#{submitAmount} where user_name=#{parentUser} and business_code=#{businessCode} and channel_code=#{payType}")
+    void updateBusinessTodayAmount(OrderInfoEntity order);
+
+    @Update("update sys_user_business set today_amount=0.000")
+    void updateBusinessTodayAmount();
 }

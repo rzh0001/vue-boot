@@ -13,3 +13,6 @@ alter table sys_user_amount_detail add remark varchar(128) null comment '备注'
 #20191009
 alter table sys_user_business add active varchar(2) DEFAULT '0' COMMENT '0:未激活；1：激活';
 alter table sys_user_business add today_max_amount decimal(8,3) DEFAULT NULL COMMENT '当天交易金额上限';
+update sys_user_business set active='1';
+
+定时任务
