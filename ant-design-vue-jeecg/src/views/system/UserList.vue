@@ -357,7 +357,7 @@
       },
       addBusiness:function(record){
         if(record.memberType != "1"){
-          alert("会员类型不是代理，无挂马信息");
+          alert("无操作权限");
           return;
         }
         this.$refs.userBusinessModal.title='添加挂马信息';
@@ -370,7 +370,11 @@
         this.$refs.userChannelModal.addChannel(record);
       },
       activeBusiness: function(record){
-        this.$refs.activeBusinessModal.active(record);
+        if(record.memberType != "1"){
+          alert("无操作权限");
+          return;
+        }
+        this.$refs.activeBusinessModal.activeBusiness(record);
       },
       getAvatarView: function(avatar) {
         return this.url.imgerver + '/' + avatar

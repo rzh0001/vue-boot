@@ -1,28 +1,5 @@
 <template>
   <div>
-    <a-modal
-      :title="title"
-      :width="800"
-      :visible="visible"
-      :confirmLoading="confirmLoading"
-      @ok="handleCancel"
-      @cancel="handleCancel"
-      cancelText="关闭">
-
-      <a-spin :spinning="confirmLoading">
-        <a-form :form="form">
-          <a-table :columns="columns" :dataSource="data" :pagination="false" size="middle">
-            <template slot="operation" slot-scope="text, record, index">
-              <template v-if="record.editable">
-              </template>
-              <span v-else>
-                  <a-popconfirm title="是否要删除此通道？" @confirm="removeRow(record)"><a>删除</a></a-popconfirm>
-                </span>
-            </template>
-          </a-table>
-        </a-form>
-      </a-spin>
-    </a-modal>
 
     <a-modal
       :title="title4add"
@@ -39,36 +16,21 @@
             label="商户">
             <a-input placeholder="商户" style="width:200px;" readonly=true v-model="userName"/>
           </a-form-item>
-          <a-form-item
-            v-show="isAgent"
-            label="挂码账号">
-            <a-input placeholder="挂码账号" style="width:200px;" v-decorator="['businessCode', validatorRules.businessCode]"/>
-          </a-form-item>
-          <a-form-item
-            v-show="isAgent"
-            label="秘钥">
-            <a-input placeholder="秘钥" style="width:200px;" v-decorator="['apiKey', validatorRules.apiKey]" />
-          </a-form-item>
-          <a-form-item label="单笔金额限制" v-show="isMenber">
-            <a-input-group compact>
-              <a-input-number placeholder="下限"
-                              v-decorator="[ 'lowerLimit']" style="width: 30%;text-align: center"
-                              min="0.01"/>
-              <a-input placeholder="~" disabled
-                       style="width: 35px; border-left: 0px; pointer-events: none;background-color: #fff;text-align: center"/>
-              <a-input-number placeholder="上限"
-                              v-decorator="[ 'upperLimit']" style="width: 35%; border-left: 0px;text-align: center"
-                              min="0.01"/>
-            </a-input-group>
-          </a-form-item>
-          <a-form-item
-            label="通道">
-            <select v-decorator="['channelCode', validatorRules.channelCode ]">
+          通道：<br/><br/>
+            <select v-model="selected"  @change="getBusinesses()">
               <option v-for="option in channels" v-bind:value="option.channelCode">
                 {{ option.channelName}}
               </option>
             </select>
+          <br/>
+          <a-form-item
+            label="挂码账号">
+            <j-checkbox
+              v-model="businesses.values"
+              :options="businesses.options"
+            />
           </a-form-item>
+
         </a-form>
       </a-spin>
     </a-modal>
@@ -77,76 +39,28 @@
 
 <script>
   import {getAction,httpAction} from '@/api/manage'
+  import JCheckbox from '@/components/jeecg/JCheckbox'
   export default {
     name: "UserChannelModal",
+    components: {
+      JCheckbox,
+    },
     data() {
       return {
+        selected:"",
         isAgent:false,
         isMenber:true,
         userName: '',
-        title: "通道详细",
-        title4add:"添加",
+        title4add:"关联子账号",
         visible: false,
         channels: [],
         visible4Add:false,
         model: {},
-        columns: [
-          {
-            title: '商户',
-            dataIndex: 'userName',
-            key: 'userName',
-            scopedSlots: {customRender: 'userName'}
-          },
-          {
-            title: '通道',
-            dataIndex: 'channelCode',
-            key: 'channelCode',
-            scopedSlots: {customRender: 'channelCode'},
-            customRender: function (text) {
-              if (text == 'ysf') {
-                return '云闪付'
-              } else if (text == 'ali_bank') {
-                return '支付宝转卡'
-              } else if (text == 'ali_zz') {
-                return '支付宝转账'
-              }else if (text == 'nxys_wx') {
-                return '农信易扫微信'
-              }else if (text == 'nxys_alipay') {
-                return '农信易扫支付宝'
-              } else if (text == 'wechat_bank') {
-                return '微信转卡'
-              } else {
-                return text
-              }
-            }
-          },
-          {
-            title: '挂码账号',
-            align:"center",
-            dataIndex: 'businessCode'
-          },
-          {
-            title: '秘钥',
-            align:"center",
-            dataIndex: 'apiKey'
-          },
-          {
-            title: '支付金额下限',
-            align:"center",
-            dataIndex: 'lowerLimit'
-          },
-          {
-            title: '支付金额上限',
-            align:"center",
-            dataIndex: 'upperLimit'
-          },
-          {
-            title: '操作',
-            key: 'action',
-            scopedSlots: {customRender: 'operation'}
-          }
-        ],
         data:[],
+        businesses: {
+          values: '',
+          options: []
+        },
         confirmLoading: false,
         form: this.$form.createForm(this),
         validatorRules:{
@@ -154,10 +68,9 @@
 
         },
         url: {
-          queryChannelByUserName: "/pay/userChannelEntity/queryChannelByUserName",
+          queryBusinessByUserName: "/pay/userBusinessEntity/queryBusinessByUserName",
           channel: "/pay/channelEntity/channel",
-          deleteUserChannel:"/pay/userChannelEntity/deleteUserChannel",
-          addUserChannel:"/pay/userChannelEntity/add",
+          activeBusiness:"/pay/userBusinessEntity/activeBusiness"
         },
       }
     },
@@ -174,17 +87,20 @@
         }
       })
       },
-      active:function(record) {
-        this.visible = true;
-        var params = {username:record.username};//查询条件
-        getAction(this.url.queryChannelByUserName,params).then((res)=>{
+      getBusinesses:function(){
+        let formData = [];
+        formData.channelCode = this.selected;
+        formData.userName = this.userName;
+        console.log(formData);
+        getAction(this.url.queryBusinessByUserName,formData).then((res)=>{
           if(res.success){
-          this.data = res.result;
+          this.businesses.values = res.result.associated;
+          this.businesses.options = res.result.all;
         }else{
         }
       })
       },
-      addChannel:function(record){
+      activeBusiness:function(record){
         this.isAgent=false;
         this.isMenber = true;
         this.visible4Add=true;
@@ -196,27 +112,21 @@
         this.userName = record.username;
       },
       handleOk () {
-        const that = this;
-        // 触发表单验证
-        this.form.validateFields((err, values) => {
-          if (!err) {
-          console.log(values);
-          that.confirmLoading = true;
-          let formData = Object.assign(this.model, values);
-          formData.userName=this.userName;
-          console.log(formData);
-          //时间格式化
-          httpAction(this.url.addUserChannel,formData,"post").then((res)=>{
-            if(res.success){
-            that.$message.success(res.message);
-            that.$emit('ok');
-          }else{
-            that.$message.warning(res.message);
-          }
-        }).finally(() => {
-            that.confirmLoading = false;
-          that.close4Add();
-        })
+        let formData = [];
+        formData.userName = this.userName;
+        formData.channelCode = this.selected;
+        formData.businesses = this.businesses.values;
+        console.log(formData);
+        getAction(this.url.activeBusiness,formData).then((res)=>{
+          if(res.success){
+          this.visible4Add=false;
+          this.selected = "";
+          this.businesses.values="";
+          this.businesses.options=[];
+          this.$message.success(res.message);
+          this.$emit('ok');
+        }else{
+          this.$message.warning(res.message);
         }
       })
       },

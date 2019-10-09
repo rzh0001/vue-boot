@@ -98,4 +98,10 @@ public class UserChannelEntity {
 	@Excel(name = "单笔金额下限", width = 15)
 	@ApiModelProperty(value = "单笔金额下限")
 	private BigDecimal lowerLimit;
+
+	/**当天交易金额上限*/
+	@TableField(exist = false)
+	@Excel(name = "当天交易金额上限", width = 15)
+	@ApiModelProperty(value = "当天交易金额上限")
+	private BigDecimal todayMaxAmount;
 }

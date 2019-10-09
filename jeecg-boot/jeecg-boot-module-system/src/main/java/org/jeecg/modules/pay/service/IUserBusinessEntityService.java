@@ -24,4 +24,10 @@ public interface IUserBusinessEntityService extends IService<UserBusinessEntity>
     void deleteUserBusiness( UserBusinessEntity userBusinessEntity);
 
     Result<UserBusinessEntity> add(UserBusinessEntity userBusinessEntity);
+
+    List<UserBusinessEntity> queryAllBusiness(UserBusinessEntity userBusinessEntity);
+
+    void activeBusiness(String userName,String channelCode,String[] codes);
+    void disableBusiness(String userName,String channelCode,String[] codes);
+    void disableAllBusiness(String userName,String channelCode);
 }

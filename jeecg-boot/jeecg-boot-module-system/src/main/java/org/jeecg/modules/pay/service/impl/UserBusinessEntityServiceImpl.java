@@ -70,4 +70,25 @@ public class UserBusinessEntityServiceImpl extends ServiceImpl<UserBusinessEntit
         result.success("添加成功！");
         return result;
     }
+
+
+    @Override
+    public List<UserBusinessEntity> queryAllBusiness(UserBusinessEntity userBusinessEntity) {
+        return baseMapper.queryAllBusiness(userBusinessEntity);
+    }
+
+    @Override
+    public void activeBusiness(String userName, String channelCode, String[] codes) {
+        baseMapper.activeBusiness(userName,channelCode,codes);
+    }
+
+    @Override
+    public void disableBusiness(String userName, String channelCode, String[] codes) {
+        baseMapper.disableBusiness(userName,channelCode,codes);
+    }
+
+    @Override
+    public void disableAllBusiness(String userName, String channelCode) {
+        baseMapper.disableAllBusiness(userName,channelCode);
+    }
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import org.jeecg.modules.pay.entity.UserBusinessEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
@@ -23,4 +24,12 @@ public interface UserBusinessEntityMapper extends BaseMapper<UserBusinessEntity>
 
     @Delete("delete from sys_user_business where user_name=#{userName} and business_code=#{businessCode} and channel_code=#{channelCode}")
     void deleteUserBusiness(UserBusinessEntity userBusinessEntity);
+
+    @Select("select business_code as businessCode,active  from sys_user_business where user_name=#{userName} and channel_code = #{channelCode}")
+    List<UserBusinessEntity> queryAllBusiness(UserBusinessEntity userBusinessEntity);
+
+    void activeBusiness(@Param("userName")String userName,@Param("channelCode")String channelCode,@Param("codes")String[] codes);
+    void disableBusiness(@Param("userName")String userName,@Param("channelCode")String channelCode,@Param("codes")String[] codes);
+    @Update("update sys_user_business set active='0' where user_name=#{userName} and channel_code=#{channelCode}")
+    void disableAllBusiness(@Param("userName")String userName,@Param("channelCode")String channelCode);
 }
