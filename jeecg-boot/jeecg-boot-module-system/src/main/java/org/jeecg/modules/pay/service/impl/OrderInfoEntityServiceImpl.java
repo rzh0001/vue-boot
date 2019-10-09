@@ -242,19 +242,21 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
 
     /**
      * 更新挂马账户的收入情况
+     *
      * @param order
      */
-    public synchronized void updateBusinessTodayAmount(OrderInfoEntity order){
+    public synchronized void updateBusinessTodayAmount(OrderInfoEntity order) {
         businessEntityService.updateBusinessTodayAmount(order);
     }
+
     /**
      * 校验申请金额
      *
      * @param submitAmount
      * @return
      */
-    private void checkAmountValidity(String userName,String submitAmount, String payType) {
-        UserChannelEntity channel = channelUserDao.queryChannelAndUserName(payType,userName);
+    private void checkAmountValidity(String userName, String submitAmount, String payType) {
+        UserChannelEntity channel = channelUserDao.queryChannelAndUserName(payType, userName);
         if (channel == null) {
             throw new RRException("用户通道通道不存在:" + payType);
         }
@@ -524,16 +526,16 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
                 businessEntityService.queryBusinessCodeByUserName(user.getAgentUsername(), payType);
         if (CollectionUtils.isEmpty(useBusinesses)) {
             log.info("用户:{},无对应商户信息", userName);
-            throw new RRException("通道："+payType+",未配置账号或账号未激活，请联系管理员");
+            throw new RRException("通道：" + payType + ",未配置账号或账号未激活，请联系管理员");
         }
         UserBusinessEntity userBusinessEntity = null;
-        if(useBusinesses.size() == 1){
+        if (useBusinesses.size() == 1) {
             userBusinessEntity = useBusinesses.get(0);
-        }else{
+        } else {
             Collections.shuffle(useBusinesses);
             //如果配置的账号包含多个，则需要筛选一个
-            for(UserBusinessEntity b:useBusinesses){
-                if(b.getTodayAmount().add(new BigDecimal(submitAmount)).doubleValue() > b.getTodayMaxAmount().doubleValue()){
+            for (UserBusinessEntity b : useBusinesses) {
+                if (b.getTodayMaxAmount() != null && b.getTodayAmount() != null && b.getTodayAmount().add(new BigDecimal(submitAmount)).doubleValue() > b.getTodayMaxAmount().doubleValue()) {
                     continue;
                 }
                 userBusinessEntity = b;
@@ -541,11 +543,11 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             }
         }
 
-        if(userBusinessEntity == null){
-            throw new RRException("通道："+payType+"下，所以账户额度已满，请联系管理员");
+        if (userBusinessEntity == null) {
+            throw new RRException("通道：" + payType + "下，所以账户额度已满，请联系管理员");
         }
         //校验金额的合法性
-        checkAmountValidity(userName,submitAmount, payType);
+        checkAmountValidity(userName, submitAmount, payType);
         //校验用户费率是否有填写
         checkRate(user, payType);
 
