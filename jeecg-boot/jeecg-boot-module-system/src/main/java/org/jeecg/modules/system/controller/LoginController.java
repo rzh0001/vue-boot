@@ -36,6 +36,7 @@ import org.jeecg.modules.system.service.ISysUserService;
 import org.jeecg.modules.util.BaseConstant;
 import org.jeecg.modules.util.R;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -65,7 +66,8 @@ public class LoginController {
     private ISysDepartService sysDepartService;
     @Autowired
     public ISysDictService dictService;
-
+    @Value("${skip.google.check}")
+    private boolean skipGoogleCheck;
     /**
      * 获取谷歌
      *
@@ -160,7 +162,7 @@ public class LoginController {
             }
         }
         //跳过谷歌验证
-        if (!CollectionUtils.isEmpty(skipGoogleCheckNames) && skipGoogleCheckNames.contains(username)) {
+        if (skipGoogleCheck || (!CollectionUtils.isEmpty(skipGoogleCheckNames) && skipGoogleCheckNames.contains(username))) {
             return checkPassword(username, password, sysUser, result);
         } else {
             if (StringUtils.isEmpty(sysUser.getGoogleSecretKey())) {

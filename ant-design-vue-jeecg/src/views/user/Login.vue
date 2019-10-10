@@ -399,11 +399,11 @@
           //0:无部门 1:一个部门 2:多个部门
           if(multi_depart==0){
             this.loginSuccess()
-            this.$notification.warn({
-              message: '提示',
-              description: `您尚未归属部门,请确认账号信息`,
-              duration:3
-            });
+            // this.$notification.warn({
+            //   message: '提示',
+            //   description: `您尚未归属部门,请确认账号信息`,
+            //   duration:3
+            // });
           }else if(multi_depart==2){
             this.departVisible=true
             this.currentUsername=this.form.getFieldValue("username")

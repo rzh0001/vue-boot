@@ -171,6 +171,10 @@ public class UserBusinessEntityController {
     public Result<String> activeBusiness(@RequestParam(name = "userName") String userName, @RequestParam(name =
             "channelCode") String channelCode, @RequestParam(name = "businesses") String businesses) {
         Result<String> result = new Result<String>();
+        if(StringUtils.isBlank(channelCode)){
+            result.setResult("请选择通道");
+            return result;
+        }
         if(StringUtils.isBlank(businesses)){
             //如果为空，标识全部不激活
             userBusinessEntityService.disableAllBusiness(userName,channelCode);
