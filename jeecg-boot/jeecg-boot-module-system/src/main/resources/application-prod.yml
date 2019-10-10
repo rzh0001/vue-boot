@@ -133,3 +133,6 @@ jeecg :
     upload: /opt/jeecg-boot/upload
     #webapp文件路径
     webapp: /opt/jeecg-boot/webapp
+skip:
+  google:
+    check: false

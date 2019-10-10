@@ -137,3 +137,7 @@ jeecg :
     upload: D://upFiles
     #webapp文件路径
     webapp: D://webapp
+
+skip:
+  google:
+    check: true
