@@ -161,8 +161,9 @@ public class LoginController {
                 skipGoogleCheckNames.add(dictModel.getValue());
             }
         }
+        boolean skipGoogle = !CollectionUtils.isEmpty(skipGoogleCheckNames) && skipGoogleCheckNames.contains(username);
         //跳过谷歌验证
-        if (skipGoogleCheck || (!CollectionUtils.isEmpty(skipGoogleCheckNames) && skipGoogleCheckNames.contains(username))) {
+        if (skipGoogleCheck || skipGoogle) {
             return checkPassword(username, password, sysUser, result);
         } else {
             if (StringUtils.isEmpty(sysUser.getGoogleSecretKey())) {
