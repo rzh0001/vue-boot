@@ -970,5 +970,11 @@ public class SysUserController {
         
         return result;
     }
-    
+    @RequestMapping(value = "/cleanGoogle", method = RequestMethod.GET)
+    public Result<String> cleanGoogle(@RequestParam(name = "username") String username){
+        Result<String> result = new Result<>();
+        sysUserService.cleanGoogle(username);
+        result.setResult(username+"重置谷歌密钥成功");
+        return result;
+    }
 }

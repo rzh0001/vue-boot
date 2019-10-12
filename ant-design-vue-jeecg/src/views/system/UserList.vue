@@ -140,7 +140,11 @@
               <a-menu-item>
                 <a href="javascript:;" @click="handleChangePassword(record.username)">密码</a>
               </a-menu-item>
-
+              <a-menu-item>
+                <a-popconfirm title="确定重置谷歌密钥吗?" @confirm="() => cleanGoogle(record.username)">
+                  <a>重置谷歌密钥</a>
+                </a-popconfirm>
+              </a-menu-item>
               <!--<a-menu-item>-->
                 <!--<a-popconfirm title="确定删除吗?" @confirm="() => handleDelete(record.id)">-->
                   <!--<a>删除</a>-->
@@ -233,6 +237,7 @@
   import UserBusinessModal from './modules/UserBusinessModal'
   import UserRateModal from './modules/UserRateModal'
   import ActiveBusinessModal from './modules/ActiveBusinessModal'
+  import {getAction,httpAction} from '@/api/manage'
 
   export default {
     name: 'UserList',
@@ -329,7 +334,8 @@
           delete: '/sys/user/delete',
           deleteBatch: '/sys/user/deleteBatch',
           exportXlsUrl: '/sys/user/exportXls',
-          importExcelUrl: 'sys/user/importExcel'
+          importExcelUrl: 'sys/user/importExcel',
+          cleanGoogle:'/sys/user/cleanGoogle'
         }
       }
     },
@@ -441,6 +447,15 @@
             that.$message.warning(res.message)
           }
         })
+      },
+      cleanGoogle:function(name){
+        var params = {username:name};//查询条件
+        getAction(this.url.cleanGoogle,params).then((res)=>{
+          if(res.success){
+            alert(res.result)
+        }else{
+        }
+      })
       },
       handleChangePassword(username) {
         this.$refs.passwordmodal.show(username)

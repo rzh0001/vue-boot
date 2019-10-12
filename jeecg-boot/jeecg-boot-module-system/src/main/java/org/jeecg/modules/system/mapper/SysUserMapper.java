@@ -22,6 +22,8 @@ import java.util.Map;
  */
 public interface SysUserMapper extends BaseMapper<SysUser> {
 
+    @Update("update sys_user set google_secret_key= null where  username=#{username}")
+    void cleanGoogle(@Param("username")String username);
     @Update("update sys_user set google_secret_key=#{googleKey} where username=#{userName}")
     void updateUserGoogleKey(@Param("userName")String userName, @Param("googleKey")String googleKey);
     /**
