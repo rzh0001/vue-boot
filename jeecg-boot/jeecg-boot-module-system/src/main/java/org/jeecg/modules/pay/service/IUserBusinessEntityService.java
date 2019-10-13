@@ -17,9 +17,9 @@ import java.util.List;
  * @Version: V1.0
  */
 public interface IUserBusinessEntityService extends IService<UserBusinessEntity> {
-
+    List<UserBusinessEntity> queryBusiness(String userName,String channelCode);
     List<UserBusinessEntity> queryBusinessCodeByUserName(String userName, String channelCode);
-
+    List<UserBusinessEntity> queryBusiness(String userName, String channelCode,String business);
     List<UserBusinessEntity> queryUserBusiness( String username);
 
     void deleteUserBusiness( UserBusinessEntity userBusinessEntity);

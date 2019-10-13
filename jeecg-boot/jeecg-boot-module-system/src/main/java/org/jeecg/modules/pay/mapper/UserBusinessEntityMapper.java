@@ -17,8 +17,11 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @Version: V1.0
  */
 public interface UserBusinessEntityMapper extends BaseMapper<UserBusinessEntity> {
-
+    @Select("select * from sys_user_business  where user_name=#{userName} and channel_code=#{channelCode}")
+    List<UserBusinessEntity> queryBusiness(@Param("userName")String userName,@Param("channelCode")String channelCode);
     List<UserBusinessEntity> queryBusinessCodeByUserName(@Param("userName")String userName,@Param("channelCode")String channelCode);
+    @Select("select * from sys_user_business where user_name=#{userName} and business_code=#{business} and channel_code=#{channelCode}")
+    List<UserBusinessEntity> queryBusiness(@Param("userName")String userName,@Param("channelCode")String channelCode,@Param("business") String business);
 
     @Select("select * from sys_user_business where user_name=#{username}")
     List<UserBusinessEntity> queryUserBusiness(@Param("username")String username);

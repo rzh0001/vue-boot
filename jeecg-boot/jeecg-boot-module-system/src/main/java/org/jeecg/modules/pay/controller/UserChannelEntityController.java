@@ -34,6 +34,7 @@ import org.jeecgframework.poi.excel.entity.ImportParams;
 import org.jeecgframework.poi.excel.view.JeecgEntityExcelView;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -129,14 +130,19 @@ public class UserChannelEntityController {
     public Result<Boolean> deleteUserChannel(@RequestBody UserChannelEntity dto) {
         Result<Boolean> result = new Result<Boolean>();
         SysUser user = userService.getUserByName(dto.getUserName());
-        userChannelEntityService.deleteUserChannel(dto.getUserName(), dto.getChannelCode());
         if (user.getMemberType().equals(BaseConstant.USER_AGENT)) {
-            //代理删除，需要删除对应的挂马信息
+            //删除代理关联的通道，则需要先删除代理关联的挂马，再删除代理关联的通道
             UserBusinessEntity userBusinessEntity = new UserBusinessEntity();
             userBusinessEntity.setChannelCode(dto.getChannelCode());
             userBusinessEntity.setUserName(dto.getUserName());
             userBusinessEntity.setBusinessCode(dto.getBusinessCode());
             userBusinessEntityService.deleteUserBusiness(userBusinessEntity);
+            List<UserBusinessEntity> ub = userBusinessEntityService.queryBusiness(dto.getUserName(),dto.getChannelCode());
+            if(CollectionUtils.isEmpty(ub)){
+                userChannelEntityService.deleteUserChannel(dto.getUserName(), dto.getChannelCode());
+            }
+        }else{
+            userChannelEntityService.deleteUserChannel(dto.getUserName(), dto.getChannelCode());
         }
         result.setResult(true);
         result.setMessage("删除成功");
@@ -175,14 +181,19 @@ public class UserChannelEntityController {
                 userChannelEntity.setMemberType(user.getMemberType());
                 userChannelEntityService.save(userChannelEntity);
             } else if (BaseConstant.USER_AGENT.equals(user.getMemberType())) {
-                if(channel == null){
-                    userChannelEntity.setMemberType(user.getMemberType());
-                    userChannelEntityService.save(userChannelEntity);
+                List<UserBusinessEntity> ub = userBusinessEntityService.queryBusiness(userChannelEntity.getUserName(),userChannelEntity.getChannelCode(),userChannelEntity.getBusinessCode());
+                if(!CollectionUtils.isEmpty(ub)){
+                    result.error500("该账号已经关联过此通道");
+                    return result;
                 }
                 //如果是代理，则需要设置和挂马账号的关联关系
                 if (StringUtils.isEmpty(userChannelEntity.getBusinessCode())) {
                     result.error500("挂马账号不能为空");
                     return result;
+                }
+                if(channel == null){
+                    userChannelEntity.setMemberType(user.getMemberType());
+                    userChannelEntityService.save(userChannelEntity);
                 }
                 UserBusinessEntity business = new UserBusinessEntity();
                 business.setUserId(user.getId());

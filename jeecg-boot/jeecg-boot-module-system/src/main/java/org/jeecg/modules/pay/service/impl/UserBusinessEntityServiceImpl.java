@@ -30,8 +30,18 @@ public class UserBusinessEntityServiceImpl extends ServiceImpl<UserBusinessEntit
     private ISysUserService userService;
 
     @Override
+    public List<UserBusinessEntity> queryBusiness(String userName, String channelCode) {
+        return baseMapper.queryBusiness(userName,channelCode);
+    }
+
+    @Override
     public List<UserBusinessEntity> queryBusinessCodeByUserName(String userName, String channelCode) {
         return baseMapper.queryBusinessCodeByUserName(userName,channelCode);
+    }
+
+    @Override
+    public List<UserBusinessEntity> queryBusiness(String userName, String channelCode, String business) {
+        return baseMapper.queryBusiness( userName,  channelCode,  business);
     }
 
     @Override
