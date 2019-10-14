@@ -183,7 +183,10 @@
             </a-button>
             <a-menu slot="overlay">
               <a-menu-item>
-                <a @click="activeBusiness(record)">关联子账号</a>
+                <a @click="activeBusiness(record)">激活子账号</a>
+              </a-menu-item>
+               <a-menu-item>
+                <a @click="rechargeAmount(record)">子账号充值</a>
               </a-menu-item>
             </a-menu>
           </a-dropdown>
@@ -381,6 +384,13 @@
           return;
         }
         this.$refs.activeBusinessModal.activeBusiness(record);
+      },
+      rechargeAmount: function(record){
+        if(record.memberType != "1"){
+          alert("无操作权限");
+          return;
+        }
+        this.$refs.activeBusinessModal.rechargeAmount(record);
       },
       getAvatarView: function(avatar) {
         return this.url.imgerver + '/' + avatar

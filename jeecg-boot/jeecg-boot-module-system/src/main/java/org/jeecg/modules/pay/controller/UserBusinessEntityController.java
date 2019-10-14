@@ -1,5 +1,6 @@
 package org.jeecg.modules.pay.controller;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -153,8 +154,10 @@ public class UserBusinessEntityController {
         userBusinessEntity.setChannelCode(channelCode);
         List<UserBusinessEntity> list = userBusinessEntityService.queryAllBusiness(userBusinessEntity);
         for (UserBusinessEntity b : list) {
+            StringBuilder msg = new StringBuilder();
             BusinessLabelValue labelValue = new BusinessLabelValue();
-            labelValue.setLabel(b.getBusinessCode());
+            labelValue.setLabel(msg.append("子账号名称：").append(b.getBusinessCode()).append("；余额=").append(b.getRechargeAmount() == null ?
+                    0.00 : b.getRechargeAmount()).toString());
             labelValue.setValue(b.getBusinessCode());
             all.add(labelValue);
             if ("1".equals(b.getActive())) {
@@ -167,25 +170,75 @@ public class UserBusinessEntityController {
         return result;
     }
 
+    @GetMapping(value = "/getBusinessCodesByAgentName")
+    public Result<List<String>> getBusinessCodesByAgentName(@RequestParam(name = "userName") String userName,
+                                                            @RequestParam(name = "channelCode") String channelCode) {
+        Result<List<String>> result = new Result<List<String>>();
+        List<String> businessCodes = userBusinessEntityService.getBusinessCodesByAgentName(userName, channelCode);
+        result.setResult(businessCodes);
+        return result;
+    }
+
     @GetMapping("/activeBusiness")
+    @RequiresPermissions("user:business:activeBusiness")
     public Result<String> activeBusiness(@RequestParam(name = "userName") String userName, @RequestParam(name =
             "channelCode") String channelCode, @RequestParam(name = "businesses") String businesses) {
         Result<String> result = new Result<String>();
-        if(StringUtils.isBlank(channelCode)){
+        if (StringUtils.isBlank(channelCode)) {
             result.setResult("请选择通道");
             return result;
         }
-        if(StringUtils.isBlank(businesses)){
+        if (StringUtils.isBlank(businesses)) {
             //如果为空，标识全部不激活
-            userBusinessEntityService.disableAllBusiness(userName,channelCode);
+            userBusinessEntityService.disableAllBusiness(userName, channelCode);
             result.setResult("激活成功");
             return result;
         }
         String[] codes = businesses.split(",");
-        userBusinessEntityService.activeBusiness(userName,channelCode,codes);
-        userBusinessEntityService.disableBusiness(userName,channelCode,codes);
+        userBusinessEntityService.activeBusiness(userName, channelCode, codes);
+        userBusinessEntityService.disableBusiness(userName, channelCode, codes);
         result.setResult("激活成功");
         return result;
+    }
+
+    @GetMapping("/rechargeAmount")
+    @RequiresPermissions("user:business:rechargeAmount")
+    public Result<String> rechargeAmount(@RequestParam(name = "userName") String userName, @RequestParam(name =
+            "channelCode") String channelCode, @RequestParam(name = "businessCode") String businesses,
+                                         @RequestParam(name = "rechargeAmount") String amount) {
+        Result<String> result = new Result<String>();
+        if (StringUtils.isBlank(userName) || StringUtils.isBlank(channelCode) || StringUtils.isBlank(businesses) || StringUtils.isBlank(amount)) {
+            result.setResult("充值失败，参数不全");
+            return result;
+        }
+        try {
+            userBusinessEntityService.rechargeAmount(userName, channelCode, businesses, Double.parseDouble(amount));
+            result.setResult(businesses + "：充值金额[" + amount + "]成功");
+            return result;
+        } catch (Exception e) {
+            log.info("充值金额异常，异常信息：{}", e);
+            result.setResult("金额充值异常");
+            return result;
+        }
+    }
+
+    @GetMapping("/queryRechargeAmount")
+    public Result<Double> getRechargeAmount(@RequestParam(name = "userName") String userName, @RequestParam(name =
+            "channelCode") String channelCode, @RequestParam(name = "businesses") String businesses) {
+        Result<Double> result = new Result<Double>();
+        if (StringUtils.isBlank(userName) || StringUtils.isBlank(channelCode) || StringUtils.isBlank(businesses)) {
+            result.setResult(null);
+            return result;
+        }
+        try {
+            BigDecimal rechagerAmount = userBusinessEntityService.getRechargeAmount(userName, channelCode, businesses);
+            result.setResult(rechagerAmount.doubleValue());
+            return result;
+        } catch (Exception e) {
+            log.info("查询充值金额异常，异常信息：{}", e);
+            result.setResult(null);
+            return result;
+        }
     }
 
     /**

@@ -87,15 +87,15 @@ public class UserBusinessEntity {
 	 *
 	 * 0：未激活，1：激活
 	 * */
-	@Excel(name = "更新人", width = 2)
-	@ApiModelProperty(value = "更新人")
+	@Excel(name = "激活状态", width = 2)
+	@ApiModelProperty(value = "激活状态")
 	private String active;
 
-	@Excel(name = "当天交易金额上限", width = 15)
-	@ApiModelProperty(value = "当天交易金额上限")
-	private BigDecimal todayMaxAmount;
+	@Excel(name = "充值金额", width = 15)
+	@ApiModelProperty(value = "充值金额")
+	private BigDecimal rechargeAmount;
 
-	@Excel(name = "当天该账号的收入", width = 15)
-	@ApiModelProperty(value = "当天该账号的收入")
-	private BigDecimal todayAmount;
+	@Excel(name = "收入金额", width = 15)
+	@ApiModelProperty(value = "收入金额")
+	private BigDecimal incomeAmount;
 }

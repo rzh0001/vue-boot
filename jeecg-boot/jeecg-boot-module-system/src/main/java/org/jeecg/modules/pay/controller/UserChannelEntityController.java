@@ -201,7 +201,6 @@ public class UserChannelEntityController {
                 business.setChannelCode(userChannelEntity.getChannelCode());
                 business.setApiKey(userChannelEntity.getApiKey());
                 business.setBusinessCode(userChannelEntity.getBusinessCode());
-                business.setTodayMaxAmount(userChannelEntity.getTodayMaxAmount());
                 userBusinessEntityService.add(business);
             }else {
                 return result.error500("操作失败");

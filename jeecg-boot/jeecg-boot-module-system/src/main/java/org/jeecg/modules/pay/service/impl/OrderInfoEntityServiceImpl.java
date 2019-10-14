@@ -210,7 +210,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
                 CallBackResult callBackResult = JSONObject.parseObject(result.getBody(), CallBackResult.class);
                 if (callBackResult.getCode() == BaseConstant.SUCCESS) {
                     updateOrderStatusSuccessByOrderId(orderId);
-                    updateBusinessTodayAmount(order);
+                    updateBusinessIncomeAmount(order);
                     log.info("通知商户成功，并且商户返回成功,orderID:{}", orderId);
                     flag = true;
                     msg.append("通知商户成功，并且商户返回成功");
@@ -245,8 +245,8 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      *
      * @param order
      */
-    public synchronized void updateBusinessTodayAmount(OrderInfoEntity order) {
-        businessEntityService.updateBusinessTodayAmount(order);
+    public synchronized void updateBusinessIncomeAmount(OrderInfoEntity order) {
+        businessEntityService.updateBusinessIncomeAmount(order);
     }
 
     /**
@@ -535,7 +535,9 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             Collections.shuffle(useBusinesses);
             //如果配置的账号包含多个，则需要筛选一个
             for (UserBusinessEntity b : useBusinesses) {
-                if (b.getTodayMaxAmount() != null && b.getTodayAmount() != null && b.getTodayAmount().add(new BigDecimal(submitAmount)).doubleValue() > b.getTodayMaxAmount().doubleValue()) {
+                //如果充值金额为空，或收入金额+本单的金额>充值金额，则不能使用
+                Double amount = b.getIncomeAmount().add(new BigDecimal(submitAmount)).setScale(3, BigDecimal.ROUND_HALF_UP).doubleValue();
+                if (b.getRechargeAmount() == null || b.getRechargeAmount().doubleValue() < amount) {
                     continue;
                 }
                 userBusinessEntity = b;

@@ -49,11 +49,6 @@
           label="秘钥">
           <a-input placeholder="秘钥" style="width:200px;" v-decorator="['apiKey']" />
         </a-form-item>
-        <a-form-item
-          v-show="isAgent"
-          label="当天交易金额上限">
-          <a-input placeholder="当天交易金额上限" style="width:200px;" v-decorator="['todayMaxAmount']" />
-        </a-form-item>
         <a-form-item label="单笔金额限制" v-show="isMenber">
           <a-input-group compact>
             <a-input-number placeholder="下限"
@@ -144,11 +139,6 @@
             title: '支付金额上限',
             align:"center",
             dataIndex: 'upperLimit'
-          },
-          {
-            title: '当天交易金额上限',
-            align:"center",
-            dataIndex: 'todayMaxAmount'
           },
           {
             title: '操作',

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -89,6 +90,11 @@ public class UserBusinessEntityServiceImpl extends ServiceImpl<UserBusinessEntit
     }
 
     @Override
+    public List<String> getBusinessCodesByAgentName(String userName, String channelCode) {
+        return baseMapper.getBusinessCodesByAgentName(userName,channelCode);
+    }
+
+    @Override
     public void activeBusiness(String userName, String channelCode, String[] codes) {
         baseMapper.activeBusiness(userName,channelCode,codes);
     }
@@ -104,8 +110,18 @@ public class UserBusinessEntityServiceImpl extends ServiceImpl<UserBusinessEntit
     }
 
     @Override
-    public void updateBusinessTodayAmount(OrderInfoEntity order) {
-        baseMapper.updateBusinessTodayAmount(order);
+    public void rechargeAmount(String userName, String channelCode, String businesses, Double amount) {
+        baseMapper.rechargeAmount(userName,channelCode,businesses,amount);
+    }
+
+    @Override
+    public BigDecimal getRechargeAmount(String userName, String channelCode, String businesses) {
+        return baseMapper.getRechargeAmount(userName,channelCode,businesses);
+    }
+
+    @Override
+    public void updateBusinessIncomeAmount(OrderInfoEntity order) {
+        baseMapper.updateBusinessIncomeAmount(order);
     }
 
     @Override

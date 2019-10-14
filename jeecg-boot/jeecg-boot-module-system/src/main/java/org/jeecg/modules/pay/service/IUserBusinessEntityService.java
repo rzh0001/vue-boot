@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -27,11 +28,12 @@ public interface IUserBusinessEntityService extends IService<UserBusinessEntity>
     Result<UserBusinessEntity> add(UserBusinessEntity userBusinessEntity);
 
     List<UserBusinessEntity> queryAllBusiness(UserBusinessEntity userBusinessEntity);
-
+    List<String> getBusinessCodesByAgentName(String userName, String channelCode);
     void activeBusiness(String userName,String channelCode,String[] codes);
     void disableBusiness(String userName,String channelCode,String[] codes);
     void disableAllBusiness(String userName,String channelCode);
-
-    void updateBusinessTodayAmount(OrderInfoEntity order);
+    void rechargeAmount(String userName,  String channelCode, String businesses, Double amount);
+    BigDecimal getRechargeAmount(String userName,  String channelCode, String businesses);
+    void updateBusinessIncomeAmount(OrderInfoEntity order);
     void updateBusinessTodayAmount();
 }
