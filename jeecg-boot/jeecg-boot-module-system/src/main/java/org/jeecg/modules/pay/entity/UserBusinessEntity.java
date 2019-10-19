@@ -1,6 +1,7 @@
 package org.jeecg.modules.pay.entity;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -82,4 +83,19 @@ public class UserBusinessEntity {
 	 */
 	@TableField(exist = false)
 	private boolean editable = false;
+	/**激活状态
+	 *
+	 * 0：未激活，1：激活
+	 * */
+	@Excel(name = "激活状态", width = 2)
+	@ApiModelProperty(value = "激活状态")
+	private String active;
+
+	@Excel(name = "充值金额", width = 15)
+	@ApiModelProperty(value = "充值金额")
+	private BigDecimal rechargeAmount;
+
+	@Excel(name = "收入金额", width = 15)
+	@ApiModelProperty(value = "收入金额")
+	private BigDecimal incomeAmount;
 }

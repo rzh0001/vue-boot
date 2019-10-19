@@ -62,6 +62,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 	private IUserAmountEntityService userAmountService;
 
 	@Override
+	public void cleanGoogle(String username) {
+		userMapper.cleanGoogle(username);
+	}
+
+	@Override
 	public void updateUserGoogleKey(String userName, String googleKey) {
 		userMapper.updateUserGoogleKey(userName,googleKey);
 	}

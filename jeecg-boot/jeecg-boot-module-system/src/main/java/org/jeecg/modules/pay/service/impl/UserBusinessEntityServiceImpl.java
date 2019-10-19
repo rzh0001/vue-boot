@@ -3,6 +3,7 @@ package org.jeecg.modules.pay.service.impl;
 import org.apache.shiro.SecurityUtils;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.vo.LoginUser;
+import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import org.jeecg.modules.pay.entity.UserBusinessEntity;
 import org.jeecg.modules.pay.mapper.UserBusinessEntityMapper;
 import org.jeecg.modules.pay.service.IUserBusinessEntityService;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -29,8 +31,18 @@ public class UserBusinessEntityServiceImpl extends ServiceImpl<UserBusinessEntit
     private ISysUserService userService;
 
     @Override
+    public List<UserBusinessEntity> queryBusiness(String userName, String channelCode) {
+        return baseMapper.queryBusiness(userName,channelCode);
+    }
+
+    @Override
     public List<UserBusinessEntity> queryBusinessCodeByUserName(String userName, String channelCode) {
         return baseMapper.queryBusinessCodeByUserName(userName,channelCode);
+    }
+
+    @Override
+    public List<UserBusinessEntity> queryBusiness(String userName, String channelCode, String business) {
+        return baseMapper.queryBusiness( userName,  channelCode,  business);
     }
 
     @Override
@@ -69,5 +81,51 @@ public class UserBusinessEntityServiceImpl extends ServiceImpl<UserBusinessEntit
         this.save(userBusinessEntity);
         result.success("添加成功！");
         return result;
+    }
+
+
+    @Override
+    public List<UserBusinessEntity> queryAllBusiness(UserBusinessEntity userBusinessEntity) {
+        return baseMapper.queryAllBusiness(userBusinessEntity);
+    }
+
+    @Override
+    public List<String> getBusinessCodesByAgentName(String userName, String channelCode) {
+        return baseMapper.getBusinessCodesByAgentName(userName,channelCode);
+    }
+
+    @Override
+    public void activeBusiness(String userName, String channelCode, String[] codes) {
+        baseMapper.activeBusiness(userName,channelCode,codes);
+    }
+
+    @Override
+    public void disableBusiness(String userName, String channelCode, String[] codes) {
+        baseMapper.disableBusiness(userName,channelCode,codes);
+    }
+
+    @Override
+    public void disableAllBusiness(String userName, String channelCode) {
+        baseMapper.disableAllBusiness(userName,channelCode);
+    }
+
+    @Override
+    public void rechargeAmount(String userName, String channelCode, String businesses, Double amount) {
+        baseMapper.rechargeAmount(userName,channelCode,businesses,amount);
+    }
+
+    @Override
+    public BigDecimal getRechargeAmount(String userName, String channelCode, String businesses) {
+        return baseMapper.getRechargeAmount(userName,channelCode,businesses);
+    }
+
+    @Override
+    public void updateBusinessIncomeAmount(OrderInfoEntity order) {
+        baseMapper.updateBusinessIncomeAmount(order);
+    }
+
+    @Override
+    public void updateBusinessTodayAmount() {
+        baseMapper.updateBusinessTodayAmount();
     }
 }

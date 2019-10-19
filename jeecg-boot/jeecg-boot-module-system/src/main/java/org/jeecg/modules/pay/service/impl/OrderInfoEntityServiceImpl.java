@@ -9,6 +9,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jeecg.common.system.vo.DictModel;
 import org.jeecg.common.util.DateUtils;
+import org.jeecg.common.util.RedisUtil;
 import org.jeecg.modules.exception.RRException;
 import org.jeecg.modules.pay.entity.*;
 import org.jeecg.modules.pay.mapper.OrderInfoEntityMapper;
@@ -59,6 +60,8 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     public ISysDictService dictService;
     @Autowired
     public IUserAmountDetailService amountDetailService;
+    @Autowired
+    private RedisUtil redisUtil;
     /**
      * 请求挂码平台的秘钥
      */
@@ -207,6 +210,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
                 CallBackResult callBackResult = JSONObject.parseObject(result.getBody(), CallBackResult.class);
                 if (callBackResult.getCode() == BaseConstant.SUCCESS) {
                     updateOrderStatusSuccessByOrderId(orderId);
+                    updateBusinessIncomeAmount(order);
                     log.info("通知商户成功，并且商户返回成功,orderID:{}", orderId);
                     flag = true;
                     msg.append("通知商户成功，并且商户返回成功");
@@ -236,6 +240,14 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         }
     }
 
+    /**
+     * 更新挂马账户的收入情况
+     *
+     * @param order
+     */
+    public synchronized void updateBusinessIncomeAmount(OrderInfoEntity order) {
+        businessEntityService.updateBusinessIncomeAmount(order);
+    }
 
     /**
      * 校验申请金额
@@ -243,8 +255,8 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * @param submitAmount
      * @return
      */
-    private void checkAmountValidity(String userName,String submitAmount, String payType) {
-        UserChannelEntity channel = channelUserDao.queryChannelAndUserName(payType,userName);
+    private void checkAmountValidity(String userName, String submitAmount, String payType) {
+        UserChannelEntity channel = channelUserDao.queryChannelAndUserName(payType, userName);
         if (channel == null) {
             throw new RRException("用户通道通道不存在:" + payType);
         }
@@ -514,14 +526,30 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
                 businessEntityService.queryBusinessCodeByUserName(user.getAgentUsername(), payType);
         if (CollectionUtils.isEmpty(useBusinesses)) {
             log.info("用户:{},无对应商户信息", userName);
-            throw new RRException(userName + "对应的代理" + user.getAgentUsername() + "未配置挂码信息");
+            throw new RRException("通道：" + payType + ",未配置账号或账号未激活，请联系管理员");
         }
-        if (useBusinesses.size() > 1) {
-            throw new RRException(userName + "对应的代理" + user.getAgentUsername() + "配置了多个挂码信息");
+        UserBusinessEntity userBusinessEntity = null;
+        if (useBusinesses.size() == 1) {
+            userBusinessEntity = useBusinesses.get(0);
+        } else {
+            Collections.shuffle(useBusinesses);
+            //如果配置的账号包含多个，则需要筛选一个
+            for (UserBusinessEntity b : useBusinesses) {
+                //如果充值金额为空，或收入金额+本单的金额>充值金额，则不能使用
+                Double amount = b.getIncomeAmount().add(new BigDecimal(submitAmount)).setScale(3, BigDecimal.ROUND_HALF_UP).doubleValue();
+                if (b.getRechargeAmount() == null || b.getRechargeAmount().doubleValue() < amount) {
+                    continue;
+                }
+                userBusinessEntity = b;
+                break;
+            }
         }
-        UserBusinessEntity userBusinessEntity = useBusinesses.get(0);
+
+        if (userBusinessEntity == null) {
+            throw new RRException("通道：" + payType + "下，所以账户额度已满，请联系管理员");
+        }
         //校验金额的合法性
-        checkAmountValidity(userName,submitAmount, payType);
+        checkAmountValidity(userName, submitAmount, payType);
         //校验用户费率是否有填写
         checkRate(user, payType);
 

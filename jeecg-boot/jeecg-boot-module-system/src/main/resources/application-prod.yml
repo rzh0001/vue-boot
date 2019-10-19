@@ -63,7 +63,7 @@ spring:
       stat-view-servlet:
         enabled: true
         loginUsername: admin
-        loginPassword: 123456
+        loginPassword: abc123#@!
       web-stat-filter:
         enabled: true
     dynamic:
@@ -92,7 +92,7 @@ spring:
         connectionProperties: druid.stat.mergeSql\=true;druid.stat.slowSqlMillis\=5000
       datasource:
         master:
-          url: jdbc:mysql://47.56.110.58:3306/jeecg-boot?characterEncoding=UTF-8&useUnicode=true&useSSL=false
+          url: jdbc:mysql://127.0.0.1:3306/jeecg-boot?characterEncoding=UTF-8&useUnicode=true&useSSL=false
           username: xsf
           password: xh9%Os$M#*KArp^20f
           driver-class-name: com.mysql.jdbc.Driver
@@ -133,3 +133,6 @@ jeecg :
     upload: /opt/jeecg-boot/upload
     #webapp文件路径
     webapp: /opt/jeecg-boot/webapp
+skip:
+  google:
+    check: false

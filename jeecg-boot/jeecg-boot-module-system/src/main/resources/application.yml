@@ -1,9 +1,9 @@
 spring:
   profiles:
-    active: dev
+      active: dev
 swagger:
   production: false
   basic:
     enable: true
-    username: jeecg
-    password: jeecg1314
+    username: admin
+    password: abc123#@!

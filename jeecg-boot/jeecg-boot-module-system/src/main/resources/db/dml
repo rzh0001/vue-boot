@@ -6,3 +6,18 @@ alter table pay_order_info add ip VARCHAR(32) default NULL;
 #20190927
 alter table sys_user_channel add upper_limit decimal(7,2) default NULL COMMENT '单笔金额上限';
 alter table sys_user_channel add lower_limit decimal(7,2) default NULL COMMENT '单笔金额下限';
+
+#20191006
+alter table sys_user_amount_detail add remark varchar(128) null comment '备注';
+
+#支持多挂马账号
+alter table sys_user_business add active varchar(2) DEFAULT '0' COMMENT '0:未激活；1：激活';
+alter table sys_user_business add recharge_amount decimal(10,3) DEFAULT '0.000' COMMENT '充值金额';
+alter table sys_user_business add income_amount decimal(10,3) DEFAULT '0.000' COMMENT '收入金额';
+update sys_user_business set active='1';
+update sys_user_business set recharge_amount=0.00, income_amount=0.00;
+
+权限配置：
+挂马账号充值  user:business:rechargeAmount
+激活挂马账号  user:business:activeBusiness
+重置谷歌      user:cleanGoogle

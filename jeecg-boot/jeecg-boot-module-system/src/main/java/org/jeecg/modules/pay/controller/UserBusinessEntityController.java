@@ -1,5 +1,6 @@
 package org.jeecg.modules.pay.controller;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -7,7 +8,7 @@ import java.net.URLDecoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.jeecg.common.api.vo.Result;
@@ -15,6 +16,7 @@ import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.aspect.annotation.AutoLog;
 import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.oConvertUtils;
+import org.jeecg.modules.pay.entity.BusinessLabelValue;
 import org.jeecg.modules.pay.entity.UserBusinessEntity;
 import org.jeecg.modules.pay.service.IUserBusinessEntityService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -100,22 +102,25 @@ public class UserBusinessEntityController {
         result.setResult(pageList);
         return result;
     }
+
     @GetMapping(value = "/queryUserBusiness")
     @RequiresPermissions("user::business::detail")
-    public Result<List<UserBusinessEntity>> queryUserBusiness(@RequestParam(name="username") String username){
+    public Result<List<UserBusinessEntity>> queryUserBusiness(@RequestParam(name = "username") String username) {
         Result<List<UserBusinessEntity>> result = new Result<List<UserBusinessEntity>>();
         result.setResult(userBusinessEntityService.queryUserBusiness(username));
         return result;
     }
+
     @PostMapping(value = "/deleteUserBusiness")
     @RequiresPermissions("user::business::delete")
-    public Result<Boolean> deleteUserBusiness(@RequestBody UserBusinessEntity userBusinessEntity){
+    public Result<Boolean> deleteUserBusiness(@RequestBody UserBusinessEntity userBusinessEntity) {
         Result<Boolean> result = new Result<Boolean>();
         userBusinessEntityService.deleteUserBusiness(userBusinessEntity);
         result.setResult(true);
         result.setMessage("删除成功");
         return result;
     }
+
     /**
      * 添加
      *
@@ -135,6 +140,105 @@ public class UserBusinessEntityController {
             result.error500("操作失败");
         }
         return result;
+    }
+
+    @GetMapping(value = "/queryBusinessByUserName")
+    public Result<Map<String, Object>> queryBusinessByUserName(@RequestParam(name = "userName") String userName,
+                                                               @RequestParam(name = "channelCode") String channelCode) {
+        Result<Map<String, Object>> result = new Result<Map<String, Object>>();
+        Map<String, Object> re = new HashMap<>();
+        List<String> associated = new ArrayList<>();
+        List<BusinessLabelValue> all = new ArrayList<>();
+        UserBusinessEntity userBusinessEntity = new UserBusinessEntity();
+        userBusinessEntity.setUserName(userName);
+        userBusinessEntity.setChannelCode(channelCode);
+        List<UserBusinessEntity> list = userBusinessEntityService.queryAllBusiness(userBusinessEntity);
+        for (UserBusinessEntity b : list) {
+            StringBuilder msg = new StringBuilder();
+            BusinessLabelValue labelValue = new BusinessLabelValue();
+            labelValue.setLabel(msg.append("子账号名称：").append(b.getBusinessCode()).append("；余额=").append(b.getRechargeAmount() == null ?
+                    0.00 : b.getRechargeAmount()).toString());
+            labelValue.setValue(b.getBusinessCode());
+            all.add(labelValue);
+            if ("1".equals(b.getActive())) {
+                associated.add(b.getBusinessCode());
+            }
+        }
+        re.put("all", all);
+        re.put("associated", org.apache.commons.lang.StringUtils.join(associated.toArray(), ","));
+        result.setResult(re);
+        return result;
+    }
+
+    @GetMapping(value = "/getBusinessCodesByAgentName")
+    public Result<List<String>> getBusinessCodesByAgentName(@RequestParam(name = "userName") String userName,
+                                                            @RequestParam(name = "channelCode") String channelCode) {
+        Result<List<String>> result = new Result<List<String>>();
+        List<String> businessCodes = userBusinessEntityService.getBusinessCodesByAgentName(userName, channelCode);
+        result.setResult(businessCodes);
+        return result;
+    }
+
+    @GetMapping("/activeBusiness")
+    @RequiresPermissions("user:business:activeBusiness")
+    public Result<String> activeBusiness(@RequestParam(name = "userName") String userName, @RequestParam(name =
+            "channelCode") String channelCode, @RequestParam(name = "businesses") String businesses) {
+        Result<String> result = new Result<String>();
+        if (StringUtils.isBlank(channelCode)) {
+            result.setResult("请选择通道");
+            return result;
+        }
+        if (StringUtils.isBlank(businesses)) {
+            //如果为空，标识全部不激活
+            userBusinessEntityService.disableAllBusiness(userName, channelCode);
+            result.setResult("激活成功");
+            return result;
+        }
+        String[] codes = businesses.split(",");
+        userBusinessEntityService.activeBusiness(userName, channelCode, codes);
+        userBusinessEntityService.disableBusiness(userName, channelCode, codes);
+        result.setResult("激活成功");
+        return result;
+    }
+
+    @GetMapping("/rechargeAmount")
+    @RequiresPermissions("user:business:rechargeAmount")
+    public Result<String> rechargeAmount(@RequestParam(name = "userName") String userName, @RequestParam(name =
+            "channelCode") String channelCode, @RequestParam(name = "businessCode") String businesses,
+                                         @RequestParam(name = "rechargeAmount") String amount) {
+        Result<String> result = new Result<String>();
+        if (StringUtils.isBlank(userName) || StringUtils.isBlank(channelCode) || StringUtils.isBlank(businesses) || StringUtils.isBlank(amount)) {
+            result.setResult("充值失败，参数不全");
+            return result;
+        }
+        try {
+            userBusinessEntityService.rechargeAmount(userName, channelCode, businesses, Double.parseDouble(amount));
+            result.setResult(businesses + "：充值金额[" + amount + "]成功");
+            return result;
+        } catch (Exception e) {
+            log.info("充值金额异常，异常信息：{}", e);
+            result.setResult("金额充值异常");
+            return result;
+        }
+    }
+
+    @GetMapping("/queryRechargeAmount")
+    public Result<Double> getRechargeAmount(@RequestParam(name = "userName") String userName, @RequestParam(name =
+            "channelCode") String channelCode, @RequestParam(name = "businesses") String businesses) {
+        Result<Double> result = new Result<Double>();
+        if (StringUtils.isBlank(userName) || StringUtils.isBlank(channelCode) || StringUtils.isBlank(businesses)) {
+            result.setResult(null);
+            return result;
+        }
+        try {
+            BigDecimal rechagerAmount = userBusinessEntityService.getRechargeAmount(userName, channelCode, businesses);
+            result.setResult(rechagerAmount.doubleValue());
+            return result;
+        } catch (Exception e) {
+            log.info("查询充值金额异常，异常信息：{}", e);
+            result.setResult(null);
+            return result;
+        }
     }
 
     /**

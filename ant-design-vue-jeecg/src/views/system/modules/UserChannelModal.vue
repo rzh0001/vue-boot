@@ -37,7 +37,7 @@
       <a-form :form="form">
         <a-form-item
           label="商户">
-            <a-input placeholder="商户" style="width:200px;" readonly=true v-model="userName"/>
+            <a-input placeholder="商户" style="width:200px;" readOnly=true v-model="userName"/>
         </a-form-item>
         <a-form-item
           v-show="isAgent"
@@ -47,18 +47,18 @@
         <a-form-item
           v-show="isAgent"
           label="秘钥">
-          <a-input placeholder="秘钥" style="width:200px;" v-decorator="['apiKey', validatorRules.apiKey]" />
+          <a-input placeholder="秘钥" style="width:200px;" v-decorator="['apiKey']" />
         </a-form-item>
         <a-form-item label="单笔金额限制" v-show="isMenber">
           <a-input-group compact>
             <a-input-number placeholder="下限"
                             v-decorator="[ 'lowerLimit']" style="width: 30%;text-align: center"
-                            min="0.01"/>
+                            />
             <a-input placeholder="~" disabled
                      style="width: 35px; border-left: 0px; pointer-events: none;background-color: #fff;text-align: center"/>
             <a-input-number placeholder="上限"
                             v-decorator="[ 'upperLimit']" style="width: 35%; border-left: 0px;text-align: center"
-                            min="0.01"/>
+                            />
           </a-input-group>
         </a-form-item>
         <a-form-item
