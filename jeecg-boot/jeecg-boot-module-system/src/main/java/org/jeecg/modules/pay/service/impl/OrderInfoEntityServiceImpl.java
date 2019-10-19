@@ -449,6 +449,18 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         return baseMapper.getOrderByTime(time);
     }
 
+    @Override
+    public void updateCustomerIncomeAmount(String orderId,BigDecimal amount) throws Exception{
+        OrderInfoEntity order = queryOrderInfoByOrderId(orderId);
+        if(order == null){
+            throw new RRException("订单不存在");
+        }
+        String businessCode = order.getBusinessCode();
+        String channelType = order.getPayType();
+        String userName = order.getUserName();
+        baseMapper.updateCustomerIncomeAmount(userName,businessCode,channelType,amount);
+    }
+
     /**
      * 校验外部订单是否已经创建过
      *

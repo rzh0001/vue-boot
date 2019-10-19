@@ -25,6 +25,7 @@ import org.jeecg.common.util.PasswordUtil;
 import org.jeecg.common.util.RedisUtil;
 import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.pay.entity.UserAmountEntity;
+import org.jeecg.modules.pay.service.IOrderInfoEntityService;
 import org.jeecg.modules.system.entity.SysDepart;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.entity.SysUserDepart;
@@ -40,6 +41,7 @@ import org.jeecgframework.poi.excel.entity.ExportParams;
 import org.jeecgframework.poi.excel.entity.ImportParams;
 import org.jeecgframework.poi.excel.view.JeecgEntityExcelView;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -86,6 +88,9 @@ public class SysUserController {
 
 	@Autowired
 	private RedisUtil redisUtil;
+
+	@Autowired
+	private IOrderInfoEntityService orderService;
 	
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
     public Result<IPage<SysUserPage>> queryPageList(SysUser user, @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
@@ -985,18 +990,16 @@ public class SysUserController {
     @AutoLog(value = "用户余额-手工调账")
     @ApiOperation(value = "用户余额-手工调账", notes = "用户余额-手工调账")
     @PostMapping(value = "/adjust")
-    public Result<UserAmountEntity> adjust(@RequestBody JSONObject params, HttpServletRequest request) {
+    @Transactional
+    public Result<UserAmountEntity> adjust(@RequestBody JSONObject params, HttpServletRequest request) throws Exception{
         Result<UserAmountEntity> result = new Result<UserAmountEntity>();
         String username = params.getString("userName");
         String remark = params.getString("remark");
+        String orderId = params.getString("orderId");
         BigDecimal amount = params.getBigDecimal("amount");
-        try {
-            sysUserService.adjustAmount(username, amount, remark);
-            result.success("操作成功！");
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            result.error500("操作失败," + e.getMessage());
-        }
+        sysUserService.adjustAmount(username, amount, remark);
+        orderService.updateCustomerIncomeAmount(orderId,amount);
+        result.success("操作成功！");
         return result;
     }
     
