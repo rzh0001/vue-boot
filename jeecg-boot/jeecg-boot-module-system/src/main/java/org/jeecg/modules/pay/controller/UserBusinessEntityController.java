@@ -157,7 +157,7 @@ public class UserBusinessEntityController {
             StringBuilder msg = new StringBuilder();
             BusinessLabelValue labelValue = new BusinessLabelValue();
             labelValue.setLabel(msg.append("子账号名称：").append(b.getBusinessCode()).append("；余额=").append(b.getRechargeAmount() == null ?
-                    0.00 : b.getRechargeAmount()).toString());
+                    0.00 : b.getRechargeAmount().subtract(b.getIncomeAmount())).toString());
             labelValue.setValue(b.getBusinessCode());
             all.add(labelValue);
             if ("1".equals(b.getActive())) {
