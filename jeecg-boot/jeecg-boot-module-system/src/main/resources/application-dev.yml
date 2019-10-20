@@ -141,3 +141,6 @@ jeecg :
 skip:
   google:
     check: true
+logging:
+  level:
+    org.jeecg.modules.system.mapper: debug
