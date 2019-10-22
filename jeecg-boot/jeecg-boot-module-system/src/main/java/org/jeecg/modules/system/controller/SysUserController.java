@@ -2,6 +2,7 @@ package org.jeecg.modules.system.controller;
 
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.IdUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -1008,15 +1009,31 @@ public class SysUserController {
     public Result<String> getApiKey(HttpServletRequest req, HttpServletResponse res) {
         Result<String> result = new Result<>();
         LoginUser optUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+    
+        SysUser user = sysUserService.getOne(
+                new QueryWrapper<SysUser>()
+                        .lambda()
+                        .eq(SysUser::getId, optUser.getId()));
+    
+        result.setResult(user.getApiKey());
+        result.setSuccess(true);
+    
+        return result;
+    }
+    
+    @PutMapping(value = "/resetApiKey")
+    public Result<String> resetApiKey(HttpServletRequest req, HttpServletResponse res) {
+        Result<String> result = new Result<>();
+        LoginUser optUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
         
         SysUser user = sysUserService.getOne(
                 new QueryWrapper<SysUser>()
                         .lambda()
                         .eq(SysUser::getId, optUser.getId()));
+        user.setApiKey(IdUtil.simpleUUID().substring(0, 16));
+        sysUserService.saveOrUpdate(user);
         
-        result.setResult(user.getApiKey());
         result.setSuccess(true);
-        
         return result;
     }
 	
