@@ -104,6 +104,7 @@ public class SysUserController {
             switch (opUser.getMemberType()) {
                 case PayConstant.MEMBER_TYPE_AGENT:
                     map.put("agentId", opUser.getId());
+                    map.put("agentName",opUser.getUsername());
                     break;
                 case PayConstant.MEMBER_TYPE_SALESMAN:
                     map.put("salesmanId", opUser.getId());
