@@ -164,4 +164,6 @@ public class OrderInfoEntity {
 	@Excel(name = "ip", width = 15)
 	@ApiModelProperty(value = "ip")
 	private String ip;
+
+	private String remark;
 }
