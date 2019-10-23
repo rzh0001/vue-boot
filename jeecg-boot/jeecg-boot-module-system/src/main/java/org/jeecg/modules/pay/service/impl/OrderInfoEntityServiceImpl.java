@@ -811,6 +811,8 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     private R decryptData(String data, String userName, Long timestamp, String sign, String apiKey) throws Exception {
         StringBuilder local = new StringBuilder();
         local.append(userName).append(timestamp).append(data).append(apiKey);
+        log.info("===>系统拼接的sign值为：{}",local.toString());
+        log.info("===>商户传递的sign值为：{}",sign);
         String localSgin = DigestUtils.md5Hex(local.toString());
         if (!localSgin.equals(sign)) {
             return R.error("签名验证不通过");
