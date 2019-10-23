@@ -24,6 +24,9 @@
 		<if test="map.username!=null and map.username!=''">
 			and u.username = #{map.username}
 		</if>
+		<if test="map.agentId!=null and map.agentId!=''">
+			or u.username=#{map.agentName}
+		</if>
 	</select>
 
 	<!-- 根据部门Id查询 -->

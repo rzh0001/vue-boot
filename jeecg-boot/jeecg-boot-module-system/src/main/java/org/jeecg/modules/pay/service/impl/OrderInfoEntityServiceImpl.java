@@ -516,6 +516,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         String agentName = (String) checkParam.get(BaseConstant.AGENT_NAME);
         RequestPayUrl requestPayUrl = (RequestPayUrl) checkParam.get(BaseConstant.REQUEST);
         String requestUrl = (String) checkParam.get(BaseConstant.REQUEST_URL);
+        String remark = (String) checkParam.get(BaseConstant.REMARK);
         log.info("请求创建订单，商户单号为:{};通道为：{};用户名为:{};申请金额为:{}", new String[]{outerOrderId, payType, userName,
                 submitAmount});
         //校验是否是重复订单
@@ -584,6 +585,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         order.setCreateBy("api");
         order.setParentUser(agentName);
         order.setIp(ip);
+        order.setRemark(remark);
         //冗余字段
         order.setUserId(user.getId());
         order.setUserRealname(user.getRealname());
@@ -713,6 +715,8 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         String data = reqobj.getString(BaseConstant.DATA);
         //四方系统用户
         String userName = reqobj.getString(BaseConstant.USER_NAME);
+        //备注
+        String remark = reqobj.getString(BaseConstant.REMARK);
 
         Assert.isBlank(sign, "签名不能为空");
         Assert.isBlank(data, "数据不能为空");
@@ -759,7 +763,8 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
                     .put(BaseConstant.IP, dataObj.getString(BaseConstant.IP))
                     .put(BaseConstant.AGENT_NAME, user.getAgentUsername())
                     .put(BaseConstant.REQUEST, request)
-                    .put(BaseConstant.REQUEST_URL, requestUrl);
+                    .put(BaseConstant.REQUEST_URL, requestUrl)
+                    .put(BaseConstant.REMARK,remark);
         } else {
             return decryptData;
         }
@@ -811,6 +816,8 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     private R decryptData(String data, String userName, Long timestamp, String sign, String apiKey) throws Exception {
         StringBuilder local = new StringBuilder();
         local.append(userName).append(timestamp).append(data).append(apiKey);
+        log.info("===>系统拼接的sign值为：{}",local.toString());
+        log.info("===>商户传递的sign值为：{}",sign);
         String localSgin = DigestUtils.md5Hex(local.toString());
         if (!localSgin.equals(sign)) {
             return R.error("签名验证不通过");
@@ -855,6 +862,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         callbackjson.put(BaseConstant.DATA, data);
         callbackjson.put(BaseConstant.TIMESTAMP, timestamp);
         callbackjson.put(BaseConstant.USER_NAME, order.getUserName());
+        callbackjson.put(BaseConstant.REMARK, order.getRemark());
         log.info("====回调商户加密后数据====" + callbackjson);
         return callbackjson;
     }
