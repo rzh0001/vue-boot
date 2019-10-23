@@ -43,9 +43,14 @@
               </a-form-item>
             </a-col>
 
-            <a-col :md="8" :sm="10">
-              <a-form-item label="起始时间">
+            <a-col :md="6" :sm="8">
+              <a-form-item label="开始时间">
                 <j-date v-model="queryParam.createTime_begin" :showTime="true" dateFormat="YYYY-MM-DD HH:mm:ss"/>
+              </a-form-item>
+            </a-col>
+            <a-col :md="6" :sm="8">
+              <a-form-item label="结束时间">
+                <j-date v-model="queryParam.createTime_end" :showTime="true" dateFormat="YYYY-MM-DD HH:mm:ss"/>
               </a-form-item>
             </a-col>
           </template>
