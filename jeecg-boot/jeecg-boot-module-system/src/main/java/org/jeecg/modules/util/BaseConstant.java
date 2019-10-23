@@ -8,6 +8,7 @@ package org.jeecg.modules.util;
  */
 public class BaseConstant {
     public static final String USER_NAME="username";
+    public static final String REMARK = "remark";
     public static final String TIMESTAMP="timestamp";
     public static final String SIGN="sign";
     public static final String DATA="data";
