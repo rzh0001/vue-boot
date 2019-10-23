@@ -23,6 +23,9 @@
         <a-form-item label="金额" :labelCol="labelCol" :wrapperCol="wrapperCol" hasFeedback>
           <a-input-number  v-decorator="[ 'amount', validatorRules.amount]"/>
         </a-form-item>
+        <a-form-item label="系统订单号" :labelCol="labelCol" :wrapperCol="wrapperCol" hasFeedback>
+          <a-input  v-decorator="[ 'orderId', validatorRules.orderId]"/>
+        </a-form-item>
         <a-form-item label="备注" :labelCol="labelCol" :wrapperCol="wrapperCol" hasFeedback>
           <a-input  v-decorator="[ 'remark', validatorRules.remark]"/>
         </a-form-item>
@@ -62,9 +65,12 @@
             rules: [{
               required: true, message: '请输入备注!'
             }
-              // {
-              //   validator: this.validateAmount()
-              // }
+            ]
+          },
+          orderId: {
+            rules: [{
+              required: true, message: '请输入订单号!'
+            }
             ]
           }
         },

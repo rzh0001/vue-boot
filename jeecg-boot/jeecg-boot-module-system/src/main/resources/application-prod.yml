@@ -63,7 +63,7 @@ spring:
       stat-view-servlet:
         enabled: true
         loginUsername: admin
-        loginPassword: 123456
+        loginPassword: abc123#@!
       web-stat-filter:
         enabled: true
     dynamic:
@@ -133,3 +133,6 @@ jeecg :
     upload: /opt/jeecg-boot/upload
     #webapp文件路径
     webapp: /opt/jeecg-boot/webapp
+skip:
+  google:
+    check: false

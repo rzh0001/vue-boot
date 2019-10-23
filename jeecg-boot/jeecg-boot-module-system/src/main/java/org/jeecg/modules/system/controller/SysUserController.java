@@ -2,6 +2,7 @@ package org.jeecg.modules.system.controller;
 
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.IdUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -25,6 +26,7 @@ import org.jeecg.common.util.PasswordUtil;
 import org.jeecg.common.util.RedisUtil;
 import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.pay.entity.UserAmountEntity;
+import org.jeecg.modules.pay.service.IOrderInfoEntityService;
 import org.jeecg.modules.system.entity.SysDepart;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.entity.SysUserDepart;
@@ -40,6 +42,7 @@ import org.jeecgframework.poi.excel.entity.ExportParams;
 import org.jeecgframework.poi.excel.entity.ImportParams;
 import org.jeecgframework.poi.excel.view.JeecgEntityExcelView;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -86,6 +89,9 @@ public class SysUserController {
 
 	@Autowired
 	private RedisUtil redisUtil;
+
+	@Autowired
+	private IOrderInfoEntityService orderService;
 	
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
     public Result<IPage<SysUserPage>> queryPageList(SysUser user, @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
@@ -98,6 +104,7 @@ public class SysUserController {
             switch (opUser.getMemberType()) {
                 case PayConstant.MEMBER_TYPE_AGENT:
                     map.put("agentId", opUser.getId());
+                    map.put("agentName",opUser.getUsername());
                     break;
                 case PayConstant.MEMBER_TYPE_SALESMAN:
                     map.put("salesmanId", opUser.getId());
@@ -985,18 +992,16 @@ public class SysUserController {
     @AutoLog(value = "用户余额-手工调账")
     @ApiOperation(value = "用户余额-手工调账", notes = "用户余额-手工调账")
     @PostMapping(value = "/adjust")
-    public Result<UserAmountEntity> adjust(@RequestBody JSONObject params, HttpServletRequest request) {
+    @Transactional
+    public Result<UserAmountEntity> adjust(@RequestBody JSONObject params, HttpServletRequest request) throws Exception{
         Result<UserAmountEntity> result = new Result<UserAmountEntity>();
         String username = params.getString("userName");
         String remark = params.getString("remark");
+        String orderId = params.getString("orderId");
         BigDecimal amount = params.getBigDecimal("amount");
-        try {
-            sysUserService.adjustAmount(username, amount, remark);
-            result.success("操作成功！");
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            result.error500("操作失败," + e.getMessage());
-        }
+        sysUserService.adjustAmount(username, amount, remark);
+        orderService.updateCustomerIncomeAmount(orderId,amount);
+        result.success("操作成功！");
         return result;
     }
     
@@ -1005,15 +1010,40 @@ public class SysUserController {
     public Result<String> getApiKey(HttpServletRequest req, HttpServletResponse res) {
         Result<String> result = new Result<>();
         LoginUser optUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+    
+        SysUser user = sysUserService.getOne(
+                new QueryWrapper<SysUser>()
+                        .lambda()
+                        .eq(SysUser::getId, optUser.getId()));
+    
+        result.setResult(user.getApiKey());
+        result.setSuccess(true);
+    
+        return result;
+    }
+    
+    @PutMapping(value = "/resetApiKey")
+    public Result<String> resetApiKey(HttpServletRequest req, HttpServletResponse res) {
+        Result<String> result = new Result<>();
+        LoginUser optUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
         
         SysUser user = sysUserService.getOne(
                 new QueryWrapper<SysUser>()
                         .lambda()
                         .eq(SysUser::getId, optUser.getId()));
+        user.setApiKey(IdUtil.simpleUUID().substring(0, 16));
+        sysUserService.saveOrUpdate(user);
         
-        result.setResult(user.getApiKey());
         result.setSuccess(true);
-        
+        return result;
+    }
+	
+	@RequestMapping(value = "/cleanGoogle", method = RequestMethod.GET)
+    @RequiresPermissions("user:cleanGoogle")
+    public Result<String> cleanGoogle(@RequestParam(name = "username") String username){
+        Result<String> result = new Result<>();
+        sysUserService.cleanGoogle(username);
+        result.setResult(username+"重置谷歌密钥成功");
         return result;
     }
     

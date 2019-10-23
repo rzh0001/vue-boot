@@ -140,7 +140,11 @@
               <a-menu-item>
                 <a href="javascript:;" @click="handleChangePassword(record.username)">密码</a>
               </a-menu-item>
-
+              <a-menu-item>
+                <a-popconfirm title="确定重置谷歌密钥吗?" @confirm="() => cleanGoogle(record.username)">
+                  <a>重置谷歌密钥</a>
+                </a-popconfirm>
+              </a-menu-item>
               <!--<a-menu-item>-->
                 <!--<a-popconfirm title="确定删除吗?" @confirm="() => handleDelete(record.id)">-->
                   <!--<a>删除</a>-->
@@ -176,19 +180,19 @@
               </a-menu-item>
             </a-menu>
           </a-dropdown>
-        <!--  <a-dropdown>
+         <a-dropdown>
             <a-button >
-              关联挂马
+              关联子账号
             </a-button>
             <a-menu slot="overlay">
               <a-menu-item>
-                <a @click="businessDeatil(record)">已关联挂马</a>
+                <a @click="activeBusiness(record)">激活子账号</a>
               </a-menu-item>
-              <a-menu-item>
-                <a @click="addBusiness(record)">添加挂马账号</a>
+               <a-menu-item>
+                <a @click="rechargeAmount(record)">子账号充值</a>
               </a-menu-item>
             </a-menu>
-          </a-dropdown>-->
+          </a-dropdown>
             <a-dropdown>
             <a-button>
               费率设置
@@ -222,6 +226,7 @@
     <user-channel-modal ref="userChannelModal"></user-channel-modal>
     <user-business-modal ref="userBusinessModal"></user-business-modal>
     <user-rate-modal ref="userRateModal"></user-rate-modal>
+    <active-business-modal ref="activeBusinessModal"></active-business-modal>
   </a-card>
 </template>
 
@@ -239,6 +244,8 @@
   import UserChannelModal from './modules/UserChannelModal'
   import UserBusinessModal from './modules/UserBusinessModal'
   import UserRateModal from './modules/UserRateModal'
+  import ActiveBusinessModal from './modules/ActiveBusinessModal'
+  import {getAction,httpAction} from '@/api/manage'
 
   export default {
     name: 'UserList',
@@ -253,7 +260,8 @@
       UserChannelModal,
       UserBusinessModal,
       UserRateModal,
-      UserAmountModal
+      UserAmountModal,
+      ActiveBusinessModal
     },
     data() {
       return {
@@ -335,7 +343,8 @@
           delete: '/sys/user/delete',
           deleteBatch: '/sys/user/deleteBatch',
           exportXlsUrl: '/sys/user/exportXls',
-          importExcelUrl: 'sys/user/importExcel'
+          importExcelUrl: 'sys/user/importExcel',
+          cleanGoogle:'/sys/user/cleanGoogle'
         }
       }
     },
@@ -363,7 +372,7 @@
       },
       addBusiness:function(record){
         if(record.memberType != "1"){
-          alert("会员类型不是代理，无挂马信息");
+          alert("无操作权限");
           return;
         }
         this.$refs.userBusinessModal.title='添加挂马信息';
@@ -374,6 +383,20 @@
       },
       addChannel: function(record){
         this.$refs.userChannelModal.addChannel(record);
+      },
+      activeBusiness: function(record){
+        if(record.memberType != "1"){
+          alert("无操作权限");
+          return;
+        }
+        this.$refs.activeBusinessModal.activeBusiness(record);
+      },
+      rechargeAmount: function(record){
+        if(record.memberType != "1"){
+          alert("无操作权限");
+          return;
+        }
+        this.$refs.activeBusinessModal.rechargeAmount(record);
       },
       getAvatarView: function(avatar) {
         return this.url.imgerver + '/' + avatar
@@ -440,6 +463,15 @@
             that.$message.warning(res.message)
           }
         })
+      },
+      cleanGoogle:function(name){
+        var params = {username:name};//查询条件
+        getAction(this.url.cleanGoogle,params).then((res)=>{
+          if(res.success){
+            alert(res.result)
+        }else{
+        }
+      })
       },
       handleChangePassword(username) {
         this.$refs.passwordmodal.show(username)

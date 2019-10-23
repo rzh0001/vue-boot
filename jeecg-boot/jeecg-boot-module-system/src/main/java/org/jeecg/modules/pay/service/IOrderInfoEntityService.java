@@ -8,6 +8,7 @@ import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import org.jeecg.modules.util.R;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -69,4 +70,10 @@ public interface IOrderInfoEntityService extends IService<OrderInfoEntity> {
      */
     boolean notifyOrderFinish(String orderId,String payType) throws Exception;
     List<String> getOrderByTime(String time);
+
+    /**
+     * 手动调整金额商户，根据订单号，更新马商的收入金额
+     * @param orderId
+     */
+    void updateCustomerIncomeAmount(String orderId, BigDecimal amount) throws Exception;
 }

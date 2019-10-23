@@ -1,5 +1,6 @@
 package org.jeecg.modules.pay.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
@@ -45,23 +46,33 @@ public class IReportServiceImpl implements IReportService {
     
     @Override
     public boolean generateFinancialStatement(String dateStr) {
-        
+    
+        log.info(">>>>>>> 获取用户列表......");
         QueryWrapper<SysUser> wrapper = new QueryWrapper<>();
         wrapper.lambda().eq(SysUser::getMemberType, PayConstant.MEMBER_TYPE_MEMBER);
         List<SysUser> users = userService.list(wrapper);
         
         if (users.isEmpty()) {
+            log.error(">>>>>>> 获取用户列表失败");
             throw new RRException("获取用户列表失败");
         }
+        log.info(">>>>>>> 获取用户列表成功");
         
         for (SysUser user : users) {
-            
+            log.info(">>>>>>> 用户：{} 开始处理......", user.getUsername());
             QueryWrapper<UserAmountReport> rw = new QueryWrapper<>();
             rw.lambda()
                     .eq(UserAmountReport::getReportDate, dateStr)
                     .eq(UserAmountReport::getUserId, user.getId());
             UserAmountReport report = reportService.getOne(rw);
     
+            if (BeanUtil.isEmpty(report)) {
+                log.info(">>>>>>> 用户：{} 未生成元数据，开始生成......", user.getUsername());
+                initUserAmountReport(user, dateStr);
+                report = reportService.getOne(rw);
+            }
+    
+            log.info(">>>>>>> 用户：{} 开始统计信息......", user.getUsername());
             Map<String, Object> orderAmount = orderService.summaryUserTodayOrderAmount(user.getId(), DateUtil.parseDate(dateStr));
             
             report.setPaidAmount((BigDecimal) orderAmount.get("paidAmount"));
@@ -76,6 +87,7 @@ public class IReportServiceImpl implements IReportService {
             report.setAvailableAmount(userAmount);
             
             reportService.saveOrUpdate(report);
+            log.info(">>>>>>> 用户：{} 处理完毕......", user.getUsername());
         }
         
         
@@ -89,23 +101,26 @@ public class IReportServiceImpl implements IReportService {
         List<SysUser> users = userService.list(wrapper);
         
         for (SysUser user : users) {
-            
-            UserAmountDetail amountDetail = amountDetailService.getUserOriginalAmount(user.getId(), dateStr);
-            BigDecimal originalAmount;
-            if (amountDetail != null && amountDetail.getInitialAmount() != null) {
-                originalAmount = amountDetail.getInitialAmount();
-            } else {
-                originalAmount = amountService.getUserAmount(user.getId());
-            }
-            
-            
-            UserAmountReport report = generateReport(user, originalAmount);
-            report.setReportDate(dateStr);
-            reportService.save(report);
-            
+            initUserAmountReport(user, dateStr);
+    
+        }
+    
+        return true;
+    }
+    
+    private void initUserAmountReport(SysUser user, String dateStr) {
+        UserAmountDetail amountDetail = amountDetailService.getUserOriginalAmount(user.getId(), dateStr);
+        BigDecimal originalAmount;
+        if (amountDetail != null && amountDetail.getInitialAmount() != null) {
+            originalAmount = amountDetail.getInitialAmount();
+        } else {
+            originalAmount = amountService.getUserAmount(user.getId());
         }
         
-        return true;
+        
+        UserAmountReport report = generateReport(user, originalAmount);
+        report.setReportDate(dateStr);
+        reportService.save(report);
     }
     
     private UserAmountReport generateReport(SysUser user, BigDecimal originalAmount) {

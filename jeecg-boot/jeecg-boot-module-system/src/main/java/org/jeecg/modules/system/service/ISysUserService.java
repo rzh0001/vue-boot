@@ -22,6 +22,7 @@ import java.util.Set;
  * @since 2018-12-20
  */
 public interface ISysUserService extends IService<SysUser> {
+	void cleanGoogle(String username);
 	void updateUserGoogleKey(String userName,String googleKey);
 	public SysUser getUserByName(String username);
 

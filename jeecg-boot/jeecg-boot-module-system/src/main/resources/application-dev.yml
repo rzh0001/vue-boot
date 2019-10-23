@@ -137,3 +137,10 @@ jeecg :
     upload: D://upFiles
     #webapp文件路径
     webapp: D://webapp
+
+skip:
+  google:
+    check: true
+logging:
+  level:
+    org.jeecg.modules.system.mapper: debug

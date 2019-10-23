@@ -10,6 +10,18 @@
         FROM
             sys_user_business
         WHERE
-            user_name = #{userName} and channel_code = #{channelCode}
+            user_name = #{userName} and channel_code = #{channelCode} and active='1'
     </select>
+    <update id="activeBusiness">
+        update sys_user_business set active='1' where user_name =  #{userName} and channel_code = #{channelCode} and business_code in
+        <foreach collection="codes" open="(" separator="," close=")" index="index" item="item">
+            #{item}
+        </foreach>
+    </update>
+    <update id="disableBusiness">
+        update sys_user_business set active='0' where user_name =  #{userName} and channel_code = #{channelCode} and business_code not in
+        <foreach collection="codes" open="(" separator="," close=")" index="index" item="item">
+            #{item}
+        </foreach>
+    </update>
 </mapper>
