@@ -85,7 +85,7 @@ public class ApiLogAspect {
             log.info("ARGS : " + Arrays.toString(joinPoint.getArgs()));
             log.info("解密ARGS : " + dataStr);
         }catch (Exception e){
-            log.info("====================接收api请求，请求参数如下：========================");
+            log.info("====================接收api请求，异常信息为{}：========================",e);
             log.info("api日志记录异常");
         }
 
