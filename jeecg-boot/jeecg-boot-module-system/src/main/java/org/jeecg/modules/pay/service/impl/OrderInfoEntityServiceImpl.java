@@ -549,7 +549,8 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             //如果配置的账号包含多个，则需要筛选一个
             for (UserBusinessEntity b : useBusinesses) {
                 //如果充值金额为空，或收入金额+本单的金额>充值金额，则不能使用
-                Double amount = b.getIncomeAmount().add(new BigDecimal(submitAmount)).setScale(3, BigDecimal.ROUND_HALF_UP).doubleValue();
+                BigDecimal incomAmount = b.getIncomeAmount() == null ? new BigDecimal("0.00") :  b.getIncomeAmount();
+                Double amount = incomAmount.add(new BigDecimal(submitAmount)).setScale(3, BigDecimal.ROUND_HALF_UP).doubleValue();
                 if (b.getRechargeAmount() == null || b.getRechargeAmount().doubleValue() < amount) {
                     continue;
                 }
