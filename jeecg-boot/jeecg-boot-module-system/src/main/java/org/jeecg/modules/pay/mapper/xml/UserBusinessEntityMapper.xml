@@ -6,7 +6,9 @@
             user_name as userName,
             business_code as businessCode,
             channel_code as channelCode,
-            api_key as apiKey
+            api_key as apiKey,
+            recharge_amount as rechargeAmount,
+            income_amount as incomeAmount
         FROM
             sys_user_business
         WHERE
