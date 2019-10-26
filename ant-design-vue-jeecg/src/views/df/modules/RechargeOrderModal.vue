@@ -11,10 +11,10 @@
     <a-spin :spinning="confirmLoading">
       <a-form :form="form">
 
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="订单号">
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="订单号" :v-show="false">
           <a-input placeholder="请输入订单号" v-decorator="['orderId', validatorRules.orderId ]" />
         </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="外部订单号">
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="外部订单号" :v-show="false">
           <a-input placeholder="请输入外部订单号" v-decorator="['outerOrderId', validatorRules.outerOrderId ]" />
         </a-form-item>
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="用户id">
