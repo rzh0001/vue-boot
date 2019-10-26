@@ -13,10 +13,7 @@
       
 <#list columns as po><#rt/>
 <#if po.fieldName !='id'><#rt/>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="${po.filedComment}">
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="${po.filedComment}">
           <#if po.fieldType =='date'>
           <a-date-picker v-decorator="[ '${po.fieldName}', <#if po.nullable =='N'>validatorRules.${po.fieldName} <#else>{}</#if>]" />
           <#elseif po.fieldType =='datetime'>

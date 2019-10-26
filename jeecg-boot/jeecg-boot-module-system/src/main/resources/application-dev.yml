@@ -1,7 +1,7 @@
 server:
   port: 8080
   servlet:
-    context-path: /df
+    context-path:
     compression:
       enabled: true
       mime-types: application/javascript,application/json,application/xml,text/html,text/xml,text/plain,text/css,image/*
@@ -56,7 +56,7 @@ spring:
   mvc:
     static-path-pattern: /**
   resource:
-    static-locations: classpath:/static/,classpath:/public/
+    static-locations: classpath:/static/**,classpath:/public/
   autoconfigure:
     exclude: com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure
   datasource:

@@ -11,29 +11,29 @@
               <a-input placeholder="请输入订单号" v-model="queryParam.orderId"></a-input>
             </a-form-item>
           </a-col>
-          <a-col :md="6" :sm="8">
-            <a-form-item label="外部订单号">
-              <a-input placeholder="请输入外部订单号" v-model="queryParam.outerOrderId"></a-input>
-            </a-form-item>
-          </a-col>
-        <template v-if="toggleSearchStatus">
-        <a-col :md="6" :sm="8">
-            <a-form-item label="用户id">
-              <a-input placeholder="请输入用户id" v-model="queryParam.userId"></a-input>
-            </a-form-item>
-          </a-col>
-          <a-col :md="6" :sm="8">
-            <a-form-item label="用户">
-              <a-input placeholder="请输入用户" v-model="queryParam.userName"></a-input>
-            </a-form-item>
-          </a-col>
-          <a-col :md="6" :sm="8">
-            <a-form-item label="用户昵称">
-              <a-input placeholder="请输入用户昵称" v-model="queryParam.userRealname"></a-input>
-            </a-form-item>
-          </a-col>
+<!--          <a-col :md="6" :sm="8">-->
+<!--            <a-form-item label="外部订单号">-->
+<!--              <a-input placeholder="请输入外部订单号" v-model="queryParam.outerOrderId"></a-input>-->
+<!--            </a-form-item>-->
+<!--          </a-col>-->
+          <template v-if="toggleSearchStatus">
+<!--            <a-col :md="6" :sm="8">-->
+<!--              <a-form-item label="用户id">-->
+<!--                <a-input placeholder="请输入用户id" v-model="queryParam.userId"></a-input>-->
+<!--              </a-form-item>-->
+<!--            </a-col>-->
+            <a-col :md="6" :sm="8">
+              <a-form-item label="用户">
+                <a-input placeholder="请输入用户" v-model="queryParam.userName"></a-input>
+              </a-form-item>
+            </a-col>
+<!--            <a-col :md="6" :sm="8">-->
+<!--              <a-form-item label="用户昵称">-->
+<!--                <a-input placeholder="请输入用户昵称" v-model="queryParam.userRealname"></a-input>-->
+<!--              </a-form-item>-->
+<!--            </a-col>-->
           </template>
-          <a-col :md="6" :sm="8" >
+          <a-col :md="6" :sm="8">
             <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
               <a-button type="primary" @click="searchQuery" icon="search">查询</a-button>
               <a-button type="primary" @click="searchReset" icon="reload" style="margin-left: 8px">重置</a-button>
@@ -52,21 +52,28 @@
     <div class="table-operator">
       <a-button @click="handleAdd" type="primary" icon="plus">新增</a-button>
       <a-button type="primary" icon="download" @click="handleExportXls('代付充值订单')">导出</a-button>
-      <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl" @change="handleImportExcel">
+      <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl"
+                @change="handleImportExcel">
         <a-button type="primary" icon="import">导入</a-button>
       </a-upload>
       <a-dropdown v-if="selectedRowKeys.length > 0">
         <a-menu slot="overlay">
-          <a-menu-item key="1" @click="batchDel"><a-icon type="delete"/>删除</a-menu-item>
+          <a-menu-item key="1" @click="batchDel">
+            <a-icon type="delete"/>
+            删除
+          </a-menu-item>
         </a-menu>
-        <a-button style="margin-left: 8px"> 批量操作 <a-icon type="down" /></a-button>
+        <a-button style="margin-left: 8px"> 批量操作
+          <a-icon type="down"/>
+        </a-button>
       </a-dropdown>
     </div>
 
     <!-- table区域-begin -->
     <div>
       <div class="ant-alert ant-alert-info" style="margin-bottom: 16px;">
-        <i class="anticon anticon-info-circle ant-alert-icon"></i> 已选择 <a style="font-weight: 600">{{ selectedRowKeys.length }}</a>项
+        <i class="anticon anticon-info-circle ant-alert-icon"></i> 已选择 <a style="font-weight: 600">{{
+        selectedRowKeys.length }}</a>项
         <a style="margin-left: 24px" @click="onClearSelected">清空</a>
       </div>
 
@@ -85,9 +92,9 @@
         <span slot="action" slot-scope="text, record">
           <a @click="handleEdit(record)">编辑</a>
 
-          <a-divider type="vertical" />
+          <a-divider type="vertical"/>
           <a-dropdown>
-            <a class="ant-dropdown-link">更多 <a-icon type="down" /></a>
+            <a class="ant-dropdown-link">更多 <a-icon type="down"/></a>
             <a-menu slot="overlay">
               <a-menu-item>
                 <a-popconfirm title="确定删除吗?" @confirm="() => handleDelete(record.id)">
@@ -112,165 +119,185 @@
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
 
   export default {
-    name: "RechargeOrderList",
-    mixins:[JeecgListMixin],
+    name: 'RechargeOrderList',
+    mixins: [JeecgListMixin],
     components: {
       RechargeOrderModal
     },
-    data () {
+    data() {
       return {
         description: '代付充值订单管理页面',
         // 表头
         columns: [
+          // {
+          //   title: '#',
+          //   dataIndex: '',
+          //   key: 'rowIndex',
+          //   width: 60,
+          //   align: 'center',
+          //   customRender: function(t, r, index) {
+          //     return parseInt(index) + 1
+          //   }
+          // },
           {
-            title: '#',
-            dataIndex: '',
-            key:'rowIndex',
-            width:60,
-            align:"center",
-            customRender:function (t,r,index) {
-              return parseInt(index)+1;
-            }
-           },
-		   {
             title: '订单号',
-            align:"center",
+            align: 'center',
             dataIndex: 'orderId'
-           },
-		   {
-            title: '外部订单号',
-            align:"center",
-            dataIndex: 'outerOrderId'
-           },
-		   {
-            title: '用户id',
-            align:"center",
-            dataIndex: 'userId'
-           },
-		   {
+          },
+          // {
+          //   title: '外部订单号',
+          //   align: 'center',
+          //   dataIndex: 'outerOrderId'
+          // },
+          // {
+          //   title: '用户id',
+          //   align: 'center',
+          //   dataIndex: 'userId'
+          // },
+          {
             title: '用户',
-            align:"center",
+            align: 'center',
             dataIndex: 'userName'
-           },
-		   {
-            title: '用户昵称',
-            align:"center",
-            dataIndex: 'userRealname'
-           },
-		   {
+          },
+          // {
+          //   title: '用户昵称',
+          //   align: 'center',
+          //   dataIndex: 'userRealname'
+          // },
+          {
             title: '商户编号',
-            align:"center",
+            align: 'center',
             dataIndex: 'merchantId'
-           },
-		   {
+          },
+          {
             title: '订单金额',
-            align:"center",
+            align: 'center',
             dataIndex: 'amount'
-           },
-		   {
-            title: '订单状态：0-已保存;1-已打款,待审核;2-已确认;3-审核拒绝',
-            align:"center",
-            dataIndex: 'status'
-           },
-		   {
-            title: '银行卡ID',
-            align:"center",
-            dataIndex: 'bankcardId'
-           },
-		   {
-            title: '账户类型(1-对私;2-对公)',
-            align:"center",
-            dataIndex: 'accountType'
-           },
-		   {
+          },
+          {
+            title: '订单状态',
+            align: 'center',
+            dataIndex: 'status',
+            customRender: function(text) {
+              if (text == 0) {
+                return '已保存'
+              } else if (text == 1) {
+                return '已打款'
+              }  else if (text == 2) {
+                return '已确认'
+              }  else if (text == 3) {
+                return '审核拒绝'
+              } else {
+                return text
+              }
+            }
+          },
+          // {
+          //   title: '银行卡ID',
+          //   align: 'center',
+          //   dataIndex: 'bankcardId'
+          // },
+          {
+            title: '账户类型',
+            align: 'center',
+            dataIndex: 'accountType',
+            customRender: function(text) {
+              if (text == 1) {
+                return '对私'
+              } else if (text == 2) {
+                return '对公'
+              } else {
+                return text
+              }
+            }
+          },
+          {
             title: '账户名',
-            align:"center",
+            align: 'center',
             dataIndex: 'accountName'
-           },
-		   {
+          },
+          {
             title: '卡号',
-            align:"center",
+            align: 'center',
             dataIndex: 'cardNumber'
-           },
-		   {
+          },
+          {
             title: '银行名称',
-            align:"center",
+            align: 'center',
             dataIndex: 'bankName'
-           },
-		   {
+          },
+          {
             title: '开户行全称',
-            align:"center",
+            align: 'center',
             dataIndex: 'branchName'
-           },
-		   {
+          },
+          {
             title: '备注',
-            align:"center",
+            align: 'center',
             dataIndex: 'remark'
-           },
-		   {
+          },
+          {
             title: '成功时间',
-            align:"center",
+            align: 'center',
             dataIndex: 'successTime'
-           },
-		   {
-            title: '代理ID',
-            align:"center",
-            dataIndex: 'agentId'
-           },
-		   {
-            title: '代理帐号',
-            align:"center",
-            dataIndex: 'agentUsername'
-           },
-		   {
-            title: '代理姓名',
-            align:"center",
-            dataIndex: 'agentRealname'
-           },
-		   {
-            title: '介绍人ID',
-            align:"center",
-            dataIndex: 'salesmanId'
-           },
-		   {
-            title: '介绍人帐号',
-            align:"center",
-            dataIndex: 'salesmanUsername'
-           },
-		   {
-            title: '介绍人姓名',
-            align:"center",
-            dataIndex: 'salesmanRealname'
-           },
-		   {
+          },
+          // {
+          //   title: '代理ID',
+          //   align: 'center',
+          //   dataIndex: 'agentId'
+          // },
+          // {
+          //   title: '代理帐号',
+          //   align: 'center',
+          //   dataIndex: 'agentUsername'
+          // },
+          // {
+          //   title: '代理姓名',
+          //   align: 'center',
+          //   dataIndex: 'agentRealname'
+          // },
+          // {
+          //   title: '介绍人ID',
+          //   align: 'center',
+          //   dataIndex: 'salesmanId'
+          // },
+          // {
+          //   title: '介绍人帐号',
+          //   align: 'center',
+          //   dataIndex: 'salesmanUsername'
+          // },
+          // {
+          //   title: '介绍人姓名',
+          //   align: 'center',
+          //   dataIndex: 'salesmanRealname'
+          // },
+          {
             title: '操作IP',
-            align:"center",
+            align: 'center',
             dataIndex: 'ip'
-           },
+          },
           {
             title: '操作',
             dataIndex: 'action',
-            align:"center",
-            scopedSlots: { customRender: 'action' },
+            align: 'center',
+            scopedSlots: { customRender: 'action' }
           }
         ],
-		url: {
-          list: "/df/rechargeOrder/list",
-          delete: "/df/rechargeOrder/delete",
-          deleteBatch: "/df/rechargeOrder/deleteBatch",
-          exportXlsUrl: "df/rechargeOrder/exportXls",
-          importExcelUrl: "df/rechargeOrder/importExcel",
-       },
-    }
-  },
-  computed: {
-    importExcelUrl: function(){
-      return `${window._CONFIG['domianURL']}/${this.url.importExcelUrl}`;
-    }
-  },
-    methods: {
-     
-    }
+        url: {
+          list: '/df/rechargeOrder/list',
+          delete: '/df/rechargeOrder/delete',
+          deleteBatch: '/df/rechargeOrder/deleteBatch',
+          exportXlsUrl: 'df/rechargeOrder/exportXls',
+          importExcelUrl: 'df/rechargeOrder/importExcel'
+        }
+      }
+    },
+    computed: {
+      importExcelUrl: function() {
+        return `${window._CONFIG['domianURL']}/${this.url.importExcelUrl}`
+      }
+    },
+    methods: {}
   }
 </script>
 <style scoped>
