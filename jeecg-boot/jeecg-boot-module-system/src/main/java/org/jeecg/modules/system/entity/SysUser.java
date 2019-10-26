@@ -151,4 +151,16 @@ public class SysUser {
 	@Excel(name = "IP白名单开关", width = 15)
     @ApiModelProperty(value = "IP白名单开关")
 	private java.lang.String ipSwitch;
+	/**
+	 * 订单单笔手续费
+	 */
+	@Excel(name = "订单单笔手续费", width = 15)
+	@ApiModelProperty(value = "订单单笔手续费")
+	private java.math.BigDecimal orderFixedFee;
+	/**
+	 * 交易手续费率
+	 */
+	@Excel(name = "交易手续费率", width = 15)
+	@ApiModelProperty(value = "交易手续费率")
+	private java.math.BigDecimal transactionFeeRate;
 }
