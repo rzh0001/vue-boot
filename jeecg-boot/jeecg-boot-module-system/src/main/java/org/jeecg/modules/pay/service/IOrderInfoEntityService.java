@@ -36,7 +36,7 @@ public interface IOrderInfoEntityService extends IService<OrderInfoEntity> {
      * @return
      */
     R callback(JSONObject reqobj, HttpServletRequest req) throws Exception;
-
+    R innerSysCallBack(String payTpye,Object param) throws Exception;
     OrderInfoEntity queryOrderInfoByOrderId(String orderId);
 
     /**

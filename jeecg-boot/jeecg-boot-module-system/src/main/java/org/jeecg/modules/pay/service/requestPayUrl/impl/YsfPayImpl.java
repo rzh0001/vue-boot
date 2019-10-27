@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpRequest;
 import org.jeecg.modules.exception.RRException;
 import org.jeecg.modules.pay.entity.ChannelBusinessEntity;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
@@ -15,13 +16,18 @@ import org.jeecg.modules.pay.service.requestPayUrl.RequestPayUrl;
 import org.jeecg.modules.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
 @Service
 @Slf4j
-public class YsfPayImpl implements RequestPayUrl<OrderInfoEntity, String, String, String,String, UserBusinessEntity> {
+public class YsfPayImpl implements RequestPayUrl<OrderInfoEntity, String, String, String,String, UserBusinessEntity,Object> {
     @Autowired
     private IOrderInfoEntityService orderInfoEntityService;
     @Override
@@ -120,6 +126,15 @@ public class YsfPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
         }
         return false;
     }
+
+    @Override
+    public R callBack(Object object) throws Exception {
+//        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+//        String json = getParm(request);
+//        JSONObject reqobj = JSONObject.parseObject(json);
+        return null;
+    }
+
 
     private String structuralYsfParam(OrderInfoEntity order, String md5Key, String aesKey, String agentCode,
                                       String userName,String innerCallBackUrl) {

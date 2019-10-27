@@ -134,7 +134,11 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             return R.error("订单查询异常");
         }
     }
-
+    @Override
+    public R innerSysCallBack(String payTpye,Object param) throws Exception {
+        RequestPayUrl requestPayUrl = factory.getPay(payTpye);
+        return requestPayUrl.callBack(param);
+    }
     /**
      * 挂马 --> 四方
      * <p>
