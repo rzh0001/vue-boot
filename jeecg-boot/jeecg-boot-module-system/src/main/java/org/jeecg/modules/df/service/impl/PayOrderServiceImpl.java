@@ -51,11 +51,13 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
         
         // 扣减余额
         userAmountService.changeAmount(order.getUserId(), order.getAmount().negate(), order.getOrderId(), "", "1");
-        
-        order.setUserId(ou.getId());
-        order.setUserName(ou.getUsername());
-        order.setAgentId(ou.getAgentId());
-        order.setAgentUsername(ou.getAgentUsername());
+    
+        order.setUserId(user.getId());
+        order.setUserName(user.getUsername());
+        order.setUserRealname(user.getRealname());
+        order.setAgentId(user.getAgentId());
+        order.setAgentUsername(user.getAgentUsername());
+        order.setAgentRealname(user.getAgentRealname());
         
         // 生成订单号
         order.setOrderId(IDUtil.genPayOrderId());

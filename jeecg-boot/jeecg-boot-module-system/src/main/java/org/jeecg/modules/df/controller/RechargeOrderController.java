@@ -124,9 +124,10 @@ public class RechargeOrderController {
 	 @GetMapping(value = "getBankcard")
 	 public Result<Object> getBankcard() {
 		 LoginUser ou = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+		 SysUser user = userService.getById(ou.getId());
 		 QueryWrapper<UserBankcard> qw = new QueryWrapper<>();
 		 qw.lambda()
-				 .eq(UserBankcard::getUserId, ou.getAgentId())
+				 .eq(UserBankcard::getUserId, user.getAgentId())
 				 .eq(UserBankcard::getIsOpen, "1");
 		 List<UserBankcard> list = bankcardService.list(qw);
 		 if (list.isEmpty()) {
@@ -147,10 +148,13 @@ public class RechargeOrderController {
 	public Result<RechargeOrder> add(@RequestBody RechargeOrder order) {
 		Result<RechargeOrder> result = new Result<RechargeOrder>();
 		LoginUser ou = (LoginUser) SecurityUtils.getSubject().getPrincipal();
-		order.setUserId(ou.getId());
-		order.setUserName(ou.getUsername());
-		order.setAgentId(ou.getAgentId());
-		order.setAgentUsername(ou.getAgentUsername());
+		SysUser user = userService.getById(ou.getId());
+		order.setUserId(user.getId());
+		order.setUserName(user.getUsername());
+		order.setUserRealname(user.getRealname());
+		order.setAgentId(user.getAgentId());
+		order.setAgentUsername(user.getAgentUsername());
+		order.setAgentRealname(user.getAgentRealname());
 		
 		order.setOrderId(IDUtil.genRechargeOrderId());
 		order.setStatus(DfConstant.STATUS_SAVE);

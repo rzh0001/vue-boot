@@ -47,13 +47,13 @@ import java.util.List;
 import java.util.Map;
 
  /**
-  * @Description: 1
+  * @Description: 代付订单
  * @Author: jeecg-boot
   * @Date: 2019-10-27
  * @Version: V1.0
  */
 @Slf4j
-@Api(tags = "1")
+@Api(tags = "代付订单")
 @RestController
 @RequestMapping("/df/payOrder")
 public class PayOrderController {
@@ -92,7 +92,7 @@ public class PayOrderController {
 	
 	/**
 	 * 分页列表查询
-	 * @param payOrder
+	 * @param order
 	 * @param pageNo
 	 * @param pageSize
 	 * @param req
@@ -125,10 +125,14 @@ public class PayOrderController {
 	public Result<PayOrder> add(@RequestBody PayOrder order) {
 		Result<PayOrder> result = new Result<PayOrder>();
 		LoginUser ou = (LoginUser) SecurityUtils.getSubject().getPrincipal();
-		order.setUserId(ou.getId());
-		order.setUserName(ou.getUsername());
-		order.setAgentId(ou.getAgentId());
-		order.setAgentUsername(ou.getAgentUsername());
+		SysUser user = userService.getById(ou.getId());
+		order.setUserId(user.getId());
+		order.setUserName(user.getUsername());
+		order.setUserRealname(user.getRealname());
+		order.setAgentId(user.getAgentId());
+		order.setAgentUsername(user.getAgentUsername());
+		order.setAgentRealname(user.getAgentRealname());
+		
 		
 		order.setOrderId(IDUtil.genPayOrderId());
 		order.setStatus(DfConstant.STATUS_SAVE);
