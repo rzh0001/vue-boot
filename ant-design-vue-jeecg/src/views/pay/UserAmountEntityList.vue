@@ -91,9 +91,9 @@
            }
         ],
 		url: {
-          list: "/pay/userAmountEntity/list",
-          exportXlsUrl: "pay/userAmountEntity/exportXls",
-          importExcelUrl: "pay/userAmountEntity/importExcel",
+          list: "/sys/userAmountEntity/list",
+          exportXlsUrl: "sys/userAmountEntity/exportXls",
+          importExcelUrl: "sys/userAmountEntity/importExcel",
        },
     }
   },

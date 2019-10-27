@@ -51,7 +51,7 @@
     <!-- 操作按钮区域 -->
     <div class="table-operator">
       <a-button @click="handleAdd" type="primary" icon="plus">新增</a-button>
-      <a-button type="primary" icon="download" @click="handleExportXls('代付订单')">导出</a-button>
+      <a-button type="primary" icon="download" @click="handleExportXls('1')">导出</a-button>
       <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl" @change="handleImportExcel">
         <a-button type="primary" icon="import">导入</a-button>
       </a-upload>
@@ -119,7 +119,7 @@
     },
     data () {
       return {
-        description: '代付订单管理页面',
+        description: '1管理页面',
         // 表头
         columns: [
           {

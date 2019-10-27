@@ -4,7 +4,7 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.modules.pay.service.IReportService;
-import org.jeecg.modules.pay.service.IUserAmountEntityService;
+import org.jeecg.modules.system.service.IUserAmountEntityService;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;

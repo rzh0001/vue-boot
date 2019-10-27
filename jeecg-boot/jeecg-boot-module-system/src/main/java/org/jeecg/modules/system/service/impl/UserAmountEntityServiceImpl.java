@@ -1,16 +1,17 @@
-package org.jeecg.modules.pay.service.impl;
+package org.jeecg.modules.system.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.constant.PayConstant;
 import org.jeecg.modules.exception.RRException;
-import org.jeecg.modules.pay.entity.UserAmountEntity;
-import org.jeecg.modules.pay.mapper.UserAmountEntityMapper;
-import org.jeecg.modules.pay.service.IUserAmountDetailService;
-import org.jeecg.modules.pay.service.IUserAmountEntityService;
 import org.jeecg.modules.system.entity.SysUser;
+import org.jeecg.modules.system.entity.UserAmountEntity;
+import org.jeecg.modules.system.mapper.UserAmountEntityMapper;
+import org.jeecg.modules.system.service.IUserAmountDetailService;
+import org.jeecg.modules.system.service.IUserAmountEntityService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +28,7 @@ import java.math.BigDecimal;
 public class UserAmountEntityServiceImpl extends ServiceImpl<UserAmountEntityMapper, UserAmountEntity> implements IUserAmountEntityService {
     
     @Autowired
+    @Lazy
     private IUserAmountDetailService amountDetailService;
     
     
@@ -56,19 +58,34 @@ public class UserAmountEntityServiceImpl extends ServiceImpl<UserAmountEntityMap
     }
     
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean changeAmount(String userId, BigDecimal amount, String orderId, String remark, String type) {
+        UserAmountEntity userAmount = baseMapper.getByUserId(userId);
+        amountDetailService.addAmountDetail(amount, userAmount.getAmount(), orderId, remark, type, userId);
+        changeAmount(userId, amount);
+        return true;
+    }
+    
+    @Override
     public BigDecimal getUserAmount(String userId) {
-        UserAmountEntity amount = baseMapper.getByUserId(userId);
-        if (amount == null) {
-            throw new RRException("获取余额失败");
-        }
+        UserAmountEntity amount = getUserAmountEntity(userId);
         return amount.getAmount();
     }
     
     @Override
+    public UserAmountEntity getUserAmountEntity(String userId) {
+        UserAmountEntity amount = baseMapper.getByUserId(userId);
+        if (amount == null) {
+            throw new RRException("获取余额失败");
+        }
+        return amount;
+    }
+    
+    @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean adjustAmount(String username, BigDecimal adjustAmount, String remark, SysUser user) {
-        
-        UserAmountEntity userAmountEntity = baseMapper.getUserAmountByUserName(username);
+    public boolean adjustAmount(String userId, BigDecimal adjustAmount, String remark, SysUser user) {
+    
+        UserAmountEntity userAmountEntity = getUserAmountEntity(userId);
         if (BeanUtil.isEmpty(userAmountEntity)) {
             throw new RRException("内部错误!请联系管理员！");
         }
@@ -76,11 +93,8 @@ public class UserAmountEntityServiceImpl extends ServiceImpl<UserAmountEntityMap
         if (adjustAmount.compareTo(userAmountEntity.getAmount()) > 0) {
             throw new RRException("余额不足！");
         }
-        
-        changeAmountByUserName(username, adjustAmount);
     
-    
-        amountDetailService.addAmountDetail(adjustAmount, userAmountEntity.getAmount(), remark, "4", user);
+        changeAmount(userId, adjustAmount, "", remark, "4");
         
         return true;
     }

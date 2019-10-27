@@ -2,8 +2,7 @@ package org.jeecg.modules.df.util;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.IdUtil;
-
-import java.util.Date;
+import cn.hutool.core.util.StrUtil;
 
 /**
  * @author ruanzh
@@ -26,6 +25,6 @@ public class IDUtil {
      * @return
      */
     public static String genPayOrderId() {
-        return "DF" + DateUtil.format(new Date(), "yyyyMMdd") + IdUtil.simpleUUID().substring(24);
+        return "DF" + StrUtil.removeAll(DateUtil.today(), "-") + IdUtil.simpleUUID().substring(24);
     }
 }

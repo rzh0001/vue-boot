@@ -1,13 +1,13 @@
-package org.jeecg.modules.pay.service.impl;
+package org.jeecg.modules.system.service.impl;
 
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
-import org.jeecg.modules.pay.entity.UserAmountDetail;
-import org.jeecg.modules.pay.mapper.UserAmountDetailMapper;
-import org.jeecg.modules.pay.service.IUserAmountDetailService;
 import org.jeecg.modules.system.entity.SysUser;
+import org.jeecg.modules.system.entity.UserAmountDetail;
+import org.jeecg.modules.system.mapper.UserAmountDetailMapper;
 import org.jeecg.modules.system.service.ISysUserService;
+import org.jeecg.modules.system.service.IUserAmountDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,17 +27,17 @@ public class UserAmountDetailServiceImpl extends ServiceImpl<UserAmountDetailMap
     
     @Override
     public boolean addAmountDetail(BigDecimal amount, BigDecimal originalAmount, String type, String userId) {
-        SysUser user = userService.getById(userId);
-        return addAmountDetail(amount, originalAmount, type, user);
+        return addAmountDetail(amount, originalAmount, "", type, userId);
     }
     
     @Override
-    public boolean addAmountDetail(BigDecimal amount, BigDecimal originalAmount, String type, SysUser opUser) {
-        return addAmountDetail(amount, originalAmount, "", type, opUser);
+    public boolean addAmountDetail(BigDecimal amount, BigDecimal originalAmount, String remark, String type, String userId) {
+        return addAmountDetail(amount, originalAmount, "", remark, type, userId);
     }
     
     @Override
-    public boolean addAmountDetail(BigDecimal amount, BigDecimal originalAmount, String remark, String type, SysUser opUser) {
+    public boolean addAmountDetail(BigDecimal amount, BigDecimal originalAmount, String orderId, String remark, String type, String userId) {
+        SysUser opUser = userService.getById(userId);
         UserAmountDetail detail = new UserAmountDetail();
         detail.setUserId(opUser.getId());
         detail.setUserName(opUser.getUsername());
@@ -45,6 +45,7 @@ public class UserAmountDetailServiceImpl extends ServiceImpl<UserAmountDetailMap
         detail.setAmount(amount);
         detail.setInitialAmount(originalAmount);
         detail.setUpdateAmount(amount.add(originalAmount));
+        detail.setOrderId(orderId);
         detail.setRemark(remark);
         detail.setAgentId(opUser.getAgentId());
         detail.setAgentUsername(opUser.getAgentUsername());

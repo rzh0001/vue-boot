@@ -87,10 +87,10 @@
           <a-popconfirm title="确定已打款吗?" v-has="'rechargeOrder:paid'" v-if="record.status==0" @confirm="() => handleApproval({id: record.id, status: '1'})">
                   <a>已打款</a>
           </a-popconfirm>
-          <a-popconfirm title="确定已收到款项吗?" v-has="'rechargeOrder:approvalOk'" v-if="record.status==1" @confirm="() => handleApproval({id: record.id, status: '2'})">
+          <a-popconfirm title="确定已收到款项吗?" v-has="'rechargeOrder:approval'" v-if="record.status==1" @confirm="() => handleApproval({id: record.id, status: '2'})">
                   <a>审核通过</a> <a-divider type="vertical"/>
           </a-popconfirm>
-          <a-popconfirm title="确定未收到款项吗?" v-has="'rechargeOrder:approvalReject'" v-if="record.status==1" @confirm="() => handleApproval({id: record.id, status: '3'})">
+          <a-popconfirm title="确定未收到款项吗?" v-has="'rechargeOrder:approval'" v-if="record.status==1" @confirm="() => handleApproval({id: record.id, status: '3'})">
                   <a>审核拒绝</a>
           </a-popconfirm>
 

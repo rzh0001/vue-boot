@@ -66,9 +66,11 @@ public class UserBankcardController {
                                                      @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
                                                      HttpServletRequest req) {
         Result<IPage<UserBankcard>> result = new Result<IPage<UserBankcard>>();
-        QueryWrapper<UserBankcard> queryWrapper = QueryGenerator.initQueryWrapper(userBankcard, req.getParameterMap());
+        LoginUser ou = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+        QueryWrapper<UserBankcard> qw = QueryGenerator.initQueryWrapper(userBankcard, req.getParameterMap());
+        qw.lambda().eq(UserBankcard::getId, ou.getId());
         Page<UserBankcard> page = new Page<UserBankcard>(pageNo, pageSize);
-        IPage<UserBankcard> pageList = userBankcardService.page(page, queryWrapper);
+        IPage<UserBankcard> pageList = userBankcardService.page(page, qw);
         result.setSuccess(true);
         result.setResult(pageList);
         return result;

@@ -1,8 +1,7 @@
-package org.jeecg.modules.pay.service;
+package org.jeecg.modules.system.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import org.jeecg.modules.pay.entity.UserAmountDetail;
-import org.jeecg.modules.system.entity.SysUser;
+import org.jeecg.modules.system.entity.UserAmountDetail;
 
 import java.math.BigDecimal;
 
@@ -24,9 +23,9 @@ public interface IUserAmountDetailService extends IService<UserAmountDetail> {
      */
     boolean addAmountDetail(BigDecimal amount, BigDecimal originalAmount, String type, String userId);
     
-    boolean addAmountDetail(BigDecimal amount, BigDecimal originalAmount, String type, SysUser opUser);
+    boolean addAmountDetail(BigDecimal amount, BigDecimal originalAmount, String remark, String type, String userId);
     
-    boolean addAmountDetail(BigDecimal amount, BigDecimal originalAmount, String remark, String type, SysUser opUser);
+    boolean addAmountDetail(BigDecimal amount, BigDecimal originalAmount, String orderId, String remark, String type, String userId);
     
     /**
      * 获取用户总收入

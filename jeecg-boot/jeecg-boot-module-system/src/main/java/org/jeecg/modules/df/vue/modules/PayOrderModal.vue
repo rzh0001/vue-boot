@@ -11,160 +11,82 @@
     <a-spin :spinning="confirmLoading">
       <a-form :form="form">
       
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="订单号">
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="订单号">
           <a-input placeholder="请输入订单号" v-decorator="['orderId', validatorRules.orderId ]" />
         </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="外部订单号">
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="外部订单号">
           <a-input placeholder="请输入外部订单号" v-decorator="['outerOrderId', validatorRules.outerOrderId ]" />
         </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="用户id">
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="用户id">
           <a-input placeholder="请输入用户id" v-decorator="['userId', {}]" />
         </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="用户">
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="用户">
           <a-input placeholder="请输入用户" v-decorator="['userName', {}]" />
         </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="用户昵称">
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="用户昵称">
           <a-input placeholder="请输入用户昵称" v-decorator="['userRealname', {}]" />
         </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="商户编号">
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="商户编号">
           <a-input placeholder="请输入商户编号" v-decorator="['merchantId', validatorRules.merchantId ]" />
         </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="订单金额">
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="订单金额">
           <a-input-number v-decorator="[ 'amount', {}]" />
         </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="交易手续费">
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="交易手续费">
           <a-input-number v-decorator="[ 'transactionFee', {}]" />
         </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="固定手续费">
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="固定手续费">
           <a-input-number v-decorator="[ 'fixedFee', {}]" />
         </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="订单总手续费">
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="订单总手续费">
           <a-input-number v-decorator="[ 'orderFee', {}]" />
         </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="通道">
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="通道">
           <a-input placeholder="请输入通道" v-decorator="['channel', {}]" />
         </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="账户类型(1-对私;2-对公)">
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="账户类型(1-对私;2-对公)">
           <a-input placeholder="请输入账户类型(1-对私;2-对公)" v-decorator="['accountType', {}]" />
         </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="账户名">
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="账户名">
           <a-input placeholder="请输入账户名" v-decorator="['accountName', {}]" />
         </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="卡号">
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="卡号">
           <a-input placeholder="请输入卡号" v-decorator="['cardNumber', {}]" />
         </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="银行名称">
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="银行名称">
           <a-input placeholder="请输入银行名称" v-decorator="['bankName', {}]" />
         </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="开户行全称">
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="开户行全称">
           <a-input placeholder="请输入开户行全称" v-decorator="['branchName', {}]" />
         </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="订单状态：0-待处理;1-已接单;2-已打款;3-审核拒绝">
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="订单状态：0-待处理;1-已接单;2-已打款;3-审核拒绝">
           <a-input placeholder="请输入订单状态：0-待处理;1-已接单;2-已打款;3-审核拒绝" v-decorator="['status', validatorRules.status ]" />
         </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="备注">
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="备注">
           <a-input placeholder="请输入备注" v-decorator="['remark', {}]" />
         </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="成功时间">
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="成功时间">
           <a-date-picker showTime format='YYYY-MM-DD HH:mm:ss' v-decorator="[ 'successTime', {}]" />
         </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="代理ID">
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="代理ID">
           <a-input placeholder="请输入代理ID" v-decorator="['agentId', {}]" />
         </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="代理帐号">
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="代理帐号">
           <a-input placeholder="请输入代理帐号" v-decorator="['agentUsername', {}]" />
         </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="代理姓名">
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="代理姓名">
           <a-input placeholder="请输入代理姓名" v-decorator="['agentRealname', {}]" />
         </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="介绍人ID">
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="介绍人ID">
           <a-input placeholder="请输入介绍人ID" v-decorator="['salesmanId', {}]" />
         </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="介绍人帐号">
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="介绍人帐号">
           <a-input placeholder="请输入介绍人帐号" v-decorator="['salesmanUsername', {}]" />
         </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="介绍人姓名">
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="介绍人姓名">
           <a-input placeholder="请输入介绍人姓名" v-decorator="['salesmanRealname', {}]" />
         </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="操作IP">
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="操作IP">
           <a-input placeholder="请输入操作IP" v-decorator="['ip', {}]" />
         </a-form-item>
 		

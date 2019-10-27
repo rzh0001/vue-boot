@@ -1,10 +1,10 @@
 package org.jeecg.modules.system.service.impl;
 
 import org.jeecg.common.api.vo.Result;
-import org.jeecg.modules.pay.service.IUserAmountDetailService;
-import org.jeecg.modules.pay.service.IUserAmountEntityService;
 import org.jeecg.modules.system.service.IBaseService;
 import org.jeecg.modules.system.service.IHomepageService;
+import org.jeecg.modules.system.service.IUserAmountDetailService;
+import org.jeecg.modules.system.service.IUserAmountEntityService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;

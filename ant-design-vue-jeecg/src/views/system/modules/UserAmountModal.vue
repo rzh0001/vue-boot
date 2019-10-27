@@ -48,7 +48,7 @@
         confirmDirty: false,
         avaliableAmount: 0,
         url: {
-          getMemberAvailableAmount: '/pay/userAmountEntity/getMemberAvailableAmount',
+          getMemberAvailableAmount: '/sys/userAmountEntity/getMemberAvailableAmount',
           adjust: '/sys/user/adjust'
         },
         validatorRules: {

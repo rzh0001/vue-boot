@@ -1,8 +1,8 @@
 package org.jeecg;
 
-import org.jeecg.modules.pay.entity.UserAmountEntity;
-import org.jeecg.modules.pay.service.IUserAmountDetailService;
-import org.jeecg.modules.pay.service.IUserAmountEntityService;
+import org.jeecg.modules.system.entity.UserAmountEntity;
+import org.jeecg.modules.system.service.IUserAmountDetailService;
+import org.jeecg.modules.system.service.IUserAmountEntityService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

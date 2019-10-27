@@ -1,9 +1,9 @@
-package org.jeecg.modules.pay.mapper;
+package org.jeecg.modules.system.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
-import org.jeecg.modules.pay.entity.UserAmountDetail;
+import org.jeecg.modules.system.entity.UserAmountDetail;
 
 import java.math.BigDecimal;
 import java.util.Date;

@@ -19,13 +19,13 @@ import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.exception.RRException;
 import org.jeecg.modules.pay.entity.BankCard;
 import org.jeecg.modules.pay.entity.CashOutApply;
-import org.jeecg.modules.pay.entity.UserAmountEntity;
 import org.jeecg.modules.pay.service.IBankCardService;
 import org.jeecg.modules.pay.service.ICashOutApplyService;
-import org.jeecg.modules.pay.service.IUserAmountDetailService;
-import org.jeecg.modules.pay.service.IUserAmountEntityService;
 import org.jeecg.modules.system.entity.SysUser;
+import org.jeecg.modules.system.entity.UserAmountEntity;
 import org.jeecg.modules.system.service.ISysUserService;
+import org.jeecg.modules.system.service.IUserAmountDetailService;
+import org.jeecg.modules.system.service.IUserAmountEntityService;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -129,10 +129,10 @@ public class CashOutApplyController {
 		if (amount == null || amount.getAmount().compareTo(apply.getAmount()) == -1) {
 			throw new RRException("余额不足");
 		}
-		userAmountService.changeAmount(user.getId(), apply.getAmount().negate());
+		userAmountService.changeAmount(user.getId(), apply.getAmount().negate(), "", "", "2");
 		
 		// 插入流水表
-		userAmountDetailService.addAmountDetail(apply.getAmount().negate(), amount.getAmount(), "2", user);
+//		userAmountDetailService.addAmountDetail(apply.getAmount().negate(), amount.getAmount(), "2", user);
 		
 		apply.setUserId(optUser.getId());
 		apply.setUsername(optUser.getUsername());
@@ -211,7 +211,7 @@ public class CashOutApplyController {
 				 userAmountService.changeAmount(apply.getUserId(), apply.getAmount());
 				
 				 // 插入流水表
-				 userAmountDetailService.addAmountDetail(apply.getAmount(), amount.getAmount(), "3", sysUserService.getById(apply.getUserId()));
+				 userAmountDetailService.addAmountDetail(apply.getAmount(), amount.getAmount(), "3", apply.getUserId());
 			 }
 			 //TODO 返回false说明什么？
 			 if (ok) {

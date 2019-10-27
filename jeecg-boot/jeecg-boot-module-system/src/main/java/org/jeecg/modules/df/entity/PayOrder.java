@@ -16,16 +16,16 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.jeecgframework.poi.excel.annotation.Excel;
 
 /**
- * @Description: 代付订单
+ * @Description: 1
  * @Author: jeecg-boot
- * @Date:   2019-10-25
+ * @Date:   2019-10-27
  * @Version: V1.0
  */
 @Data
 @TableName("df_pay_order")
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value="df_pay_order对象", description="代付订单")
+@ApiModel(value="df_pay_order对象", description="1")
 public class PayOrder {
     
 	/**主键id*/

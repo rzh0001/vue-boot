@@ -1,4 +1,4 @@
-package org.jeecg.modules.pay.entity;
+package org.jeecg.modules.system.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;

@@ -119,8 +119,8 @@
         userRate:{rules: [{ required: true, message: '请输入费率!' }]},
         },
         url: {
-          add: "/pay/userAmountDetail/add",
-          edit: "/pay/userAmountDetail/edit",
+          add: "/sys/userAmountDetail/add",
+          edit: "/sys/userAmountDetail/edit",
         },
       }
     },

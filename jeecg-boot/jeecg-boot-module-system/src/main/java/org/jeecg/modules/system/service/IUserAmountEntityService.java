@@ -1,8 +1,8 @@
-package org.jeecg.modules.pay.service;
+package org.jeecg.modules.system.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import org.jeecg.modules.pay.entity.UserAmountEntity;
 import org.jeecg.modules.system.entity.SysUser;
+import org.jeecg.modules.system.entity.UserAmountEntity;
 
 import java.math.BigDecimal;
 
@@ -31,6 +31,9 @@ public interface IUserAmountEntityService extends IService<UserAmountEntity> {
      */
     boolean changeAmount(String userId, BigDecimal amount);
     
+    
+    boolean changeAmount(String userId, BigDecimal amount, String orderId, String remark, String type);
+    
     /**
      * 获取用户余额
      *
@@ -38,6 +41,8 @@ public interface IUserAmountEntityService extends IService<UserAmountEntity> {
      * @return
      */
     BigDecimal getUserAmount(String userId);
+    
+    UserAmountEntity getUserAmountEntity(String userId);
     
     /**
      * 手工调账

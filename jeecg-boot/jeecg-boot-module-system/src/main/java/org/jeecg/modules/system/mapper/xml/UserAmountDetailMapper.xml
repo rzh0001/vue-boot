@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="org.jeecg.modules.pay.mapper.UserAmountDetailMapper">
+<mapper namespace="org.jeecg.modules.system.mapper.UserAmountDetailMapper">
 
     <select id="getTotalIncome" parameterType="String" resultType="bigDecimal">
         select if(isnull(sum(amount)), 0, sum(amount))

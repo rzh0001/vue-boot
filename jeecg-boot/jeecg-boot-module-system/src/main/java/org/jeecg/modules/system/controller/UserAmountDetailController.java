@@ -1,4 +1,4 @@
-package org.jeecg.modules.pay.controller;
+package org.jeecg.modules.system.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -12,8 +12,8 @@ import org.jeecg.common.aspect.annotation.AutoLog;
 import org.jeecg.common.constant.PayConstant;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.vo.LoginUser;
-import org.jeecg.modules.pay.entity.UserAmountDetail;
-import org.jeecg.modules.pay.service.IUserAmountDetailService;
+import org.jeecg.modules.system.entity.UserAmountDetail;
+import org.jeecg.modules.system.service.IUserAmountDetailService;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -41,7 +41,7 @@ import java.util.Map;
 @Slf4j
 @Api(tags="用户收入流水详情")
 @RestController
-@RequestMapping("/pay/userAmountDetail")
+@RequestMapping("/sys/userAmountDetail")
 public class UserAmountDetailController {
 	@Autowired
 	private IUserAmountDetailService userAmountDetailService;

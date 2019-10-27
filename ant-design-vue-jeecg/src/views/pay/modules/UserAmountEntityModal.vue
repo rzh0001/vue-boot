@@ -81,8 +81,8 @@
         agentId:{rules: [{ required: true, message: '请输入agentId!' }]},
         },
         url: {
-          add: "/pay/userAmountEntity/add",
-          edit: "/pay/userAmountEntity/edit",
+          add: "/sys/userAmountEntity/add",
+          edit: "/sys/userAmountEntity/edit",
         },
       }
     },

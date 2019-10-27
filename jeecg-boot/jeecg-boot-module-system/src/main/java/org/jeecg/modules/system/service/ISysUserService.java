@@ -154,5 +154,5 @@ public interface ISysUserService extends IService<SysUser> {
      * @param adjustAmount
      * @return
      */
-	boolean adjustAmount(String username, BigDecimal adjustAmount, String remark);
+	boolean adjustAmount(String userId, BigDecimal adjustAmount, String remark);
 }

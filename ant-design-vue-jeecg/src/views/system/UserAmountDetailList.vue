@@ -233,11 +233,11 @@
           // }
         ],
         url: {
-          list: '/pay/userAmountDetail/list',
-          delete: '/pay/userAmountDetail/delete',
-          deleteBatch: '/pay/userAmountDetail/deleteBatch',
-          exportXlsUrl: 'pay/userAmountDetail/exportXls',
-          importExcelUrl: 'pay/userAmountDetail/importExcel'
+          list: '/sys/userAmountDetail/list',
+          delete: '/sys/userAmountDetail/delete',
+          deleteBatch: '/sys/userAmountDetail/deleteBatch',
+          exportXlsUrl: 'sys/userAmountDetail/exportXls',
+          importExcelUrl: 'sys/userAmountDetail/importExcel'
         }
       }
     },

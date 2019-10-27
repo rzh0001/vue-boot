@@ -9,9 +9,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.aspect.annotation.AutoLog;
+import org.jeecg.common.constant.PayConstant;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.oConvertUtils;
@@ -22,9 +24,10 @@ import org.jeecg.modules.df.service.IRechargeOrderService;
 import org.jeecg.modules.df.service.IUserBankcardService;
 import org.jeecg.modules.df.util.IDUtil;
 import org.jeecg.modules.exception.RRException;
-import org.jeecg.modules.pay.entity.UserAmountEntity;
-import org.jeecg.modules.pay.service.IUserAmountDetailService;
-import org.jeecg.modules.pay.service.IUserAmountEntityService;
+import org.jeecg.modules.system.entity.SysUser;
+import org.jeecg.modules.system.entity.UserAmountEntity;
+import org.jeecg.modules.system.service.ISysUserService;
+import org.jeecg.modules.system.service.IUserAmountEntityService;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -68,7 +71,31 @@ public class RechargeOrderController {
 	 private IUserAmountEntityService userAmountService;
 	
 	 @Autowired
-	 private IUserAmountDetailService userAmountDetailService;
+	 private ISysUserService userService;
+	
+	 // 查询条件独立成方法，查询、统计、导出 三个接口使用
+	 private QueryWrapper<RechargeOrder> initQueryCondition(RechargeOrder order, HttpServletRequest req) {
+		 LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+		 SysUser opUser = userService.getUserByName(loginUser.getUsername());
+		
+		 QueryWrapper<RechargeOrder> queryWrapper = QueryGenerator.initQueryWrapper(order,
+				 req.getParameterMap());
+		 if (StringUtils.isNotBlank(opUser.getMemberType())) {
+			 switch (opUser.getMemberType()) {
+				 case PayConstant.MEMBER_TYPE_AGENT:
+					 queryWrapper.lambda().eq(RechargeOrder::getAgentId, opUser.getId());
+					 break;
+				 case PayConstant.MEMBER_TYPE_SALESMAN:
+					 queryWrapper.lambda().eq(RechargeOrder::getSalesmanId, opUser.getId());
+					 break;
+				 case PayConstant.MEMBER_TYPE_MEMBER:
+					 queryWrapper.lambda().eq(RechargeOrder::getUserId, opUser.getId());
+					 break;
+				 default:
+			 }
+		 }
+		 return queryWrapper;
+	 }
 	
 	 /**
 	 * 分页列表查询
@@ -81,12 +108,12 @@ public class RechargeOrderController {
 	@AutoLog(value = "代付充值订单-分页列表查询")
 	@ApiOperation(value="代付充值订单-分页列表查询", notes="代付充值订单-分页列表查询")
 	@GetMapping(value = "/list")
-	public Result<IPage<RechargeOrder>> queryPageList(RechargeOrder rechargeOrder,
-									  @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
-									  @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
-									  HttpServletRequest req) {
+	public Result<IPage<RechargeOrder>> queryPageList(RechargeOrder order,
+													  @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
+													  @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
+													  HttpServletRequest req) {
 		Result<IPage<RechargeOrder>> result = new Result<IPage<RechargeOrder>>();
-		QueryWrapper<RechargeOrder> queryWrapper = QueryGenerator.initQueryWrapper(rechargeOrder, req.getParameterMap());
+		QueryWrapper<RechargeOrder> queryWrapper = initQueryCondition(order, req);
 		Page<RechargeOrder> page = new Page<RechargeOrder>(pageNo, pageSize);
 		IPage<RechargeOrder> pageList = rechargeOrderService.page(page, queryWrapper);
 		result.setSuccess(true);
@@ -111,24 +138,24 @@ public class RechargeOrderController {
 	
 	 /**
 	 *   添加
-	 * @param rechargeOrder
+	  * @param order
 	 * @return
 	 */
 	@AutoLog(value = "代付充值订单-添加")
 	@ApiOperation(value="代付充值订单-添加", notes="代付充值订单-添加")
 	@PostMapping(value = "/add")
-	public Result<RechargeOrder> add(@RequestBody RechargeOrder rechargeOrder) {
+	public Result<RechargeOrder> add(@RequestBody RechargeOrder order) {
 		Result<RechargeOrder> result = new Result<RechargeOrder>();
 		LoginUser ou = (LoginUser) SecurityUtils.getSubject().getPrincipal();
-		rechargeOrder.setUserId(ou.getId());
-		rechargeOrder.setUserName(ou.getUsername());
-		rechargeOrder.setAgentId(ou.getAgentId());
-		rechargeOrder.setAgentUsername(ou.getAgentUsername());
+		order.setUserId(ou.getId());
+		order.setUserName(ou.getUsername());
+		order.setAgentId(ou.getAgentId());
+		order.setAgentUsername(ou.getAgentUsername());
 		
-		rechargeOrder.setOrderId(IDUtil.genRechargeOrderId());
-		rechargeOrder.setStatus(DfConstant.STATUS_SAVE);
+		order.setOrderId(IDUtil.genRechargeOrderId());
+		order.setStatus(DfConstant.STATUS_SAVE);
 		try {
-			rechargeOrderService.save(rechargeOrder);
+			rechargeOrderService.save(order);
 			result.success("添加成功！");
 		} catch (Exception e) {
 			log.error(e.getMessage(),e);
@@ -185,10 +212,10 @@ public class RechargeOrderController {
 		 // 审核通过增加余额
 		 if (DfConstant.STATUS_CHECKED.equals(jsonObject.getString("status"))) {
 			 UserAmountEntity amount = userAmountService.getUserAmountByUserName(order.getUserName());
-			 userAmountService.changeAmount(order.getUserId(), order.getAmount());
+			 userAmountService.changeAmount(order.getUserId(), order.getAmount(), order.getOrderId(), order.getRemark(), "1");
 			
 			 // 插入流水表
-			 userAmountDetailService.addAmountDetail(order.getAmount(), amount.getAmount(), "1", order.getUserId());
+//			 userAmountDetailService.addAmountDetail(order.getAmount(), amount.getAmount(), "1", order.getUserId());
 		 }
 		
 		 return Result.ok("修改成功!");

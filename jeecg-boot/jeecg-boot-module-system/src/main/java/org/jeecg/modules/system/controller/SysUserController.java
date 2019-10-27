@@ -25,12 +25,9 @@ import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.PasswordUtil;
 import org.jeecg.common.util.RedisUtil;
 import org.jeecg.common.util.oConvertUtils;
-import org.jeecg.modules.pay.entity.UserAmountEntity;
+import org.jeecg.modules.exception.RRException;
 import org.jeecg.modules.pay.service.IOrderInfoEntityService;
-import org.jeecg.modules.system.entity.SysDepart;
-import org.jeecg.modules.system.entity.SysUser;
-import org.jeecg.modules.system.entity.SysUserDepart;
-import org.jeecg.modules.system.entity.SysUserRole;
+import org.jeecg.modules.system.entity.*;
 import org.jeecg.modules.system.model.DepartIdModel;
 import org.jeecg.modules.system.service.*;
 import org.jeecg.modules.system.vo.SysDepartUsersVO;
@@ -999,7 +996,11 @@ public class SysUserController {
         String remark = params.getString("remark");
         String orderId = params.getString("orderId");
         BigDecimal amount = params.getBigDecimal("amount");
-        sysUserService.adjustAmount(username, amount, remark);
+        SysUser user = sysUserService.getUserByName(username);
+        if (BeanUtil.isEmpty(user)) {
+            throw new RRException("用户【" + username + "】未找到");
+        }
+        sysUserService.adjustAmount(user.getId(), amount, remark);
         orderService.updateCustomerIncomeAmount(orderId,amount);
         result.success("操作成功！");
         return result;

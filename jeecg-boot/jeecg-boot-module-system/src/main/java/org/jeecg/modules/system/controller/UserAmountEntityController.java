@@ -1,4 +1,4 @@
-package org.jeecg.modules.pay.controller;
+package org.jeecg.modules.system.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -16,8 +16,8 @@ import org.jeecg.common.aspect.annotation.AutoLog;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.oConvertUtils;
-import org.jeecg.modules.pay.entity.UserAmountEntity;
-import org.jeecg.modules.pay.service.IUserAmountEntityService;
+import org.jeecg.modules.system.entity.UserAmountEntity;
+import org.jeecg.modules.system.service.IUserAmountEntityService;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -48,7 +48,7 @@ import java.util.Map;
 @Slf4j
 @Api(tags = "用户余额")
 @RestController
-@RequestMapping("/pay/userAmountEntity")
+@RequestMapping("/sys/userAmountEntity")
 public class UserAmountEntityController {
 	@Autowired
 	private IUserAmountEntityService userAmountEntityService;
