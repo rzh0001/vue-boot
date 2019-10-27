@@ -19,8 +19,7 @@ import java.util.Map;
 public class RequestHandleUtil {
     public static final String METHOD_POST = "POST";
     public static final String METHOD_GET = "GET";
-    public static final String CONTENT_TYPE_JSON = "application/json; charset=UTF-8";
-
+    public static final String CONTENT_TYPE_JSON = "application/json";
     /**
      * 获取请求参数
      * @param req
@@ -28,6 +27,7 @@ public class RequestHandleUtil {
      */
     public static Object getReqParam(HttpServletRequest req){
         String method = req.getMethod();
+        log.info("=====>回调的请求的方式为:{}",method);
         if(METHOD_GET.equals(method)){
             return doGet(req);
         }else if(METHOD_POST.equals(method)){
@@ -40,22 +40,26 @@ public class RequestHandleUtil {
 
     private static Map<String, Object> doGet(HttpServletRequest req) {
         String param = req.getQueryString();
+        log.info("====>回调的入参为：{}",param);
         return (Map<String, Object>)paramsToMap(param,METHOD_GET);
     }
 
     private static JSONObject doPost(HttpServletRequest req){
         String contentType = req.getContentType();
+        log.info("====>post请求的contentType为：{}",contentType);
         StringBuilder sb = new StringBuilder();
         try {
-            if (CONTENT_TYPE_JSON.equals(contentType)) {
+            if (contentType.contains(CONTENT_TYPE_JSON)) {
                 BufferedReader br = new BufferedReader(new InputStreamReader(req.getInputStream(), "UTF-8"));
                 String line = null;
                 while ((line = br.readLine()) != null) {
                     sb.append(line);
                 }
+                log.info("====>回调的入参为：{}",sb.toString());
                 return (JSONObject)paramsToMap(sb.toString(),METHOD_POST);
             } else {
                 //其他内容格式的请求暂不处理
+                log.info("====>post请求的contentType为：{}",contentType);
             }
         } catch (IOException e) {
             log.info("获取post请求中的参数异常，异常信息为：{}",e);
@@ -73,6 +77,7 @@ public class RequestHandleUtil {
         //如果是post请求，转换为json
         if(methodType.equals(METHOD_POST)){
             JSONObject jsonObject = JSON.parseObject(params);
+            log.info("====>回调的入参为：{}",jsonObject.toJSONString());
             return  (Map<String,Object>)jsonObject;
         }else{
             //get请求转换为Map<String,Object>

@@ -29,3 +29,14 @@ alter table pay_order_info add remark varchar(128) DEFAULT NULL COMMENT '订单�
 UPDATE sys_permission SET parent_id = '', name = '个人页', url = '/account', component = 'layouts/RouteView', component_name = null, redirect = null, menu_type = 0, perms = null, perms_type = null, sort_no = 9, always_show = 0, icon = 'user', is_route = 1, is_leaf = 0, keep_alive = 0, hidden = 1, description = null, create_by = null, create_time = '2018-12-25 20:34:38', update_by = 'admin', update_time = '2019-10-22 23:18:13', del_flag = 0, rule_flag = 0, status = null WHERE id = '717f6bee46f44a3897eca9abd6e2ec44';
 UPDATE sys_permission SET parent_id = '717f6bee46f44a3897eca9abd6e2ec44', name = '个人中心', url = '/account/center', component = 'account/center/Index', component_name = null, redirect = null, menu_type = 1, perms = null, perms_type = null, sort_no = 1, always_show = null, icon = null, is_route = 1, is_leaf = 1, keep_alive = null, hidden = null, description = null, create_by = null, create_time = '2018-12-25 20:34:38', update_by = null, update_time = null, del_flag = 0, rule_flag = 0, status = null WHERE id = 'd86f58e7ab516d3bc6bfb1fe10585f97';
 INSERT INTO sys_permission (id, parent_id, name, url, component, component_name, redirect, menu_type, perms, perms_type, sort_no, always_show, icon, is_route, is_leaf, keep_alive, hidden, description, create_by, create_time, update_by, update_time, del_flag, rule_flag, status) VALUES ('f72fc4d6f3e62d6f98c4dd9f18a5bae8', '6e73eb3c26099c191bf03852ee1310a1', '系统密钥', '/account/settings/apiKey', 'account/settings/ApiKey', null, null, 1, null, '1', null, 0, '', 1, 1, 0, 0, null, 'admin', '2019-10-22 20:45:46', 'admin', '2019-10-22 20:51:22', 0, 0, '1');
+
+===挂马账号收入详情==
+CREATE TABLE `business_income_log` (
+  `id` varchar(32) NOT NULL,
+  `order_id` varchar(32) NOT NULL COMMENT '订单号',
+  `business_code` varchar(32) NOT NULL COMMENT '挂马账号',
+  `submitAmount` decimal(7,2) NOT NULL COMMENT '订单金额',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `channel_code` varchar(16) DEFAULT NULL COMMENT '通道',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='挂马账号收入详情';

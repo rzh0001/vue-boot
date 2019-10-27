@@ -62,6 +62,8 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     public IUserAmountDetailService amountDetailService;
     @Autowired
     private RedisUtil redisUtil;
+    @Autowired
+    private IBusinessIncomeLogService bi;
     /**
      * 请求挂码平台的秘钥
      */
@@ -249,7 +251,14 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      *
      * @param order
      */
-    public synchronized void updateBusinessIncomeAmount(OrderInfoEntity order) {
+    public void updateBusinessIncomeAmount(OrderInfoEntity order) {
+        BusinessIncomeLog income = new BusinessIncomeLog();
+        income.setOrderId(order.getOrderId());
+        income.setBusinessCode(order.getBusinessCode());
+        income.setChannelCode(order.getPayType());
+        income.setSubmitamount(order.getSubmitAmount());
+        income.setType("2");
+        bi.save(income);
         businessEntityService.updateBusinessIncomeAmount(order);
     }
 
