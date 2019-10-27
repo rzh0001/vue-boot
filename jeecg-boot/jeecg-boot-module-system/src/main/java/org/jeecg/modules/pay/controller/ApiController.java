@@ -2,18 +2,16 @@ package org.jeecg.modules.pay.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
-import org.jeecg.common.util.RedisUtil;
-import org.jeecg.modules.exception.RRException;
 import org.jeecg.modules.pay.service.IOrderInfoEntityService;
 import org.jeecg.modules.util.R;
+import org.jeecg.modules.util.RequestHandleUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import java.util.Map;
 
 /**
  * @title:
@@ -55,21 +53,31 @@ public class ApiController {
      * 1、根据订单号查询订单信息
      * 2、通过http回调给商户，通知商户成功
      *
-     * @param reqobj
+     * @param
      * @return
      */
     @PostMapping(value = "/callback", produces = "application/json;charset=UTF-8")
     @ResponseBody
-    public R callback(@RequestBody JSONObject reqobj) {
+    public R callback() {
         try {
-            return orderInfoService.callback(reqobj,
-                    ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest());
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+            Object param = RequestHandleUtil.getReqParam(request);
+            String payType = null;
+            Map<String, Object> map = (Map<String, Object>) param;
+            if (map.get("payType") == null) {
+                //内部系统之间的调用
+                return orderInfoService.callback(new JSONObject(map),
+                        ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest());
+            } else {
+                //外接系统的调用
+                payType = (String) map.get("payType");
+                return orderInfoService.innerSysCallBack(payType, param);
+            }
         } catch (Exception e) {
             log.info("订单回调异常，异常信息为：", e);
             return R.error(e.getMessage());
         }
     }
-
 
     /**
      * 订单查询（AES）

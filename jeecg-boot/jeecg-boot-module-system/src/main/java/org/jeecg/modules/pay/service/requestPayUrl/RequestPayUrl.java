@@ -5,7 +5,7 @@ import org.jeecg.modules.util.R;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-public interface RequestPayUrl<O, N, U, K, C, B> {
+public interface RequestPayUrl<O, N, U, K, C, B,P> {
 
     /**
      * @param order        订单
@@ -38,4 +38,14 @@ public interface RequestPayUrl<O, N, U, K, C, B> {
      * @throws Exception
      */
     boolean notifyOrderFinish(O order,K key,B userBusiness,U url) throws Exception;
+
+    /**
+     * 回调商户
+     * 如果是使用post方式回调的话，要求必须是json格式的入参，且必须要有payType字段
+     * 如果是使用get方式回调的话，必要要有payType参数
+     * @param object ：挂马平台传递过来的参数
+     * @return
+     * @throws Exception
+     */
+    R callBack(P object) throws Exception;
 }

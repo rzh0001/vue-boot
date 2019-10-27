@@ -27,7 +27,7 @@ import java.util.Map;
  */
 @Service
 @Slf4j
-public class AliPayImpl implements RequestPayUrl<OrderInfoEntity, String, String, String, String, UserBusinessEntity> {
+public class AliPayImpl implements RequestPayUrl<OrderInfoEntity, String, String, String, String, UserBusinessEntity,Object> {
 
     @Autowired
     private IOrderInfoEntityService orderInfoEntityService;
@@ -92,14 +92,13 @@ public class AliPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
             } else {
                 throw new RRException("四方回调挂马平台失败,订单创建失败：" + result.getBody());
             }
-            if (StringUtils.isEmpty(payUrl)) {
-                throw new RRException("设备产码失败，请联系商户，查看设置状态");
-            }
-            if(!org.springframework.util.StringUtils.isEmpty(payUrl)){
+            if (!org.springframework.util.StringUtils.isEmpty(payUrl)) {
                 break;
             }
         }
-
+        if (StringUtils.isEmpty(payUrl)) {
+            throw new RRException("设备产码失败，请联系商户，查看设置状态");
+        }
         return payUrl;
     }
 
@@ -146,6 +145,11 @@ public class AliPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
             }
         }
         return false;
+    }
+
+    @Override
+    public R callBack(Object param) throws Exception {
+        return null;
     }
 
 
