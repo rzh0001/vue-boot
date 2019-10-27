@@ -79,5 +79,9 @@ public class LoginUser {
     private String activitiSync;
 	
 	private String memberType;
+	
+	private String agentId;
+	
+	private String agentUsername;
 
 }

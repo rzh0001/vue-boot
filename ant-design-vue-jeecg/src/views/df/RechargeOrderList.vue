@@ -50,7 +50,7 @@
 
     <!-- 操作按钮区域 -->
     <div class="table-operator">
-      <a-button @click="handleAdd" type="primary" icon="plus">新增</a-button>
+      <a-button @click="handleAdd" v-has="'rechargeOrder:add'" type="primary" icon="plus">充值</a-button>
       <a-button type="primary" icon="download" @click="handleExportXls('代付充值订单')">导出</a-button>
       <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl"
                 @change="handleImportExcel">
@@ -71,11 +71,6 @@
 
     <!-- table区域-begin -->
     <div>
-      <div class="ant-alert ant-alert-info" style="margin-bottom: 16px;">
-        <i class="anticon anticon-info-circle ant-alert-icon"></i> 已选择 <a style="font-weight: 600">{{
-        selectedRowKeys.length }}</a>项
-        <a style="margin-left: 24px" @click="onClearSelected">清空</a>
-      </div>
 
       <a-table
         ref="table"
@@ -86,23 +81,19 @@
         :dataSource="dataSource"
         :pagination="ipagination"
         :loading="loading"
-        :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
         @change="handleTableChange">
 
         <span slot="action" slot-scope="text, record">
-          <a @click="handleEdit(record)">编辑</a>
+          <a-popconfirm title="确定已打款吗?" v-has="'rechargeOrder:paid'" v-if="record.status==0" @confirm="() => handleApproval({id: record.id, status: '1'})">
+                  <a>已打款</a>
+          </a-popconfirm>
+          <a-popconfirm title="确定已收到款项吗?" v-has="'rechargeOrder:approvalOk'" v-if="record.status==1" @confirm="() => handleApproval({id: record.id, status: '2'})">
+                  <a>审核通过</a> <a-divider type="vertical"/>
+          </a-popconfirm>
+          <a-popconfirm title="确定未收到款项吗?" v-has="'rechargeOrder:approvalReject'" v-if="record.status==1" @confirm="() => handleApproval({id: record.id, status: '3'})">
+                  <a>审核拒绝</a>
+          </a-popconfirm>
 
-          <a-divider type="vertical"/>
-          <a-dropdown>
-            <a class="ant-dropdown-link">更多 <a-icon type="down"/></a>
-            <a-menu slot="overlay">
-              <a-menu-item>
-                <a-popconfirm title="确定删除吗?" @confirm="() => handleDelete(record.id)">
-                  <a>删除</a>
-                </a-popconfirm>
-              </a-menu-item>
-            </a-menu>
-          </a-dropdown>
         </span>
 
       </a-table>
@@ -164,18 +155,18 @@
           //   align: 'center',
           //   dataIndex: 'userRealname'
           // },
+          // {
+          //   title: '商户编号',
+          //   align: 'center',
+          //   dataIndex: 'merchantId'
+          // },
           {
-            title: '商户编号',
-            align: 'center',
-            dataIndex: 'merchantId'
-          },
-          {
-            title: '订单金额',
+            title: '金额',
             align: 'center',
             dataIndex: 'amount'
           },
           {
-            title: '订单状态',
+            title: '状态',
             align: 'center',
             dataIndex: 'status',
             customRender: function(text) {
@@ -227,7 +218,7 @@
             dataIndex: 'bankName'
           },
           {
-            title: '开户行全称',
+            title: '开户行',
             align: 'center',
             dataIndex: 'branchName'
           },
@@ -271,11 +262,11 @@
           //   align: 'center',
           //   dataIndex: 'salesmanRealname'
           // },
-          {
-            title: '操作IP',
-            align: 'center',
-            dataIndex: 'ip'
-          },
+          // {
+          //   title: '操作IP',
+          //   align: 'center',
+          //   dataIndex: 'ip'
+          // },
           {
             title: '操作',
             dataIndex: 'action',
@@ -285,6 +276,7 @@
         ],
         url: {
           list: '/df/rechargeOrder/list',
+          approval: '/df/rechargeOrder/approval',
           delete: '/df/rechargeOrder/delete',
           deleteBatch: '/df/rechargeOrder/deleteBatch',
           exportXlsUrl: 'df/rechargeOrder/exportXls',

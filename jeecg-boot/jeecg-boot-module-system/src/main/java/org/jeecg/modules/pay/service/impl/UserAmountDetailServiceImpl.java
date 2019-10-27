@@ -7,6 +7,8 @@ import org.jeecg.modules.pay.entity.UserAmountDetail;
 import org.jeecg.modules.pay.mapper.UserAmountDetailMapper;
 import org.jeecg.modules.pay.service.IUserAmountDetailService;
 import org.jeecg.modules.system.entity.SysUser;
+import org.jeecg.modules.system.service.ISysUserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -20,6 +22,14 @@ import java.math.BigDecimal;
 @Slf4j
 @Service
 public class UserAmountDetailServiceImpl extends ServiceImpl<UserAmountDetailMapper, UserAmountDetail> implements IUserAmountDetailService {
+    @Autowired
+    private ISysUserService userService;
+    
+    @Override
+    public boolean addAmountDetail(BigDecimal amount, BigDecimal originalAmount, String type, String userId) {
+        SysUser user = userService.getById(userId);
+        return addAmountDetail(amount, originalAmount, type, user);
+    }
     
     @Override
     public boolean addAmountDetail(BigDecimal amount, BigDecimal originalAmount, String type, SysUser opUser) {

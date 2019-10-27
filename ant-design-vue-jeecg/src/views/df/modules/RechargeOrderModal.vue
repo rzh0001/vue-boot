@@ -10,74 +10,49 @@
 
     <a-spin :spinning="confirmLoading">
       <a-form :form="form">
-
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="订单号" :v-show="false">
+        <a-form-item>
+          <a-alert :message="'请向匹配的账户打款！'" type="info" showIcon/>
+        </a-form-item>
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="订单号" v-show="false">
           <a-input placeholder="请输入订单号" v-decorator="['orderId', validatorRules.orderId ]" />
         </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="外部订单号" :v-show="false">
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="外部订单号" v-show="false">
           <a-input placeholder="请输入外部订单号" v-decorator="['outerOrderId', validatorRules.outerOrderId ]" />
         </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="用户id">
-          <a-input placeholder="请输入用户id" v-decorator="['userId', {}]" />
-        </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="用户">
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="用户" v-show="false">
           <a-input placeholder="请输入用户" v-decorator="['userName', {}]" />
         </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="用户昵称">
-          <a-input placeholder="请输入用户昵称" v-decorator="['userRealname', {}]" />
-        </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="商户编号">
-          <a-input placeholder="请输入商户编号" v-decorator="['merchantId', validatorRules.merchantId ]" />
-        </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="订单金额">
-          <a-input-number v-decorator="[ 'amount', {}]" />
-        </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="订单状态：0-已保存;1-已打款,待审核;2-已确认;3-审核拒绝">
-          <a-input placeholder="请输入订单状态：0-已保存;1-已打款,待审核;2-已确认;3-审核拒绝" v-decorator="['status', validatorRules.status ]" />
-        </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="银行卡ID">
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="银行卡ID"  v-show="false">
           <a-input placeholder="请输入银行卡ID" v-decorator="['bankcardId', validatorRules.bankcardId ]" />
         </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="账户类型(1-对私;2-对公)">
-          <a-input placeholder="请输入账户类型(1-对私;2-对公)" v-decorator="['accountType', {}]" />
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="账户类型">
+          <a-select v-decorator="['accountType', {}]" placeholder="" disabled="disabled">
+            <a-select-option value="1">对私</a-select-option>
+            <a-select-option value="2">对公</a-select-option>
+          </a-select>
         </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="账户名">
-          <a-input placeholder="请输入账户名" v-decorator="['accountName', {}]" />
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="账户名" >
+          <a-input placeholder="" v-decorator="['accountName', {}]"  disabled="disabled"/>
         </a-form-item>
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="卡号">
-          <a-input placeholder="请输入卡号" v-decorator="['cardNumber', {}]" />
+          <a-input placeholder="" v-decorator="['cardNumber', {}]"  disabled="disabled"/>
         </a-form-item>
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="银行名称">
-          <a-input placeholder="请输入银行名称" v-decorator="['bankName', {}]" />
+          <a-input placeholder="" v-decorator="['bankName', {}]"  disabled="disabled"/>
         </a-form-item>
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="开户行全称">
-          <a-input placeholder="请输入开户行全称" v-decorator="['branchName', {}]" />
+          <a-input placeholder="" v-decorator="['branchName', {}]"  disabled="disabled"/>
+        </a-form-item>
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="充值金额">
+          <a-input-number v-decorator="[ 'amount', {}]" :min="0"/>
         </a-form-item>
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="备注">
           <a-input placeholder="请输入备注" v-decorator="['remark', {}]" />
         </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="成功时间">
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="成功时间" v-show="false">
           <a-date-picker showTime format='YYYY-MM-DD HH:mm:ss' v-decorator="[ 'successTime', {}]" />
         </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="代理ID">
-          <a-input placeholder="请输入代理ID" v-decorator="['agentId', {}]" />
-        </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="代理帐号">
-          <a-input placeholder="请输入代理帐号" v-decorator="['agentUsername', {}]" />
-        </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="代理姓名">
-          <a-input placeholder="请输入代理姓名" v-decorator="['agentRealname', {}]" />
-        </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="介绍人ID">
-          <a-input placeholder="请输入介绍人ID" v-decorator="['salesmanId', {}]" />
-        </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="介绍人帐号">
-          <a-input placeholder="请输入介绍人帐号" v-decorator="['salesmanUsername', {}]" />
-        </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="介绍人姓名">
-          <a-input placeholder="请输入介绍人姓名" v-decorator="['salesmanRealname', {}]" />
-        </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="操作IP">
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="操作IP" v-show="false">
           <a-input placeholder="请输入操作IP" v-decorator="['ip', {}]" />
         </a-form-item>
 
@@ -90,6 +65,7 @@
   import { httpAction } from '@/api/manage'
   import pick from 'lodash.pick'
   import moment from "moment"
+  import { getAction } from '../../../api/manage'
 
   export default {
     name: "RechargeOrderModal",
@@ -110,23 +86,35 @@
         confirmLoading: false,
         form: this.$form.createForm(this),
         validatorRules:{
-          orderId:{rules: [{ required: true, message: '请输入订单号!' }]},
-          outerOrderId:{rules: [{ required: true, message: '请输入外部订单号!' }]},
-          merchantId:{rules: [{ required: true, message: '请输入商户编号!' }]},
-          status:{rules: [{ required: true, message: '请输入订单状态：0-已保存;1-已打款,待审核;2-已确认;3-审核拒绝!' }]},
+          orderId:{rules: [{ required: false, message: '请输入订单号!' }]},
+          outerOrderId:{rules: [{ required: false, message: '请输入外部订单号!' }]},
+          merchantId:{rules: [{ required: false, message: '请输入商户编号!' }]},
+          status:{rules: [{ required: false, message: '请输入订单状态：0-已保存;1-已打款,待审核;2-已确认;3-审核拒绝!' }]},
           bankcardId:{rules: [{ required: true, message: '请输入银行卡ID!' }]},
         },
         url: {
           add: "/df/rechargeOrder/add",
           edit: "/df/rechargeOrder/edit",
+          getBankcard: "/df/rechargeOrder/getBankcard"
         },
+        bankcard: {},
       }
     },
     created () {
     },
     methods: {
       add () {
-        this.edit({});
+        getAction(this.url.getBankcard, {}).then((res) => {
+          if (res.success) {
+            this.bankcard = res.result;
+            this.bankcard.bankcardId = this.bankcard.id;
+            this.bankcard.id = null;
+            this.bankcard.remark = null;
+            this.edit(this.bankcard);
+          } else {
+            this.$message.error("操作失败，"+res.message)
+          }
+        })
       },
       edit (record) {
         this.form.resetFields();

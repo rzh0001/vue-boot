@@ -22,6 +22,8 @@ public interface IUserAmountDetailService extends IService<UserAmountDetail> {
      * @param opUser
      * @return
      */
+    boolean addAmountDetail(BigDecimal amount, BigDecimal originalAmount, String type, String userId);
+    
     boolean addAmountDetail(BigDecimal amount, BigDecimal originalAmount, String type, SysUser opUser);
     
     boolean addAmountDetail(BigDecimal amount, BigDecimal originalAmount, String remark, String type, SysUser opUser);

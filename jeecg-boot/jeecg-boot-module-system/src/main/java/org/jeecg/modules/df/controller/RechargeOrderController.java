@@ -1,24 +1,37 @@
 package org.jeecg.modules.df.controller;
 
+import cn.hutool.core.util.RandomUtil;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.SecurityUtils;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.aspect.annotation.AutoLog;
 import org.jeecg.common.system.query.QueryGenerator;
+import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.oConvertUtils;
+import org.jeecg.modules.df.constant.DfConstant;
 import org.jeecg.modules.df.entity.RechargeOrder;
+import org.jeecg.modules.df.entity.UserBankcard;
 import org.jeecg.modules.df.service.IRechargeOrderService;
+import org.jeecg.modules.df.service.IUserBankcardService;
+import org.jeecg.modules.df.util.IDUtil;
+import org.jeecg.modules.exception.RRException;
+import org.jeecg.modules.pay.entity.UserAmountEntity;
+import org.jeecg.modules.pay.service.IUserAmountDetailService;
+import org.jeecg.modules.pay.service.IUserAmountEntityService;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
 import org.jeecgframework.poi.excel.entity.ImportParams;
 import org.jeecgframework.poi.excel.view.JeecgEntityExcelView;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -30,6 +43,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -47,7 +61,16 @@ public class RechargeOrderController {
 	@Autowired
 	private IRechargeOrderService rechargeOrderService;
 	
-	/**
+	 @Autowired
+	 private IUserBankcardService bankcardService;
+	
+	 @Autowired
+	 private IUserAmountEntityService userAmountService;
+	
+	 @Autowired
+	 private IUserAmountDetailService userAmountDetailService;
+	
+	 /**
 	 * 分页列表查询
 	 * @param rechargeOrder
 	 * @param pageNo
@@ -71,7 +94,22 @@ public class RechargeOrderController {
 		return result;
 	}
 	
-	/**
+	 @GetMapping(value = "getBankcard")
+	 public Result<Object> getBankcard() {
+		 LoginUser ou = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+		 QueryWrapper<UserBankcard> qw = new QueryWrapper<>();
+		 qw.lambda()
+				 .eq(UserBankcard::getUserId, ou.getAgentId())
+				 .eq(UserBankcard::getIsOpen, "1");
+		 List<UserBankcard> list = bankcardService.list(qw);
+		 if (list.isEmpty()) {
+			 throw new RRException("获取银行卡失败，代理未配置收款银行卡，请联系代理配置！");
+		 }
+		 UserBankcard bankcard = list.get(RandomUtil.randomInt(list.size()));
+		 return Result.ok(bankcard);
+	 }
+	
+	 /**
 	 *   添加
 	 * @param rechargeOrder
 	 * @return
@@ -81,6 +119,14 @@ public class RechargeOrderController {
 	@PostMapping(value = "/add")
 	public Result<RechargeOrder> add(@RequestBody RechargeOrder rechargeOrder) {
 		Result<RechargeOrder> result = new Result<RechargeOrder>();
+		LoginUser ou = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+		rechargeOrder.setUserId(ou.getId());
+		rechargeOrder.setUserName(ou.getUsername());
+		rechargeOrder.setAgentId(ou.getAgentId());
+		rechargeOrder.setAgentUsername(ou.getAgentUsername());
+		
+		rechargeOrder.setOrderId(IDUtil.genRechargeOrderId());
+		rechargeOrder.setStatus(DfConstant.STATUS_SAVE);
 		try {
 			rechargeOrderService.save(rechargeOrder);
 			result.success("添加成功！");
@@ -114,6 +160,39 @@ public class RechargeOrderController {
 		
 		return result;
 	}
+	
+	 /**
+	  * 审核
+	  *
+	  * @param jsonObject
+	  * @return
+	  */
+	 @AutoLog(value = "提现申请-审核")
+	 @ApiOperation(value = "提现申请-审核", notes = "提现申请-审核")
+	 @PutMapping(value = "/approval")
+	 @Transactional(rollbackFor = Exception.class)
+	 public Result<Object> approval(@RequestBody JSONObject jsonObject) {
+		
+		 RechargeOrder order = rechargeOrderService.getById(jsonObject.getString("id"));
+		 if (order == null) {
+			 return Result.error("未找到对应实体");
+		 }
+		
+		 order.setStatus(jsonObject.getString("status"));
+		 order.setSuccessTime(new Date());
+		 boolean ok = rechargeOrderService.updateById(order);
+		
+		 // 审核通过增加余额
+		 if (DfConstant.STATUS_CHECKED.equals(jsonObject.getString("status"))) {
+			 UserAmountEntity amount = userAmountService.getUserAmountByUserName(order.getUserName());
+			 userAmountService.changeAmount(order.getUserId(), order.getAmount());
+			
+			 // 插入流水表
+			 userAmountDetailService.addAmountDetail(order.getAmount(), amount.getAmount(), "1", order.getUserId());
+		 }
+		
+		 return Result.ok("修改成功!");
+	 }
 	
 	/**
 	 *   通过id删除
