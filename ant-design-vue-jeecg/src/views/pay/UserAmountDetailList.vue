@@ -23,6 +23,7 @@
                 <a-select-option value="1">手续费收入</a-select-option>
                 <a-select-option value="2">提现</a-select-option>
                 <a-select-option value="3">冲正</a-select-option>
+                <a-select-option value="3">手动调账</a-select-option>
               </a-select>
             </a-form-item>
           </a-col>

@@ -23,6 +23,11 @@
               </a-form-item>
             </a-col>
             <a-col :md="6" :sm="8">
+              <a-form-item label="商户编号">
+                <a-input placeholder="请输入商户编号" v-model="queryParam.businessCode"></a-input>
+              </a-form-item>
+            </a-col>
+            <a-col :md="6" :sm="8">
               <a-form-item label="支付通道">
                 <a-select v-model="queryParam.payType" placeholder="">
                   <a-select-option v-for="option in channels" :key="option.toString()" :value="option.channelCode">
