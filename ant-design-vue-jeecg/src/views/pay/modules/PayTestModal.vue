@@ -123,7 +123,7 @@
             let method =  'post';
             let formData = Object.assign(this.model, values);
             let outerOrderId = Date.parse(new Date())+'abc';
-            let form = Object.assign(this.model, {"callbackUrl":"http://www.jcokpay.com/jeecg-boot/api/testCallBack","outerOrderId":outerOrderId});
+            let form = Object.assign(this.model, {"callbackUrl":"http://www.btcode123.com/pay/api/testCallBack","outerOrderId":outerOrderId});
             let data = JSON.stringify(form);
           var jsondata =  JSON.parse(data);
             let key = jsondata.apikey;

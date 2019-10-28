@@ -56,7 +56,7 @@ public class ApiController {
      * @param
      * @return
      */
-    @PostMapping(value = "/callback", produces = "application/json;charset=UTF-8")
+    @RequestMapping(value = "/callback", method = {RequestMethod.POST,RequestMethod.GET})
     @ResponseBody
     public R callback() {
         try {

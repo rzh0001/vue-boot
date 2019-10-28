@@ -182,7 +182,7 @@ public class LoginController {
                 GoogleAuthenticator authenticator = new GoogleAuthenticator();
                 try {
                     boolean checkGoogle = authenticator.authorize(sysUser.getGoogleSecretKey(),
-							Integer.parseInt(googleCode));
+                            Integer.parseInt(googleCode));
                     if (!checkGoogle) {
                         result.error500("输入的谷歌验证码有误");
                         return result;
@@ -204,7 +204,7 @@ public class LoginController {
      * @return
      */
     private Result<JSONObject> checkPassword(String username, String password, SysUser sysUser,
-											 Result<JSONObject> result) {
+                                             Result<JSONObject> result) {
         //用户登录信息
         userInfo(sysUser, result);
         sysBaseAPI.addLog("用户名: " + username + ",登录成功！", CommonConstant.LOG_TYPE_1, null);

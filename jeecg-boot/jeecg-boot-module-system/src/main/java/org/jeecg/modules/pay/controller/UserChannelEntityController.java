@@ -181,7 +181,7 @@ public class UserChannelEntityController {
                 userChannelEntity.setMemberType(user.getMemberType());
                 userChannelEntityService.save(userChannelEntity);
             } else if (BaseConstant.USER_AGENT.equals(user.getMemberType())) {
-                List<UserBusinessEntity> ub = userBusinessEntityService.queryBusiness(userChannelEntity.getUserName(),userChannelEntity.getChannelCode(),userChannelEntity.getBusinessCode());
+                List<UserBusinessEntity> ub = userBusinessEntityService.queryBusiness2(userChannelEntity.getUserName(),userChannelEntity.getChannelCode(),userChannelEntity.getBusinessCode());
                 if(!CollectionUtils.isEmpty(ub)){
                     result.error500("该账号已经关联过此通道");
                     return result;

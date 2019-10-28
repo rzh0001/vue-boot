@@ -41,8 +41,8 @@ public class UserBusinessEntityServiceImpl extends ServiceImpl<UserBusinessEntit
     }
 
     @Override
-    public List<UserBusinessEntity> queryBusiness(String userName, String channelCode, String business) {
-        return baseMapper.queryBusiness( userName,  channelCode,  business);
+    public List<UserBusinessEntity> queryBusiness2(String userName, String channelCode, String businessCode) {
+        return baseMapper.queryBusiness2( userName,  channelCode,  businessCode);
     }
 
     @Override

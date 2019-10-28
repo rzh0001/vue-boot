@@ -16,8 +16,10 @@ import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.aspect.annotation.AutoLog;
 import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.oConvertUtils;
+import org.jeecg.modules.pay.entity.BusinessIncomeLog;
 import org.jeecg.modules.pay.entity.BusinessLabelValue;
 import org.jeecg.modules.pay.entity.UserBusinessEntity;
+import org.jeecg.modules.pay.service.IBusinessIncomeLogService;
 import org.jeecg.modules.pay.service.IUserBusinessEntityService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -58,7 +60,8 @@ public class UserBusinessEntityController {
     private IUserBusinessEntityService userBusinessEntityService;
     @Autowired
     private ISysUserService userService;
-
+    @Autowired
+    private IBusinessIncomeLogService bi;
     /**
      * 分页列表查询
      *
@@ -213,6 +216,11 @@ public class UserBusinessEntityController {
         }
         try {
             userBusinessEntityService.rechargeAmount(userName, channelCode, businesses, Double.parseDouble(amount));
+            BusinessIncomeLog income = new BusinessIncomeLog();
+            income.setType("1");
+            income.setSubmitamount(new BigDecimal(amount));
+            income.setBusinessCode(businesses);
+            bi.save(income);
             result.setResult(businesses + "：充值金额[" + amount + "]成功");
             return result;
         } catch (Exception e) {
