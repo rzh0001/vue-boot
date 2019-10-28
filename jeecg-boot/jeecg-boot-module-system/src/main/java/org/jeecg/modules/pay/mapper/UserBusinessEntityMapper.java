@@ -25,11 +25,11 @@ public interface UserBusinessEntityMapper extends BaseMapper<UserBusinessEntity>
     List<UserBusinessEntity> queryBusinessCodeByUserName(@Param("userName") String userName,
                                                          @Param("channelCode") String channelCode);
 
-    @Select("select * from sys_user_business where user_name=#{userName} and business_code=#{business} and " +
+    @Select("select * from sys_user_business where user_name=#{userName} and business_code=#{businessCode} and " +
             "channel_code=#{channelCode}")
-    List<UserBusinessEntity> queryBusiness(@Param("userName") String userName,
+    List<UserBusinessEntity> queryBusiness2(@Param("userName") String userName,
                                            @Param("channelCode") String channelCode,
-                                           @Param("business") String business);
+                                           @Param("businessCode") String businessCode);
 
     @Select("select * from sys_user_business where user_name=#{username}")
     List<UserBusinessEntity> queryUserBusiness(@Param("username") String username);

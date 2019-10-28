@@ -20,7 +20,7 @@ import java.util.List;
 public interface IUserBusinessEntityService extends IService<UserBusinessEntity> {
     List<UserBusinessEntity> queryBusiness(String userName,String channelCode);
     List<UserBusinessEntity> queryBusinessCodeByUserName(String userName, String channelCode);
-    List<UserBusinessEntity> queryBusiness(String userName, String channelCode,String business);
+    List<UserBusinessEntity> queryBusiness2(String userName, String channelCode,String businessCode);
     List<UserBusinessEntity> queryUserBusiness( String username);
 
     void deleteUserBusiness( UserBusinessEntity userBusinessEntity);
