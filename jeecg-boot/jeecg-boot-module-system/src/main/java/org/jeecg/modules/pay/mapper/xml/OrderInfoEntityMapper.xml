@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.jeecg.modules.pay.mapper.OrderInfoEntityMapper">
-    <select id="queryOrderByOuterOrderId" resultType="String" parameterType="String">
-        SELECT order_id
-        FROM pay_order_info
-        WHERE outer_order_id = #{outerOrderId}
-    </select>
     <select id="queryOrderByOrderId" parameterType="String" resultType="org.jeecg.modules.pay.entity.OrderInfoEntity">
         select
           *

@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpRequest;
+import org.jeecg.common.util.RedisUtil;
 import org.jeecg.modules.exception.RRException;
 import org.jeecg.modules.pay.entity.ChannelBusinessEntity;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
@@ -30,6 +31,8 @@ import java.net.URISyntaxException;
 public class YsfPayImpl implements RequestPayUrl<OrderInfoEntity, String, String, String,String, UserBusinessEntity,Object> {
     @Autowired
     private IOrderInfoEntityService orderInfoEntityService;
+    @Autowired
+    private RedisUtil redisUtil;
     @Override
     public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key, String callbackUrl,UserBusinessEntity userBusinessEntity) throws Exception {
         String ysfKey = userBusinessEntity.getApiKey();
@@ -49,6 +52,7 @@ public class YsfPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
         if(StringUtils.isEmpty(payUrl)){
             throw new RRException("设备产码失败，请联系商户，查看设置状态");
         }
+        redisUtil.del(order.getOuterOrderId());
         return R.ok().put("url", payUrl);
     }
 
@@ -164,18 +168,22 @@ public class YsfPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
         if (StringUtils.isBlank(url)) {
             throw new RRException("未配置云闪付回调地址，请联系管理员配置回调地址");
         }
-        HttpResult result = HttpUtils.doPostJson(url, param);
-        if (result.getCode() == BaseConstant.SUCCESS) {
-            log.info("云闪付挂马平台返回信息为：{}", result.getBody());
-            JSONObject r = JSON.parseObject(result.getBody());
-            String resultUrl = (String) r.get("payurl");
-            log.info("===请求挂码平台，返回支付链接为:{}", resultUrl);
-            if (StringUtils.isNotBlank(resultUrl)) {
-                return resultUrl;
+        String resultUrl = null;
+        for(int i=0;i<3;i++){
+            HttpResult result = HttpUtils.doPostJson(url, param);
+            log.info("==>第：{} 次请求云闪付挂马平台",i);
+            if (result.getCode() == BaseConstant.SUCCESS) {
+                log.info("云闪付挂马平台返回信息为：{}", result.getBody());
+                JSONObject r = JSON.parseObject(result.getBody());
+                resultUrl = (String) r.get("payurl");
+                log.info("===请求挂码平台，返回支付链接为:{}", resultUrl);
+                if (StringUtils.isNotBlank(resultUrl)) {
+                    break;
+                }
+            } else {
+                throw new RRException("云闪付请求挂马平台，四方回调挂马平台失败,订单创建失败：" + param);
             }
-        } else {
-            throw new RRException("云闪付请求挂马平台，四方回调挂马平台失败,订单创建失败：" + param);
         }
-        return null;
+        return resultUrl;
     }
 }

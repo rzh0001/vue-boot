@@ -4,7 +4,7 @@
 
 
     <select id="pageSummary" parameterType="Map" resultType="org.jeecg.modules.pay.vo.DailyIncomeSummaryVO">
-        select user_id,user_name,user_realname,pay_type,
+        select user_id,user_name,pay_type,
         count(1) as totalOrderCount,
         sum(submit_amount) as totalOrderAmount,
         count( case when status = 2 || status = 1 then 1 else null end) as paidOrderCount,
@@ -30,7 +30,7 @@
             and salesman_Id = #{map.salesmanId}
         </if>
 
-        group by user_id,user_name,user_realname,pay_type
+        group by user_id,user_name,pay_typeß
         order by user_name
     </select>
 </mapper>
