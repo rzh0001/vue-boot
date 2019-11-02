@@ -31,6 +31,7 @@ public interface OrderInfoEntityMapper extends BaseMapper<OrderInfoEntity> {
     void updateCustomerIncomeAmount(@Param("userName") String userName, @Param("businessCode") String businessCode,
                                     @Param("channelCode") String channelCode, @Param("amount") BigDecimal amount);
 
+    @Select("SELECT outer_order_id as outOrderId FROM pay_order_info WHERE outer_order_id = #{outerOrderId}")
     String queryOrderByOuterOrderId(@Param("outerOrderId") String outerOrderId);
 
     OrderInfoEntity queryOrderByOrderId(@Param("orderId") String orderId);

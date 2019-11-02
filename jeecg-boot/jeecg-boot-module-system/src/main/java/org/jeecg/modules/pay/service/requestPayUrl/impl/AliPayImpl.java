@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jeecg.common.util.RedisUtil;
 import org.jeecg.modules.exception.RRException;
 import org.jeecg.modules.pay.entity.AliPayCallBackParam;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
@@ -27,10 +28,13 @@ import java.util.Map;
  */
 @Service
 @Slf4j
-public class AliPayImpl implements RequestPayUrl<OrderInfoEntity, String, String, String, String, UserBusinessEntity,Object> {
+public class AliPayImpl implements RequestPayUrl<OrderInfoEntity, String, String, String, String, UserBusinessEntity,
+        Object> {
 
     @Autowired
     private IOrderInfoEntityService orderInfoEntityService;
+    @Autowired
+    private RedisUtil redisUtil;
 
     @Override
     public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key, String callbackUrl,
@@ -65,6 +69,7 @@ public class AliPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
         JSONObject p = new JSONObject();
         p.put("data", data);
         log.info("四方回调挂马平台，加密后数据，url:{};param:{}", url, p.toJSONString());
+        redisUtil.del(order.getOuterOrderId());
         return R.ok().put("url", postCallBack(url, p));
     }
 

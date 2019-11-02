@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.util.StringUtil;
 import org.jeecg.common.system.vo.DictModel;
 import org.jeecg.common.util.DateUtils;
 import org.jeecg.common.util.RedisUtil;
@@ -481,6 +482,13 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * @return
      */
     private boolean outerOrderIdIsOnly(String outerOrderId) {
+        String redisValue = (String) redisUtil.get(outerOrderId);
+        log.info("===>从redis中获取订单号，校验订单是否重复，申请的订单号为：{}，redis返回值为：{}",outerOrderId,redisValue);
+        //如果redis中存在值，则说明该订单是重复创建的
+        if(!org.springframework.util.StringUtils.isEmpty(redisValue)){
+            return false;
+        }
+        redisUtil.set(outerOrderId,outerOrderId,10);
         String orderId = baseMapper.queryOrderByOuterOrderId(outerOrderId);
         if (StringUtils.isNotBlank(orderId)) {
             return false;
