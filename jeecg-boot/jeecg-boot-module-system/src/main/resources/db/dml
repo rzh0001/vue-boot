@@ -38,5 +38,6 @@ CREATE TABLE `business_income_log` (
   `submitAmount` decimal(7,2) NOT NULL COMMENT '订单金额',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `channel_code` varchar(16) DEFAULT NULL COMMENT '通道',
+  `type` varchar(2) DEFAULT NULL COMMENT '类型',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='挂马账号收入详情';
