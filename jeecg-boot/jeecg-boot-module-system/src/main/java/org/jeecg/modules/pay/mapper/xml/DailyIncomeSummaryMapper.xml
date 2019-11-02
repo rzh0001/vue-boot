@@ -30,7 +30,7 @@
             and salesman_Id = #{map.salesmanId}
         </if>
 
-        group by user_id,user_name,pay_typeß
+        group by user_id,user_name,pay_type
         order by user_name
     </select>
 </mapper>
