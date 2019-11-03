@@ -138,7 +138,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         }
     }
     @Override
-    public R innerSysCallBack(String payTpye,Object param) throws Exception {
+    public Object innerSysCallBack(String payTpye,Object param) throws Exception {
         RequestPayUrl requestPayUrl = factory.getPay(payTpye);
         return requestPayUrl.callBack(param);
     }
@@ -156,7 +156,6 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      */
     @Override
     public R callback(JSONObject reqobj, HttpServletRequest req) throws Exception {
-        boolean flag = false;
         //1 校验ip是否来源于挂马平台
         if (!checkIpOk(req)) {
             throw new RRException("IP非法");
@@ -201,6 +200,12 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             log.info("订单回调过程中，订单查询异常,orderID:{}", orderId);
             return R.error("订单查询异常，无此订单信息");
         }
+        return notifyCustomer(order,user,payType);
+    }
+
+    @Override
+    public R notifyCustomer(OrderInfoEntity order,SysUser user,String payType) throws Exception {
+        boolean flag = false;
         String submitAmount = order.getSubmitAmount().toString();
         JSONObject callobj = encryptAESData(order, user.getApiKey());
         StringBuilder msg = new StringBuilder();
@@ -216,37 +221,36 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             if (result.getCode() == BaseConstant.SUCCESS) {
                 CallBackResult callBackResult = JSONObject.parseObject(result.getBody(), CallBackResult.class);
                 if (callBackResult.getCode() == BaseConstant.SUCCESS) {
-                    updateOrderStatusSuccessByOrderId(orderId);
+                    updateOrderStatusSuccessByOrderId(order.getOrderId());
                     updateBusinessIncomeAmount(order);
-                    log.info("通知商户成功，并且商户返回成功,orderID:{}", orderId);
+                    log.info("通知商户成功，并且商户返回成功,orderID:{}", order.getOrderId());
                     flag = true;
                     msg.append("通知商户成功，并且商户返回成功");
                     return R.ok(msg.toString());
                 } else {
-                    log.info("通通知商户失败,orderID:{}", orderId);
-                    updateOrderStatusNoBackByOrderId(orderId);
+                    log.info("通通知商户失败,orderID:{}", order.getOrderId());
+                    updateOrderStatusNoBackByOrderId(order.getOrderId());
                     msg.append("通知商户失败，原因：").append(callBackResult.getMsg());
                     return R.error(msg.toString());
                 }
             } else {
-                log.info("通通知商户失败,orderID:{}", orderId);
-                updateOrderStatusNoBackByOrderId(orderId);
+                log.info("通通知商户失败,orderID:{}", order.getOrderId());
+                updateOrderStatusNoBackByOrderId(order.getOrderId());
                 msg.append("通知商户失败，返回状态码为：").append(result.getCode());
                 return R.error(msg.toString());
             }
         } catch (Exception e) {
             log.info("订单回调商户异常，异常信息为:{}", e);
-            updateOrderStatusNoBackByOrderId(orderId);
+            updateOrderStatusNoBackByOrderId(order.getOrderId());
             msg.append("通知商户失败，原因：商户未返回json格式数据,返回内容：").append(body);
             return R.error(msg.toString());
         } finally {
             if (flag) {
                 //5、只有在通知商户成功，才统计高级代理。商户。介绍人的收入情况
-                countAmount(orderId, userName, submitAmount, payType);
+                countAmount(order.getOrderId(), user.getUsername(), submitAmount, payType);
             }
         }
     }
-
     /**
      * 更新挂马账户的收入情况
      *

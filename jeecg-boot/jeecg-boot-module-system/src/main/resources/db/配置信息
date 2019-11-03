@@ -1,0 +1,3 @@
+新增信付支付支付宝通道：
+通道名称：xin_pay_alipay
+支付地址：http://47.52.203.28/api/startOrder

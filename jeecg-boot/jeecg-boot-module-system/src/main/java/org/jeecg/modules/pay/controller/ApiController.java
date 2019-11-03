@@ -58,20 +58,23 @@ public class ApiController {
      */
     @RequestMapping(value = "/callback", method = {RequestMethod.POST,RequestMethod.GET})
     @ResponseBody
-    public R callback() {
+    public Object callback() {
         try {
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
             Object param = RequestHandleUtil.getReqParam(request);
             String payType = null;
             Map<String, Object> map = (Map<String, Object>) param;
-            if (map.get("payType") == null) {
+            if (map.get("attch") == null) {
                 //内部系统之间的调用
                 return orderInfoService.callback(new JSONObject(map),
                         ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest());
-            } else {
+            } else if(map.get("attch") != null){
                 //外接系统的调用
-                payType = (String) map.get("payType");
+                payType = (String) map.get("attch");
                 return orderInfoService.innerSysCallBack(payType, param);
+            }else{
+                log.info("未匹配到回调器");
+                return null;
             }
         } catch (Exception e) {
             log.info("订单回调异常，异常信息为：", e);
