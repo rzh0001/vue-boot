@@ -91,6 +91,7 @@ public class XinPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
     public Object callBack(Object object) throws Exception {
         Map<String, Object> map = (Map<String, Object>) object;
         String orderId =(String) map.get("orderNo");
+        log.info("==>信付回调四方开始，订单号为：{}",orderId);
         //验证签名： 订单状态+商户号+商户订单号+支付金额+商户秘钥
         StringBuilder sign = new StringBuilder();
         sign.append(map.get("state").toString()).append(map.get("merchantNum").toString()).append(orderId).append(map.get("amount").toString()).append(MD5_KEY);
@@ -110,8 +111,10 @@ public class XinPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
         String payType = (String) map.get("attch");
         R r = orderInfoEntityService.notifyCustomer(order,user,payType);
         if("0".equals(r.get("code"))){
+            log.info("==>信付回调四方结束，返回信付为success，订单号为：{}",orderId);
             return "success";
         }else {
+            log.info("==>信付回调四方结束，fail，订单号为：{}",orderId);
             return "fail";
         }
 
