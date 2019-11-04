@@ -96,7 +96,7 @@ public class XinPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
         sign.append(map.get("state").toString()).append(map.get("merchantNum").toString()).append(orderId).append(map.get("amount").toString()).append(MD5_KEY);
         String signStr = DigestUtils.md5Hex(sign.toString());
         log.info("===>信付支付回调，签名串为：{},加密之后的签名为：{}",sign.toString(),signStr);
-        if(signStr.equals(map.get("sign").toString())){
+        if(!signStr.equals(map.get("sign").toString())){
             log.info("===>信付支付回调，入参的签名为：{},本地签名为：{}",map.get("sign").toString(),signStr);
             return "签名验证不通过";
         }
