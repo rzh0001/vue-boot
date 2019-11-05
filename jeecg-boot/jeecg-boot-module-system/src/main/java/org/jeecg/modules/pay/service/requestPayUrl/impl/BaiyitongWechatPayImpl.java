@@ -28,7 +28,7 @@ import java.util.*;
 /**
  * @title: 百易通-微信支付
  * @Description:
- * @author: wangjb
+ * @author:
  * @create: 2019-11-05 14:20
  */
 @Service

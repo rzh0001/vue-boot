@@ -31,6 +31,8 @@ import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @Description: 订单信息
@@ -153,6 +155,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         Map<String, Object> map = new HashMap<>();
         //获取数据字典配置的属于外部系统标识通道的字段
         List<DictModel> fields = dictService.queryDictItemsByCode(BaseConstant.EXTERNAL_FIELD);
+        log.info("==》挂马平台回调四方平台，数据字典externalField：{}",fields.toString());
         List<String> payTypeFields = new ArrayList<>();
         boolean isInternalSystem = true;
         if (!CollectionUtils.isEmpty(fields)) {
@@ -165,6 +168,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
                 if(param.get(field) != null){
                     isInternalSystem = false;
                     payType = (String) param.get(field);
+                    log.info("===>外部挂马平台回调四方，通道为：{}",payType);
                     break;
                 }
             }
@@ -282,6 +286,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             }
         }
     }
+    private Lock lock = new ReentrantLock();
     /**
      * 更新挂马账户的收入情况
      *
@@ -294,8 +299,16 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         income.setChannelCode(order.getPayType());
         income.setSubmitamount(order.getSubmitAmount());
         income.setType("2");
-        bi.save(income);
-        businessEntityService.updateBusinessIncomeAmount(order);
+        lock.lock();
+        try{
+            bi.save(income);
+            businessEntityService.updateBusinessIncomeAmount(order);
+        }catch (Exception e){
+            log.info("更新挂马账户的收入情况发生异常，异常信息为：{}",e);
+        }finally {
+            lock.unlock();
+        }
+
     }
 
     /**
