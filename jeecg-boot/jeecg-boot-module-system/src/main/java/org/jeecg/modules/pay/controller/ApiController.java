@@ -62,25 +62,24 @@ public class ApiController {
         try {
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
             Object param = RequestHandleUtil.getReqParam(request);
-            String payType = null;
             Map<String, Object> map = (Map<String, Object>) param;
-            if (map.get("attch") == null) {
+            Map<String, Object> checkMap = orderInfoService.isInternalSystem(map);
+            boolean isInternalSystem =(Boolean) checkMap.get("isInternalSystem");
+            if (isInternalSystem) {
                 //内部系统之间的调用
                 return orderInfoService.callback(new JSONObject(map),
                         ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest());
-            } else if(map.get("attch") != null){
+            } else {
                 //外接系统的调用
-                payType = (String) map.get("attch");
+                String payType = (String) checkMap.get("payType");
                 return orderInfoService.innerSysCallBack(payType, param);
-            }else{
-                log.info("未匹配到回调器");
-                return null;
             }
         } catch (Exception e) {
             log.info("订单回调异常，异常信息为：", e);
             return R.error(e.getMessage());
         }
     }
+
 
     /**
      * 订单查询（AES）

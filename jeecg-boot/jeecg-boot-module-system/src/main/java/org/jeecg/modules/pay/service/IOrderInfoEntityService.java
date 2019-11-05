@@ -39,6 +39,7 @@ public interface IOrderInfoEntityService extends IService<OrderInfoEntity> {
     R callback(JSONObject reqobj, HttpServletRequest req) throws Exception;
     public R notifyCustomer(OrderInfoEntity order, SysUser user, String payType) throws Exception;
     Object innerSysCallBack(String payTpye,Object param) throws Exception;
+    Map<String, Object> isInternalSystem(Map<String, Object> param);
     OrderInfoEntity queryOrderInfoByOrderId(String orderId);
 
     /**

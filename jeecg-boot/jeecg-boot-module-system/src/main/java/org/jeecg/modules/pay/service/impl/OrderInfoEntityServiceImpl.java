@@ -143,6 +143,37 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         return requestPayUrl.callBack(param);
     }
     /**
+     * 通过回调的参数来区分，是否是内部系统的调用
+     * @param param
+     * @return
+     */
+    @Override
+    public Map<String, Object> isInternalSystem(Map<String, Object> param){
+        String payType = null;
+        Map<String, Object> map = new HashMap<>();
+        //获取数据字典配置的属于外部系统标识通道的字段
+        List<DictModel> fields = dictService.queryDictItemsByCode(BaseConstant.EXTERNAL_FIELD);
+        List<String> payTypeFields = new ArrayList<>();
+        boolean isInternalSystem = true;
+        if (!CollectionUtils.isEmpty(fields)) {
+            for (DictModel dictModel : fields) {
+                payTypeFields.add(dictModel.getValue());
+            }
+        }
+        if(!CollectionUtils.isEmpty(payTypeFields)){
+            for(String field:payTypeFields){
+                if(param.get(field) != null){
+                    isInternalSystem = false;
+                    payType = (String) param.get(field);
+                    break;
+                }
+            }
+        }
+        map.put("isInternalSystem",isInternalSystem);
+        map.put("payType",payType);
+        return map;
+    }
+    /**
      * 挂马 --> 四方
      * <p>
      * 1、校验IP是否合法；ip来源是否来自四方

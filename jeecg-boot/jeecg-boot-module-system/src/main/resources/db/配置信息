@@ -1,3 +1,15 @@
 新增信付支付支付宝通道：
 通道名称：xin_pay_alipay
 支付地址：http://47.52.203.28/api/startOrder
+
+新增百易通微信通道
+通道名称：baiyitong_pay_wechat
+支付地址：http://api.autosu.cn/gateway/index/unifiedorder?format=json
+
+新增数据字典：
+名称：外部对接系统中标识通道的字段 externalField
+
+值：
+attch :信付通道字段
+out_uid：百易通通道字段
+
