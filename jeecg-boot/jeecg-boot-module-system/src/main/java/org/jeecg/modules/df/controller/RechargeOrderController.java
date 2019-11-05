@@ -1,7 +1,6 @@
 package org.jeecg.modules.df.controller;
 
 import cn.hutool.core.util.RandomUtil;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -16,7 +15,6 @@ import org.jeecg.common.aspect.annotation.AutoLog;
 import org.jeecg.common.constant.PayConstant;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.vo.LoginUser;
-import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.df.constant.DfConstant;
 import org.jeecg.modules.df.entity.RechargeOrder;
 import org.jeecg.modules.df.entity.UserBankcard;
@@ -43,8 +41,6 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -289,21 +285,11 @@ public class RechargeOrderController {
    * @param response
    */
   @RequestMapping(value = "/exportXls")
-  public ModelAndView exportXls(HttpServletRequest request, HttpServletResponse response) {
+  public ModelAndView exportXls(RechargeOrder order, HttpServletRequest request, HttpServletResponse response) {
       // Step.1 组装查询条件
-      QueryWrapper<RechargeOrder> queryWrapper = null;
-      try {
-          String paramsStr = request.getParameter("paramsStr");
-          if (oConvertUtils.isNotEmpty(paramsStr)) {
-              String deString = URLDecoder.decode(paramsStr, "UTF-8");
-              RechargeOrder rechargeOrder = JSON.parseObject(deString, RechargeOrder.class);
-              queryWrapper = QueryGenerator.initQueryWrapper(rechargeOrder, request.getParameterMap());
-          }
-      } catch (UnsupportedEncodingException e) {
-          e.printStackTrace();
-      }
-
-      //Step.2 AutoPoi 导出Excel
+	  QueryWrapper<RechargeOrder> queryWrapper = initQueryCondition(order, request);
+	
+	  //Step.2 AutoPoi 导出Excel
       ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
       List<RechargeOrder> pageList = rechargeOrderService.list(queryWrapper);
       //导出文件名称

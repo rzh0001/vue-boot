@@ -1,6 +1,5 @@
 package org.jeecg.modules.df.controller;
 
-import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -12,7 +11,6 @@ import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.aspect.annotation.AutoLog;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.vo.LoginUser;
-import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.df.entity.UserBankcard;
 import org.jeecg.modules.df.service.IUserBankcardService;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
@@ -29,8 +27,6 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +44,14 @@ import java.util.Map;
 public class UserBankcardController {
     @Autowired
     private IUserBankcardService userBankcardService;
+    
+    // 查询条件独立成方法，查询、统计、导出 三个接口使用
+    private QueryWrapper<UserBankcard> initQueryCondition(UserBankcard userBankcard, HttpServletRequest req) {
+        LoginUser ou = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+        QueryWrapper<UserBankcard> qw = QueryGenerator.initQueryWrapper(userBankcard, req.getParameterMap());
+        qw.lambda().eq(UserBankcard::getUserId, ou.getId());
+        return qw;
+    }
     
     /**
      * 分页列表查询
@@ -67,8 +71,7 @@ public class UserBankcardController {
                                                      HttpServletRequest req) {
         Result<IPage<UserBankcard>> result = new Result<IPage<UserBankcard>>();
         LoginUser ou = (LoginUser) SecurityUtils.getSubject().getPrincipal();
-        QueryWrapper<UserBankcard> qw = QueryGenerator.initQueryWrapper(userBankcard, req.getParameterMap());
-        qw.lambda().eq(UserBankcard::getId, ou.getId());
+        QueryWrapper<UserBankcard> qw = initQueryCondition(userBankcard, req);
         Page<UserBankcard> page = new Page<UserBankcard>(pageNo, pageSize);
         IPage<UserBankcard> pageList = userBankcardService.page(page, qw);
         result.setSuccess(true);
@@ -193,23 +196,13 @@ public class UserBankcardController {
      * @param response
      */
     @RequestMapping(value = "/exportXls")
-    public ModelAndView exportXls(HttpServletRequest request, HttpServletResponse response) {
+    public ModelAndView exportXls(UserBankcard userBankcard, HttpServletRequest request, HttpServletResponse response) {
         // Step.1 组装查询条件
-        QueryWrapper<UserBankcard> queryWrapper = null;
-        try {
-            String paramsStr = request.getParameter("paramsStr");
-            if (oConvertUtils.isNotEmpty(paramsStr)) {
-                String deString = URLDecoder.decode(paramsStr, "UTF-8");
-                UserBankcard userBankcard = JSON.parseObject(deString, UserBankcard.class);
-                queryWrapper = QueryGenerator.initQueryWrapper(userBankcard, request.getParameterMap());
-            }
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+        QueryWrapper<UserBankcard> qw = initQueryCondition(userBankcard, request);
         
         //Step.2 AutoPoi 导出Excel
         ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
-        List<UserBankcard> pageList = userBankcardService.list(queryWrapper);
+        List<UserBankcard> pageList = userBankcardService.list(qw);
         //导出文件名称
         mv.addObject(NormalExcelConstants.FILE_NAME, "代付平台用户银行卡列表");
         mv.addObject(NormalExcelConstants.CLASS, UserBankcard.class);

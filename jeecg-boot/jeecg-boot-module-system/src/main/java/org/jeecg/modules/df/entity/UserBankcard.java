@@ -35,14 +35,13 @@ public class UserBankcard {
     /**
      * 用户ID
      */
-    @Excel(name = "用户ID", width = 15)
     @ApiModelProperty(value = "用户ID")
     private java.lang.String userId;
     /**
      * 用户登录账号
      */
-    @Excel(name = "用户登录账号", width = 15)
-    @ApiModelProperty(value = "用户登录账号")
+    @Excel(name = "用户", width = 15)
+    @ApiModelProperty(value = "用户")
     private java.lang.String username;
     /**
      * 账户类型(1-对私;2-对公)
@@ -129,7 +128,6 @@ public class UserBankcard {
     /**
      * 乐观锁
      */
-    @Excel(name = "乐观锁", width = 15)
     @ApiModelProperty(value = "乐观锁")
     @Version
     private java.lang.Integer version;
