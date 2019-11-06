@@ -64,6 +64,8 @@
 <!--              <a-button type="primary" @click="searchQuery" icon="search">查询</a-button>-->
               <a-button type="primary" @click="searchQueryLocal" icon="search">查询</a-button>
               <a-button type="primary" @click="searchReset" icon="reload" style="margin-left: 8px">重置</a-button>
+              <a-button type="primary" icon="download" @click="handleExportXls('订单信息')" style="margin-left: 8px">导出</a-button>
+
               <a @click="handleToggleSearch" style="margin-left: 8px">
                 {{ toggleSearchStatus ? '收起' : '展开' }}
                 <a-icon :type="toggleSearchStatus ? 'up' : 'down'"/>

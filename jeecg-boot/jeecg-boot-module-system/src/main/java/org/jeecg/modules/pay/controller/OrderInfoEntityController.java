@@ -1,6 +1,6 @@
 package org.jeecg.modules.pay.controller;
 
-import com.alibaba.fastjson.JSON;
+import cn.hutool.core.collection.CollUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -15,7 +15,6 @@ import org.jeecg.common.aspect.annotation.AutoLog;
 import org.jeecg.common.constant.PayConstant;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.vo.LoginUser;
-import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.pay.entity.CallBackResult;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import org.jeecg.modules.pay.service.IOrderInfoEntityService;
@@ -35,12 +34,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -239,27 +237,26 @@ public class OrderInfoEntityController {
      * @param response
      */
     @RequestMapping(value = "/exportXls")
-    public ModelAndView exportXls(HttpServletRequest request, HttpServletResponse response) {
+    public ModelAndView exportXls(OrderInfoEntity orderInfoEntity, HttpServletRequest request, HttpServletResponse response) {
         // Step.1 组装查询条件
-        QueryWrapper<OrderInfoEntity> queryWrapper = null;
-        try {
-            String paramsStr = request.getParameter("paramsStr");
-            if (oConvertUtils.isNotEmpty(paramsStr)) {
-                String deString = URLDecoder.decode(paramsStr, "UTF-8");
-                OrderInfoEntity orderInfoEntity = JSON.parseObject(deString, OrderInfoEntity.class);
-                queryWrapper = QueryGenerator.initQueryWrapper(orderInfoEntity, request.getParameterMap());
-            }
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
+        QueryWrapper<OrderInfoEntity> queryWrapper = initQueryCondition(orderInfoEntity, request);
+        queryWrapper.lambda().in(OrderInfoEntity::getStatus, CollUtil.newArrayList("2", "3"));
+    
         //Step.2 AutoPoi 导出Excel
-        ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
         List<OrderInfoEntity> pageList = orderInfoEntityService.list(queryWrapper);
+        if (pageList.isEmpty()) {
+            ModelAndView mv = new ModelAndView(new MappingJackson2JsonView());
+            mv.addObject("code", "-1");
+            mv.addObject("msg", "查询结果无成功订单");
+            return mv;
+        }
+        log.info("文件导出{}条记录", pageList.size());
         //导出文件名称
-        mv.addObject(NormalExcelConstants.FILE_NAME, "订单信息列表");
+    
+        ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
+        mv.addObject(NormalExcelConstants.FILE_NAME, "订单列表");
         mv.addObject(NormalExcelConstants.CLASS, OrderInfoEntity.class);
-        mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("订单信息列表数据", "导出人:Jeecg", "导出信息"));
+        mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("订单列表数据", "导出人:Jeecg", "导出信息"));
         mv.addObject(NormalExcelConstants.DATA_LIST, pageList);
         return mv;
     }
