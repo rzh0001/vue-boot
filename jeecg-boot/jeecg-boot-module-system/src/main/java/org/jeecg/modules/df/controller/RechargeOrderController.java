@@ -124,8 +124,7 @@ public class RechargeOrderController {
 		 QueryWrapper<UserBankcard> qw = new QueryWrapper<>();
 		 qw.lambda()
 				 .eq(UserBankcard::getUserId, user.getAgentId())
-				 .eq(UserBankcard::getIsOpen, "1")
-				 .eq(UserBankcard::getDelFlag, "0");
+				 .eq(UserBankcard::getIsOpen, "1");
 		 List<UserBankcard> list = bankcardService.list(qw);
 		 if (list.isEmpty()) {
 			 throw new RRException("获取银行卡失败，代理未配置收款银行卡，请联系代理配置！");
