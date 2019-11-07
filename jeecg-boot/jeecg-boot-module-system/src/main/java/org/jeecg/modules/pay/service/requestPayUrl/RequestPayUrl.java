@@ -47,5 +47,5 @@ public interface RequestPayUrl<O, N, U, K, C, B,P> {
      * @return
      * @throws Exception
      */
-    R callBack(P object) throws Exception;
+    P callBack(P object) throws Exception;
 }

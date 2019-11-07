@@ -1,5 +1,6 @@
 package org.jeecg.modules.pay.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -31,6 +32,8 @@ import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @Description: 订单信息
@@ -137,11 +140,48 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             return R.error("订单查询异常");
         }
     }
+
     @Override
-    public R innerSysCallBack(String payTpye,Object param) throws Exception {
+    public Object innerSysCallBack(String payTpye, Object param) throws Exception {
         RequestPayUrl requestPayUrl = factory.getPay(payTpye);
         return requestPayUrl.callBack(param);
     }
+
+    /**
+     * 通过回调的参数来区分，是否是内部系统的调用
+     *
+     * @param param
+     * @return
+     */
+    @Override
+    public Map<String, Object> isInternalSystem(Map<String, Object> param) {
+        String payType = null;
+        Map<String, Object> map = new HashMap<>();
+        //获取数据字典配置的属于外部系统标识通道的字段
+        List<DictModel> fields = dictService.queryDictItemsByCode(BaseConstant.EXTERNAL_FIELD);
+        log.info("==》挂马平台回调四方平台，数据字典externalField：{}",fields.toString());
+        List<String> payTypeFields = new ArrayList<>();
+        boolean isInternalSystem = true;
+        if (!CollectionUtils.isEmpty(fields)) {
+            for (DictModel dictModel : fields) {
+                payTypeFields.add(dictModel.getValue());
+            }
+        }
+        if(!CollectionUtils.isEmpty(payTypeFields)){
+            for(String field:payTypeFields){
+                if(param.get(field) != null){
+                    isInternalSystem = false;
+                    payType = (String) param.get(field);
+                    log.info("===>外部挂马平台回调四方，通道为：{}",payType);
+                    break;
+                }
+            }
+        }
+        map.put("isInternalSystem", isInternalSystem);
+        map.put("payType", payType);
+        return map;
+    }
+
     /**
      * 挂马 --> 四方
      * <p>
@@ -156,7 +196,6 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      */
     @Override
     public R callback(JSONObject reqobj, HttpServletRequest req) throws Exception {
-        boolean flag = false;
         //1 校验ip是否来源于挂马平台
         if (!checkIpOk(req)) {
             throw new RRException("IP非法");
@@ -201,6 +240,12 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             log.info("订单回调过程中，订单查询异常,orderID:{}", orderId);
             return R.error("订单查询异常，无此订单信息");
         }
+        return notifyCustomer(order, user, payType);
+    }
+
+    @Override
+    public R notifyCustomer(OrderInfoEntity order, SysUser user, String payType) throws Exception {
+        boolean flag = false;
         String submitAmount = order.getSubmitAmount().toString();
         JSONObject callobj = encryptAESData(order, user.getApiKey());
         StringBuilder msg = new StringBuilder();
@@ -214,44 +259,48 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             body = result.getBody();
             log.info("===商户返回信息：{}", body);
             if (result.getCode() == BaseConstant.SUCCESS) {
-                CallBackResult callBackResult = JSONObject.parseObject(result.getBody(), CallBackResult.class);
-                if (callBackResult.getCode() == BaseConstant.SUCCESS) {
-                    updateOrderStatusSuccessByOrderId(orderId);
+                JSONObject callBackResult = JSON.parseObject(result.getBody());
+                //CallBackResult callBackResult = JSONObject.parseObject(result.getBody(), CallBackResult.class);
+                if ("200".equals(callBackResult.get("code").toString())) {
+                    updateOrderStatusSuccessByOrderId(order.getOrderId());
                     updateBusinessIncomeAmount(order);
-                    log.info("通知商户成功，并且商户返回成功,orderID:{}", orderId);
+                    log.info("通知商户成功，并且商户返回成功,orderID:{}", order.getOrderId());
                     flag = true;
                     msg.append("通知商户成功，并且商户返回成功");
                     return R.ok(msg.toString());
                 } else {
-                    log.info("通通知商户失败,orderID:{}", orderId);
-                    updateOrderStatusNoBackByOrderId(orderId);
-                    msg.append("通知商户失败，原因：").append(callBackResult.getMsg());
+                    log.info("通通知商户失败,orderID:{}", order.getOrderId());
+                    updateOrderStatusNoBackByOrderId(order.getOrderId());
+                    msg.append("通知商户失败，原因：").append(callBackResult.get("msg"));
                     return R.error(msg.toString());
                 }
             } else {
-                log.info("通通知商户失败,orderID:{}", orderId);
-                updateOrderStatusNoBackByOrderId(orderId);
+                log.info("通通知商户失败,orderID:{}", order.getOrderId());
+                updateOrderStatusNoBackByOrderId(order.getOrderId());
                 msg.append("通知商户失败，返回状态码为：").append(result.getCode());
                 return R.error(msg.toString());
             }
         } catch (Exception e) {
             log.info("订单回调商户异常，异常信息为:{}", e);
-            updateOrderStatusNoBackByOrderId(orderId);
+            updateOrderStatusNoBackByOrderId(order.getOrderId());
             msg.append("通知商户失败，原因：商户未返回json格式数据,返回内容：").append(body);
             return R.error(msg.toString());
         } finally {
             if (flag) {
                 //5、只有在通知商户成功，才统计高级代理。商户。介绍人的收入情况
-                countAmount(orderId, userName, submitAmount, payType);
+                countAmount(order.getOrderId(), user.getUsername(), submitAmount, payType);
             }
         }
     }
+
+    private Lock lock = new ReentrantLock();
 
     /**
      * 更新挂马账户的收入情况
      *
      * @param order
      */
+    @Transactional
     public void updateBusinessIncomeAmount(OrderInfoEntity order) {
         BusinessIncomeLog income = new BusinessIncomeLog();
         income.setOrderId(order.getOrderId());
@@ -260,7 +309,15 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         income.setSubmitamount(order.getSubmitAmount());
         income.setType("2");
         bi.save(income);
-        businessEntityService.updateBusinessIncomeAmount(order);
+        lock.lock();
+        try {
+            businessEntityService.updateBusinessIncomeAmount(order);
+        } catch (Exception e) {
+            log.info("==》更新挂马账号收入异常，异常信息为:{}", e);
+        } finally {
+            lock.unlock();
+        }
+
     }
 
     /**
@@ -464,15 +521,15 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     }
 
     @Override
-    public void updateCustomerIncomeAmount(String orderId,BigDecimal amount) throws Exception{
+    public void updateCustomerIncomeAmount(String orderId, BigDecimal amount) throws Exception {
         OrderInfoEntity order = queryOrderInfoByOrderId(orderId);
-        if(order == null){
+        if (order == null) {
             throw new RRException("订单不存在");
         }
         String businessCode = order.getBusinessCode();
         String channelType = order.getPayType();
         String userName = order.getUserName();
-        baseMapper.updateCustomerIncomeAmount(userName,businessCode,channelType,amount);
+        baseMapper.updateCustomerIncomeAmount(userName, businessCode, channelType, amount);
     }
 
     /**
@@ -483,12 +540,12 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      */
     private boolean outerOrderIdIsOnly(String outerOrderId) {
         String redisValue = (String) redisUtil.get(outerOrderId);
-        log.info("===>从redis中获取订单号，校验订单是否重复，申请的订单号为：{}，redis返回值为：{}",outerOrderId,redisValue);
+        log.info("===>从redis中获取订单号，校验订单是否重复，申请的订单号为：{}，redis返回值为：{}", outerOrderId, redisValue);
         //如果redis中存在值，则说明该订单是重复创建的
-        if(!org.springframework.util.StringUtils.isEmpty(redisValue)){
+        if (!org.springframework.util.StringUtils.isEmpty(redisValue)) {
             return false;
         }
-        redisUtil.set(outerOrderId,outerOrderId,10);
+        redisUtil.set(outerOrderId, outerOrderId, 10);
         String orderId = baseMapper.queryOrderByOuterOrderId(outerOrderId);
         if (StringUtils.isNotBlank(orderId)) {
             return false;
@@ -570,8 +627,9 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             //如果配置的账号包含多个，则需要筛选一个
             for (UserBusinessEntity b : useBusinesses) {
                 //如果充值金额为空，或收入金额+本单的金额>充值金额，则不能使用
-                BigDecimal incomAmount = b.getIncomeAmount() == null ? new BigDecimal("0.00") :  b.getIncomeAmount();
-                Double amount = incomAmount.add(new BigDecimal(submitAmount)).setScale(3, BigDecimal.ROUND_HALF_UP).doubleValue();
+                BigDecimal incomAmount = b.getIncomeAmount() == null ? new BigDecimal("0.00") : b.getIncomeAmount();
+                Double amount =
+                        incomAmount.add(new BigDecimal(submitAmount)).setScale(3, BigDecimal.ROUND_HALF_UP).doubleValue();
                 if (b.getRechargeAmount() == null || b.getRechargeAmount().doubleValue() < amount) {
                     continue;
                 }
@@ -786,7 +844,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
                     .put(BaseConstant.AGENT_NAME, user.getAgentUsername())
                     .put(BaseConstant.REQUEST, request)
                     .put(BaseConstant.REQUEST_URL, requestUrl)
-                    .put(BaseConstant.REMARK,remark);
+                    .put(BaseConstant.REMARK, remark);
         } else {
             return decryptData;
         }
@@ -838,8 +896,8 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     private R decryptData(String data, String userName, Long timestamp, String sign, String apiKey) throws Exception {
         StringBuilder local = new StringBuilder();
         local.append(userName).append(timestamp).append(data).append(apiKey);
-        log.info("===>系统拼接的sign值为：{}",local.toString());
-        log.info("===>商户传递的sign值为：{}",sign);
+        log.info("===>系统拼接的sign值为：{}", local.toString());
+        log.info("===>商户传递的sign值为：{}", sign);
         String localSgin = DigestUtils.md5Hex(local.toString());
         if (!localSgin.equals(sign)) {
             return R.error("签名验证不通过");

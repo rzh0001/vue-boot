@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.apache.ibatis.annotations.Param;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
+import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.util.R;
 
 import javax.servlet.http.HttpServletRequest;
@@ -36,7 +37,9 @@ public interface IOrderInfoEntityService extends IService<OrderInfoEntity> {
      * @return
      */
     R callback(JSONObject reqobj, HttpServletRequest req) throws Exception;
-    R innerSysCallBack(String payTpye,Object param) throws Exception;
+    public R notifyCustomer(OrderInfoEntity order, SysUser user, String payType) throws Exception;
+    Object innerSysCallBack(String payTpye,Object param) throws Exception;
+    Map<String, Object> isInternalSystem(Map<String, Object> param);
     OrderInfoEntity queryOrderInfoByOrderId(String orderId);
 
     /**

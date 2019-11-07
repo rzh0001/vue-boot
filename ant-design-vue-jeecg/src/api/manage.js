@@ -108,7 +108,8 @@ export function downFile(url,parameter){
     url: url,
     params: parameter,
     method:'get' ,
-    responseType: 'blob'
+    responseType: 'blob',
+    timeout: 30000
   })
 }
 

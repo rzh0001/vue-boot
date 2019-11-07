@@ -58,19 +58,20 @@ public class ApiController {
      */
     @RequestMapping(value = "/callback", method = {RequestMethod.POST,RequestMethod.GET})
     @ResponseBody
-    public R callback() {
+    public Object callback() {
         try {
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
             Object param = RequestHandleUtil.getReqParam(request);
-            String payType = null;
             Map<String, Object> map = (Map<String, Object>) param;
-            if (map.get("payType") == null) {
+            Map<String, Object> checkMap = orderInfoService.isInternalSystem(map);
+            boolean isInternalSystem =(Boolean) checkMap.get("isInternalSystem");
+            if (isInternalSystem) {
                 //内部系统之间的调用
                 return orderInfoService.callback(new JSONObject(map),
                         ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest());
             } else {
                 //外接系统的调用
-                payType = (String) map.get("payType");
+                String payType = (String) checkMap.get("payType");
                 return orderInfoService.innerSysCallBack(payType, param);
             }
         } catch (Exception e) {
@@ -78,6 +79,7 @@ public class ApiController {
             return R.error(e.getMessage());
         }
     }
+
 
     /**
      * 订单查询（AES）

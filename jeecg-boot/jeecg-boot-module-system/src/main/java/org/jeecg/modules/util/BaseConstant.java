@@ -51,6 +51,7 @@ public class BaseConstant {
     //数据字典配置的挂马平台的地址
     public static final String API_KEY = "apiKey";
     public static final String IP_WHITE_LIST= "ipWhiteList";
+    public static final String EXTERNAL_FIELD = "externalField";
     public static final String SKIP_GOOGLE_CHECK_NAMES = "skipGoogleCheckNames";
     public static final String IP_BLACK_LIST = "ipBlacklist";
     public static final String INNER_CALL_BACK_URL= "innerCallBackUrl";
@@ -72,6 +73,10 @@ public class BaseConstant {
     public static final String REQUEST_NXYS_ALIPAY = "nxys_alipay";
     //微信转卡
     public static final String REQUEST_WECHAT_BANK = "wechat_bank";
+    //信付-支付宝
+    public static final String REQUEST_XINPAY_ALIPAY = "xin_pay_alipay";
+
+    public static final String REQUEST_BAIYITONG_WECHAT = "baiyitong_pay_wechat";
     //四方回调挂马平台的返回码
     public static final int SUCCESS = 200;
     //流水类型 流水类型 1-手续费收入 2-提现 3-冲正
