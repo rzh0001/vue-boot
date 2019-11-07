@@ -3,6 +3,7 @@ package org.jeecg.modules.system.controller;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -1036,6 +1037,52 @@ public class SysUserController {
         
         result.setSuccess(true);
         return result;
+    }
+    
+    
+    @GetMapping(value = "/getPaymentPasswordStatus")
+    public Result<Object> getPaymentPasswordStatus(HttpServletRequest req, HttpServletResponse res) {
+        LoginUser optUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+        
+        SysUser user = sysUserService.getOne(
+                new QueryWrapper<SysUser>()
+                        .lambda()
+                        .eq(SysUser::getId, optUser.getId()));
+        
+        return Result.ok(StrUtil.isNotEmpty(user.getPaymentPassword()));
+    }
+    
+    @PutMapping(value = "/updatePaymentPassword")
+    public Result<Object> updatePaymentPassword(@RequestBody JSONObject json) {
+        LoginUser ou = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+        
+        String username = json.getString("username");
+        String oldPassword = json.getString("oldPassword");
+        SysUser user = this.sysUserService.getOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getId, ou.getId()));
+        if (BeanUtil.isEmpty(user)) {
+            return Result.error("获取用户数据失败");
+        }
+        
+        // 检查是否已设置过支付密码,若已设置检查旧密码
+        if (!StrUtil.isEmpty(user.getPaymentPassword())) {
+            String passwordEncode = PasswordUtil.encrypt(username, oldPassword, user.getSalt());
+            if (!StrUtil.equals(passwordEncode, user.getPaymentPassword())) {
+                return Result.error("旧密码错误");
+            }
+        }
+        
+        String password = json.getString("password");
+        String confirmPassword = json.getString("confirmPassword");
+        if (StrUtil.isEmpty(password)) {
+            return Result.error("请输入新密码!");
+        }
+        
+        if (!password.equals(confirmPassword)) {
+            return Result.error("两次输入密码不一致!");
+        }
+        String newPassword = PasswordUtil.encrypt(username, password, user.getSalt());
+        this.sysUserService.update(new SysUser().setPassword(newPassword), new LambdaQueryWrapper<SysUser>().eq(SysUser::getId, user.getId()));
+        return Result.ok("密码修改完成！");
     }
 	
 	@RequestMapping(value = "/cleanGoogle", method = RequestMethod.GET)

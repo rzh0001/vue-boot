@@ -40,6 +40,11 @@
                 系统密钥
               </router-link>
             </a-menu-item>
+            <a-menu-item key="/account/settings/paymentPassword.vue">
+              <router-link :to="{ name: 'account-settings-paymentPassword' }">
+                提现密码
+              </router-link>
+            </a-menu-item>
           </a-menu>
         </div>
         <div class="account-settings-info-right">

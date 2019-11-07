@@ -72,8 +72,9 @@ public class UserAmountEntityServiceImpl extends ServiceImpl<UserAmountEntityMap
         if (BeanUtil.isEmpty(userAmountEntity)) {
             throw new RRException("内部错误!请联系管理员！");
         }
-        
-        if (adjustAmount.compareTo(userAmountEntity.getAmount()) > 0) {
+    
+        // 若是余额调减，判断是否超出余额
+        if (adjustAmount.compareTo(BigDecimal.ZERO) < 0 && adjustAmount.negate().compareTo(userAmountEntity.getAmount()) > 0) {
             throw new RRException("余额不足！");
         }
         

@@ -159,6 +159,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         Map<String, Object> map = new HashMap<>();
         //获取数据字典配置的属于外部系统标识通道的字段
         List<DictModel> fields = dictService.queryDictItemsByCode(BaseConstant.EXTERNAL_FIELD);
+        log.info("==》挂马平台回调四方平台，数据字典externalField：{}",fields.toString());
         List<String> payTypeFields = new ArrayList<>();
         boolean isInternalSystem = true;
         if (!CollectionUtils.isEmpty(fields)) {
@@ -166,11 +167,12 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
                 payTypeFields.add(dictModel.getValue());
             }
         }
-        if (!CollectionUtils.isEmpty(payTypeFields)) {
-            for (String field : payTypeFields) {
-                if (param.get(field) != null) {
+        if(!CollectionUtils.isEmpty(payTypeFields)){
+            for(String field:payTypeFields){
+                if(param.get(field) != null){
                     isInternalSystem = false;
                     payType = (String) param.get(field);
+                    log.info("===>外部挂马平台回调四方，通道为：{}",payType);
                     break;
                 }
             }
