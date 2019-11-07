@@ -110,6 +110,7 @@ public class RechargeOrderController {
 													  HttpServletRequest req) {
 		Result<IPage<RechargeOrder>> result = new Result<IPage<RechargeOrder>>();
 		QueryWrapper<RechargeOrder> queryWrapper = initQueryCondition(order, req);
+		queryWrapper.lambda().orderByDesc(RechargeOrder::getCreateTime);
 		Page<RechargeOrder> page = new Page<RechargeOrder>(pageNo, pageSize);
 		IPage<RechargeOrder> pageList = rechargeOrderService.page(page, queryWrapper);
 		result.setSuccess(true);

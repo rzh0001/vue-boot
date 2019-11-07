@@ -64,7 +64,7 @@
 
     <!-- 操作按钮区域 -->
     <div class="table-operator" style="border-top: 5px">
-      <a-button @click="handleAdd" v-has="'user:add'" type="primary" icon="plus">添加用户</a-button>
+<!--      <a-button @click="handleAdd" v-has="'user:add'" type="primary" icon="plus">添加用户</a-button>-->
       <a-button @click="handleAddAgent" v-has="'user:addAgent'" type="primary" icon="plus">添加代理</a-button>
       <a-button @click="handleAddSalesman" v-has="'user:addSalesman'" type="primary" icon="plus">添加介绍人</a-button>
       <a-button @click="handleAddMember" v-has="'user:addMember'" type="primary" icon="plus">添加商户</a-button>
@@ -162,50 +162,50 @@
                   <a>解冻</a>
                 </a-popconfirm>
               </a-menu-item>
-            <a-menu-item>
-                <a href="javascript:;" @click="handleChangeAmount(record.username)">资金</a>
-              </a-menu-item>
+<!--              <a-menu-item>-->
+<!--                <a href="javascript:;" @click="handleChangeAmount(record.username)">资金</a>-->
+<!--              </a-menu-item>-->
             </a-menu>
           </a-dropdown>
-          <a-dropdown>
-            <a-button>
-              通道配置
-            </a-button>
-            <a-menu slot="overlay">
-              <a-menu-item>
-                <a @click="channelDetail(record)">已配置通道</a>
-              </a-menu-item>
-              <a-menu-item>
-                <a @click="addChannel(record)">添加通道</a>
-              </a-menu-item>
-            </a-menu>
-          </a-dropdown>
-         <a-dropdown>
-            <a-button >
-              关联子账号
-            </a-button>
-            <a-menu slot="overlay">
-              <a-menu-item>
-                <a @click="activeBusiness(record)">激活子账号</a>
-              </a-menu-item>
-               <a-menu-item>
-                <a @click="rechargeAmount(record)">子账号充值</a>
-              </a-menu-item>
-            </a-menu>
-          </a-dropdown>
-            <a-dropdown>
-            <a-button>
-              费率设置
-            </a-button>
-            <a-menu slot="overlay">
-              <a-menu-item>
-                <a @click="rateDeatil(record)">已设置费率</a>
-              </a-menu-item>
-              <a-menu-item>
-                <a @click="addRate(record)">添加费率</a>
-              </a-menu-item>
-            </a-menu>
-          </a-dropdown>
+<!--          <a-dropdown>-->
+<!--            <a-button>-->
+<!--              通道配置-->
+<!--            </a-button>-->
+<!--            <a-menu slot="overlay">-->
+<!--              <a-menu-item>-->
+<!--                <a @click="channelDetail(record)">已配置通道</a>-->
+<!--              </a-menu-item>-->
+<!--              <a-menu-item>-->
+<!--                <a @click="addChannel(record)">添加通道</a>-->
+<!--              </a-menu-item>-->
+<!--            </a-menu>-->
+<!--          </a-dropdown>-->
+<!--         <a-dropdown>-->
+<!--            <a-button >-->
+<!--              关联子账号-->
+<!--            </a-button>-->
+<!--            <a-menu slot="overlay">-->
+<!--              <a-menu-item>-->
+<!--                <a @click="activeBusiness(record)">激活子账号</a>-->
+<!--              </a-menu-item>-->
+<!--               <a-menu-item>-->
+<!--                <a @click="rechargeAmount(record)">子账号充值</a>-->
+<!--              </a-menu-item>-->
+<!--            </a-menu>-->
+<!--          </a-dropdown>-->
+<!--            <a-dropdown>-->
+<!--            <a-button>-->
+<!--              费率设置-->
+<!--            </a-button>-->
+<!--            <a-menu slot="overlay">-->
+<!--              <a-menu-item>-->
+<!--                <a @click="rateDeatil(record)">已设置费率</a>-->
+<!--              </a-menu-item>-->
+<!--              <a-menu-item>-->
+<!--                <a @click="addRate(record)">添加费率</a>-->
+<!--              </a-menu-item>-->
+<!--            </a-menu>-->
+<!--          </a-dropdown>-->
         </span>
 
 
@@ -315,6 +315,16 @@
             dataIndex: 'salesmanRealname'
           },
           {
+            title: '单笔手续费',
+            align: 'center',
+            width: 80,
+            dataIndex: 'orderFixedFee'
+          },{
+            title: '交易手续费率',
+            align: 'center',
+            width: 80,
+            dataIndex: 'transactionFeeRate'
+          },{
             title: '可提现金额',
             align: 'center',
             width: 80,
@@ -332,7 +342,7 @@
             dataIndex: 'action',
             scopedSlots: { customRender: 'action' },
             align: 'center',
-            width: 300
+            width: 80
           }
 
         ],

@@ -134,4 +134,12 @@ public class SysUserPage {
      * 会员余额
      */
     private java.math.BigDecimal amount;
+    /**
+     * 订单单笔手续费
+     */
+    private java.math.BigDecimal orderFixedFee;
+    /**
+     * 交易手续费率
+     */
+    private java.math.BigDecimal transactionFeeRate;
 }
