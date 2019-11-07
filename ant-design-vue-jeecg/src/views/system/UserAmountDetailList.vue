@@ -21,8 +21,9 @@
               <a-select v-model="queryParam.type" placeholder="请选择类型">
                 <a-select-option value="">全部</a-select-option>
                 <a-select-option value="1">手续费收入</a-select-option>
-                <a-select-option value="2">提现</a-select-option>
+                <a-select-option value="2">充值</a-select-option>
                 <a-select-option value="3">冲正</a-select-option>
+                <a-select-option value="5">代付</a-select-option>
               </a-select>
             </a-form-item>
           </a-col>
@@ -158,13 +159,15 @@
             width: 90,
             customRender: function(text) {
               if (text == 1) {
-                return '收入'
+                return '手续费收入'
               } else if (text == 2) {
-                return '提现'
+                return '充值'
               } else if (text == 3) {
                 return '冲正'
               }  else if (text == 4) {
                 return '手工调账'
+              }  else if (text == 5) {
+                return '代付'
               } else {
                 return text
               }

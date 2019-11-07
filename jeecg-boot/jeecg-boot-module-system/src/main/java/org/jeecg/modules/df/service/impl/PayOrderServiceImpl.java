@@ -15,6 +15,7 @@ import org.jeecg.modules.system.service.ISysUserService;
 import org.jeecg.modules.system.service.IUserAmountEntityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
@@ -34,6 +35,7 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
     private IUserAmountEntityService userAmountService;
     
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean create(PayOrder order) {
         LoginUser ou = (LoginUser) SecurityUtils.getSubject().getPrincipal();
         
@@ -48,9 +50,6 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
         if (BeanUtil.isEmpty(user) || null == user.getTransactionFeeRate() || null == user.getOrderFixedFee()) {
             throw new RRException("获取费率配置失败！");
         }
-        
-        // 扣减余额
-        userAmountService.changeAmount(order.getUserId(), order.getAmount().negate(), order.getOrderId(), "", "1");
     
         order.setUserId(user.getId());
         order.setUserName(user.getUsername());
@@ -67,7 +66,38 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
         order.setTransactionFee(order.getAmount().multiply(user.getTransactionFeeRate()));
         order.setFixedFee(user.getOrderFixedFee());
         order.setOrderFee(order.getTransactionFee().add(order.getFixedFee()));
-        
+    
+        // 扣减商户余额
+        userAmountService.changeAmount(user.getId(), order.getAmount().negate(), order.getOrderId(), "", "5");
+    
         return save(order);
+    }
+    
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean checked(PayOrder order) {
+        
+        // 修改订单状态
+        updateById(order);
+        
+        // 增加代理收入
+        // 生成收入明细
+        userAmountService.changeAmount(order.getAgentId(), order.getOrderFee(), order.getOrderId(), order.getRemark(), "1");
+        
+        return false;
+    }
+    
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean rejected(PayOrder order) {
+        
+        // 修改订单状态
+        updateById(order);
+        
+        // 返还商户额度
+        // 生成收入明细
+        userAmountService.changeAmount(order.getUserId(), order.getAmount(), order.getOrderId(), order.getRemark(), "3");
+        
+        return false;
     }
 }

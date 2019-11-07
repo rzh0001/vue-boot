@@ -17,4 +17,20 @@ public interface IPayOrderService extends IService<PayOrder> {
      * @return
      */
     boolean create(PayOrder order);
+    
+    /**
+     * 审核通过
+     *
+     * @param order
+     * @return
+     */
+    boolean checked(PayOrder order);
+    
+    /**
+     * 审核拒绝
+     *
+     * @param order
+     * @return
+     */
+    boolean rejected(PayOrder order);
 }

@@ -110,7 +110,7 @@ public class RechargeOrderController {
 													  HttpServletRequest req) {
 		Result<IPage<RechargeOrder>> result = new Result<IPage<RechargeOrder>>();
 		QueryWrapper<RechargeOrder> queryWrapper = initQueryCondition(order, req);
-		queryWrapper.lambda().orderByDesc(RechargeOrder::getCreateTime);
+		queryWrapper.lambda().orderByDesc(RechargeOrder::getId);
 		Page<RechargeOrder> page = new Page<RechargeOrder>(pageNo, pageSize);
 		IPage<RechargeOrder> pageList = rechargeOrderService.page(page, queryWrapper);
 		result.setSuccess(true);
@@ -154,7 +154,7 @@ public class RechargeOrderController {
 		order.setAgentRealname(user.getAgentRealname());
 		
 		order.setOrderId(IDUtil.genRechargeOrderId());
-		order.setStatus(DfConstant.STATUS_SAVE);
+		order.setStatus(DfConstant.STATUS_PAID);
 		try {
 			rechargeOrderService.save(order);
 			result.success("添加成功！");
@@ -213,7 +213,7 @@ public class RechargeOrderController {
 		 // 审核通过增加余额
 		 if (DfConstant.STATUS_CHECKED.equals(jsonObject.getString("status"))) {
 			 UserAmountEntity amount = userAmountService.getUserAmountByUserName(order.getUserName());
-			 userAmountService.changeAmount(order.getUserId(), order.getAmount(), order.getOrderId(), order.getRemark(), "1");
+			 userAmountService.changeAmount(order.getUserId(), order.getAmount(), order.getOrderId(), order.getRemark(), "2");
 			
 			 // 插入流水表
 //			 userAmountDetailService.addAmountDetail(order.getAmount(), amount.getAmount(), "1", order.getUserId());

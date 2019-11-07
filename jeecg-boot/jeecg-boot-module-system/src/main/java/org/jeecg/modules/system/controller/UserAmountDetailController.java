@@ -46,6 +46,27 @@ public class UserAmountDetailController {
 	@Autowired
 	private IUserAmountDetailService userAmountDetailService;
 	
+	 // 查询条件独立成方法，查询、统计、导出 三个接口使用
+	 private QueryWrapper<UserAmountDetail> initQueryCondition(UserAmountDetail userAmountDetail, HttpServletRequest req) {
+		 QueryWrapper<UserAmountDetail> queryWrapper = QueryGenerator.initQueryWrapper(userAmountDetail, req.getParameterMap());
+		
+		 LoginUser opUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+		 if (opUser.getMemberType() != null) {
+			 switch (opUser.getMemberType()) {
+				 case PayConstant.MEMBER_TYPE_AGENT:
+					 queryWrapper.lambda().eq(UserAmountDetail::getAgentId, opUser.getId());
+					 break;
+				 case PayConstant.MEMBER_TYPE_SALESMAN:
+					 queryWrapper.lambda().eq(UserAmountDetail::getSalesmanId, opUser.getId());
+					 break;
+				 case PayConstant.MEMBER_TYPE_MEMBER:
+					 queryWrapper.lambda().eq(UserAmountDetail::getUserId, opUser.getId());
+					 break;
+				 default:
+			 }
+		 }
+		 return queryWrapper;
+	 }
 	/**
 	 * 分页列表查询
 	 * @param userAmountDetail
@@ -62,23 +83,8 @@ public class UserAmountDetailController {
 									  @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 									  HttpServletRequest req) {
 		Result<IPage<UserAmountDetail>> result = new Result<IPage<UserAmountDetail>>();
-		QueryWrapper<UserAmountDetail> queryWrapper = QueryGenerator.initQueryWrapper(userAmountDetail, req.getParameterMap());
+		QueryWrapper<UserAmountDetail> queryWrapper = initQueryCondition(userAmountDetail, req);
 		Page<UserAmountDetail> page = new Page<UserAmountDetail>(pageNo, pageSize);
-		LoginUser optUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
-		if (optUser.getMemberType() != null) {
-			switch (optUser.getMemberType()) {
-				case PayConstant.MEMBER_TYPE_AGENT:
-					queryWrapper.lambda().eq(UserAmountDetail::getAgentId, optUser.getId());
-					break;
-				case PayConstant.MEMBER_TYPE_SALESMAN:
-					queryWrapper.lambda().eq(UserAmountDetail::getSalesmanId, optUser.getId());
-					break;
-				case PayConstant.MEMBER_TYPE_MEMBER:
-					queryWrapper.lambda().eq(UserAmountDetail::getUserId, optUser.getId());
-					break;
-				default:
-			}
-		}
 		IPage<UserAmountDetail> pageList = userAmountDetailService.page(page, queryWrapper);
 		result.setSuccess(true);
 		result.setResult(pageList);
@@ -195,24 +201,9 @@ public class UserAmountDetailController {
   @RequestMapping(value = "/exportXls")
   public ModelAndView exportXls(UserAmountDetail userAmountDetail, HttpServletRequest request, HttpServletResponse response) {
       // Step.1 组装查询条件
-	  QueryWrapper<UserAmountDetail> queryWrapper = QueryGenerator.initQueryWrapper(userAmountDetail, request.getParameterMap());
-	  LoginUser optUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
-	  if (optUser.getMemberType() != null) {
-		  switch (optUser.getMemberType()) {
-			  case PayConstant.MEMBER_TYPE_AGENT:
-				  queryWrapper.lambda().eq(UserAmountDetail::getAgentId, optUser.getId());
-				  break;
-			  case PayConstant.MEMBER_TYPE_SALESMAN:
-				  queryWrapper.lambda().eq(UserAmountDetail::getSalesmanId, optUser.getId());
-				  break;
-			  case PayConstant.MEMBER_TYPE_MEMBER:
-				  queryWrapper.lambda().eq(UserAmountDetail::getUserId, optUser.getId());
-				  break;
-			  default:
-		  }
-	  }
-
-      //Step.2 AutoPoi 导出Excel
+	  QueryWrapper<UserAmountDetail> queryWrapper = initQueryCondition(userAmountDetail, request);
+	
+	  //Step.2 AutoPoi 导出Excel
       ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
       List<UserAmountDetail> pageList = userAmountDetailService.list(queryWrapper);
       //导出文件名称

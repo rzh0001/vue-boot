@@ -243,6 +243,11 @@
             dataIndex: 'remark'
           },
           {
+            title: '创建时间',
+            align: 'center',
+            dataIndex: 'createTime'
+          },
+          {
             title: '成功时间',
             align: 'center',
             dataIndex: 'successTime'

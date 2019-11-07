@@ -26,7 +26,7 @@
 <!--          <a-input placeholder="请输入商户编号" v-decorator="['merchantId', validatorRules.merchantId ]" />-->
 <!--        </a-form-item>-->
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="订单金额">
-          <a-input-number v-decorator="[ 'amount', {}]" />
+          <a-input-number v-decorator="[ 'amount', validatorRules.amount]"  min="0"/>
         </a-form-item>
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="交易手续费"  v-show="false">
           <a-input-number v-decorator="[ 'transactionFee', {}]" />
@@ -38,7 +38,7 @@
           <a-input-number v-decorator="[ 'orderFee', {}]" />
         </a-form-item>
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="通道">
-          <a-select v-decorator="['channel', {}]" placeholder="" >
+          <a-select v-decorator="['channel', validatorRules.channel]" placeholder="" >
             <a-select-option value="bank">银行转账</a-select-option>
             <a-select-option value="alipay">支付宝</a-select-option>
           </a-select>
@@ -50,10 +50,10 @@
           </a-select>
         </a-form-item>
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="账户名">
-          <a-input placeholder="请输入账户名" v-decorator="['accountName', {}]" />
+          <a-input placeholder="请输入账户名" v-decorator="['accountName', validatorRules.accountName]" />
         </a-form-item>
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="卡号">
-          <a-input placeholder="请输入卡号或支付宝帐号" v-decorator="['cardNumber', {}]" />
+          <a-input placeholder="请输入卡号或支付宝帐号" v-decorator="['cardNumber', validatorRules.cardNumber]" />
         </a-form-item>
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="银行名称">
           <a-input placeholder="请输入银行名称" v-decorator="['bankName', {}]" />
@@ -103,10 +103,10 @@
         confirmLoading: false,
         form: this.$form.createForm(this),
         validatorRules:{
-          orderId:{rules: [{ required: false, message: '请输入订单号!' }]},
-          outerOrderId:{rules: [{ required: false, message: '请输入外部订单号!' }]},
-          merchantId:{rules: [{ required: false, message: '请输入商户编号!' }]},
-          status:{rules: [{ required: false, message: '请输入订单状态：0-待处理;1-已接单;2-已打款;3-审核拒绝!' }]},
+          amount:{rules: [{ required: true, message: '请输入金额!' }]},
+          channel:{rules: [{ required: true, message: '请选择通道!' }]},
+          accountName:{rules: [{ required: true, message: '请输入账户名!' }]},
+          cardNumber:{rules: [{ required: true, message: '请输入卡号或支付宝帐号!' }]},
         },
         url: {
           add: "/df/payOrder/add",

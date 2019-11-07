@@ -44,7 +44,7 @@
           <a-input placeholder="" v-decorator="['branchName', {}]"  disabled="disabled"/>
         </a-form-item>
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="充值金额">
-          <a-input-number v-decorator="[ 'amount', {}]" :min="0"/>
+          <a-input-number v-decorator="[ 'amount', validatorRules.amount]" :min="0"/>
         </a-form-item>
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="备注">
           <a-input placeholder="请输入备注" v-decorator="['remark', {}]" />
@@ -91,6 +91,7 @@
           merchantId:{rules: [{ required: false, message: '请输入商户编号!' }]},
           status:{rules: [{ required: false, message: '请输入订单状态：0-已保存;1-已打款,待审核;2-已确认;3-审核拒绝!' }]},
           bankcardId:{rules: [{ required: true, message: '请输入银行卡ID!' }]},
+          amount:{rules: [{ required: true, message: '请输入充值金额!' }]},
         },
         url: {
           add: "/df/rechargeOrder/add",

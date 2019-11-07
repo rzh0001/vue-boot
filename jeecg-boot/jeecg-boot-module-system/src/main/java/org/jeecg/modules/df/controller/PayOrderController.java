@@ -1,5 +1,6 @@
 package org.jeecg.modules.df.controller;
 
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -17,9 +18,7 @@ import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.modules.df.constant.DfConstant;
 import org.jeecg.modules.df.entity.PayOrder;
 import org.jeecg.modules.df.service.IPayOrderService;
-import org.jeecg.modules.df.util.IDUtil;
 import org.jeecg.modules.system.entity.SysUser;
-import org.jeecg.modules.system.entity.UserAmountEntity;
 import org.jeecg.modules.system.service.ISysUserService;
 import org.jeecg.modules.system.service.IUserAmountEntityService;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
@@ -121,18 +120,7 @@ public class PayOrderController {
 	@PostMapping(value = "/add")
 	public Result<PayOrder> add(@RequestBody PayOrder order) {
 		Result<PayOrder> result = new Result<PayOrder>();
-		LoginUser ou = (LoginUser) SecurityUtils.getSubject().getPrincipal();
-		SysUser user = userService.getById(ou.getId());
-		order.setUserId(user.getId());
-		order.setUserName(user.getUsername());
-		order.setUserRealname(user.getRealname());
-		order.setAgentId(user.getAgentId());
-		order.setAgentUsername(user.getAgentUsername());
-		order.setAgentRealname(user.getAgentRealname());
 		
-		
-		order.setOrderId(IDUtil.genPayOrderId());
-		order.setStatus(DfConstant.STATUS_SAVE);
 		try {
 			payOrderService.create(order);
 			result.success("添加成功！");
@@ -183,19 +171,22 @@ public class PayOrderController {
 		 if (order == null) {
 			 return Result.error("未找到对应实体");
 		 }
+		 String status = jsonObject.getString("status");
 		
-		 order.setStatus(jsonObject.getString("status"));
+		 if (StrUtil.isEmpty(status)) {
+			 return Result.error("内部错误，status 字段不能为空");
+		 }
+		 order.setStatus(status);
 		 order.setSuccessTime(new Date());
 		 boolean ok = payOrderService.updateById(order);
 		
-		 // 审核拒绝增加余额
-		 if (DfConstant.STATUS_REJECTED.equals(jsonObject.getString("status"))) {
-			 UserAmountEntity amount = userAmountService.getUserAmountByUserName(order.getUserName());
-			 userAmountService.changeAmount(order.getUserId(), order.getAmount(), order.getOrderId(), order.getRemark(), "3");
-			
+		 if (DfConstant.STATUS_CHECKED.equals(status)) {
+			 payOrderService.checked(order);
+		 } else if (DfConstant.STATUS_REJECTED.equals(status)) {
+			 payOrderService.rejected(order);
 		 }
 		
-		 return Result.ok("修改成功!");
+		 return Result.ok("审核成功!");
 	 }
 	
 	/**
