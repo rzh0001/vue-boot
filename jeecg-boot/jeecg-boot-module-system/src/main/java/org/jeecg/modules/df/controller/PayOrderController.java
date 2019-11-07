@@ -103,6 +103,7 @@ public class PayOrderController {
 												 HttpServletRequest req) {
 		Result<IPage<PayOrder>> result = new Result<IPage<PayOrder>>();
 		QueryWrapper<PayOrder> queryWrapper = initQueryCondition(order, req);
+		queryWrapper.lambda().orderByDesc(PayOrder::getCreateTime);
 		Page<PayOrder> page = new Page<PayOrder>(pageNo, pageSize);
 		IPage<PayOrder> pageList = payOrderService.page(page, queryWrapper);
 		result.setSuccess(true);
