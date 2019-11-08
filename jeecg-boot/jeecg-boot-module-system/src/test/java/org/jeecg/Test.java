@@ -7,7 +7,9 @@ import org.jeecg.modules.util.BaseConstant;
 import org.jeecg.modules.util.HttpResult;
 import org.jeecg.modules.util.HttpUtils;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -21,6 +23,11 @@ import java.util.*;
 
 public class Test {
     private static final String MD5_KEY="Pd3y8WTAJjacGlg6mxr3d3MYn57Vqyzq";
+    @org.junit.Test
+    public void test1(){
+        BigDecimal amount = new BigDecimal("100").setScale(2, RoundingMode.HALF_UP);
+        System.out.println(amount.toString());
+    }
     @org.junit.Test
     public void test() throws Exception {
         BaiyitongParam param = valueOf(null,null,null);
@@ -36,17 +43,21 @@ public class Test {
         param.setReturn_type("app");
         param.setAppid("1095031");
         param.setPay_type("wechat");
-        param.setAmount("100");
+        param.setAmount("100.00");
         param.setCallback_url("http://www.baidu.com");
         param.setOut_uid(BaseConstant.REQUEST_BAIYITONG_WECHAT);
         param.setOut_trade_no("123456789abc");
-        Map<Object,Object> map = new LinkedHashMap<>();
-        map.put("appid",param.getAppid());
-        map.put("pay_type",param.getPay_type());
-        map.put("amount",param.getAmount());
-        map.put("callback_url",param.getCallback_url());
+        SortedMap<Object,Object> map = new TreeMap<Object,Object>();
         map.put("out_trade_no",param.getOut_trade_no());
+        map.put("amount",param.getAmount());
+        map.put("appid",param.getAppid());
+        map.put("callback_url",param.getCallback_url());
+        map.put("out_uid","baiyitong_pay_wechat");
+        map.put("pay_type",param.getPay_type());
+        map.put("return_type","app");
         map.put("version","v1.1");
+
+
         param.setSign(signForInspiry(map,MD5_KEY));
         return param;
     }
