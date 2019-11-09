@@ -57,8 +57,9 @@ public class BaiyitongWechatPayImpl implements RequestPayUrl<OrderInfoEntity, St
             String body = r.getBody();
             JSONObject result = JSONObject.parseObject(body);
             if("200".equals(result.get("code").toString())){
-                JSONObject data  = (JSONObject) result.get("data");
-                payUrl = (String) data.get("payUrl");
+                //JSONObject data  = (JSONObject) result.get("data");
+                payUrl =  (String)result.get("url").toString();
+                log.info("===>百易通，支付链接地址为：{}",payUrl);
             }else{
                 log.info("===>订单为：{}，请求百易通平台，获取支付链接，返回的code为：{}",order.getOrderId(),result.get("code").toString());
                 throw new RRException("设备产码失败，请联系商户");
