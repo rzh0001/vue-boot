@@ -1,13 +1,17 @@
 package org.jeecg;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import org.jeecg.modules.exception.RRException;
 import org.jeecg.modules.pay.entity.BaiyitongParam;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import org.jeecg.modules.util.BaseConstant;
 import org.jeecg.modules.util.HttpResult;
 import org.jeecg.modules.util.HttpUtils;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -20,7 +24,12 @@ import java.util.*;
  */
 
 public class Test {
-    private static final String MD5_KEY="Pd3y8WTAJjacGlg6mxr3d3MYn57Vqyzq";
+    private static final String MD5_KEY="UoVoRPwckOZgYWBDZ15kQnzAZeY2140d";
+    @org.junit.Test
+    public void test1(){
+        BigDecimal amount = new BigDecimal("100").setScale(2, RoundingMode.HALF_UP);
+        System.out.println(amount.toString());
+    }
     @org.junit.Test
     public void test() throws Exception {
         BaiyitongParam param = valueOf(null,null,null);
@@ -28,25 +37,39 @@ public class Test {
         Map<String,Object> mapTypes = JSON.parseObject(json);
         System.out.println("===>请求百易通，获取支付链接，请求入参为："+json);
         HttpResult r = HttpUtils.doPost("http://api.autosu.cn/gateway/index/unifiedorder?format=json", mapTypes);
+        String body = r.getBody();
+        String payUrl = null;
+        JSONObject result = JSONObject.parseObject(body);
+        if("200".equals(result.get("code").toString())){
+            JSONObject data  = (JSONObject) result.get("data");
+            payUrl = (String)result.get("url").toString();
+            System.out.println("===url=="+payUrl);
+        }else{
+            throw new RRException("设备产码失败，请联系商户");
+        }
         System.out.println("===>请求百易通，获取支付链接,请求返回code为：，返回内容为：{}"+r.getBody());
     }
 
     private BaiyitongParam valueOf(OrderInfoEntity order, String businessCode, String callBackUrl){
         BaiyitongParam param = new BaiyitongParam();
         param.setReturn_type("app");
-        param.setAppid("1095031");
+        param.setAppid("1015518");
         param.setPay_type("wechat");
-        param.setAmount("100");
+        param.setAmount("100.00");
         param.setCallback_url("http://www.baidu.com");
         param.setOut_uid(BaseConstant.REQUEST_BAIYITONG_WECHAT);
-        param.setOut_trade_no("123456789abc");
-        Map<Object,Object> map = new LinkedHashMap<>();
-        map.put("appid",param.getAppid());
-        map.put("pay_type",param.getPay_type());
-        map.put("amount",param.getAmount());
-        map.put("callback_url",param.getCallback_url());
+        param.setOut_trade_no("2021545489632");
+        SortedMap<Object,Object> map = new TreeMap<Object,Object>();
         map.put("out_trade_no",param.getOut_trade_no());
+        map.put("amount",param.getAmount());
+        map.put("appid",param.getAppid());
+        map.put("callback_url",param.getCallback_url());
+        map.put("out_uid","baiyitong_pay_wechat");
+        map.put("pay_type",param.getPay_type());
+        map.put("return_type","app");
         map.put("version","v1.1");
+
+
         param.setSign(signForInspiry(map,MD5_KEY));
         return param;
     }

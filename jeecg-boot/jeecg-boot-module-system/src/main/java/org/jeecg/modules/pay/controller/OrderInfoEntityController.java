@@ -78,6 +78,7 @@ public class OrderInfoEntityController {
                                                         HttpServletRequest req) {
         Result<IPage<OrderInfoEntity>> result = new Result<IPage<OrderInfoEntity>>();
         QueryWrapper<OrderInfoEntity> queryWrapper = initQueryCondition(orderInfoEntity, req);
+        queryWrapper.lambda().orderByDesc(OrderInfoEntity::getCreateTime);
         Page<OrderInfoEntity> page = new Page<OrderInfoEntity>(pageNo, pageSize);
         IPage<OrderInfoEntity> pageList = orderInfoEntityService.page(page, queryWrapper);
         result.setSuccess(true);

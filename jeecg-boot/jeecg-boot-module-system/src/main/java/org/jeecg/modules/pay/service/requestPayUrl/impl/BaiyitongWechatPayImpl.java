@@ -20,7 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -55,8 +57,9 @@ public class BaiyitongWechatPayImpl implements RequestPayUrl<OrderInfoEntity, St
             String body = r.getBody();
             JSONObject result = JSONObject.parseObject(body);
             if("200".equals(result.get("code").toString())){
-                JSONObject data  = (JSONObject) result.get("data");
-                payUrl = (String) data.get("payUrl");
+                //JSONObject data  = (JSONObject) result.get("data");
+                payUrl =  (String)result.get("url").toString();
+                log.info("===>百易通，支付链接地址为：{}",payUrl);
             }else{
                 log.info("===>订单为：{}，请求百易通平台，获取支付链接，返回的code为：{}",order.getOrderId(),result.get("code").toString());
                 throw new RRException("设备产码失败，请联系商户");
@@ -125,14 +128,18 @@ public class BaiyitongWechatPayImpl implements RequestPayUrl<OrderInfoEntity, St
         param.setReturn_type("app");
         param.setAppid(businessCode);
         param.setPay_type("wechat");
-        param.setAmount(order.getSubmitAmount().toString());
+        //金额要求保留2位小数
+        BigDecimal amount = new BigDecimal(order.getSubmitAmount().toString()).setScale(2, RoundingMode.HALF_UP);
+        param.setAmount(amount.toString());
         param.setCallback_url(callBackUrl);
         param.setOut_uid(BaseConstant.REQUEST_BAIYITONG_WECHAT);
         param.setOut_trade_no(order.getOrderId());
         SortedMap<Object,Object> map = new TreeMap<Object,Object>();
         map.put("appid",param.getAppid());
         map.put("pay_type",param.getPay_type());
+        map.put("return_type",param.getReturn_type());
         map.put("amount",param.getAmount());
+        map.put("out_uid",param.getOut_uid());
         map.put("callback_url",param.getCallback_url());
         map.put("out_trade_no",param.getOut_trade_no());
         map.put("version","v1.1");
