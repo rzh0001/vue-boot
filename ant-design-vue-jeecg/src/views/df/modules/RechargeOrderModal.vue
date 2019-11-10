@@ -107,10 +107,13 @@
       add () {
         getAction(this.url.getBankcard, {}).then((res) => {
           if (res.success) {
-            this.bankcard = res.result;
-            this.bankcard.bankcardId = this.bankcard.id;
-            this.bankcard.id = null;
-            this.bankcard.remark = null;
+            this.bankcard.bankcardId = res.result.id;
+            this.bankcard.accountType = res.result.accountType;
+            this.bankcard.accountName = res.result.accountName;
+            this.bankcard.cardNumber = res.result.cardNumber;
+            this.bankcard.accountType = res.result.accountType;
+            this.bankcard.branchName = res.result.branchName;
+            this.bankcard.bankName = res.result.bankName;
             this.edit(this.bankcard);
           } else {
             this.$message.error("操作失败，"+res.message)
