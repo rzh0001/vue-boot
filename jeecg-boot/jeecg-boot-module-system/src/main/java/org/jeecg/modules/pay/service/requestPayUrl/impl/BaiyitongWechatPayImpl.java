@@ -9,6 +9,7 @@ import org.jeecg.modules.pay.entity.BaiyitongParam;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import org.jeecg.modules.pay.entity.UserBusinessEntity;
 import org.jeecg.modules.pay.service.IOrderInfoEntityService;
+import org.jeecg.modules.pay.service.IUserBusinessEntityService;
 import org.jeecg.modules.pay.service.requestPayUrl.RequestPayUrl;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.service.ISysUserService;
@@ -18,6 +19,7 @@ import org.jeecg.modules.util.HttpUtils;
 import org.jeecg.modules.util.R;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
@@ -36,7 +38,6 @@ import java.util.*;
 @Service
 @Slf4j
 public class BaiyitongWechatPayImpl implements RequestPayUrl<OrderInfoEntity, String, String, String,String, UserBusinessEntity,Object> {
-    private static final String MD5_KEY="Pd3y8WTAJjacGlg6mxr3d3MYn57Vqyzq";
     @Autowired
     private RedisUtil redisUtil;
     @Autowired
@@ -46,7 +47,7 @@ public class BaiyitongWechatPayImpl implements RequestPayUrl<OrderInfoEntity, St
     @Override
     public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key, String callbackUrl,
                            UserBusinessEntity userBusiness) throws Exception {
-        BaiyitongParam param = valueOf(order,userBusiness.getBusinessCode(),callbackUrl);
+        BaiyitongParam param = valueOf(order,userBusiness.getBusinessCode(),callbackUrl,userBusiness.getApiKey());
         String json = JSON.toJSONString(param);
         Map<String,Object> mapTypes = JSON.parseObject(json);
         log.info("===>请求百易通，获取支付链接，请求入参为：{}",json);
@@ -84,7 +85,8 @@ public class BaiyitongWechatPayImpl implements RequestPayUrl<OrderInfoEntity, St
     public boolean notifyOrderFinish(OrderInfoEntity order, String key, UserBusinessEntity userBusiness, String url) throws Exception {
         return false;
     }
-
+    @Autowired
+    private IUserBusinessEntityService businessEntityService;
     @Override
     public Object callBack(Object object) throws Exception {
         Map<String, Object> map = (Map<String, Object>) object;
@@ -98,21 +100,27 @@ public class BaiyitongWechatPayImpl implements RequestPayUrl<OrderInfoEntity, St
         params1.put("error_url",map.get("error_url"));
         params1.put("out_trade_no",map.get("out_trade_no"));
         params1.put("amount",map.get("amount"));
-        log.info("===>百易通回调，订单号：{},服务端sign串为：{}",orderId,params1);
-        String sign=signForInspiry(params1,MD5_KEY);
-        log.info("===>百易通回调，订单号：{},服务端sign为：{}",orderId,sign);
-        if(!sign.equals(map.get("sign"))){
-            log.info("===>百易通回调,签名验证不通过，入参的签名为：{},本地签名为：{}",map.get("sign").toString(),sign);
-            return "签名验证失败";
-        }
         OrderInfoEntity order = orderInfoEntityService.queryOrderInfoByOrderId(orderId);
         if(order == null){
             log.info("===>百易通回调，根据订单号：{}，查询不到订单信息",orderId);
             return "订单不存在";
         }
-        order.setStatus(BaseConstant.ORDER_STATUS_SUCCESS_NOT_RETURN);
         SysUser user = userService.getUserByName(order.getUserName());
+        log.info("===>百易通回调，订单号：{},服务端sign串为：{}",orderId,params1);
         String payType = (String) map.get("out_uid");
+        List<UserBusinessEntity> useBusinesses =
+                businessEntityService.queryBusinessCodeByUserName(user.getAgentUsername(), payType);
+        if(CollectionUtils.isEmpty(useBusinesses)){
+            log.info("===>百易通回调，根据订单号：{}，查询不到代理信息",orderId);
+            return "代理不存在";
+        }
+        String sign=signForInspiry(params1,useBusinesses.get(0).getApiKey());
+        log.info("===>百易通回调，订单号：{},服务端sign为：{}",orderId,sign);
+        if(!sign.equals(map.get("sign"))){
+            log.info("===>百易通回调,签名验证不通过，入参的签名为：{},本地签名为：{}",map.get("sign").toString(),sign);
+            return "签名验证失败";
+        }
+        order.setStatus(BaseConstant.ORDER_STATUS_SUCCESS_NOT_RETURN);
         R r = orderInfoEntityService.notifyCustomer(order,user,payType);
         if("0".equals(r.get("code"))){
             log.info("==>百易通回调四方结束，返回信付为success，订单号为：{}",orderId);
@@ -123,7 +131,7 @@ public class BaiyitongWechatPayImpl implements RequestPayUrl<OrderInfoEntity, St
         }
     }
 
-    private BaiyitongParam valueOf(OrderInfoEntity order,String businessCode,String callBackUrl){
+    private BaiyitongParam valueOf(OrderInfoEntity order,String businessCode,String callBackUrl,String apiKey){
         BaiyitongParam param = new BaiyitongParam();
         param.setReturn_type("app");
         param.setAppid(businessCode);
@@ -143,7 +151,7 @@ public class BaiyitongWechatPayImpl implements RequestPayUrl<OrderInfoEntity, St
         map.put("callback_url",param.getCallback_url());
         map.put("out_trade_no",param.getOut_trade_no());
         map.put("version","v1.1");
-        param.setSign(signForInspiry(map,MD5_KEY));
+        param.setSign(signForInspiry(map,apiKey));
         return param;
     }
     /**

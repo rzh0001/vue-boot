@@ -75,7 +75,7 @@ public class BaseConstant {
     public static final String REQUEST_WECHAT_BANK = "wechat_bank";
     //信付-支付宝
     public static final String REQUEST_XINPAY_ALIPAY = "xin_pay_alipay";
-
+    //百易通-微信
     public static final String REQUEST_BAIYITONG_WECHAT = "baiyitong_pay_wechat";
     //四方回调挂马平台的返回码
     public static final int SUCCESS = 200;
