@@ -222,7 +222,11 @@
                 return '农信易扫支付宝'
               } else if (text == 'wechat_bank') {
                 return '微信转卡'
-              }  else {
+              } else if (text == 'xin_pay_alipay') {
+                return '信付-支付宝'
+              }  else if (text == 'baiyitong_pay_wechat') {
+                return '百易通-微信'
+              } else {
                 return text
               }
             }

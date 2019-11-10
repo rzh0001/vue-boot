@@ -5,6 +5,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.jeecg.modules.pay.controller.ApiController;
+import org.jeecg.modules.pay.service.impl.OrderInfoEntityServiceImpl;
 import org.jeecg.modules.util.AES128Util;
 import org.jeecg.modules.util.BareBonesBrowserLaunch;
 import org.jeecg.modules.util.BaseConstant;
@@ -12,6 +13,7 @@ import org.jeecg.modules.util.R;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -33,6 +35,8 @@ public class PayTest {
     @Resource
     private ApiController api;
 
+    @Autowired
+    private OrderInfoEntityServiceImpl order;
     private MockHttpServletRequest request;
     private MockHttpServletResponse response;
 
@@ -99,21 +103,26 @@ public class PayTest {
         R r = api.queryOrder(req);
         System.out.println(r.get("orderInfo").toString());
     }
-
+    @Test
+    public void testAmount() throws Exception {
+        order.countAmount("20190913123844IiNeL","a7_putong","100","ali_bank");
+    }
 
     public static void main(String[] args) {
         BareBonesBrowserLaunch.openURL("http://www.baidu.com");
     }
     @Test
     public void a(){
-        JSONObject data = new JSONObject();
-        data.put(BaseConstant.OUTER_ORDER_ID,"1565944907000abc");
-        data.put(BaseConstant.USER_NAME,"www");
-        data.put(BaseConstant.SUBMIT_AMOUNT,"111");
-        data.put(BaseConstant.PAY_TYPE,"ysf");
-        data.put(BaseConstant.CALLBACK_URL,"http://localhost/api/callback");
-        String dataEn = AES128Util.encryptBase64(data.toJSONString(), "1234123412ABCDEF");
-        System.out.println(dataEn);
+//        JSONObject data = new JSONObject();
+//        data.put(BaseConstant.OUTER_ORDER_ID,"HY19092222008184403");
+//        data.put(BaseConstant.USER_NAME,"hc001");
+//        data.put(BaseConstant.SUBMIT_AMOUNT,"1000.000");
+//        data.put(BaseConstant.PAY_TYPE,"wechat_bank");
+//        data.put(BaseConstant.CALLBACK_URL,"http://localhost:60997/Notify/JinChanPayNotify");
+//        String dataEn = AES128Util.encryptBase64(data.toJSONString(), "5787731c4d684c29");
+       String data = "oOiP7Z8hAXyNifhyg9DX4fiAF4mINZKp6mlb9lpz7k9e04SdPh5rEfZnl5/X+zJJ8tzFfMZHiy7oh//rVyPrJcYIUTPJ4oJCIe2I1zstPI7ck5hZOlaMKjZ4SwRmiM+IIk3H0xTHCQtXIf2ZDiMpNA==";
+        String a = AES128Util.decryptBase64(data, "15525d49bbe64a2c");
+        System.out.println(a);
     }
 
 

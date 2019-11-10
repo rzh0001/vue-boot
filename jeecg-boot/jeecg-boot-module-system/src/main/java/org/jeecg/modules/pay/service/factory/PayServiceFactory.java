@@ -4,6 +4,7 @@ import org.jeecg.common.system.vo.DictModel;
 import org.jeecg.modules.pay.service.impl.OrderInfoEntityServiceImpl;
 import org.jeecg.modules.pay.service.requestPayUrl.RequestPayUrl;
 import org.jeecg.modules.pay.service.requestPayUrl.impl.AliPayImpl;
+import org.jeecg.modules.pay.service.requestPayUrl.impl.BaiyitongWechatPayImpl;
 import org.jeecg.modules.pay.service.requestPayUrl.impl.XinPayImpl;
 import org.jeecg.modules.pay.service.requestPayUrl.impl.YsfPayImpl;
 import org.jeecg.modules.system.service.ISysDictService;
@@ -35,6 +36,8 @@ public class PayServiceFactory {
      */
     private static String xinPayAliPay = null;
 
+    private static String baiyitongPayWxPay = null;
+
     @PostConstruct
     public void init() {
         factory = this;
@@ -62,6 +65,9 @@ public class PayServiceFactory {
             if (BaseConstant.REQUEST_XINPAY_ALIPAY.equals(dict.getText())) {
                 xinPayAliPay = dict.getValue();
             }
+            if (BaseConstant.REQUEST_BAIYITONG_WECHAT.equals(dict.getText())) {
+                baiyitongPayWxPay = dict.getValue();
+            }
         }
 
     }
@@ -80,6 +86,8 @@ public class PayServiceFactory {
                 return wechatBank;
             case BaseConstant.REQUEST_XINPAY_ALIPAY:
                 return xinPayAliPay;
+            case BaseConstant.REQUEST_BAIYITONG_WECHAT:
+                return baiyitongPayWxPay;
             default:
                 return null;
         }
@@ -97,6 +105,8 @@ public class PayServiceFactory {
                 return applicationContext.getBean(AliPayImpl.class);
             case BaseConstant.REQUEST_XINPAY_ALIPAY:
                 return applicationContext.getBean(XinPayImpl.class);
+            case BaseConstant.REQUEST_BAIYITONG_WECHAT:
+                return applicationContext.getBean(BaiyitongWechatPayImpl.class);
             default:
                 return null;
         }
