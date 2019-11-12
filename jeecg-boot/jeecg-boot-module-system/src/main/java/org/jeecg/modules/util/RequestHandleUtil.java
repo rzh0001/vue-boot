@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.net.URLDecoder;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -47,22 +48,23 @@ public class RequestHandleUtil {
         return (Map<String, Object>) paramsToMap(param, METHOD_GET);
     }
 
-    private static JSONObject doPost(HttpServletRequest req) {
+    public static JSONObject doPost(HttpServletRequest req) {
         String contentType = req.getContentType();
         log.info("====>post请求的contentType为：{}", contentType);
         StringBuilder sb = new StringBuilder();
         try {
-            BufferedReader br = new BufferedReader(new InputStreamReader(req.getInputStream(), "UTF-8"));
-            String line = null;
-            while ((line = br.readLine()) != null) {
-                sb.append(line);
-            }
-            log.info("====>回调的入参为：{}", sb.toString());
-            if (contentType.contains(CONTENT_TYPE_JSON)) {
+            if (contentType.contains(CONTENT_TYPE_JSON)){
+                BufferedReader br = new BufferedReader(new InputStreamReader(req.getInputStream(), "UTF-8"));
+                String line = null;
+                while ((line = br.readLine()) != null) {
+                    sb.append(line);
+                }
+                log.info("====>回调的入参为：{}", sb.toString());
                 return (JSONObject) paramsToMap(sb.toString(), METHOD_POST);
-            } else if (contentType.contains(CONTENT_TYPE_FORM)) {
-                return (JSONObject) paramsToMap(sb.toString(), METHOD_GET);
-            } else {
+            }else if(contentType.contains(CONTENT_TYPE_FORM)){
+                Map<String, String[]> map = req.getParameterMap();
+                return valueOf(map);
+            }else{
                 log.info("====>post请求的contentType为：{}", contentType);
             }
         } catch (IOException e) {
@@ -70,7 +72,20 @@ public class RequestHandleUtil {
         }
         return null;
     }
-
+    private static JSONObject valueOf(Map<String, String[]> map){
+        Map<String,String> param = new HashMap<>();
+        for (Map.Entry<String, String[]> entry : map.entrySet()){
+            String[] values = entry.getValue();
+            String value = null;
+            if(values != null && values.length>=1){
+                value = values[0];
+            }
+            param.put(entry.getKey(),value);
+        }
+        log.info("====>回调的入参为：{}", param);
+        JSONObject jsonObject = JSONObject.parseObject(JSON.toJSONString(param));
+        return jsonObject;
+    }
     /**
      * post:{"data":"GYu8TUt8u/GUJA7irzFyKiwMb8Hj7a8L59ZFY+SV6A95Dk3TCBGSRn6AvrAGhz2m8JhFPGaM9+OaGWCYQEC3mg==","sign":"b8a76e35ec18df01ee9936b9fe27bdd9","timestamp":1572167429525,"username":"www"}
      * get:orderId=123456&&status=1

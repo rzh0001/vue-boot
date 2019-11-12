@@ -101,4 +101,9 @@ public class ApiController {
         result.put("msg", "success");
         return result.toJSONString();
     }
+    @PostMapping("/test")
+    @ResponseBody
+    public void test(){
+        RequestHandleUtil.doPost(((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest());
+    }
 }

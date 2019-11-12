@@ -100,6 +100,8 @@ public class BaiyitongWechatPayImpl implements RequestPayUrl<OrderInfoEntity, St
         params1.put("error_url",map.get("error_url"));
         params1.put("out_trade_no",map.get("out_trade_no"));
         params1.put("amount",map.get("amount"));
+        params1.put("out_uid",map.get("out_uid"));
+        params1.put("amount_true",map.get("amount_true"));
         OrderInfoEntity order = orderInfoEntityService.queryOrderInfoByOrderId(orderId);
         if(order == null){
             log.info("===>百易通回调，根据订单号：{}，查询不到订单信息",orderId);
