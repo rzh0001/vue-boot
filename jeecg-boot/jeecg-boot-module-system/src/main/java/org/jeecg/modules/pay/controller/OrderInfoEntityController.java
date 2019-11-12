@@ -306,24 +306,21 @@ public class OrderInfoEntityController {
             //手动补单，密钥取订单中用户的密钥
             LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
             SysUser sysUser = userService.getUserByName(loginUser.getUsername());
-            log.info("==》补单操作==补单操作人：{}；单号为：{}", sysUser.getUsername(), id);
+            log.info("==》手动补单操作==补单操作人：{}；单号为：{}", sysUser.getUsername(), id);
             if (order.getStatus() == BaseConstant.ORDER_STATUS_SUCCESS) {
                 return R.error("订单状态是已成功状态，不能补单");
             }
             if (order == null) {
                 return R.error("订单不存在");
             }
-            if(!orderInfoEntityService.notifyOrderFinish(id,order.getPayType())){
-                return R.error("通知挂马平台失败，请联系管理员");
-            }
             order.setReplacementOrder("1");
             orderInfoEntityService.updateById(order);
             StringBuilder msg = new StringBuilder();
             SysUser orderUser = userService.getUserByName(order.getUserName());
             JSONObject callobj = orderInfoEntityService.encryptAESData(order, orderUser.getApiKey());
-            log.info("===补单回调商户，url:{},param:{}", order.getSuccessCallbackUrl(), callobj.toJSONString());
+            log.info("===手动补单回调商户，url:{},param:{}", order.getSuccessCallbackUrl(), callobj.toJSONString());
             HttpResult result = HttpUtils.doPostJson(order.getSuccessCallbackUrl(), callobj.toJSONString());
-            log.info("===补单商户返回信息=={}", result.getBody());
+            log.info("===手动补单商户返回信息=={}", result.getBody());
             if (result.getCode() == BaseConstant.SUCCESS) {
                 CallBackResult callBackResult = JSONObject.parseObject(result.getBody(), CallBackResult.class);
                 if (callBackResult.getCode() == BaseConstant.SUCCESS) {
@@ -360,5 +357,36 @@ public class OrderInfoEntityController {
         }
     }
 
+    /**
+     * 线下补单
+     * 线下补单：不通知商户
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "/offline", method = RequestMethod.GET)
+    public R offline(@RequestParam(name = "id") String id) {
+        OrderInfoEntity order = orderInfoEntityService.queryOrderInfoByOrderId(id);
+        LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+        SysUser sysUser = userService.getUserByName(loginUser.getUsername());
+        log.info("==》线下补单操作==补单操作人：{}；单号为：{}", sysUser.getUsername(), id);
+        if (order.getStatus() == BaseConstant.ORDER_STATUS_SUCCESS) {
+            return R.error("订单状态是已成功状态，不能补单");
+        }
+        if (order == null) {
+            return R.error("订单不存在");
+        }
+        //状态更新为成功，已返回
+        order.setStatus(BaseConstant.ORDER_STATUS_SUCCESS);
+        order.setReplacementOrder("1");
+        orderInfoEntityService.updateById(order);
+        try{
+            orderInfoEntityService.countAmount(id, order.getUserName(), order.getSubmitAmount().toString(),
+                    order.getPayType());
+            return R.ok("线下补单成功:"+id);
+        }catch (Exception e){
+            log.info("线下补单失败，单号为：{}，失败原因为：{}",id,e);
+        }
+        return R.error("线下补单失败："+id);
+    }
 
 }

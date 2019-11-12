@@ -106,8 +106,13 @@
             <a class="ant-dropdown-link">更多 <a-icon type="down"/></a>
             <a-menu slot="overlay">
               <a-menu-item>
-                <a-popconfirm title="确定补单吗?" @confirm="() => againRequest(record.orderId)">
-                  <a>补单</a>
+                <a-popconfirm title="确定手动补单吗?手动补单会重新通知商户" @confirm="() => againRequest(record.orderId)">
+                  <a>手动补单</a>
+                </a-popconfirm>
+              </a-menu-item>
+              <a-menu-item>
+                <a-popconfirm title="线下补单不通知商户，直接进行统计" @confirm="() => offline(record.orderId)">
+                  <a>线下补单</a>
                 </a-popconfirm>
               </a-menu-item>
             </a-menu>
@@ -205,6 +210,19 @@
             }
           },
           {
+            title: '是否补单',
+            align: 'center',
+            dataIndex: 'replacementOrder',
+            key: 'replacementOrder',
+            customRender: function(text) {
+              if (text == 1) {
+                return <a-tag color="red">是</a-tag>
+              } else {
+                return <a-tag color="cyan">否</a-tag>
+              }
+            }
+          },
+          {
             title: '支付通道',
             align: 'center',
             dataIndex: 'payType',
@@ -267,7 +285,8 @@
           importExcelUrl: 'pay/orderInfoEntity/importExcel',
           againRequest: 'pay/orderInfoEntity/againRequest',
           channel: '/pay/channelEntity/channel',
-          summaryUrl: '/pay/orderInfoEntity/summary'
+          summaryUrl: '/pay/orderInfoEntity/summary',
+          offline: 'pay/orderInfoEntity/offline',
 
         }
       }
@@ -288,6 +307,11 @@
     methods: {
       againRequest(orderId) {
         getAction(this.url.againRequest, { id: orderId }).then((res) => {
+          alert(res.msg)
+      })
+      },
+      offline(orderId) {
+        getAction(this.url.offline, { id: orderId }).then((res) => {
           alert(res.msg)
       })
       },
