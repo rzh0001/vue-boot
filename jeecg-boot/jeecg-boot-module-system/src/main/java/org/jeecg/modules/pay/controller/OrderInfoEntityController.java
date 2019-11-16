@@ -307,11 +307,11 @@ public class OrderInfoEntityController {
             LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
             SysUser sysUser = userService.getUserByName(loginUser.getUsername());
             log.info("==》手动补单操作==补单操作人：{}；单号为：{}", sysUser.getUsername(), id);
-            if (order.getStatus() == BaseConstant.ORDER_STATUS_SUCCESS) {
-                return R.error("订单状态是已成功状态，不能补单");
-            }
             if (order == null) {
                 return R.error("订单不存在");
+            }
+            if (order.getStatus() != BaseConstant.ORDER_STATUS_SUCCESS_NOT_RETURN) {
+                return R.error("订单状态不是‘成功未返回’，不能补单");
             }
             order.setReplacementOrder("1");
             orderInfoEntityService.updateById(order);
@@ -369,11 +369,11 @@ public class OrderInfoEntityController {
         LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
         SysUser sysUser = userService.getUserByName(loginUser.getUsername());
         log.info("==》线下补单操作==补单操作人：{}；单号为：{}", sysUser.getUsername(), id);
-        if (order.getStatus() == BaseConstant.ORDER_STATUS_SUCCESS) {
-            return R.error("订单状态是已成功状态，不能补单");
-        }
         if (order == null) {
             return R.error("订单不存在");
+        }
+        if (order.getStatus() != BaseConstant.ORDER_STATUS_SUCCESS_NOT_RETURN) {
+            return R.error("订单状态不是‘成功未返回’，不能补单");
         }
         //状态更新为成功，已返回
         order.setStatus(BaseConstant.ORDER_STATUS_SUCCESS);
