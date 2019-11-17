@@ -24,14 +24,6 @@ public class ApiController {
     @PostMapping(value = "/order", produces = "application/json;charset=UTF-8")
     @ResponseBody
     public CommonResponseBody createPayOrder(@Valid @RequestBody CommonRequestBody req) {
-
-//        RequestParam param = JSON.toJavaObject(req, RequestParam.class);
-        
-        // 检查商户、代理状态
-        
-        String data = req.getData();
-        
-        apiService.createOrder(req);
         
         return apiService.createOrder(req);
         

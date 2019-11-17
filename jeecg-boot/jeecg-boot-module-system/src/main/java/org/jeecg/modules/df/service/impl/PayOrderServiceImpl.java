@@ -105,11 +105,11 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
     
     @Override
     public PayOrderResult apiOrder(PayOrder order) {
-
-//        int count = baseMapper.count(order.getUserId(), order.getOuterOrderId());
-//        if (count > 0) {
-//            throw new ApiException(1005, "订单号重复");
-//        }
+    
+        int count = baseMapper.count(order.getUserId(), order.getOuterOrderId());
+        if (count > 0) {
+            throw new ApiException(1005, "订单号重复");
+        }
         
         // 检查代付额度
         BigDecimal userAmount = userAmountService.getUserAmount(order.getUserId());
