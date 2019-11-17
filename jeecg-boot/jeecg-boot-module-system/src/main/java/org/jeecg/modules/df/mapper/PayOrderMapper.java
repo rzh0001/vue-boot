@@ -15,4 +15,7 @@ public interface PayOrderMapper extends BaseMapper<PayOrder> {
     
     @Select("select count(*) from df_pay_order where user_id = #{userId} and outer_order_id = #{outerOrderId}")
     int count(@Param("userId") String userId, @Param("outerOrderId") String outerOrderId);
+    
+    @Select("select *from df_pay_order where outer_order_id = #{outerOrderId}")
+    PayOrder getByOuterOrderId(@Param("outerOrderId") String outerOrderId);
 }

@@ -145,4 +145,9 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
         
         return baseMapper.count(userId, outerOrderId);
     }
+    
+    @Override
+    public PayOrder getByOuterOrderId(String outerOrderId) {
+        return baseMapper.getByOuterOrderId(outerOrderId);
+    }
 }

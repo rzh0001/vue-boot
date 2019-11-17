@@ -15,4 +15,10 @@ public interface IApiService {
      * @return bool
      */
     CommonResponseBody createOrder(CommonRequestBody req);
+    
+    CommonResponseBody queryOrder(CommonRequestBody req);
+    
+    CommonResponseBody callback(String orderId);
+    
+    
 }

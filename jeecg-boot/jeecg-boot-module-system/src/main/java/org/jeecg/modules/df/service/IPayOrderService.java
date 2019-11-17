@@ -38,4 +38,6 @@ public interface IPayOrderService extends IService<PayOrder> {
     PayOrderResult apiOrder(PayOrder order);
     
     int count(String userId, String outerOrderId);
+    
+    PayOrder getByOuterOrderId(String outerOrderId);
 }

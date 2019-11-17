@@ -21,11 +21,21 @@ public class ApiController {
     private IApiService apiService;
     
     
-    @PostMapping(value = "/order", produces = "application/json;charset=UTF-8")
+    @PostMapping(value = "/order/create", produces = "application/json;charset=UTF-8")
     @ResponseBody
     public CommonResponseBody createPayOrder(@Valid @RequestBody CommonRequestBody req) {
         
         return apiService.createOrder(req);
         
     }
+    
+    @PostMapping(value = "/order/query", produces = "application/json;charset=UTF-8")
+    @ResponseBody
+    public CommonResponseBody query(@Valid @RequestBody CommonRequestBody req) {
+        
+        return apiService.queryOrder(req);
+        
+    }
+    
+    
 }

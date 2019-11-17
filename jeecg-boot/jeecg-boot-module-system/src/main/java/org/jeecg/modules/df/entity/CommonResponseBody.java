@@ -1,5 +1,6 @@
 package org.jeecg.modules.df.entity;
 
+import com.alibaba.fastjson.JSON;
 import lombok.Data;
 
 /**
@@ -33,4 +34,9 @@ public class CommonResponseBody {
         body.setMsg(msg);
         return body;
     }
+    
+    public String toJsonString() {
+        return JSON.toJSONString(this);
+    }
+    
 }
