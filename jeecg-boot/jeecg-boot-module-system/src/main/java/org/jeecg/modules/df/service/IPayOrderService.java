@@ -2,6 +2,7 @@ package org.jeecg.modules.df.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.jeecg.modules.df.entity.PayOrder;
+import org.jeecg.modules.df.entity.PayOrderResult;
 
 /**
  * @Description: 1
@@ -33,4 +34,8 @@ public interface IPayOrderService extends IService<PayOrder> {
      * @return
      */
     boolean rejected(PayOrder order);
+    
+    PayOrderResult apiOrder(PayOrder order);
+    
+    int count(String userId, String outerOrderId);
 }

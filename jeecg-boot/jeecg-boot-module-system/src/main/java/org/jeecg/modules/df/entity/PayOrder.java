@@ -1,19 +1,16 @@
 package org.jeecg.modules.df.entity;
 
-import java.io.Serializable;
-import java.util.Date;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.TableField;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.jeecgframework.poi.excel.annotation.Excel;
+import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  * @Description: 1
@@ -96,6 +93,12 @@ public class PayOrder {
 	@Excel(name = "开户行全称", width = 15)
     @ApiModelProperty(value = "开户行全称")
 	private java.lang.String branchName;
+	/**
+	 * 银行编码，对公必填;支付宝对公不 填写;
+	 */
+	@Excel(name = "银行编码，对公必填;支付宝对公不 填写;", width = 15)
+	@ApiModelProperty(value = "银行编码，对公必填;支付宝对公不 填写;")
+	private java.lang.String bankCode;
 	/**订单状态：0-待处理;1-已接单;2-已打款;3-审核拒绝*/
 	@Excel(name = "订单状态：0-待处理;1-已接单;2-已打款;3-审核拒绝", width = 15)
     @ApiModelProperty(value = "订单状态：0-待处理;1-已接单;2-已打款;3-审核拒绝")
@@ -104,6 +107,12 @@ public class PayOrder {
 	@Excel(name = "备注", width = 15)
     @ApiModelProperty(value = "备注")
 	private java.lang.String remark;
+	/**
+	 * 回调地址
+	 */
+	@Excel(name = "回调地址", width = 15)
+	@ApiModelProperty(value = "回调地址")
+	private java.lang.String callbackUrl;
 	/**成功时间*/
 	@Excel(name = "成功时间", width = 20, format = "yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
