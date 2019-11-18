@@ -23,7 +23,7 @@
       <a-form :form="form">
 
         <a-form-item label="用户账号" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input placeholder="请输入用户账号" v-decorator="[ 'username', validatorRules.username]" :readOnly="!!model.id"/>
+          <a-input placeholder="请输入用户账号" disabled v-decorator="[ 'username', validatorRules.username]" :readOnly="!!model.id"/>
         </a-form-item>
 
         <template v-if="!model.id">
@@ -65,6 +65,17 @@
           <a-input placeholder="" :disabled="isDisabledAuth('user:form:apiKey')"
                    v-decorator="[ 'apiKey']" disabled/>
         </a-form-item>
+        <a-form-item v-if="model.memberType == 3" label="订单单笔手续费" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input-number placeholder="" :disabled="isDisabledAuth('user:form:orderFixedFee')"
+                          v-decorator="[ 'orderFixedFee']"
+                          min="0.01"/>
+        </a-form-item>
+        <a-form-item v-if="model.memberType == 3" label="交易手续费率" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input-number placeholder="" :disabled="isDisabledAuth('user:form:transactionFeeRate')"
+                          v-decorator="[ 'transactionFeeRate']"
+                          min="0.0001"/>
+        </a-form-item>
+
 
         <!--部门分配-->
         <!--        <a-form-item label="部门分配" :labelCol="labelCol" :wrapperCol="wrapperCol" v-show="!departDisabled">-->
@@ -119,19 +130,19 @@
         <!--        </a-form-item>-->
 
 
-        <a-form-item v-if="model.memberType == 1 || model.memberType == 3" label="单笔金额限制" :labelCol="labelCol"
-                     :wrapperCol="wrapperCol">
-          <a-input-group compact>
-            <a-input-number placeholder="下限" :disabled="isDisabledAuth('user:form:lowerLimit')"
-                            v-decorator="[ 'lowerLimit']" style="width: 30%;text-align: center"
-                            :min="0.01"/>
-            <a-input placeholder="~" disabled
-                     style="width: 30px; border-left: 0px; pointer-events: none;background-color: #fff"/>
-            <a-input-number placeholder="上限" :disabled="isDisabledAuth('user:form:upperLimit')"
-                            v-decorator="[ 'upperLimit']" style="width: 30%; border-left: 0px;text-align: center"
-                            :min="0.01"/>
-          </a-input-group>
-        </a-form-item>
+<!--        <a-form-item v-if="model.memberType == 1 || model.memberType == 3" label="单笔金额限制" :labelCol="labelCol"-->
+<!--                     :wrapperCol="wrapperCol">-->
+<!--          <a-input-group compact>-->
+<!--            <a-input-number placeholder="下限" :disabled="isDisabledAuth('user:form:lowerLimit')"-->
+<!--                            v-decorator="[ 'lowerLimit']" style="width: 30%;text-align: center"-->
+<!--                            :min="0.01"/>-->
+<!--            <a-input placeholder="~" disabled-->
+<!--                     style="width: 30px; border-left: 0px; pointer-events: none;background-color: #fff"/>-->
+<!--            <a-input-number placeholder="上限" :disabled="isDisabledAuth('user:form:upperLimit')"-->
+<!--                            v-decorator="[ 'upperLimit']" style="width: 30%; border-left: 0px;text-align: center"-->
+<!--                            :min="0.01"/>-->
+<!--          </a-input-group>-->
+<!--        </a-form-item>-->
 
         <a-form-item v-if="model.memberType == 3 && !model.salesmanId" label="所属介绍人" :labelCol="labelCol"
                      :wrapperCol="wrapperCol">
@@ -371,6 +382,7 @@
         that.model = Object.assign({}, record)
         that.$nextTick(() => {
           let filedsVal = pick(this.model, 'username', 'realname', 'sex', 'email', 'phone', 'apiKey', 'memberType',
+            'orderFixedFee','transactionFeeRate',
             'upperLimit', 'lowerLimit', 'agentUsername', 'agentRealname', 'salesmanUsername', 'salesmanRealname', 'activitiSync')
 
           that.form.setFieldsValue(filedsVal)
