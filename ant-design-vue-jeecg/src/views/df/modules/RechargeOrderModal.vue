@@ -26,7 +26,7 @@
           <a-input placeholder="请输入银行卡ID" v-decorator="['bankcardId', validatorRules.bankcardId ]" />
         </a-form-item>
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="账户类型">
-          <a-select v-decorator="['accountType', {}]" placeholder="" disabled="disabled">
+          <a-select v-decorator="['accountType', {initailValue:1}]" placeholder="" disabled="disabled">
             <a-select-option value="1">对私</a-select-option>
             <a-select-option value="2">对公</a-select-option>
           </a-select>
@@ -45,6 +45,9 @@
         </a-form-item>
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="充值金额">
           <a-input-number v-decorator="[ 'amount', validatorRules.amount]" :min="0"/>
+        </a-form-item>
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="付款人">
+          <a-input placeholder="请输入付款人，才能自动回调" v-decorator="['payer', {}]" />
         </a-form-item>
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="备注">
           <a-input placeholder="请输入备注" v-decorator="['remark', {}]" />

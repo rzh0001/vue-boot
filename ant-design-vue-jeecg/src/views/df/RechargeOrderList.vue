@@ -223,6 +223,11 @@
             dataIndex: 'branchName'
           },
           {
+            title: '付款人',
+            align: 'center',
+            dataIndex: 'payer'
+          },
+          {
             title: '备注',
             align: 'center',
             dataIndex: 'remark'

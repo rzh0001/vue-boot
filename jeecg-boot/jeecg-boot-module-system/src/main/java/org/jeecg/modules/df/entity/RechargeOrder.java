@@ -1,19 +1,16 @@
 package org.jeecg.modules.df.entity;
 
-import java.io.Serializable;
-import java.util.Date;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.TableField;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.jeecgframework.poi.excel.annotation.Excel;
+import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  * @Description: 代付充值订单
@@ -146,4 +143,10 @@ public class RechargeOrder {
 	@Excel(name = "操作IP", width = 15)
     @ApiModelProperty(value = "操作IP")
 	private java.lang.String ip;
+	/**
+	 * 付款人
+	 */
+	@Excel(name = "付款人", width = 15)
+	@ApiModelProperty(value = "付款人")
+	private java.lang.String payer;
 }
