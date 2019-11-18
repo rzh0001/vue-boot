@@ -40,7 +40,7 @@ public class ApiServiceImpl implements IApiService {
     
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public CommonResponseBody createOrder(CommonRequestBody req) {
+    public CommonResponseBody createOrder(ApiRequestBody req) {
         
         // 检查商户状态
         SysUser user = userService.getUserByName(req.getUsername());
@@ -83,7 +83,7 @@ public class ApiServiceImpl implements IApiService {
     }
     
     @Override
-    public CommonResponseBody queryOrder(CommonRequestBody req) {
+    public CommonResponseBody queryOrder(ApiRequestBody req) {
         // 检查商户状态
         SysUser user = userService.getUserByName(req.getUsername());
         if (BeanUtil.isEmpty(user)) {

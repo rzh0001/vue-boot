@@ -1,7 +1,7 @@
 package org.jeecg.test;
 
 import cn.hutool.http.HttpUtil;
-import org.jeecg.modules.df.entity.CommonRequestBody;
+import org.jeecg.modules.df.entity.ApiRequestBody;
 import org.jeecg.modules.df.entity.PayOrderData;
 import org.jeecg.modules.df.entity.QueryOrderData;
 
@@ -29,8 +29,8 @@ public class ApiTest {
         data.setBankCode("31211212211");
         
         String apiKey = "53e6f5cc060a4adf";
-        
-        CommonRequestBody req = new CommonRequestBody();
+    
+        ApiRequestBody req = new ApiRequestBody();
         req.setUsername("shanghu");
         req.setTimestamp(System.currentTimeMillis());
         req.setData(data.encodeData(apiKey));

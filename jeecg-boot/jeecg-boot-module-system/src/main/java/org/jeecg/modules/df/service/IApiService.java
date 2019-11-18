@@ -1,6 +1,6 @@
 package org.jeecg.modules.df.service;
 
-import org.jeecg.modules.df.entity.CommonRequestBody;
+import org.jeecg.modules.df.entity.ApiRequestBody;
 import org.jeecg.modules.df.entity.CommonResponseBody;
 
 /**
@@ -14,9 +14,9 @@ public interface IApiService {
      * @param req
      * @return bool
      */
-    CommonResponseBody createOrder(CommonRequestBody req);
+    CommonResponseBody createOrder(ApiRequestBody req);
     
-    CommonResponseBody queryOrder(CommonRequestBody req);
+    CommonResponseBody queryOrder(ApiRequestBody req);
     
     CommonResponseBody callback(String orderId);
     

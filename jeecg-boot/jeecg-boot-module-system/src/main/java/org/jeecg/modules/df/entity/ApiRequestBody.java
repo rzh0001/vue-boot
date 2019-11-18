@@ -15,14 +15,14 @@ import javax.validation.constraints.NotBlank;
  */
 @Data
 @Slf4j
-public class CommonRequestBody {
+public class ApiRequestBody {
     @NotBlank(message = "用户帐号不能为空")
     private String username;
     private String data;
     private Long timestamp;
     private String sign;
     
-    public CommonRequestBody() {
+    public ApiRequestBody() {
     }
     
     /**
