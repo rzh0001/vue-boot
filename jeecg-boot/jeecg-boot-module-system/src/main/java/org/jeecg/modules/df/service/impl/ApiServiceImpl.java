@@ -2,6 +2,7 @@ package org.jeecg.modules.df.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.http.HttpUtil;
+import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.constant.CommonConstant;
@@ -18,8 +19,6 @@ import org.jeecg.modules.system.service.IUserAmountEntityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
 
 /**
  * @author ruanzh
@@ -67,13 +66,8 @@ public class ApiServiceImpl implements IApiService {
         String data = req.decodeData(user.getApiKey());
         cn.hutool.json.JSONObject jsonObject = JSONUtil.parseObj(data);
         PayOrderData payOrderData = jsonObject.toBean(PayOrderData.class);
-        
-        // 检查余额
-        BigDecimal userAmount = amountService.getUserAmount(user.getId());
-        if (payOrderData.getAmount().compareTo(userAmount) > 0) {
-            throw new ApiException(1004, "余额不足，当前余额[" + userAmount + "]");
-        }
-        
+    
+    
         // 检查订单信息
         
         PayOrder order = payOrderData.toPayOrder(user);
@@ -123,7 +117,7 @@ public class ApiServiceImpl implements IApiService {
     }
     
     @Override
-    public ApiResponseBody callback(String orderId) {
+    public boolean callback(String orderId) {
         PayOrder order = payOrderService.getById(orderId);
         if (!order.getStatus().equals("2") && !order.getStatus().equals("3")) {
             throw new RRException("订单未完结，不允许回调");
@@ -132,11 +126,21 @@ public class ApiServiceImpl implements IApiService {
         SysUser user = userService.getById(order.getUserId());
         
         PayOrderResult result = PayOrderResult.fromPayOrder(order);
-        ApiResponseBody body = new ApiResponseBody();
+        CallbackBody body = new CallbackBody();
+        body.setUsername(user.getUsername());
+        body.setTimestamp(System.currentTimeMillis());
         body.setData(result.encodeData(user.getApiKey()));
+        body.setSign(body.sign(user.getApiKey()));
         
         String post = HttpUtil.post(order.getCallbackUrl(), body.toJsonString());
-        return body;
+        JSONObject jsonObject = JSONUtil.parseObj(post);
+        if (BeanUtil.isEmpty(jsonObject)) {
+            throw new RRException("解析返回数据出错！请联系管理员！");
+        }
+        int code = (int) jsonObject.get("code");
+        order.setCallbackStatus(code == 0 ? "2" : "1");
+        payOrderService.updateById(order);
+        return true;
     }
     
     

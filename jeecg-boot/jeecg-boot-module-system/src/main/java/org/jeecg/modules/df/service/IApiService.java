@@ -18,7 +18,7 @@ public interface IApiService {
     
     ApiResponseBody queryOrder(ApiRequestBody req);
     
-    ApiResponseBody callback(String orderId);
+    boolean callback(String orderId);
     
     
 }

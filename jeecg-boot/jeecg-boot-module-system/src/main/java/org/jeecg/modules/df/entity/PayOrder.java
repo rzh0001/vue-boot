@@ -113,6 +113,12 @@ public class PayOrder {
 	@Excel(name = "回调地址", width = 15)
 	@ApiModelProperty(value = "回调地址")
 	private java.lang.String callbackUrl;
+	/**
+	 * 回调状态
+	 */
+	@Excel(name = "回调状态", width = 15)
+	@ApiModelProperty(value = "回调状态")
+	private java.lang.String callbackStatus;
 	/**成功时间*/
 	@Excel(name = "成功时间", width = 20, format = "yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")

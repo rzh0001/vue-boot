@@ -24,6 +24,7 @@
                 <a-select-option value="2">充值</a-select-option>
                 <a-select-option value="3">冲正</a-select-option>
                 <a-select-option value="5">代付</a-select-option>
+                <a-select-option value="6">手续费</a-select-option>
               </a-select>
             </a-form-item>
           </a-col>
@@ -168,6 +169,8 @@
                 return '手工调账'
               }  else if (text == 5) {
                 return '代付'
+              } else if (text == 6) {
+                return '手续费'
               } else {
                 return text
               }

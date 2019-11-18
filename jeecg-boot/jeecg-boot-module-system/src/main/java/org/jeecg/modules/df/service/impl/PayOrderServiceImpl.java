@@ -40,13 +40,8 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
     @Transactional(rollbackFor = Exception.class)
     public boolean create(PayOrder order) {
         LoginUser ou = (LoginUser) SecurityUtils.getSubject().getPrincipal();
-        
-        // 检查代付额度
-        BigDecimal userAmount = userAmountService.getUserAmount(ou.getId());
-        if (userAmount.compareTo(order.getAmount()) < 0) {
-            throw new RRException("余额不足，请及时充值！");
-        }
-        
+    
+    
         // 获取费率配置
         SysUser user = userService.getById(ou.getId());
         if (BeanUtil.isEmpty(user) || null == user.getTransactionFeeRate() || null == user.getOrderFixedFee()) {
@@ -59,19 +54,25 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
         order.setAgentId(user.getAgentId());
         order.setAgentUsername(user.getAgentUsername());
         order.setAgentRealname(user.getAgentRealname());
-        
+    
         // 生成订单号
         order.setOrderId(IDUtil.genPayOrderId());
         order.setStatus(DfConstant.STATUS_SAVE);
-        
+    
         // 计算手续费
         order.setTransactionFee(order.getAmount().multiply(user.getTransactionFeeRate()).setScale(2, BigDecimal.ROUND_HALF_UP));
         order.setFixedFee(user.getOrderFixedFee());
         order.setOrderFee(order.getTransactionFee().add(order.getFixedFee()));
     
+        // 检查代付额度
+        BigDecimal userAmount = userAmountService.getUserAmount(ou.getId());
+        if (userAmount.compareTo(order.getAmount().add(order.getOrderFee())) < 0) {
+            throw new RRException("余额不足，请及时充值！本订单需扣减[" + order.getAmount().add(order.getOrderFee()) + "]元");
+        }
         // 扣减商户余额
         String remark = "单笔固定手续费：" + order.getFixedFee() + "，交易手续费：" + order.getTransactionFee();
-        userAmountService.changeAmount(user.getId(), order.getAmount().negate(), order.getOrderId(), remark, "5");
+        userAmountService.changeAmount(user.getId(), order.getAmount().negate(), order.getOrderId(), "", "5");
+        userAmountService.changeAmount(user.getId(), order.getOrderFee().negate(), order.getOrderId(), remark, "6");
     
         return save(order);
     }
@@ -101,6 +102,7 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
         // 返还商户额度
         // 生成收入明细
         userAmountService.changeAmount(order.getUserId(), order.getAmount(), order.getOrderId(), order.getRemark(), "3");
+        userAmountService.changeAmount(order.getUserId(), order.getOrderFee(), order.getOrderId(), order.getRemark(), "3");
     
         return false;
     }
@@ -112,30 +114,33 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
         if (count > 0) {
             throw new ApiException(1005, "订单号重复");
         }
-        
-        // 检查代付额度
-        BigDecimal userAmount = userAmountService.getUserAmount(order.getUserId());
-        if (userAmount.compareTo(order.getAmount()) < 0) {
-            throw new ApiException(1004, "余额不足，请及时充值！");
-        }
-        
+    
+    
         // 获取费率配置
         SysUser user = userService.getById(order.getUserId());
         if (BeanUtil.isEmpty(user) || null == user.getTransactionFeeRate() || null == user.getOrderFixedFee()) {
             throw new ApiException(1006, "获取费率配置失败！");
         }
-        
+    
         // 生成订单号
         order.setOrderId(IDUtil.genPayOrderId());
         order.setStatus(DfConstant.STATUS_SAVE);
-        
+        order.setCallbackStatus("0");
+    
         // 计算手续费
         order.setTransactionFee(order.getAmount().multiply(user.getTransactionFeeRate()).setScale(2, BigDecimal.ROUND_HALF_UP));
         order.setFixedFee(user.getOrderFixedFee());
         order.setOrderFee(order.getTransactionFee().add(order.getFixedFee()));
-        
+    
+        // 检查代付额度
+        BigDecimal userAmount = userAmountService.getUserAmount(order.getUserId());
+        if (userAmount.compareTo(order.getAmount().add(order.getOrderFee())) < 0) {
+            throw new ApiException(1004, "余额不足，请及时充值！当前余额[" + userAmount + "]元，本订单需[" + order.getAmount().add(order.getOrderFee()) + "]元");
+        }
         // 扣减商户余额
-        userAmountService.changeAmount(user.getId(), order.getAmount().negate(), order.getOrderId(), "", "5");
+        userAmountService.changeAmount(user.getId(), order.getAmount().negate(), order.getOrderId(), null, "5");
+        String remark = "单笔固定手续费：" + order.getFixedFee() + "，交易手续费：" + order.getTransactionFee();
+        userAmountService.changeAmount(user.getId(), order.getOrderFee().negate(), order.getOrderId(), remark, "6");
         
         save(order);
         PayOrderResult result = PayOrderResult.fromPayOrder(order);
