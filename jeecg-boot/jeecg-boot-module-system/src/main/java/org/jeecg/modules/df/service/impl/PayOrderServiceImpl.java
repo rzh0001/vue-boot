@@ -65,12 +65,13 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
         order.setStatus(DfConstant.STATUS_SAVE);
         
         // 计算手续费
-        order.setTransactionFee(order.getAmount().multiply(user.getTransactionFeeRate()));
+        order.setTransactionFee(order.getAmount().multiply(user.getTransactionFeeRate()).setScale(2, BigDecimal.ROUND_HALF_UP));
         order.setFixedFee(user.getOrderFixedFee());
         order.setOrderFee(order.getTransactionFee().add(order.getFixedFee()));
     
         // 扣减商户余额
-        userAmountService.changeAmount(user.getId(), order.getAmount().negate(), order.getOrderId(), "", "5");
+        String remark = "单笔固定手续费：" + order.getFixedFee() + "，交易手续费：" + order.getTransactionFee();
+        userAmountService.changeAmount(user.getId(), order.getAmount().negate(), order.getOrderId(), remark, "5");
     
         return save(order);
     }
@@ -84,7 +85,8 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
         
         // 增加代理收入
         // 生成收入明细
-        userAmountService.changeAmount(order.getAgentId(), order.getOrderFee(), order.getOrderId(), order.getRemark(), "1");
+        String remark = "单笔固定手续费：" + order.getFixedFee() + "，交易手续费：" + order.getTransactionFee();
+        userAmountService.changeAmount(order.getAgentId(), order.getOrderFee(), order.getOrderId(), remark, "1");
         
         return false;
     }
@@ -128,7 +130,7 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
         order.setStatus(DfConstant.STATUS_SAVE);
         
         // 计算手续费
-        order.setTransactionFee(order.getAmount().multiply(user.getTransactionFeeRate()));
+        order.setTransactionFee(order.getAmount().multiply(user.getTransactionFeeRate()).setScale(2, BigDecimal.ROUND_HALF_UP));
         order.setFixedFee(user.getOrderFixedFee());
         order.setOrderFee(order.getTransactionFee().add(order.getFixedFee()));
         

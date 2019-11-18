@@ -44,7 +44,7 @@
           </a-select>
         </a-form-item>
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="账户类型">
-          <a-select v-decorator="['accountType', {}]" placeholder="" >
+          <a-select v-decorator="['accountType', {initialValue:'1'}]" placeholder="" >
             <a-select-option value="1">对私</a-select-option>
             <a-select-option value="2">对公</a-select-option>
           </a-select>
