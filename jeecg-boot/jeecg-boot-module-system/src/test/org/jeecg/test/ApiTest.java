@@ -21,7 +21,7 @@ public class ApiTest {
         data.setAccountName("王二");
         data.setAccountNo("1231241241");
         data.setProductCode("alipay");
-        data.setBizOrderNo("3333333333333333");
+        data.setBizOrderNo("3333333sss333333333");
         data.setAmount(BigDecimal.TEN);
         data.setCallbackUrl("q3");
         data.setIp("1.1.1.1");

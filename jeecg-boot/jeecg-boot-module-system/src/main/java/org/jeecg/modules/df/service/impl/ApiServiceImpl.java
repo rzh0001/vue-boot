@@ -40,7 +40,7 @@ public class ApiServiceImpl implements IApiService {
     
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public CommonResponseBody createOrder(ApiRequestBody req) {
+    public ApiResponseBody<PayOrderResult> createOrder(ApiRequestBody req) {
         
         // 检查商户状态
         SysUser user = userService.getUserByName(req.getUsername());
@@ -79,11 +79,13 @@ public class ApiServiceImpl implements IApiService {
         PayOrder order = payOrderData.toPayOrder(user);
         PayOrderResult result = payOrderService.apiOrder(order);
         log.info(result.toJsonString());
-        return CommonResponseBody.ok(result.toJsonString());
+        ApiResponseBody resp = ApiResponseBody.ok();
+        resp.setData(result);
+        return resp;
     }
     
     @Override
-    public CommonResponseBody queryOrder(ApiRequestBody req) {
+    public ApiResponseBody queryOrder(ApiRequestBody req) {
         // 检查商户状态
         SysUser user = userService.getUserByName(req.getUsername());
         if (BeanUtil.isEmpty(user)) {
@@ -115,12 +117,13 @@ public class ApiServiceImpl implements IApiService {
             throw new ApiException(1007, "查无此订单[outerOrderId:" + queryOrderData.getBizOrderNo() + "]");
         }
         PayOrderResult result = PayOrderResult.fromPayOrder(order);
-        
-        return CommonResponseBody.ok(result.toJsonString());
+        ApiResponseBody resp = ApiResponseBody.ok();
+        resp.setData(result);
+        return resp;
     }
     
     @Override
-    public CommonResponseBody callback(String orderId) {
+    public ApiResponseBody callback(String orderId) {
         PayOrder order = payOrderService.getById(orderId);
         if (!order.getStatus().equals("2") && !order.getStatus().equals("3")) {
             throw new RRException("订单未完结，不允许回调");
@@ -129,7 +132,7 @@ public class ApiServiceImpl implements IApiService {
         SysUser user = userService.getById(order.getUserId());
         
         PayOrderResult result = PayOrderResult.fromPayOrder(order);
-        CommonResponseBody body = new CommonResponseBody();
+        ApiResponseBody body = new ApiResponseBody();
         body.setData(result.encodeData(user.getApiKey()));
         
         String post = HttpUtil.post(order.getCallbackUrl(), body.toJsonString());
