@@ -825,8 +825,8 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             RequestPayUrl request = null;
             String requestUrl = null;
             if (!isQuery) {
-                request = factory.getPay(dataObj.getString(BaseConstant.PAY_TYPE));
-                requestUrl = factory.getRequestUrl(dataObj.getString(BaseConstant.PAY_TYPE));
+                request = PayServiceFactory.getPay(dataObj.getString(BaseConstant.PAY_TYPE));
+                requestUrl = PayServiceFactory.getRequestUrl(dataObj.getString(BaseConstant.PAY_TYPE));
             }
             if (!createOrder) {
                 return R.ok().put(BaseConstant.ORDER_ID, dataObj.getString(BaseConstant.ORDER_ID))

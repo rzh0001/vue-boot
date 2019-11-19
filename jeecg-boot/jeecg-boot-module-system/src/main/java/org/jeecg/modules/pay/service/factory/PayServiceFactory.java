@@ -1,114 +1,24 @@
 package org.jeecg.modules.pay.service.factory;
 
-import org.jeecg.common.system.vo.DictModel;
-import org.jeecg.modules.pay.service.impl.OrderInfoEntityServiceImpl;
 import org.jeecg.modules.pay.service.requestPayUrl.RequestPayUrl;
-import org.jeecg.modules.pay.service.requestPayUrl.impl.AliPayImpl;
-import org.jeecg.modules.pay.service.requestPayUrl.impl.BaiyitongWechatPayImpl;
-import org.jeecg.modules.pay.service.requestPayUrl.impl.XinPayImpl;
-import org.jeecg.modules.pay.service.requestPayUrl.impl.YsfPayImpl;
-import org.jeecg.modules.system.service.ISysDictService;
-import org.jeecg.modules.util.BaseConstant;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.PostConstruct;
-import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class PayServiceFactory {
-    @Autowired
-    public ISysDictService dictService;
-    private static PayServiceFactory factory;
-    /**
-     * 请求挂马平台的地址
-     */
-    private static String aliPayUrl = null;
-    private static String bankPayUrl = null;
-    private static String ysfPayUrl = null;
-    private static String nxysWxPayUrl = null;
-    private static String nxysAliPayUrl = null;
-    private static String wechatBank = null;
-    /**
-     * 信付接口
-     * 支付宝
-     */
-    private static String xinPayAliPay = null;
-
-    private static String baiyitongPayWxPay = null;
-
-    @PostConstruct
-    public void init() {
-        factory = this;
-        factory.dictService = this.dictService;
-        List<DictModel> payUrl = dictService.queryDictItemsByCode(BaseConstant.REQUEST_URL);
-        for (DictModel dict : payUrl) {
-            if (BaseConstant.REQUEST_ALI_ZZ.equals(dict.getText())) {
-                aliPayUrl = dict.getValue();
-            }
-            if (BaseConstant.REQUEST_ALI_BANK.equals(dict.getText())) {
-                bankPayUrl = dict.getValue();
-            }
-            if (BaseConstant.REQUEST_YSF.equals(dict.getText())) {
-                ysfPayUrl = dict.getValue();
-            }
-            if (BaseConstant.REQUEST_NXYS_WX.equals(dict.getText())) {
-                nxysWxPayUrl = dict.getValue();
-            }
-            if (BaseConstant.REQUEST_NXYS_ALIPAY.equals(dict.getText())) {
-                nxysAliPayUrl = dict.getValue();
-            }
-            if (BaseConstant.REQUEST_WECHAT_BANK.equals(dict.getText())) {
-                wechatBank = dict.getValue();
-            }
-            if (BaseConstant.REQUEST_XINPAY_ALIPAY.equals(dict.getText())) {
-                xinPayAliPay = dict.getValue();
-            }
-            if (BaseConstant.REQUEST_BAIYITONG_WECHAT.equals(dict.getText())) {
-                baiyitongPayWxPay = dict.getValue();
-            }
-        }
-
+    private static Map<String,RequestPayUrl> services = new ConcurrentHashMap<String,RequestPayUrl>();
+    private static Map<String,String> payUrls = new ConcurrentHashMap<String,String>();
+    public static String getRequestUrl(String channel){
+        return payUrls.get(channel);
     }
-    @Autowired
-    public ApplicationContext applicationContext;
-
-    public String getRequestUrl(String channel){
-        switch (channel) {
-            case BaseConstant.REQUEST_YSF:
-                return ysfPayUrl;
-            case BaseConstant.REQUEST_ALI_BANK:
-                return bankPayUrl;
-            case BaseConstant.REQUEST_ALI_ZZ:
-                return aliPayUrl;
-            case BaseConstant.REQUEST_WECHAT_BANK:
-                return wechatBank;
-            case BaseConstant.REQUEST_XINPAY_ALIPAY:
-                return xinPayAliPay;
-            case BaseConstant.REQUEST_BAIYITONG_WECHAT:
-                return baiyitongPayWxPay;
-            default:
-                return null;
-        }
+    public static void registerUrl(String channel,String url){
+        payUrls.put(channel,url);
     }
-
-    public RequestPayUrl getPay(String channel) {
-        switch (channel) {
-            case BaseConstant.REQUEST_YSF:
-                return applicationContext.getBean(YsfPayImpl.class);
-            case BaseConstant.REQUEST_ALI_BANK:
-                return applicationContext.getBean(AliPayImpl.class);
-            case BaseConstant.REQUEST_ALI_ZZ:
-                return applicationContext.getBean(AliPayImpl.class);
-            case BaseConstant.REQUEST_WECHAT_BANK:
-                return applicationContext.getBean(AliPayImpl.class);
-            case BaseConstant.REQUEST_XINPAY_ALIPAY:
-                return applicationContext.getBean(XinPayImpl.class);
-            case BaseConstant.REQUEST_BAIYITONG_WECHAT:
-                return applicationContext.getBean(BaiyitongWechatPayImpl.class);
-            default:
-                return null;
-        }
+    public static void register(String channel,RequestPayUrl requestPayUrl){
+        services.put(channel,requestPayUrl);
+    }
+    public static RequestPayUrl getPay(String channel) {
+        return services.get(channel);
     }
 }
