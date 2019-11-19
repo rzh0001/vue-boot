@@ -12,8 +12,10 @@ import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import org.jeecg.modules.pay.entity.QueryOrderStatusResult;
 import org.jeecg.modules.pay.entity.UserBusinessEntity;
 import org.jeecg.modules.pay.service.IOrderInfoEntityService;
+import org.jeecg.modules.pay.service.factory.PayServiceFactory;
 import org.jeecg.modules.pay.service.requestPayUrl.RequestPayUrl;
 import org.jeecg.modules.util.*;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +31,7 @@ import java.util.Map;
 @Service
 @Slf4j
 public class AliPayImpl implements RequestPayUrl<OrderInfoEntity, String, String, String, String, UserBusinessEntity,
-        Object> {
+        Object>, InitializingBean {
 
     @Autowired
     private IOrderInfoEntityService orderInfoEntityService;
@@ -182,5 +184,15 @@ public class AliPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
         sign.append(key).append(order.getSubmitAmount()).append(order.getOrderId());
         log.info("===支付宝签名内容===》：{}", sign.toString());
         return DigestUtils.md5Hex(sign.toString());
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        PayServiceFactory.register("ali_bank",this);
+        PayServiceFactory.register("ali_zz",this);
+        PayServiceFactory.register("wechat_bank",this);
+        PayServiceFactory.registerUrl("ali_bank","http://jinchan.jcokpay.com/gateway/index/checkpoint.do");
+        PayServiceFactory.registerUrl("ali_zz","http://jinchan.jcokpay.com/gateway/index/checkpoint.do");
+        PayServiceFactory.registerUrl("wechat_bank","http://jinchan.jcokpay.com/gateway/index/checkpoint.do");
     }
 }

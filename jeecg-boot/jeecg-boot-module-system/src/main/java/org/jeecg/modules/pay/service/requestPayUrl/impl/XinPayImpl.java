@@ -10,6 +10,7 @@ import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import org.jeecg.modules.pay.entity.UserBusinessEntity;
 import org.jeecg.modules.pay.entity.XinPayParam;
 import org.jeecg.modules.pay.service.IOrderInfoEntityService;
+import org.jeecg.modules.pay.service.factory.PayServiceFactory;
 import org.jeecg.modules.pay.service.requestPayUrl.RequestPayUrl;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.service.ISysUserService;
@@ -17,6 +18,7 @@ import org.jeecg.modules.util.BaseConstant;
 import org.jeecg.modules.util.HttpResult;
 import org.jeecg.modules.util.HttpUtils;
 import org.jeecg.modules.util.R;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -25,8 +27,8 @@ import java.util.Map;
 
 @Service
 @Slf4j
-public class XinPayImpl implements RequestPayUrl<OrderInfoEntity, String, String, String,String, UserBusinessEntity,Object> {
-    private static final String MD5_KEY = "cc9d205602f87165866458eb79f1a254";
+public class XinPayImpl implements RequestPayUrl<OrderInfoEntity, String, String, String,String, UserBusinessEntity,Object>, InitializingBean {
+    private static final String MD5_KEY = "93a6c71e361c04b8ca275e32fbd52018";
     @Autowired
     private RedisUtil redisUtil;
     @Autowired
@@ -118,5 +120,11 @@ public class XinPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
             return "fail";
         }
 
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        PayServiceFactory.register("xin_pay_alipay",this);
+        PayServiceFactory.registerUrl("xin_pay_alipay","http://www.zhizunbaopay.com/api/startOrder");
     }
 }

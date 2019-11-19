@@ -14,7 +14,7 @@ public class XinPayTest {
     @Test
     public void test() throws Exception {
         XinPayParam payParam = new XinPayParam();
-        payParam.setMerchantNum("a7999");
+        payParam.setMerchantNum("7484865");
         payParam.setOrderNo("123456789");
         payParam.setAmount("100");
         payParam.setNotifyUrl("http://www.baidu.com");
@@ -22,7 +22,7 @@ public class XinPayTest {
         payParam.setPayType("alipay");
         payParam.setAttch("test");
         StringBuilder sign = new StringBuilder();
-        sign.append(payParam.getMerchantNum()).append(payParam.getOrderNo()).append(payParam.getAmount()).append(payParam.getNotifyUrl()).append("cc9d205602f87165866458eb79f1a254");
+        sign.append(payParam.getMerchantNum()).append(payParam.getOrderNo()).append(payParam.getAmount()).append(payParam.getNotifyUrl()).append("93a6c71e361c04b8ca275e32fbd52018");
         System.out.println("===>请求信付支付平台，获取支付链接，签名串为：{}"+sign.toString());
         String signStr = DigestUtils.md5Hex(sign.toString());
         System.out.println("===>请求信付支付平台，获取支付链接，签名sign为：{}"+signStr);
@@ -31,7 +31,7 @@ public class XinPayTest {
         Map<String,Object> mapTypes = JSON.parseObject(json);
         System.out.println("===>请求信付支付平台，获取支付链接，入参为：{}"+mapTypes);
 
-        HttpResult r = HttpUtils.doPost("http://47.52.203.28/api/startOrder", mapTypes);
+        HttpResult r = HttpUtils.doPost("http://www.zhizunbaopay.com/api/startOrder", mapTypes);
         System.out.println("===>请求信付支付平台，获取支付链接，返回结果为：{}"+r.getBody());
     }
 }

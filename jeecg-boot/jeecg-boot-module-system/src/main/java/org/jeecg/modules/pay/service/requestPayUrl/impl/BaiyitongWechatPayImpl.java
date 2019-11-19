@@ -10,6 +10,7 @@ import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import org.jeecg.modules.pay.entity.UserBusinessEntity;
 import org.jeecg.modules.pay.service.IOrderInfoEntityService;
 import org.jeecg.modules.pay.service.IUserBusinessEntityService;
+import org.jeecg.modules.pay.service.factory.PayServiceFactory;
 import org.jeecg.modules.pay.service.requestPayUrl.RequestPayUrl;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.service.ISysUserService;
@@ -17,6 +18,7 @@ import org.jeecg.modules.util.BaseConstant;
 import org.jeecg.modules.util.HttpResult;
 import org.jeecg.modules.util.HttpUtils;
 import org.jeecg.modules.util.R;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -37,7 +39,7 @@ import java.util.*;
  */
 @Service
 @Slf4j
-public class BaiyitongWechatPayImpl implements RequestPayUrl<OrderInfoEntity, String, String, String,String, UserBusinessEntity,Object> {
+public class BaiyitongWechatPayImpl implements RequestPayUrl<OrderInfoEntity, String, String, String,String, UserBusinessEntity,Object> , InitializingBean {
     @Autowired
     private RedisUtil redisUtil;
     @Autowired
@@ -199,5 +201,11 @@ public class BaiyitongWechatPayImpl implements RequestPayUrl<OrderInfoEntity, St
             log.info("==>请求百易通挂马平台,生成签名异常。异常信息为：{}",e);
         }
         return null;
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        PayServiceFactory.register("baiyitong_pay_wechat",this);
+        PayServiceFactory.registerUrl("baiyitong_pay_wechat","http://api.autosu.cn/gateway/index/unifiedorder?format=json");
     }
 }

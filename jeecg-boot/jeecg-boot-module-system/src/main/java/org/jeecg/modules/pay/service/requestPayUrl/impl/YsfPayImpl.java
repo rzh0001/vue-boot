@@ -13,8 +13,11 @@ import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import org.jeecg.modules.pay.entity.UserBusinessEntity;
 import org.jeecg.modules.pay.entity.YsfQueryOrderResult;
 import org.jeecg.modules.pay.service.IOrderInfoEntityService;
+import org.jeecg.modules.pay.service.factory.PayServiceFactory;
 import org.jeecg.modules.pay.service.requestPayUrl.RequestPayUrl;
+import org.jeecg.modules.system.service.ISysDictService;
 import org.jeecg.modules.util.*;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -28,7 +31,7 @@ import java.math.BigDecimal;
 import java.net.URISyntaxException;
 @Service
 @Slf4j
-public class YsfPayImpl implements RequestPayUrl<OrderInfoEntity, String, String, String,String, UserBusinessEntity,Object> {
+public class YsfPayImpl implements RequestPayUrl<OrderInfoEntity, String, String, String,String, UserBusinessEntity,Object>, InitializingBean {
     @Autowired
     private IOrderInfoEntityService orderInfoEntityService;
     @Autowired
@@ -185,5 +188,11 @@ public class YsfPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
             }
         }
         return resultUrl;
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        PayServiceFactory.register("ysf",this);
+        PayServiceFactory.registerUrl("ysf","http://47.56.119.63:8004/api/createQrOrder");
     }
 }
