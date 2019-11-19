@@ -125,6 +125,6 @@ public class XinPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
     @Override
     public void afterPropertiesSet() throws Exception {
         PayServiceFactory.register("xin_pay_alipay",this);
-        PayServiceFactory.registerUrl("xin_pay_alipay","http://www.zhizunbaopay.com/api/startOrder");
+        PayServiceFactory.registerUrl("xin_pay_alipay","http://www.nmjianzhi.com/api/startOrder");
     }
 }
