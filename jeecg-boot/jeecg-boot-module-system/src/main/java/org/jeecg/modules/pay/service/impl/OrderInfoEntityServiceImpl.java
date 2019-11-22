@@ -159,7 +159,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         Map<String, Object> map = new HashMap<>();
         //获取数据字典配置的属于外部系统标识通道的字段
         List<DictModel> fields = dictService.queryDictItemsByCode(BaseConstant.EXTERNAL_FIELD);
-        log.info("==》挂马平台回调四方平台，数据字典externalField：{}",fields.toString());
+        log.info("==》挂马平台回调四方平台，数据字典externalField：{}", fields.toString());
         List<String> payTypeFields = new ArrayList<>();
         boolean isInternalSystem = true;
         if (!CollectionUtils.isEmpty(fields)) {
@@ -167,12 +167,12 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
                 payTypeFields.add(dictModel.getValue());
             }
         }
-        if(!CollectionUtils.isEmpty(payTypeFields)){
-            for(String field:payTypeFields){
-                if(param.get(field) != null){
+        if (!CollectionUtils.isEmpty(payTypeFields)) {
+            for (String field : payTypeFields) {
+                if (param.get(field) != null) {
                     isInternalSystem = false;
                     payType = (String) param.get(field);
-                    log.info("===>外部挂马平台回调四方，通道为：{}",payType);
+                    log.info("===>外部挂马平台回调四方，通道为：{}", payType);
                     break;
                 }
             }
@@ -420,8 +420,8 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      */
     @Transactional
     public synchronized void changeAmount(String name, String userId, BigDecimal amount,
-                                           UserAmountEntity userAmountEntity, String agentId, String orderId,
-                                           String payType, String saleUserNmae) throws Exception {
+                                          UserAmountEntity userAmountEntity, String agentId, String orderId,
+                                          String payType, String saleUserNmae) throws Exception {
         //记录明细
         UserAmountDetail agentDetail = new UserAmountDetail();
         agentDetail.setUserId(userId);
@@ -620,25 +620,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             log.info("用户:{},无对应商户信息", userName);
             throw new RRException("通道：" + payType + ",未配置账号或账号未激活，请联系管理员");
         }
-        UserBusinessEntity userBusinessEntity = null;
-        if (useBusinesses.size() == 1) {
-            userBusinessEntity = useBusinesses.get(0);
-        } else {
-            Collections.shuffle(useBusinesses);
-            //如果配置的账号包含多个，则需要筛选一个
-            for (UserBusinessEntity b : useBusinesses) {
-                //如果充值金额为空，或收入金额+本单的金额>充值金额，则不能使用
-                BigDecimal incomAmount = b.getIncomeAmount() == null ? new BigDecimal("0.00") : b.getIncomeAmount();
-                Double amount =
-                        incomAmount.add(new BigDecimal(submitAmount)).setScale(3, BigDecimal.ROUND_HALF_UP).doubleValue();
-                if (b.getRechargeAmount() == null || b.getRechargeAmount().doubleValue() < amount) {
-                    continue;
-                }
-                userBusinessEntity = b;
-                break;
-            }
-        }
-
+        UserBusinessEntity userBusinessEntity = checkBusinessAccount(useBusinesses,submitAmount);
         if (userBusinessEntity == null) {
             throw new RRException("通道：" + payType + "下，所以账户额度已满，请联系管理员");
         }
@@ -682,6 +664,34 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         return requestPayUrl.requestPayUrl(order, userName, requestUrl, key, innerCallBackUrl, userBusinessEntity);
     }
 
+    private UserBusinessEntity checkBusinessAccount(List<UserBusinessEntity> useBusinesses,String submitAmount){
+        UserBusinessEntity userBusinessEntity = null;
+        if (useBusinesses.size() == 1) {
+            userBusinessEntity = useBusinesses.get(0);
+            BigDecimal incomAmount = userBusinessEntity.getIncomeAmount() == null ? new BigDecimal("0.00") : userBusinessEntity.getIncomeAmount();
+            //总收入+当前订单金额
+            Double amount =
+                    incomAmount.add(new BigDecimal(submitAmount)).setScale(3, BigDecimal.ROUND_HALF_UP).doubleValue();
+            if (userBusinessEntity.getRechargeAmount() == null || userBusinessEntity.getRechargeAmount().doubleValue() < amount) {
+                userBusinessEntity = null;
+            }
+        } else {
+            Collections.shuffle(useBusinesses);
+            //如果配置的账号包含多个，则需要筛选一个
+            for (UserBusinessEntity b : useBusinesses) {
+                //如果充值金额为空，或收入金额+本单的金额>充值金额，则不能使用
+                BigDecimal incomAmount = b.getIncomeAmount() == null ? new BigDecimal("0.00") : b.getIncomeAmount();
+                Double amount =
+                        incomAmount.add(new BigDecimal(submitAmount)).setScale(3, BigDecimal.ROUND_HALF_UP).doubleValue();
+                if (b.getRechargeAmount() == null || b.getRechargeAmount().doubleValue() < amount) {
+                    continue;
+                }
+                userBusinessEntity = b;
+                break;
+            }
+        }
+        return  userBusinessEntity;
+    }
 
     /**
      * 校验通道是否是开启的

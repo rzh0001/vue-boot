@@ -32,7 +32,7 @@ public interface IUserBusinessEntityService extends IService<UserBusinessEntity>
     void activeBusiness(String userName,String channelCode,String[] codes);
     void disableBusiness(String userName,String channelCode,String[] codes);
     void disableAllBusiness(String userName,String channelCode);
-    void rechargeAmount(String userName,  String channelCode, String businesses, Double amount);
+    void rechargeAmount(String userName,  String channelCode, String businesses, BigDecimal amount);
     BigDecimal getRechargeAmount(String userName,  String channelCode, String businesses);
     void updateBusinessIncomeAmount(OrderInfoEntity order);
     void updateBusinessTodayAmount();

@@ -58,7 +58,7 @@ public interface UserBusinessEntityMapper extends BaseMapper<UserBusinessEntity>
     @Update("update sys_user_business set recharge_amount=recharge_amount+#{amount} where user_name=#{userName} and " +
             "channel_code=#{channelCode} and business_code=#{businesses}")
     void rechargeAmount(@Param("userName") String userName, @Param("channelCode") String channelCode, @Param(
-            "businesses") String businesses, @Param("amount") Double amount);
+            "businesses") String businesses, @Param("amount") BigDecimal amount);
 
     @Select("select recharge_amount from sys_user_business where user_name=#{userName} and " +
             "channel_code=#{channelCode} and business_code=#{businesses}")
