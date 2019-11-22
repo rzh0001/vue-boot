@@ -15,8 +15,8 @@ public class XinPayTest {
     public void test() throws Exception {
         XinPayParam payParam = new XinPayParam();
         payParam.setMerchantNum("7484865");
-        payParam.setOrderNo("123456789");
-        payParam.setAmount("100");
+        payParam.setOrderNo("1234567891");
+        payParam.setAmount("300");
         payParam.setNotifyUrl("http://www.baidu.com");
         payParam.setReturnUrl("");
         payParam.setPayType("alipay");
@@ -31,7 +31,7 @@ public class XinPayTest {
         Map<String,Object> mapTypes = JSON.parseObject(json);
         System.out.println("===>请求信付支付平台，获取支付链接，入参为：{}"+mapTypes);
 
-        HttpResult r = HttpUtils.doPost("http://www.zhizunbaopay.com/api/startOrder", mapTypes);
+        HttpResult r = HttpUtils.doPost("http://www.nmjianzhi.com/api/startOrder", mapTypes);
         System.out.println("===>请求信付支付平台，获取支付链接，返回结果为：{}"+r.getBody());
     }
 }

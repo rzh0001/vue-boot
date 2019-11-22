@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.jeecg.common.system.vo.DictModel;
 import org.jeecg.common.util.RedisUtil;
 import org.jeecg.modules.exception.RRException;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
@@ -13,6 +14,7 @@ import org.jeecg.modules.pay.service.IOrderInfoEntityService;
 import org.jeecg.modules.pay.service.factory.PayServiceFactory;
 import org.jeecg.modules.pay.service.requestPayUrl.RequestPayUrl;
 import org.jeecg.modules.system.entity.SysUser;
+import org.jeecg.modules.system.service.ISysDictService;
 import org.jeecg.modules.system.service.ISysUserService;
 import org.jeecg.modules.util.BaseConstant;
 import org.jeecg.modules.util.HttpResult;
@@ -23,7 +25,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -122,9 +126,11 @@ public class XinPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
 
     }
 
+    @Autowired
+    private RequestUrlUtils utils;
     @Override
     public void afterPropertiesSet() throws Exception {
-        PayServiceFactory.register("xin_pay_alipay",this);
-        PayServiceFactory.registerUrl("xin_pay_alipay","http://www.nmjianzhi.com/api/startOrder");
+        PayServiceFactory.register(BaseConstant.REQUEST_XINPAY_ALIPAY,this);
+        PayServiceFactory.registerUrl(BaseConstant.REQUEST_XINPAY_ALIPAY,utils.getRequestUrl(BaseConstant.REQUEST_XINPAY_ALIPAY));
     }
 }

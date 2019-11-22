@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpRequest;
+import org.jeecg.common.system.vo.DictModel;
 import org.jeecg.common.util.RedisUtil;
 import org.jeecg.modules.exception.RRException;
 import org.jeecg.modules.pay.entity.ChannelBusinessEntity;
@@ -29,6 +30,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
+
 @Service
 @Slf4j
 public class YsfPayImpl implements RequestPayUrl<OrderInfoEntity, String, String, String,String, UserBusinessEntity,Object>, InitializingBean {
@@ -36,6 +40,8 @@ public class YsfPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
     private IOrderInfoEntityService orderInfoEntityService;
     @Autowired
     private RedisUtil redisUtil;
+    @Autowired
+    private RequestUrlUtils utils;
     @Override
     public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key, String callbackUrl,UserBusinessEntity userBusinessEntity) throws Exception {
         String ysfKey = userBusinessEntity.getApiKey();
@@ -189,10 +195,9 @@ public class YsfPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
         }
         return resultUrl;
     }
-
     @Override
     public void afterPropertiesSet() throws Exception {
-        PayServiceFactory.register("ysf",this);
-        PayServiceFactory.registerUrl("ysf","http://47.56.119.63:8004/api/createQrOrder");
+        PayServiceFactory.register(BaseConstant.REQUEST_YSF,this);
+        PayServiceFactory.registerUrl(BaseConstant.REQUEST_YSF,utils.getRequestUrl(BaseConstant.REQUEST_YSF));
     }
 }

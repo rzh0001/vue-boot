@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jeecg.common.system.vo.DictModel;
 import org.jeecg.common.util.RedisUtil;
 import org.jeecg.modules.exception.RRException;
 import org.jeecg.modules.pay.entity.AliPayCallBackParam;
@@ -14,16 +15,22 @@ import org.jeecg.modules.pay.entity.UserBusinessEntity;
 import org.jeecg.modules.pay.service.IOrderInfoEntityService;
 import org.jeecg.modules.pay.service.factory.PayServiceFactory;
 import org.jeecg.modules.pay.service.requestPayUrl.RequestPayUrl;
+import org.jeecg.modules.system.service.ISysDictService;
 import org.jeecg.modules.util.*;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * 支付宝转卡请求挂码
@@ -31,12 +38,14 @@ import java.util.Map;
 @Service
 @Slf4j
 public class AliPayImpl implements RequestPayUrl<OrderInfoEntity, String, String, String, String, UserBusinessEntity,
-        Object>, InitializingBean {
+        Object>, InitializingBean, ApplicationContextAware {
 
     @Autowired
     private IOrderInfoEntityService orderInfoEntityService;
     @Autowired
     private RedisUtil redisUtil;
+    @Autowired
+    public RequestUrlUtils utils;
 
     @Override
     public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key, String callbackUrl,
@@ -188,11 +197,16 @@ public class AliPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        PayServiceFactory.register("ali_bank",this);
-        PayServiceFactory.register("ali_zz",this);
-        PayServiceFactory.register("wechat_bank",this);
-        PayServiceFactory.registerUrl("ali_bank","http://jinchan.jcokpay.com/gateway/index/checkpoint.do");
-        PayServiceFactory.registerUrl("ali_zz","http://jinchan.jcokpay.com/gateway/index/checkpoint.do");
-        PayServiceFactory.registerUrl("wechat_bank","http://jinchan.jcokpay.com/gateway/index/checkpoint.do");
+        PayServiceFactory.register(BaseConstant.REQUEST_ALI_BANK,this);
+        PayServiceFactory.register(BaseConstant.REQUEST_ALI_ZZ,this);
+        PayServiceFactory.register(BaseConstant.REQUEST_WECHAT_BANK,this);
+        PayServiceFactory.registerUrl(BaseConstant.REQUEST_ALI_BANK,utils.getRequestUrl(BaseConstant.REQUEST_ALI_BANK));
+        PayServiceFactory.registerUrl(BaseConstant.REQUEST_ALI_ZZ,utils.getRequestUrl(BaseConstant.REQUEST_ALI_ZZ));
+        PayServiceFactory.registerUrl(BaseConstant.REQUEST_WECHAT_BANK,utils.getRequestUrl(BaseConstant.REQUEST_WECHAT_BANK));
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+
     }
 }

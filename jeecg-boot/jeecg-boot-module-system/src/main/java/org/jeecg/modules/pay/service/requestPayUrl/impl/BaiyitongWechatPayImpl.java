@@ -3,6 +3,7 @@ package org.jeecg.modules.pay.service.requestPayUrl.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
+import org.jeecg.common.system.vo.DictModel;
 import org.jeecg.common.util.RedisUtil;
 import org.jeecg.modules.exception.RRException;
 import org.jeecg.modules.pay.entity.BaiyitongParam;
@@ -13,6 +14,7 @@ import org.jeecg.modules.pay.service.IUserBusinessEntityService;
 import org.jeecg.modules.pay.service.factory.PayServiceFactory;
 import org.jeecg.modules.pay.service.requestPayUrl.RequestPayUrl;
 import org.jeecg.modules.system.entity.SysUser;
+import org.jeecg.modules.system.service.ISysDictService;
 import org.jeecg.modules.system.service.ISysUserService;
 import org.jeecg.modules.util.BaseConstant;
 import org.jeecg.modules.util.HttpResult;
@@ -46,6 +48,8 @@ public class BaiyitongWechatPayImpl implements RequestPayUrl<OrderInfoEntity, St
     private IOrderInfoEntityService orderInfoEntityService;
     @Autowired
     private ISysUserService userService;
+    @Autowired
+    private RequestUrlUtils utils;
     @Override
     public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key, String callbackUrl,
                            UserBusinessEntity userBusiness) throws Exception {
@@ -205,7 +209,7 @@ public class BaiyitongWechatPayImpl implements RequestPayUrl<OrderInfoEntity, St
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        PayServiceFactory.register("baiyitong_pay_wechat",this);
-        PayServiceFactory.registerUrl("baiyitong_pay_wechat","http://api.autosu.cn/gateway/index/unifiedorder?format=json");
+        PayServiceFactory.register(BaseConstant.REQUEST_BAIYITONG_WECHAT,this);
+        PayServiceFactory.registerUrl(BaseConstant.REQUEST_BAIYITONG_WECHAT,utils.getRequestUrl(BaseConstant.REQUEST_BAIYITONG_WECHAT));
     }
 }
