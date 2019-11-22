@@ -122,9 +122,11 @@ public class XinPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
 
     }
 
+    @Autowired
+    private RequestUrlUtils utils;
     @Override
     public void afterPropertiesSet() throws Exception {
-        PayServiceFactory.register("xin_pay_alipay",this);
-        PayServiceFactory.registerUrl("xin_pay_alipay","http://www.nmjianzhi.com/api/startOrder");
+        PayServiceFactory.register(BaseConstant.REQUEST_XINPAY_ALIPAY,this);
+        PayServiceFactory.registerUrl(BaseConstant.REQUEST_XINPAY_ALIPAY,utils.getRequestUrl(BaseConstant.REQUEST_XINPAY_ALIPAY));
     }
 }

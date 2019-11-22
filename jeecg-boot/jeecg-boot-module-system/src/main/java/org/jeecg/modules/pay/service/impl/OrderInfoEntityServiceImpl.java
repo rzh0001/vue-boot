@@ -419,7 +419,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * @throws Exception
      */
     @Transactional
-    private synchronized void changeAmount(String name, String userId, BigDecimal amount,
+    public synchronized void changeAmount(String name, String userId, BigDecimal amount,
                                            UserAmountEntity userAmountEntity, String agentId, String orderId,
                                            String payType, String saleUserNmae) throws Exception {
         //记录明细
