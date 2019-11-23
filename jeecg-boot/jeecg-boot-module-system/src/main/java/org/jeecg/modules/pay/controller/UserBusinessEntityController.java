@@ -1,5 +1,6 @@
 package org.jeecg.modules.pay.controller;
 
+import java.beans.Transient;
 import java.math.BigDecimal;
 import java.util.*;
 import java.io.IOException;
@@ -36,6 +37,7 @@ import org.jeecgframework.poi.excel.entity.ImportParams;
 import org.jeecgframework.poi.excel.view.JeecgEntityExcelView;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -62,6 +64,7 @@ public class UserBusinessEntityController {
     private ISysUserService userService;
     @Autowired
     private IBusinessIncomeLogService bi;
+
     /**
      * 分页列表查询
      *
@@ -184,6 +187,7 @@ public class UserBusinessEntityController {
 
     @GetMapping("/activeBusiness")
     @RequiresPermissions("user:business:activeBusiness")
+    @Transactional
     public Result<String> activeBusiness(@RequestParam(name = "userName") String userName, @RequestParam(name =
             "channelCode") String channelCode, @RequestParam(name = "businesses") String businesses) {
         Result<String> result = new Result<String>();
@@ -206,6 +210,7 @@ public class UserBusinessEntityController {
 
     @GetMapping("/rechargeAmount")
     @RequiresPermissions("user:business:rechargeAmount")
+    @Transactional
     public Result<String> rechargeAmount(@RequestParam(name = "userName") String userName, @RequestParam(name =
             "channelCode") String channelCode, @RequestParam(name = "businessCode") String businesses,
                                          @RequestParam(name = "rechargeAmount") String amount) {
@@ -214,20 +219,14 @@ public class UserBusinessEntityController {
             result.setResult("充值失败，参数不全");
             return result;
         }
-        try {
-            userBusinessEntityService.rechargeAmount(userName, channelCode, businesses, Double.parseDouble(amount));
-            BusinessIncomeLog income = new BusinessIncomeLog();
-            income.setType("1");
-            income.setSubmitamount(new BigDecimal(amount));
-            income.setBusinessCode(businesses);
-            bi.save(income);
-            result.setResult(businesses + "：充值金额[" + amount + "]成功");
-            return result;
-        } catch (Exception e) {
-            log.info("充值金额异常，异常信息：{}", e);
-            result.setResult("金额充值异常");
-            return result;
-        }
+        userBusinessEntityService.rechargeAmount(userName, channelCode, businesses, new BigDecimal(amount));
+        BusinessIncomeLog income = new BusinessIncomeLog();
+        income.setType("1");
+        income.setSubmitamount(new BigDecimal(amount));
+        income.setBusinessCode(businesses);
+        bi.save(income);
+        result.setResult(businesses + "：充值金额[" + amount + "]成功");
+        return result;
     }
 
     @GetMapping("/queryRechargeAmount")

@@ -110,7 +110,7 @@ public class UserBusinessEntityServiceImpl extends ServiceImpl<UserBusinessEntit
     }
 
     @Override
-    public void rechargeAmount(String userName, String channelCode, String businesses, Double amount) {
+    public void rechargeAmount(String userName, String channelCode, String businesses, BigDecimal amount) {
         baseMapper.rechargeAmount(userName,channelCode,businesses,amount);
     }
 

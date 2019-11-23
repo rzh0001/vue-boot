@@ -13,3 +13,13 @@
 attch :信付通道字段
 out_uid：百易通通道字段
 
+
+======
+权限：
+business::order::offline 线下补单权限
+business::order::againRequest 手动补单权限
+
+DDL：
+alter table sys_user_business modify column income_amount decimal(20,3);
+alter table sys_user_business modify column recharge_amount decimal(20,3)
+
