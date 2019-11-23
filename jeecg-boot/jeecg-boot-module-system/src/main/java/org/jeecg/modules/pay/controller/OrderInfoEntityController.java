@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.aspect.annotation.AutoLog;
 import org.jeecg.common.constant.PayConstant;
@@ -299,6 +300,7 @@ public class OrderInfoEntityController {
     }
 
     @RequestMapping(value = "/againRequest", method = RequestMethod.GET)
+    @RequiresPermissions("business::order::againRequest")
     public R againRequest(@RequestParam(name = "id") String id) {
         boolean flag = false;
         OrderInfoEntity order = orderInfoEntityService.queryOrderInfoByOrderId(id);
@@ -364,6 +366,7 @@ public class OrderInfoEntityController {
      * @return
      */
     @RequestMapping(value = "/offline", method = RequestMethod.GET)
+    @RequiresPermissions("business::order::offline")
     public R offline(@RequestParam(name = "id") String id) {
         OrderInfoEntity order = orderInfoEntityService.queryOrderInfoByOrderId(id);
         LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
