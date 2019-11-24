@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.jeecg.modules.pay.mapper.ChannelEntityMapper">
     <select id="queryChannelByCode" parameterType="String" resultType="org.jeecg.modules.pay.entity.ChannelEntity">
-      select * from sys_channel where channel_code=#{channelCode}
+      select * from sys_channel where channel_code=#{channelCode} and status=1
     </select>
     <select id="queryAllChannelCode" resultType="org.jeecg.modules.pay.entity.ChannelEntity">
       select channel_code as channelCode,channel_name as channelName from sys_channel
