@@ -15,11 +15,13 @@ import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.aspect.annotation.AutoLog;
 import org.jeecg.common.constant.PayConstant;
 import org.jeecg.common.system.query.QueryGenerator;
+import org.jeecg.common.system.vo.DictModel;
 import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.modules.pay.entity.CallBackResult;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import org.jeecg.modules.pay.service.IOrderInfoEntityService;
 import org.jeecg.modules.system.entity.SysUser;
+import org.jeecg.modules.system.service.ISysDictService;
 import org.jeecg.modules.system.service.ISysUserService;
 import org.jeecg.modules.util.BaseConstant;
 import org.jeecg.modules.util.HttpResult;
@@ -40,10 +42,8 @@ import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.net.URISyntaxException;
+import java.util.*;
 
 /**
  * @Description: 订单信息
@@ -60,6 +60,8 @@ public class OrderInfoEntityController {
     private IOrderInfoEntityService orderInfoEntityService;
     @Autowired
     private ISysUserService userService;
+    @Autowired
+    public ISysDictService dictService;
 
     /**
      * 分页列表查询
@@ -86,12 +88,12 @@ public class OrderInfoEntityController {
         result.setResult(pageList);
         return result;
     }
-    
+
     // 查询条件独立成方法，查询、统计、导出 三个接口使用
     private QueryWrapper<OrderInfoEntity> initQueryCondition(OrderInfoEntity orderInfoEntity, HttpServletRequest req) {
         LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
         SysUser opUser = userService.getUserByName(loginUser.getUsername());
-        
+
         QueryWrapper<OrderInfoEntity> queryWrapper = QueryGenerator.initQueryWrapper(orderInfoEntity,
                 req.getParameterMap());
         if (StringUtils.isNotBlank(opUser.getMemberType())) {
@@ -110,19 +112,19 @@ public class OrderInfoEntityController {
         }
         return queryWrapper;
     }
-    
+
     @GetMapping(value = "/summary")
     public Result<Map<String, Object>> summary(OrderInfoEntity orderInfoEntity, HttpServletRequest req) {
         Result<Map<String, Object>> result = new Result<>();
         QueryWrapper<OrderInfoEntity> queryWrapper = initQueryCondition(orderInfoEntity, req);
-    
+
         Map<String, Object> map = orderInfoEntityService.summary(queryWrapper);
         Map<String, Object> map1 = new HashMap<>();
         map.put("totalCount", 5);
-    
+
         result.setResult(map);
         result.setSuccess(true);
-        
+
         return result;
     }
 
@@ -243,7 +245,7 @@ public class OrderInfoEntityController {
         // Step.1 组装查询条件
         QueryWrapper<OrderInfoEntity> queryWrapper = initQueryCondition(orderInfoEntity, request);
         queryWrapper.lambda().in(OrderInfoEntity::getStatus, CollUtil.newArrayList("2", "3"));
-    
+
         //Step.2 AutoPoi 导出Excel
         List<OrderInfoEntity> pageList = orderInfoEntityService.list(queryWrapper);
         if (pageList.isEmpty()) {
@@ -254,7 +256,7 @@ public class OrderInfoEntityController {
         }
         log.info("文件导出{}条记录", pageList.size());
         //导出文件名称
-    
+
         ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
         mv.addObject(NormalExcelConstants.FILE_NAME, "订单列表");
         mv.addObject(NormalExcelConstants.CLASS, OrderInfoEntity.class);
@@ -302,19 +304,101 @@ public class OrderInfoEntityController {
     @RequestMapping(value = "/againRequest", method = RequestMethod.GET)
     @RequiresPermissions("business::order::againRequest")
     public R againRequest(@RequestParam(name = "id") String id) {
-        boolean flag = false;
         OrderInfoEntity order = orderInfoEntityService.queryOrderInfoByOrderId(id);
+        //手动补单，密钥取订单中用户的密钥
+        LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+        SysUser sysUser = userService.getUserByName(loginUser.getUsername());
+        log.info("==》手动补单操作==补单操作人：{}；单号为：{}", sysUser.getUsername(), id);
+        if (order == null) {
+            return R.error("订单不存在");
+        }
+//        if (order.getStatus() != BaseConstant.ORDER_STATUS_SUCCESS_NOT_RETURN) {
+//            return R.error("订单状态不是‘成功未返回’，不能补单");
+//        }
+        if (order.getStatus() == BaseConstant.ORDER_STATUS_SUCCESS) {
+            return R.error("订单状态已成功，不能补单");
+        }
+        return notifyCustomer(order,id);
+    }
+
+    /**
+     * 线下补单
+     * 线下补单：不通知商户
+     *
+     * @param id
+     * @return
+     */
+    @RequestMapping(value = "/offline", method = RequestMethod.GET)
+    @RequiresPermissions("business::order::offline")
+    public R offline(@RequestParam(name = "id") String id) {
+        OrderInfoEntity order = orderInfoEntityService.queryOrderInfoByOrderId(id);
+        LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+        SysUser sysUser = userService.getUserByName(loginUser.getUsername());
+        log.info("==》线下补单操作==补单操作人：{}；单号为：{}", sysUser.getUsername(), id);
+        if (order == null) {
+            return R.error("订单不存在");
+        }
+//        if (order.getStatus() != BaseConstant.ORDER_STATUS_SUCCESS_NOT_RETURN) {
+//            return R.error("订单状态不是‘成功未返回’，不能补单");
+//        }
+        if (order.getStatus() == BaseConstant.ORDER_STATUS_SUCCESS) {
+            return R.error("订单状态已成功，不能补单");
+        }
+        //状态更新为成功，已返回
+        order.setStatus(BaseConstant.ORDER_STATUS_SUCCESS);
+        order.setReplacementOrder("1");
+        orderInfoEntityService.updateById(order);
         try {
-            //手动补单，密钥取订单中用户的密钥
-            LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
-            SysUser sysUser = userService.getUserByName(loginUser.getUsername());
-            log.info("==》手动补单操作==补单操作人：{}；单号为：{}", sysUser.getUsername(), id);
-            if (order == null) {
-                return R.error("订单不存在");
-            }
-            if (order.getStatus() != BaseConstant.ORDER_STATUS_SUCCESS_NOT_RETURN) {
-                return R.error("订单状态不是‘成功未返回’，不能补单");
-            }
+            orderInfoEntityService.countAmount(id, order.getUserName(), order.getSubmitAmount().toString(),
+                    order.getPayType());
+            return R.ok("线下补单成功:" + id);
+        } catch (Exception e) {
+            log.info("线下补单失败，单号为：{}，失败原因为：{}", id, e);
+        }
+        return R.error("线下补单失败：" + id);
+    }
+
+    /**
+     * 掉单补单入口
+     *
+     * @param id ：四方系统订单号
+     * @return
+     */
+    @RequestMapping(value = "/notifyBusiness", method = RequestMethod.GET)
+    @RequiresPermissions("business::order::notifyBusiness")
+    public R notifyBusiness(@RequestParam(name = "id") String id) throws IOException, URISyntaxException {
+        OrderInfoEntity order = orderInfoEntityService.queryOrderInfoByOrderId(id);
+        LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+        SysUser sysUser = userService.getUserByName(loginUser.getUsername());
+        log.info("==》掉单补单操作==补单操作人：{}；单号为：{}", sysUser.getUsername(), id);
+        if (order == null) {
+            return R.error("订单不存在");
+        }
+        List<DictModel> businessUrls = dictService.queryDictItemsByCode(BaseConstant.REQUEST_BUSINESS_URL);
+        Optional<DictModel> urlModel = businessUrls.stream().filter(model -> order.getPayType().equals(model.getText())).findFirst();
+        DictModel model = urlModel.orElse(null);
+        if (model == null) {
+            return R.error(order.getPayType() + "：未配置通知挂马地址");
+        }
+        Map<String, String> params = new HashMap<>();
+        params.put("orderId", order.getOrderId());
+        String result = HttpUtils.doGet(model.getText(), params);
+        if ("success".equals(result)) {
+            return notifyCustomer(order,id);
+        } else {
+            return R.error("通知挂马失败，请联系管理员");
+        }
+    }
+
+    /**
+     * 通知商户
+     * @param order
+     * @param id
+     * @return
+     */
+    private R notifyCustomer(OrderInfoEntity order, String id) {
+        boolean flag = false;
+        try {
             order.setReplacementOrder("1");
             orderInfoEntityService.updateById(order);
             StringBuilder msg = new StringBuilder();
@@ -358,38 +442,4 @@ public class OrderInfoEntityController {
             }
         }
     }
-
-    /**
-     * 线下补单
-     * 线下补单：不通知商户
-     * @param id
-     * @return
-     */
-    @RequestMapping(value = "/offline", method = RequestMethod.GET)
-    @RequiresPermissions("business::order::offline")
-    public R offline(@RequestParam(name = "id") String id) {
-        OrderInfoEntity order = orderInfoEntityService.queryOrderInfoByOrderId(id);
-        LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
-        SysUser sysUser = userService.getUserByName(loginUser.getUsername());
-        log.info("==》线下补单操作==补单操作人：{}；单号为：{}", sysUser.getUsername(), id);
-        if (order == null) {
-            return R.error("订单不存在");
-        }
-        if (order.getStatus() != BaseConstant.ORDER_STATUS_SUCCESS_NOT_RETURN) {
-            return R.error("订单状态不是‘成功未返回’，不能补单");
-        }
-        //状态更新为成功，已返回
-        order.setStatus(BaseConstant.ORDER_STATUS_SUCCESS);
-        order.setReplacementOrder("1");
-        orderInfoEntityService.updateById(order);
-        try{
-            orderInfoEntityService.countAmount(id, order.getUserName(), order.getSubmitAmount().toString(),
-                    order.getPayType());
-            return R.ok("线下补单成功:"+id);
-        }catch (Exception e){
-            log.info("线下补单失败，单号为：{}，失败原因为：{}",id,e);
-        }
-        return R.error("线下补单失败："+id);
-    }
-
 }

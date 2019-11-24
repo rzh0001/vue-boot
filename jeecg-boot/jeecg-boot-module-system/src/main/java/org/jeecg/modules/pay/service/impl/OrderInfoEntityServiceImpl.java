@@ -213,8 +213,8 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             log.info("订单查询异常，无此订单信息:{}", orderId);
             return R.error("订单查询异常，无此订单信息");
         }
-        //预防多次回调
-        if (order.getStatus() == BaseConstant.ORDER_STATUS_SUCCESS) {
+        //成功已返回的订单不能回调
+        if ("2".equals(order.getStatus().toString()) ) {
             log.info("该订单已经回调过了，不能重复回调:{}", order.getOrderId());
             return R.error("该订单已经回调过了，不能重复回调");
         }
