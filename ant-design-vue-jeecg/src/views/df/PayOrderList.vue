@@ -71,6 +71,16 @@
 
     <!-- table区域-begin -->
     <div>
+      <div class="ant-alert ant-alert-info" style="margin-bottom: 16px;">
+        总订单数：<a-tag color="cyan">{{summary.totalOrderCount}} </a-tag>
+        成功订单数：<a-tag color="cyan">{{summary.paidOrderCount}} </a-tag>
+        失败订单数：<a-tag color="red">{{summary.unpaidOrderCount}} </a-tag>
+        总金额：<a-tag color="cyan">{{summary.totalOrderAmount}}元 </a-tag>
+        成功金额：<a-tag color="cyan">{{summary.paidOrderAmount}}元 </a-tag>
+        失败金额：<a-tag color="red">{{summary.unpaidOrderAmount}}元 </a-tag>
+        预计收入：<a-tag color="cyan">{{summary.income}}元 </a-tag>
+        预计手续费：<a-tag color="cyan">{{summary.fee}}元 </a-tag>
+      </div>
 
       <a-table
         ref="table"
@@ -93,6 +103,9 @@
           <a-popconfirm title="确定拒绝代付申请吗?" v-has="'payOrder:approval'" v-if="record.status==1" @confirm="() => handleApproval({id: record.id, status: '3'})">
                   <a>拒绝</a>
           </a-popconfirm>
+          <a-popconfirm title="确定手动回调吗?" v-has="'payOrder:approval'" v-if="(record.status==2) || (record.status==3)" @confirm="() => manualCallback({id: record.id})">
+                  <a>手动回调</a>
+          </a-popconfirm>
 
         </span>
 
@@ -107,6 +120,8 @@
 
 <script>
   import PayOrderModal from './modules/PayOrderModal'
+  import JDate from '@/components/jeecg/JDate'
+  import { getAction, putAction } from '@/api/manage'
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
 
   export default {
@@ -238,6 +253,22 @@
             }
           },
           {
+            title: '回调状态',
+            align: 'center',
+            dataIndex: 'callbackStatus',
+            customRender: function(text) {
+              if (text == 0) {
+                return '未回调'
+              } else if (text == 1) {
+                return '已返回'
+              }else if (text == 2) {
+                return '未返回'
+              }  else {
+                return text
+              }
+            }
+          },
+          {
             title: '备注',
             align: 'center',
             dataIndex: 'remark'
@@ -300,8 +331,11 @@
           delete: '/df/payOrder/delete',
           deleteBatch: '/df/payOrder/deleteBatch',
           exportXlsUrl: 'df/payOrder/exportXls',
-          importExcelUrl: 'df/payOrder/importExcel'
-        }
+          importExcelUrl: 'df/payOrder/importExcel',
+          summaryUrl: '/df/payOrder/summary',
+          manualCallback: '/df/payOrder/manualCallback'
+        },
+        summary: {},
       }
     },
     computed: {
@@ -309,7 +343,30 @@
         return `${window._CONFIG['domianURL']}/${this.url.importExcelUrl}`
       }
     },
-    methods: {}
+    methods: {
+      searchQueryLocal(){
+        this.searchQuery()
+        getAction(this.url.summaryUrl, this.queryParam).then((res) => {
+          if (res.success) {
+            this.summary = res.result;
+          }
+          if(res.code===510){
+            this.$message.warning(res.message)
+          }
+          this.loading = false;
+        })
+      },
+      manualCallback: function(params){
+        putAction(this.url.manualCallback, params).then((res) => {
+          if (res.success) {
+            that.$message.success(res.message);
+            that.loadData();
+          } else {
+            that.$message.warning(res.message);
+          }
+        });
+      }
+    }
   }
 </script>
 <style scoped>

@@ -17,6 +17,7 @@ import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.modules.df.constant.DfConstant;
 import org.jeecg.modules.df.entity.PayOrder;
+import org.jeecg.modules.df.service.IApiService;
 import org.jeecg.modules.df.service.IPayOrderService;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.service.ISysUserService;
@@ -60,6 +61,9 @@ public class PayOrderController {
 	
 	 @Autowired
 	 private ISysUserService userService;
+
+	 @Autowired
+	 private IApiService apiService;
 	
 	 // 查询条件独立成方法，查询、统计、导出 三个接口使用
 	 private QueryWrapper<PayOrder> initQueryCondition(PayOrder order, HttpServletRequest req) {
@@ -185,8 +189,26 @@ public class PayOrderController {
 		 } else if (DfConstant.STATUS_REJECTED.equals(status)) {
 			 payOrderService.rejected(order);
 		 }
-		
+
+
+
 		 return Result.ok("审核成功!");
+	 }
+
+	 @AutoLog(value = "代付订单-手动回调")
+	 @ApiOperation(value = "代付订单-手动回调", notes = "代付订单-手动回调")
+	 @PutMapping(value = "/manualCallback")
+	 @Transactional(rollbackFor = Exception.class)
+	 public Result<Object> manualCallback(@RequestBody JSONObject jsonObject) {
+
+		 PayOrder order = payOrderService.getById(jsonObject.getString("id"));
+		 if (order == null) {
+			 return Result.error("未找到对应实体");
+		 }
+
+		 apiService.callback(order.getId());
+
+		 return Result.ok("异步通知已发出!");
 	 }
 	
 	/**

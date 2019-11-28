@@ -8,6 +8,7 @@ import org.jeecg.modules.df.constant.DfConstant;
 import org.jeecg.modules.df.entity.PayOrder;
 import org.jeecg.modules.df.entity.PayOrderResult;
 import org.jeecg.modules.df.mapper.PayOrderMapper;
+import org.jeecg.modules.df.service.IApiService;
 import org.jeecg.modules.df.service.IPayOrderService;
 import org.jeecg.modules.df.util.IDUtil;
 import org.jeecg.modules.exception.ApiException;
@@ -16,6 +17,7 @@ import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.service.ISysUserService;
 import org.jeecg.modules.system.service.IUserAmountEntityService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +37,10 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
     
     @Autowired
     private IUserAmountEntityService userAmountService;
+
+    @Autowired
+    @Lazy
+    private IApiService apiService;
     
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -88,7 +94,7 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
         // 生成收入明细
         String remark = "单笔固定手续费：" + order.getFixedFee() + "，交易手续费：" + order.getTransactionFee();
         userAmountService.changeAmount(order.getAgentId(), order.getOrderFee(), order.getOrderId(), remark, "1");
-        
+//        apiService.callback(order.getId());
         return false;
     }
     
@@ -103,7 +109,7 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
         // 生成收入明细
         userAmountService.changeAmount(order.getUserId(), order.getAmount(), order.getOrderId(), order.getRemark(), "3");
         userAmountService.changeAmount(order.getUserId(), order.getOrderFee(), order.getOrderId(), order.getRemark(), "3");
-    
+        apiService.callback(order.getId());
         return false;
     }
     
