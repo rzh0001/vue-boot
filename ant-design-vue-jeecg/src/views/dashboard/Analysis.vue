@@ -1,141 +1,49 @@
 <template>
   <div class="page-header-index-wide">
-    <a-row :gutter="24">
-<!--      <a-col :sm="24" :md="12" :xl="6" :style="{ marginBottom: '24px' }">-->
-<!--        <chart-card :loading="loading" title="今日订单" :total="'￥' + data.todayPaidAmount">-->
-<!--          <a-tooltip title="指标说明" slot="action">-->
-<!--            <a-icon type="info-circle-o" />-->
-<!--          </a-tooltip>-->
-<!--          <div>-->
-<!--            <trend flag="up" style="margin-right: 16px;">-->
-<!--              <span slot="term">笔数</span>-->
-<!--              {{data.todayOrderCount}}-->
-<!--            </trend>-->
-<!--            <trend flag="down">-->
-<!--              <span slot="term">成功率</span>-->
-<!--              {{data.todayPaidRate}}-->
-<!--            </trend>-->
-<!--          </div>-->
-<!--          <template slot="footer">日均销售额<span>￥ 234.56</span></template>-->
-<!--        </chart-card>-->
-<!--      </a-col>-->
-<!--      <a-col :sm="24" :md="12" :xl="6" :style="{ marginBottom: '24px' }">-->
-<!--        <chart-card :loading="loading" title="访问量" :total="8846 | NumberFormat">-->
-<!--          <a-tooltip title="指标说明" slot="action">-->
-<!--            <a-icon type="info-circle-o" />-->
-<!--          </a-tooltip>-->
-<!--          <div>-->
-<!--            <mini-area />-->
-<!--          </div>-->
-<!--          <template slot="footer"-->
-<!--          >日访问量<span> {{ '1234' | NumberFormat }}</span></template-->
-<!--          >-->
-<!--        </chart-card>-->
-<!--      </a-col>-->
-<!--      <a-col :sm="24" :md="12" :xl="6" :style="{ marginBottom: '24px' }">-->
-<!--        <chart-card :loading="loading" title="支付笔数" :total="6560 | NumberFormat">-->
-<!--          <a-tooltip title="指标说明" slot="action">-->
-<!--            <a-icon type="info-circle-o" />-->
-<!--          </a-tooltip>-->
-<!--          <div>-->
-<!--            <mini-bar :height="40" />-->
-<!--          </div>-->
-<!--          <template slot="footer"-->
-<!--          >转化率 <span>60%</span></template-->
-<!--          >-->
-<!--        </chart-card>-->
-<!--      </a-col>-->
-      <a-col :sm="24" :md="12" :xl="6" :style="{ marginBottom: '24px' }">
-        <chart-card :loading="loading" title="今日收入" :total="'￥' + data.todayIncome">
-          <a-tooltip title="指标说明" slot="action">
-            <a-icon type="info-circle-o" />
-          </a-tooltip>
-<!--          <div>-->
-<!--            <mini-progress color="rgb(19, 194, 194)" :target="80" :percentage="78" :height="8" />-->
-<!--          </div>-->
-          <template slot="footer">
-            <trend style="margin-right: 16px;">
-              <span slot="term">总收入</span>
-              {{data.totalIncome}}
-            </trend>
-            <trend >
-              <span slot="term">可提现金额</span>
-              {{data.userAmount}}
-            </trend>
-          </template>
-        </chart-card>
-      </a-col>
-    </a-row>
 
-<!--    <a-card :loading="loading" :bordered="false" :body-style="{ padding: '0' }">-->
-<!--      <div class="salesCard">-->
-<!--        <a-tabs default-active-key="1" size="large" :tab-bar-style="{ marginBottom: '24px', paddingLeft: '16px' }">-->
-<!--          <div class="extra-wrapper" slot="tabBarExtraContent">-->
-<!--            <div class="extra-item">-->
-<!--              <a>今日</a>-->
-<!--              <a>本周</a>-->
-<!--              <a>本月</a>-->
-<!--              <a>本年</a>-->
-<!--            </div>-->
-<!--            <a-range-picker :style="{ width: '256px' }" />-->
-<!--          </div>-->
-<!--          <a-tab-pane loading="true" tab="销售额" key="1">-->
-<!--            <a-row>-->
-<!--              <a-col :xl="16" :lg="12" :md="12" :sm="24" :xs="24">-->
-<!--                <bar title="销售额排行" :dataSource="barData" />-->
-<!--              </a-col>-->
-<!--              <a-col :xl="8" :lg="12" :md="12" :sm="24" :xs="24">-->
-<!--                <rank-list title="门店销售排行榜" :list="rankList" />-->
-<!--              </a-col>-->
-<!--            </a-row>-->
-<!--          </a-tab-pane>-->
-<!--          <a-tab-pane tab="访问量" key="2">-->
-<!--            <a-row>-->
-<!--              <a-col :xl="16" :lg="12" :md="12" :sm="24" :xs="24">-->
-<!--                <bar title="销售额趋势" :dataSource="barData" />-->
-<!--              </a-col>-->
-<!--              <a-col :xl="8" :lg="12" :md="12" :sm="24" :xs="24">-->
-<!--                <rank-list title="门店销售排行榜" :list="rankList" />-->
-<!--              </a-col>-->
-<!--            </a-row>-->
-<!--          </a-tab-pane>-->
-<!--        </a-tabs>-->
-<!--      </div>-->
-<!--    </a-card>-->
+      <div style="background: #f0f2f5; padding: 15px" v-has="'dashboard:agent'">
+        <a-row :gutter="12">
+          <a-col :span="6">
+            <a-card>
+              <a-statistic title="剩余额度" :value="data.totalIncome" :precision="2" :valueStyle="{color: '#2e97ef'}" style="margin-right: 50px"/>
+            </a-card>
+          </a-col>
+          <a-col :span="6">
+            <a-card>
+              <a-statistic title="已代付总额" :value="333333" :precision="2" :valueStyle="{color: '#2e97ef'}" style="margin-right: 50px"/>
+            </a-card>
+          </a-col>
+          <a-col :span="6">
+            <a-card>
+              <a-statistic title="手续费收入" :value="data.totalIncome" :precision="2" :valueStyle="{color: '#2e97ef'}" style="margin-right: 50px"/>
+            </a-card>
+          </a-col>
+          <a-col :span="6">
+              <a-button  shape="circle" icon="reload"></a-button>
+          </a-col>
+        </a-row>
+      </div>
+      <div style="background: #f0f2f5; padding: 15px" v-has="'dashboard:agent'">
+        <a-row :gutter="12">
+          <a-col :span="6">
+            <a-card>
+              <a-statistic title="今日充值" :value="data.totalIncome" :precision="2" :valueStyle="{color: '#2e97ef'}" style="margin-right: 50px"/>
+            </a-card>
+          </a-col>
+          <a-col :span="6">
+            <a-card>
+              <a-statistic title="今日代付" :value="333333" :precision="2" :valueStyle="{color: '#2e97ef'}" style="margin-right: 50px"/>
+            </a-card>
+          </a-col>
+          <a-col :span="6">
+            <a-card>
+              <a-statistic title="今日手续费收入" :value="data.totalIncome" :precision="2" :valueStyle="{color: '#2e97ef'}" style="margin-right: 50px"/>
+            </a-card>
+          </a-col>
+        </a-row>
+      </div>
 
-<!--    <a-row>-->
-<!--      <a-col :span="24">-->
-<!--        <a-card :loading="loading" :bordered="false" title="最近一周访问次数统计" :style="{ marginTop: '24px' }">-->
-<!--          <a-row>-->
-<!--            <a-col :span="6">-->
-<!--              <head-info title="今日访问IP数" :content="loginfo.todayIp"></head-info>-->
-<!--            </a-col>-->
-<!--            <a-col :span="2">-->
-<!--              <a-spin class="circle-cust">-->
-<!--                <a-icon slot="indicator" type="environment" style="font-size: 24px" />-->
-<!--              </a-spin>-->
-<!--            </a-col>-->
-<!--            <a-col :span="6">-->
-<!--              <head-info title="今日访问次数" :content="loginfo.todayVisitCount"></head-info>-->
-<!--            </a-col>-->
-<!--            <a-col :span="2">-->
-<!--              <a-spin class="circle-cust">-->
-<!--                <a-icon slot="indicator" type="team" style="font-size: 24px" />-->
-<!--              </a-spin>-->
-<!--            </a-col>-->
-<!--            <a-col :span="6">-->
-<!--              <head-info title="访问总次数" :content="loginfo.totalVisitCount"></head-info>-->
-<!--            </a-col>-->
-<!--            <a-col :span="2">-->
-<!--              <a-spin class="circle-cust">-->
-<!--                <a-icon slot="indicator" type="rise" style="font-size: 24px" />-->
-<!--              </a-spin>-->
-<!--            </a-col>-->
-<!--          </a-row>-->
-<!--          <line-chart-multid :fields="visitFields" :dataSource="visitInfo"></line-chart-multid>-->
-<!--        </a-card>-->
-<!--      </a-col>-->
-<!--    </a-row>-->
+
   </div>
 </template>
 
@@ -194,9 +102,8 @@
         data: {},
         visitFields: ['ip', 'visit'],
         visitInfo: [],
-        indicator: <a-icon type="loading" style="font-size: 24px" spin />,
         url: {
-          homepageSummary: '/sys/homepage/homepageSummary'
+          summary: '/sys/dashboard/summary'
         }
     }
     },
@@ -227,7 +134,7 @@
       },
 
       getSummary(){
-        getAction(this.url.homepageSummary, {}).then(res =>{
+        getAction(this.url.summary, {}).then(res =>{
             if (res.success){
               this.data = res.result
             }
