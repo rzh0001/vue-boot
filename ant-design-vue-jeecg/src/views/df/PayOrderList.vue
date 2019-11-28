@@ -18,24 +18,25 @@
           </a-col>
           <template v-if="toggleSearchStatus">
             <a-col :md="6" :sm="8">
-              <a-form-item label="用户id">
-                <a-input placeholder="请输入用户id" v-model="queryParam.userId"></a-input>
-              </a-form-item>
-            </a-col>
-            <a-col :md="6" :sm="8">
               <a-form-item label="用户">
                 <a-input placeholder="请输入用户" v-model="queryParam.userName"></a-input>
               </a-form-item>
             </a-col>
             <a-col :md="6" :sm="8">
-              <a-form-item label="用户昵称">
-                <a-input placeholder="请输入用户昵称" v-model="queryParam.userRealname"></a-input>
+              <a-form-item label="开始时间">
+                <j-date v-model="queryParam.createTime_begin" :showTime="true" dateFormat="YYYY-MM-DD HH:mm:ss"/>
+              </a-form-item>
+            </a-col>
+            <a-col :md="6" :sm="8">
+              <a-form-item label="结束时间">
+                <j-date v-model="queryParam.createTime_end" :showTime="true" dateFormat="YYYY-MM-DD HH:mm:ss"/>
               </a-form-item>
             </a-col>
           </template>
           <a-col :md="6" :sm="8">
             <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
-              <a-button type="primary" @click="searchQuery" icon="search">查询</a-button>
+<!--              <a-button type="primary" @click="searchQuery" icon="search">查询</a-button>-->
+              <a-button type="primary" @click="searchQueryLocal" icon="search">查询</a-button>
               <a-button type="primary" @click="searchReset" icon="reload" style="margin-left: 8px">重置</a-button>
               <a @click="handleToggleSearch" style="margin-left: 8px">
                 {{ toggleSearchStatus ? '收起' : '展开' }}
@@ -52,10 +53,10 @@
     <div class="table-operator">
       <a-button @click="handleAdd" v-has="'payOrder:add'" type="primary" icon="plus">新增</a-button>
       <a-button type="primary" icon="download" @click="handleExportXls('代付订单')">导出</a-button>
-      <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl"
-                @change="handleImportExcel">
-        <a-button type="primary" icon="import">导入</a-button>
-      </a-upload>
+<!--      <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl"-->
+<!--                @change="handleImportExcel">-->
+<!--        <a-button type="primary" icon="import">导入</a-button>-->
+<!--      </a-upload>-->
       <a-dropdown v-if="selectedRowKeys.length > 0">
         <a-menu slot="overlay">
           <a-menu-item key="1" @click="batchDel">
@@ -73,12 +74,13 @@
     <div>
       <div class="ant-alert ant-alert-info" style="margin-bottom: 16px;">
         总订单数：<a-tag color="cyan">{{summary.totalOrderCount}} </a-tag>
-        成功订单数：<a-tag color="cyan">{{summary.paidOrderCount}} </a-tag>
-        失败订单数：<a-tag color="red">{{summary.unpaidOrderCount}} </a-tag>
+        已付订单数：<a-tag color="cyan">{{summary.paidOrderCount}} </a-tag>
+<!--        失败订单数：<a-tag color="red">{{summary.unpaidOrderCount}} </a-tag>-->
         总金额：<a-tag color="cyan">{{summary.totalOrderAmount}}元 </a-tag>
-        成功金额：<a-tag color="cyan">{{summary.paidOrderAmount}}元 </a-tag>
-        失败金额：<a-tag color="red">{{summary.unpaidOrderAmount}}元 </a-tag>
-        预计收入：<a-tag color="cyan">{{summary.income}}元 </a-tag>
+        已付金额：<a-tag color="cyan">{{summary.paidOrderAmount}}元 </a-tag>
+        已返回金额：<a-tag color="cyan">{{summary.paidOrderAmount}}元 </a-tag>
+<!--        失败金额：<a-tag color="red">{{summary.unpaidOrderAmount}}元 </a-tag>-->
+<!--        预计收入：<a-tag color="cyan">{{summary.income}}元 </a-tag>-->
         预计手续费：<a-tag color="cyan">{{summary.fee}}元 </a-tag>
       </div>
 
@@ -128,7 +130,8 @@
     name: 'PayOrderList',
     mixins: [JeecgListMixin],
     components: {
-      PayOrderModal
+      PayOrderModal,
+      JDate
     },
     data() {
       return {

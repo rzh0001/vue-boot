@@ -1,6 +1,7 @@
 package org.jeecg.modules.df.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.shiro.SecurityUtils;
 import org.jeecg.common.system.vo.LoginUser;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 /**
  * @Description: 1
@@ -31,45 +33,45 @@ import java.math.BigDecimal;
  */
 @Service
 public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> implements IPayOrderService {
-    
+
     @Autowired
     private ISysUserService userService;
-    
+
     @Autowired
     private IUserAmountEntityService userAmountService;
 
     @Autowired
     @Lazy
     private IApiService apiService;
-    
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean create(PayOrder order) {
         LoginUser ou = (LoginUser) SecurityUtils.getSubject().getPrincipal();
-    
-    
+
+
         // 获取费率配置
         SysUser user = userService.getById(ou.getId());
         if (BeanUtil.isEmpty(user) || null == user.getTransactionFeeRate() || null == user.getOrderFixedFee()) {
             throw new RRException("获取费率配置失败！");
         }
-    
+
         order.setUserId(user.getId());
         order.setUserName(user.getUsername());
         order.setUserRealname(user.getRealname());
         order.setAgentId(user.getAgentId());
         order.setAgentUsername(user.getAgentUsername());
         order.setAgentRealname(user.getAgentRealname());
-    
+
         // 生成订单号
         order.setOrderId(IDUtil.genPayOrderId());
         order.setStatus(DfConstant.STATUS_SAVE);
-    
+
         // 计算手续费
         order.setTransactionFee(order.getAmount().multiply(user.getTransactionFeeRate()).setScale(2, BigDecimal.ROUND_HALF_UP));
         order.setFixedFee(user.getOrderFixedFee());
         order.setOrderFee(order.getTransactionFee().add(order.getFixedFee()));
-    
+
         // 检查代付额度
         BigDecimal userAmount = userAmountService.getUserAmount(ou.getId());
         if (userAmount.compareTo(order.getAmount().add(order.getOrderFee())) < 0) {
@@ -79,17 +81,17 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
         String remark = "单笔固定手续费：" + order.getFixedFee() + "，交易手续费：" + order.getTransactionFee();
         userAmountService.changeAmount(user.getId(), order.getAmount().negate(), order.getOrderId(), "", "5");
         userAmountService.changeAmount(user.getId(), order.getOrderFee().negate(), order.getOrderId(), remark, "6");
-    
+
         return save(order);
     }
-    
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean checked(PayOrder order) {
-        
+
         // 修改订单状态
         updateById(order);
-        
+
         // 增加代理收入
         // 生成收入明细
         String remark = "单笔固定手续费：" + order.getFixedFee() + "，交易手续费：" + order.getTransactionFee();
@@ -97,14 +99,14 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
 //        apiService.callback(order.getId());
         return false;
     }
-    
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean rejected(PayOrder order) {
-    
+
         // 修改订单状态
         updateById(order);
-    
+
         // 返还商户额度
         // 生成收入明细
         userAmountService.changeAmount(order.getUserId(), order.getAmount(), order.getOrderId(), order.getRemark(), "3");
@@ -112,32 +114,32 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
         apiService.callback(order.getId());
         return false;
     }
-    
+
     @Override
     public PayOrderResult apiOrder(PayOrder order) {
-    
+
         int count = baseMapper.count(order.getUserId(), order.getOuterOrderId());
         if (count > 0) {
             throw new ApiException(1005, "订单号重复");
         }
-    
-    
+
+
         // 获取费率配置
         SysUser user = userService.getById(order.getUserId());
         if (BeanUtil.isEmpty(user) || null == user.getTransactionFeeRate() || null == user.getOrderFixedFee()) {
             throw new ApiException(1006, "获取费率配置失败！");
         }
-    
+
         // 生成订单号
         order.setOrderId(IDUtil.genPayOrderId());
         order.setStatus(DfConstant.STATUS_SAVE);
         order.setCallbackStatus("0");
-    
+
         // 计算手续费
         order.setTransactionFee(order.getAmount().multiply(user.getTransactionFeeRate()).setScale(2, BigDecimal.ROUND_HALF_UP));
         order.setFixedFee(user.getOrderFixedFee());
         order.setOrderFee(order.getTransactionFee().add(order.getFixedFee()));
-    
+
         // 检查代付额度
         BigDecimal userAmount = userAmountService.getUserAmount(order.getUserId());
         if (userAmount.compareTo(order.getAmount().add(order.getOrderFee())) < 0) {
@@ -147,20 +149,25 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder> i
         userAmountService.changeAmount(user.getId(), order.getAmount().negate(), order.getOrderId(), null, "5");
         String remark = "单笔固定手续费：" + order.getFixedFee() + "，交易手续费：" + order.getTransactionFee();
         userAmountService.changeAmount(user.getId(), order.getOrderFee().negate(), order.getOrderId(), remark, "6");
-        
+
         save(order);
         PayOrderResult result = PayOrderResult.fromPayOrder(order);
         return result;
     }
-    
+
     @Override
     public int count(String userId, String outerOrderId) {
-        
+
         return baseMapper.count(userId, outerOrderId);
     }
-    
+
     @Override
     public PayOrder getByOuterOrderId(String outerOrderId) {
         return baseMapper.getByOuterOrderId(outerOrderId);
+    }
+
+    @Override
+    public Map<String, Object> summary(QueryWrapper<PayOrder> queryWrapper) {
+        return baseMapper.summary(queryWrapper);
     }
 }
