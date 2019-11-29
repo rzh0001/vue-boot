@@ -1,6 +1,7 @@
 package org.jeecg.modules.system.service.impl;
 
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.modules.system.mapper.DashboardMapper;
 import org.jeecg.modules.system.service.IBaseService;
 import org.jeecg.modules.system.service.IDashboardService;
 import org.jeecg.modules.system.service.IUserAmountDetailService;
@@ -20,6 +21,8 @@ public class IDashboardServiceImpl extends IBaseService implements IDashboardSer
 
   @Autowired private IUserAmountDetailService amountDetailService;
 
+  @Autowired private DashboardMapper mapper;
+
   @Override
   public Result<Map<String, Object>> homepageSummary() {
 
@@ -33,8 +36,9 @@ public class IDashboardServiceImpl extends IBaseService implements IDashboardSer
 
   public Map<String, Object> agentSummary(String userId) {
     // 剩余额度
-
+    BigDecimal userAmount = mapper.summaryUserAmount(userId);
     // 已代付总额
+
     // 手续费收入
     // 今日充值
     // 今日代付
