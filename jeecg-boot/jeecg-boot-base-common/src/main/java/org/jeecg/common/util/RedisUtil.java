@@ -1,13 +1,19 @@
 package org.jeecg.common.util;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import cn.hutool.socket.protocol.Protocol;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -22,15 +28,32 @@ public class RedisUtil {
 	@Autowired
 	private RedisTemplate<String, Object> redisTemplate;
 	@Autowired
-	private StringRedisTemplate stringRedisTemplate;
+	private StringRedisTemplate redis;
 
+	public boolean setIfAbsent(String key, String value, long expireTime) {
+		Boolean result = redisTemplate.opsForValue().setIfAbsent(key,value,expireTime, TimeUnit.SECONDS);
+		return result;
+	}
 	/**
-	 * 指定缓存失效时间
-	 * 
-	 * @param key  键
-	 * @param time 时间(秒)
-	 * @return
+	 * Redis SetNX 指令
 	 */
+//	public Boolean setnx(String key, Object value) {
+//		return redis.execute((RedisConnection conn) -> {
+//			try {
+//				return conn.setNX(redis.getStringSerializer().serialize(key),
+//						redis.getStringSerializer().serialize(value.toString()));
+//			} finally {
+//				conn.close();
+//			}
+//		});
+//	}
+		/**
+         * 指定缓存失效时间
+         *
+         * @param key  键
+         * @param time 时间(秒)
+         * @return
+         */
 	public boolean expire(String key, long time) {
 		try {
 			if (time > 0) {
