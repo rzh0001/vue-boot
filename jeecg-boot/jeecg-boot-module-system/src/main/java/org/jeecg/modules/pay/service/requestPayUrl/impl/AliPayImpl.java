@@ -197,12 +197,12 @@ public class AliPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        PayServiceFactory.register(BaseConstant.REQUEST_ALI_BANK,this);
-        PayServiceFactory.register(BaseConstant.REQUEST_ALI_ZZ,this);
-        PayServiceFactory.register(BaseConstant.REQUEST_WECHAT_BANK,this);
-        PayServiceFactory.registerUrl(BaseConstant.REQUEST_ALI_BANK,utils.getRequestUrl(BaseConstant.REQUEST_ALI_BANK));
-        PayServiceFactory.registerUrl(BaseConstant.REQUEST_ALI_ZZ,utils.getRequestUrl(BaseConstant.REQUEST_ALI_ZZ));
-        PayServiceFactory.registerUrl(BaseConstant.REQUEST_WECHAT_BANK,utils.getRequestUrl(BaseConstant.REQUEST_WECHAT_BANK));
+//        PayServiceFactory.register(BaseConstant.REQUEST_ALI_BANK,this);
+//        PayServiceFactory.register(BaseConstant.REQUEST_ALI_ZZ,this);
+//        PayServiceFactory.register(BaseConstant.REQUEST_WECHAT_BANK,this);
+//        PayServiceFactory.registerUrl(BaseConstant.REQUEST_ALI_BANK,utils.getRequestUrl(BaseConstant.REQUEST_ALI_BANK));
+//        PayServiceFactory.registerUrl(BaseConstant.REQUEST_ALI_ZZ,utils.getRequestUrl(BaseConstant.REQUEST_ALI_ZZ));
+//        PayServiceFactory.registerUrl(BaseConstant.REQUEST_WECHAT_BANK,utils.getRequestUrl(BaseConstant.REQUEST_WECHAT_BANK));
     }
 
     @Override

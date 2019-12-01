@@ -89,11 +89,25 @@ public class XinPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
         return false;
     }
 
+    /**
+     * 回调的时候，先从redis中获取回调的订单号是否存在，如果存在，则不允许进行回调，如果不存在则在进行回调
+     * @param object ：挂马平台传递过来的参数
+     * @return
+     * @throws Exception
+     */
     @Override
     public Object callBack(Object object) throws Exception {
         Map<String, Object> map = (Map<String, Object>) object;
         String orderId =(String) map.get("orderNo");
         log.info("==>信付回调四方开始，订单号为：{}",orderId);
+        //假如当前同一个单号有多个请求进来，则，只针对一个线程进行处理，其余的不处理
+        String exist = (String) redisUtil.get("callBack"+orderId);
+        if(!StringUtils.isEmpty(exist)){
+            return "不能重复回调";
+        }
+        if(!redisUtil.setIfAbsent("callBack"+orderId,orderId,30)){
+            return "不能重复回调";
+        }
         //验证签名： 订单状态+商户号+商户订单号+支付金额+商户秘钥
         StringBuilder sign = new StringBuilder();
         sign.append(map.get("state").toString()).append(map.get("merchantNum").toString()).append(orderId).append(map.get("amount").toString()).append(MD5_KEY);
@@ -108,10 +122,16 @@ public class XinPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
             log.info("===>信付支付回调，根据订单号：{}，查询不到订单信息",orderId);
             return "订单不存在";
         }
+        //成功已返回的订单不能回调
+        if ("2".equals(order.getStatus().toString()) ) {
+            log.info("该订单已经回调过了，不能重复回调:{}", order.getOrderId());
+            return R.error("该订单已经回调过了，不能重复回调");
+        }
         order.setStatus(BaseConstant.ORDER_STATUS_SUCCESS_NOT_RETURN);
         SysUser user = userService.getUserByName(order.getUserName());
         String payType = (String) map.get("attch");
         R r = orderInfoEntityService.notifyCustomer(order,user,payType);
+        redisUtil.del("callBack"+orderId);
         if("0".equals(r.get("code"))){
             log.info("==>信付回调四方结束，返回信付为success，订单号为：{}",orderId);
             return "success";

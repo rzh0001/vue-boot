@@ -218,6 +218,14 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             log.info("该订单已经回调过了，不能重复回调:{}", order.getOrderId());
             return R.error("该订单已经回调过了，不能重复回调");
         }
+        //假如当前同一个单号有多个请求进来，则，只针对一个线程进行处理，其余的不处理
+        String exist = (String) redisUtil.get("callBack"+orderId);
+        if(!org.springframework.util.StringUtils.isEmpty(exist)){
+            return R.error("该订单已经回调过了，不能重复回调");
+        }
+        if(!redisUtil.setIfAbsent("callBack"+orderId,orderId,30)){
+            return R.error("该订单已经回调过了，不能重复回调");
+        }
         //2 校验订单状态 ，从挂马平台查询
         //校验在此通道下的该商户对应的代理是否有定义挂码账号
         SysUser user = userService.getUserByName(userName);
@@ -255,6 +263,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             //捕获异常的目的是为了防止各种异常情况下，仍然会去修改订单状态
             //3 数据加密之后，通知下游商户
             HttpResult result = HttpUtils.doPostJson(order.getSuccessCallbackUrl(), callobj.toJSONString());
+            redisUtil.del("callBack"+order.getOrderId());
             //4、修改订单状态,同时更新订单的update_time;标示订单的回调时间
             body = result.getBody();
             log.info("===商户返回信息：{}", body);

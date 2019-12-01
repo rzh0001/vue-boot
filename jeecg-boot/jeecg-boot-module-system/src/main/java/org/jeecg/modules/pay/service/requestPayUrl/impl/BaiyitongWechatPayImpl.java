@@ -128,8 +128,17 @@ public class BaiyitongWechatPayImpl implements RequestPayUrl<OrderInfoEntity, St
             log.info("===>百易通回调,签名验证不通过，入参的签名为：{},本地签名为：{}",map.get("sign").toString(),sign);
             return "签名验证失败";
         }
+        //假如当前同一个单号有多个请求进来，则，只针对一个线程进行处理，其余的不处理
+        String exist = (String) redisUtil.get("callBack"+orderId);
+        if(!StringUtils.isEmpty(exist)){
+            return "不能重复回调";
+        }
+        if(!redisUtil.setIfAbsent("callBack"+orderId,orderId,30)){
+            return "不能重复回调";
+        }
         order.setStatus(BaseConstant.ORDER_STATUS_SUCCESS_NOT_RETURN);
         R r = orderInfoEntityService.notifyCustomer(order,user,payType);
+        redisUtil.del("callBack"+orderId);
         if("0".equals(r.get("code"))){
             log.info("==>百易通回调四方结束，返回信付为success，订单号为：{}",orderId);
             return "success";
