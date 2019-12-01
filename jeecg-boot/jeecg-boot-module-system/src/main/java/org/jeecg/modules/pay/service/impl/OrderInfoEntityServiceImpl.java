@@ -555,7 +555,10 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         if (!org.springframework.util.StringUtils.isEmpty(redisValue)) {
             return false;
         }
-        redisUtil.set(outerOrderId, outerOrderId, 10);
+        if(!redisUtil.setIfAbsent(outerOrderId, outerOrderId, 10)){
+            log.info("==>redis setnx 返回false,单号为：{}",outerOrderId);
+            return false;
+        }
         String orderId = baseMapper.queryOrderByOuterOrderId(outerOrderId);
         if (StringUtils.isNotBlank(orderId)) {
             return false;
