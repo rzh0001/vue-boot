@@ -6,6 +6,7 @@ import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.entity.UserAmountEntity;
+import org.jeecg.modules.system.service.IDashboardService;
 import org.jeecg.modules.system.service.ISysUserService;
 import org.jeecg.modules.system.service.IUserAmountDetailService;
 import org.jeecg.modules.system.service.IUserAmountEntityService;
@@ -33,6 +34,8 @@ public class DashboardController {
 
   @Autowired private IUserAmountDetailService amountDetailService;
 
+  @Autowired private IDashboardService dashboardService;
+
   @GetMapping("/summary")
   public Result summary() {
     LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
@@ -49,19 +52,19 @@ public class DashboardController {
     // 今日手续费收入
 
     // 获取会员余额、总收入、今日收入
-    UserAmountEntity userAmount = amountService.getUserAmountByUserName(opUser.getUsername());
-    map.put("userAmount", userAmount.getAmount());
-
-    BigDecimal totalIncome = amountDetailService.getTotalIncome(opUser.getId());
-    map.put("totalIncome", totalIncome);
-
-    BigDecimal todayIncome = amountDetailService.getTodayIncome(opUser.getId());
-    map.put("todayIncome", todayIncome);
-
-    // 今日提现金额
-
-    result.setSuccess(true);
-    result.setResult(map);
-    return result;
+    //    UserAmountEntity userAmount = amountService.getUserAmountByUserName(opUser.getUsername());
+    //    map.put("userAmount", userAmount.getAmount());
+    //
+    //    BigDecimal totalIncome = amountDetailService.getTotalIncome(opUser.getId());
+    //    map.put("totalIncome", totalIncome);
+    //
+    //    BigDecimal todayIncome = amountDetailService.getTodayIncome(opUser.getId());
+    //    map.put("todayIncome", todayIncome);
+    //
+    //    // 今日提现金额
+    //
+    //    result.setSuccess(true);
+    //    result.setResult(map);
+    return dashboardService.homepageSummary();
   }
 }

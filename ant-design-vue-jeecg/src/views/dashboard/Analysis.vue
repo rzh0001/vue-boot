@@ -1,43 +1,43 @@
 <template>
   <div class="page-header-index-wide">
 
-      <div style="background: #f0f2f5; padding: 15px" v-has="'dashboard:agent'">
+      <div style="background: #f0f2f5; padding: 15px" >
         <a-row :gutter="12">
           <a-col :span="6">
             <a-card>
-              <a-statistic title="剩余额度" :value="data.totalIncome" :precision="2" :valueStyle="{color: '#2e97ef'}" style="margin-right: 50px"/>
+              <a-statistic title="剩余额度" :value="data.userAmount" :precision="2" :valueStyle="{color: '#2e97ef'}" style="margin-right: 50px"/>
             </a-card>
           </a-col>
           <a-col :span="6">
             <a-card>
-              <a-statistic title="已代付总额" :value="333333" :precision="2" :valueStyle="{color: '#2e97ef'}" style="margin-right: 50px"/>
+              <a-statistic title="已代付总额" :value="data.payAmount" :precision="2" :valueStyle="{color: '#2e97ef'}" style="margin-right: 50px"/>
             </a-card>
           </a-col>
           <a-col :span="6">
             <a-card>
-              <a-statistic title="手续费收入" :value="data.totalIncome" :precision="2" :valueStyle="{color: '#2e97ef'}" style="margin-right: 50px"/>
+              <a-statistic title="手续费" :value="data.orderFee" :precision="2" :valueStyle="{color: '#2e97ef'}" style="margin-right: 50px"/>
             </a-card>
           </a-col>
           <a-col :span="6">
-              <a-button  shape="circle" icon="reload"></a-button>
+              <a-button  shape="circle" icon="reload" @click="getSummary"></a-button>
           </a-col>
         </a-row>
       </div>
-      <div style="background: #f0f2f5; padding: 15px" v-has="'dashboard:agent'">
+      <div style="background: #f0f2f5; padding: 15px">
         <a-row :gutter="12">
           <a-col :span="6">
             <a-card>
-              <a-statistic title="今日充值" :value="data.totalIncome" :precision="2" :valueStyle="{color: '#2e97ef'}" style="margin-right: 50px"/>
+              <a-statistic title="今日充值" :value="data.todayRechargeAmount" :precision="2" :valueStyle="{color: '#2e97ef'}" style="margin-right: 50px"/>
             </a-card>
           </a-col>
           <a-col :span="6">
             <a-card>
-              <a-statistic title="今日代付" :value="333333" :precision="2" :valueStyle="{color: '#2e97ef'}" style="margin-right: 50px"/>
+              <a-statistic title="今日代付" :value="data.todayDfPayAmount" :precision="2" :valueStyle="{color: '#2e97ef'}" style="margin-right: 50px"/>
             </a-card>
           </a-col>
           <a-col :span="6">
             <a-card>
-              <a-statistic title="今日手续费收入" :value="data.totalIncome" :precision="2" :valueStyle="{color: '#2e97ef'}" style="margin-right: 50px"/>
+              <a-statistic title="今日手续费" :value="data.todayDfOrderFee" :precision="2" :valueStyle="{color: '#2e97ef'}" style="margin-right: 50px"/>
             </a-card>
           </a-col>
         </a-row>
