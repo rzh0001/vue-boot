@@ -134,21 +134,23 @@ public class ApiServiceImpl implements IApiService {
     body.setData(result.encodeData(user.getApiKey()));
     body.setSign(body.sign(user.getApiKey()));
 
-    log.info("\n=======>订单[{}]发送异步回调", order.getOuterOrderId());
+    log.info("\n=======>订单[{}]：发送异步回调", order.getOuterOrderId());
     String post = HttpUtil.post(order.getCallbackUrl(), body.toJsonString());
     // 先更新为已发送未返回
     order.setCallbackStatus("1");
     payOrderService.updateById(order);
 
-    log.info("\n=======>订单[{}]异步回调返回报文:{}", order.getOuterOrderId(), post);
+    log.info("\n=======>订单[{}]：异步回调返回报文:{}", order.getOuterOrderId(), post);
 
     JSONObject jsonObject = JSONUtil.parseObj(post);
     if (BeanUtil.isEmpty(jsonObject)) {
+      log.error("\n=======>订单[{}]：异步回调返回报文解析失败", order.getOuterOrderId());
       throw new RRException("解析返回数据出错！请联系管理员！");
     }
 
     int code = (int) jsonObject.get("code");
     if (code == 0) {
+      log.info("\n=======>订单[{}]：异步回调返回报文解析成功，更新回调状态", order.getOuterOrderId());
       order.setCallbackStatus("2");
       payOrderService.updateById(order);
     }

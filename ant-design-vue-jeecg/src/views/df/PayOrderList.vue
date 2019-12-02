@@ -263,9 +263,9 @@
               if (text == 0) {
                 return '未回调'
               } else if (text == 1) {
-                return '已返回'
-              }else if (text == 2) {
                 return '未返回'
+              }else if (text == 2) {
+                return '已返回'
               }  else {
                 return text
               }
