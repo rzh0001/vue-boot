@@ -240,14 +240,15 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
                 break;
             }
         }
+        log.info("==>请求通道为：{},二次查询订单状态地址为：{}",payType,queryUrl);
         if (StringUtils.isBlank(queryUrl)) {
             throw new RRException("未配置四方系统查询挂马平台的订单状态地址,单号：" + orderId + ";通道为：" + payType);
         }
         //校验订单信息，并更新订单状态
-        if (!requestPayUrl.orderInfoOk(order, queryUrl, useBusinesses.get(0))) {
-            log.info("订单回调过程中，订单查询异常,orderID:{}", orderId);
-            return R.error("订单查询异常，无此订单信息");
-        }
+//        if (!requestPayUrl.orderInfoOk(order, queryUrl, useBusinesses.get(0))) {
+//            log.info("订单回调过程中，订单查询异常,orderID:{}", orderId);
+//            return R.error("订单查询异常，无此订单信息");
+//        }
         return notifyCustomer(order, user, payType);
     }
 
