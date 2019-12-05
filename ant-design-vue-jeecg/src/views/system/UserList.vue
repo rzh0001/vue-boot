@@ -162,9 +162,9 @@
                   <a>解冻</a>
                 </a-popconfirm>
               </a-menu-item>
-<!--              <a-menu-item>-->
-<!--                <a href="javascript:;" @click="handleChangeAmount(record.username)">资金</a>-->
-<!--              </a-menu-item>-->
+              <a-menu-item>
+                <a href="javascript:;" @click="handleChangeAmount(record.username)">资金</a>
+              </a-menu-item>
             </a-menu>
           </a-dropdown>
 <!--          <a-dropdown>-->
