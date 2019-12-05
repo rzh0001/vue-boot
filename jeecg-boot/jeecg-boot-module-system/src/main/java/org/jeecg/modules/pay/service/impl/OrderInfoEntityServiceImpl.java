@@ -259,6 +259,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         JSONObject callobj = encryptAESData(order, user.getApiKey());
         StringBuilder msg = new StringBuilder();
         String body = null;
+        updateOrderStatusNoBackByOrderId(order.getOrderId());
         try {
             log.info("===回调商户，url:{},param:{}", order.getSuccessCallbackUrl(), callobj.toJSONString());
             //捕获异常的目的是为了防止各种异常情况下，仍然会去修改订单状态
