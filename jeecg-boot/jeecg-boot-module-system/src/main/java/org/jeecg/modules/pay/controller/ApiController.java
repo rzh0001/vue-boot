@@ -2,6 +2,7 @@ package org.jeecg.modules.pay.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
+import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import org.jeecg.modules.pay.service.IOrderInfoEntityService;
 import org.jeecg.modules.util.R;
 import org.jeecg.modules.util.RequestHandleUtil;
@@ -97,6 +98,7 @@ public class ApiController {
     @ResponseBody
     public String testCallBack() {
         JSONObject result = new JSONObject();
+        OrderInfoEntity o = orderInfoService.queryOrderInfoByOrderId("20191202222707GuEGZ");
         result.put("code", 200);
         result.put("msg", "success");
         return result.toJSONString();
