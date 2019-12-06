@@ -73,18 +73,19 @@ public class PayTest {
     @Test
     public void callback(){
         JSONObject data = new JSONObject();
-        data.put(BaseConstant.ORDER_ID,"1565608382003");
-        data.put(BaseConstant.PAY_TYPE,"ysf");
-        String dataEn = AES128Util.encryptBase64(data.toJSONString(), "abc123#@!");
+        data.put(BaseConstant.ORDER_ID,"20191202222707GuEGZ");
+        data.put(BaseConstant.PAY_TYPE,"ali_bank");
+        String dataEn = AES128Util.encryptBase64(data.toJSONString(), "Pfe9jM2oV8zGWS9a");
         JSONObject req = new JSONObject();
         Long time = new Date().getTime();
-        req.put(BaseConstant.USER_NAME,"www");
+        req.put(BaseConstant.USER_NAME,"xiaoyao");
         req.put(BaseConstant.DATA,dataEn);
         req.put(BaseConstant.TIMESTAMP,time);
         StringBuilder sign = new StringBuilder();
-        sign.append("www").append(time).append(dataEn).append("abc123#@!");
+        sign.append("xiaoyao").append(time).append(dataEn).append("Pfe9jM2oV8zGWS9a");
         req.put(BaseConstant.SIGN, DigestUtils.md5Hex(sign.toString()));
-//        api.callback(req,request);
+        System.out.println(req.toJSONString());
+        api.callback();
     }
 
     @Test

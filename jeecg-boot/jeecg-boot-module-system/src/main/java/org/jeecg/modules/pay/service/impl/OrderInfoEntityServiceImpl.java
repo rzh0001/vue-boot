@@ -124,6 +124,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
                 OrderInfoEntity order = queryOrderInfoByOrderId(orderId);
                 Map<String, Object> map = new HashMap<String, Object>();
                 if (order != null) {
+                    log.info("==>查询订单：{}，状态为：{}",order.getOrderId(),order.getStatus());
                     map.put(BaseConstant.STATUS, order.getStatus());
                     map.put(BaseConstant.ORDER_ID, order.getOrderId());
                     map.put(BaseConstant.OUTER_ORDER_ID, order.getOuterOrderId());
@@ -244,6 +245,8 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         if (StringUtils.isBlank(queryUrl)) {
             throw new RRException("未配置四方系统查询挂马平台的订单状态地址,单号：" + orderId + ";通道为：" + payType);
         }
+        order.setStatus(BaseConstant.ORDER_STATUS_SUCCESS_NOT_RETURN);
+        updateById(order);
         //校验订单信息，并更新订单状态
 //        if (!requestPayUrl.orderInfoOk(order, queryUrl, useBusinesses.get(0))) {
 //            log.info("订单回调过程中，订单查询异常,orderID:{}", orderId);
@@ -259,7 +262,6 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         JSONObject callobj = encryptAESData(order, user.getApiKey());
         StringBuilder msg = new StringBuilder();
         String body = null;
-        updateOrderStatusNoBackByOrderId(order.getOrderId());
         try {
             log.info("===回调商户，url:{},param:{}", order.getSuccessCallbackUrl(), callobj.toJSONString());
             //捕获异常的目的是为了防止各种异常情况下，仍然会去修改订单状态
