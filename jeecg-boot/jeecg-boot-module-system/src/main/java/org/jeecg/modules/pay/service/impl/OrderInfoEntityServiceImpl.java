@@ -125,7 +125,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
                 Map<String, Object> map = new HashMap<String, Object>();
                 if (order != null) {
                     log.info("==>查询订单：{}，状态为：{}",order.getOrderId(),order.getStatus());
-                    map.put(BaseConstant.STATUS, order.getStatus());
+                    map.put(BaseConstant.STATUS, 1);
                     map.put(BaseConstant.ORDER_ID, order.getOrderId());
                     map.put(BaseConstant.OUTER_ORDER_ID, order.getOuterOrderId());
                     map.put(BaseConstant.SUBMIT_AMOUNT, order.getSubmitAmount());

@@ -374,20 +374,21 @@ public class OrderInfoEntityController {
         if (order == null) {
             return R.error("订单不存在");
         }
-        List<DictModel> businessUrls = dictService.queryDictItemsByCode(BaseConstant.REQUEST_BUSINESS_URL);
-        Optional<DictModel> urlModel = businessUrls.stream().filter(model -> order.getPayType().equals(model.getText())).findFirst();
-        DictModel model = urlModel.orElse(null);
-        if (model == null) {
-            return R.error(order.getPayType() + "：未配置通知挂马地址");
-        }
-        Map<String, String> params = new HashMap<>();
-        params.put("orderId", order.getOrderId());
-        String result = HttpUtils.doGet(model.getText(), params);
-        if ("success".equals(result)) {
-            return notifyCustomer(order,id);
-        } else {
-            return R.error("通知挂马失败，请联系管理员");
-        }
+//        List<DictModel> businessUrls = dictService.queryDictItemsByCode(BaseConstant.REQUEST_BUSINESS_URL);
+//        Optional<DictModel> urlModel = businessUrls.stream().filter(model -> order.getPayType().equals(model.getText())).findFirst();
+//        DictModel model = urlModel.orElse(null);
+//        if (model == null) {
+//            return R.error(order.getPayType() + "：未配置通知挂马地址");
+//        }
+        return notifyCustomer(order,id);
+//        Map<String, String> params = new HashMap<>();
+//        params.put("orderId", order.getOrderId());
+//        String result = HttpUtils.doGet(model.getText(), params);
+//        if ("success".equals(result)) {
+//            return notifyCustomer(order,id);
+//        } else {
+//            return R.error("通知挂马失败，请联系管理员");
+//        }
     }
 
     /**
