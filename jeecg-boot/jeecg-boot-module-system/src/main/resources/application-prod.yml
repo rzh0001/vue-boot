@@ -1,7 +1,7 @@
 server:
   port: 8080
   servlet:
-    context-path: /pay
+    context-path: /jeecg-boot
     compression:
       enabled: true
       mime-types: application/javascript,application/json,application/xml,text/html,text/xml,text/plain,text/css,image/*
@@ -93,8 +93,8 @@ spring:
       datasource:
         master:
           url: jdbc:mysql://127.0.0.1:3306/jeecg-boot?characterEncoding=UTF-8&useUnicode=true&useSSL=false&serverTimezone=Asia/Shanghai
-          username: xsf2
-          password: 4Ea13UCBv%jU1Kb^
+          username: xsf
+          password: xh9%Os$M#*KArp^20f
           driver-class-name: com.mysql.jdbc.Driver
           # 多数据源配置
           #multi-datasource1:
