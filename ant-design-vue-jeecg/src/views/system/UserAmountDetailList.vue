@@ -29,14 +29,20 @@
             </a-form-item>
           </a-col>
           <template v-if="toggleSearchStatus">
-            <a-col :md="6" :sm="8">
-              <a-form-item label="金额">
-                <a-input placeholder="请输入金额" v-model="queryParam.amount"></a-input>
-              </a-form-item>
-            </a-col>
+
             <a-col :md="6" :sm="8">
               <a-form-item label="订单号">
                 <a-input placeholder="请输入订单号" v-model="queryParam.orderId"></a-input>
+              </a-form-item>
+            </a-col>
+            <a-col :md="6" :sm="8">
+              <a-form-item label="开始时间">
+                <j-date v-model="queryParam.createTime_begin" :showTime="true" dateFormat="YYYY-MM-DD HH:mm:ss"/>
+              </a-form-item>
+            </a-col>
+            <a-col :md="6" :sm="8">
+              <a-form-item label="结束时间">
+                <j-date v-model="queryParam.createTime_end" :showTime="true" dateFormat="YYYY-MM-DD HH:mm:ss"/>
               </a-form-item>
             </a-col>
           </template>
@@ -119,12 +125,13 @@
 <script>
   import UserAmountDetailModal from './modules/UserAmountDetailModal'
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
+  import JDate from '@/components/jeecg/JDate'
 
   export default {
     name: 'UserAmountDetailList',
     mixins: [JeecgListMixin],
     components: {
-      UserAmountDetailModal
+      UserAmountDetailModal,JDate
     },
     data() {
       return {
