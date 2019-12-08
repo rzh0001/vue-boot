@@ -105,7 +105,7 @@
           <a-popconfirm title="确定拒绝代付申请吗?" v-has="'payOrder:approval'" v-if="record.status==1" @confirm="() => handleApproval({id: record.id, status: '3'})">
                   <a>拒绝</a>
           </a-popconfirm>
-          <a-popconfirm title="确定手动回调吗?" v-has="'payOrder:approval'" v-if="(record.status==2) || (record.status==3)" @confirm="() => manualCallback({id: record.id})">
+          <a-popconfirm title="确定手动回调吗?" v-has="'payOrder:approval'" v-if="(record.status==2) || (record.status==3) && (record.callbackUrl!=null)" @confirm="() => manualCallback({id: record.id})">
                   <a>手动回调</a>
           </a-popconfirm>
 
