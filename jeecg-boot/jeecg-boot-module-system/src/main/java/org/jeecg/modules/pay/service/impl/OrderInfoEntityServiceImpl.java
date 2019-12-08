@@ -259,6 +259,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     public R notifyCustomer(OrderInfoEntity order, SysUser user, String payType) throws Exception {
         boolean flag = false;
         String submitAmount = order.getSubmitAmount().toString();
+        order.setStatus(1);
         JSONObject callobj = encryptAESData(order, user.getApiKey());
         StringBuilder msg = new StringBuilder();
         String body = null;
@@ -957,7 +958,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         callobj.put(BaseConstant.SUBMIT_AMOUNT, order.getSubmitAmount());
         callobj.put(BaseConstant.STATUS, order.getStatus());
 
-        log.info("====回调商户加密前数据====" + callobj.toJSONString());
+        log.info("====回调商户加密前数据===={}" , callobj.toJSONString());
         //加密数据
         String data = AES128Util.encryptBase64(callobj.toJSONString(), aseKey);
         JSONObject callbackjson = new JSONObject();
