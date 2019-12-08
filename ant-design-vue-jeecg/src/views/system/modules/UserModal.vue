@@ -76,6 +76,9 @@
                           min="0.0001"/>
         </a-form-item>
 
+        <a-form-item label="登录IP限制" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input placeholder="请输入IP" v-decorator="[ 'ipSwitch',]"/>
+        </a-form-item>
 
         <!--部门分配-->
         <!--        <a-form-item label="部门分配" :labelCol="labelCol" :wrapperCol="wrapperCol" v-show="!departDisabled">-->
@@ -382,7 +385,7 @@
         that.model = Object.assign({}, record)
         that.$nextTick(() => {
           let filedsVal = pick(this.model, 'username', 'realname', 'sex', 'email', 'phone', 'apiKey', 'memberType',
-            'orderFixedFee','transactionFeeRate',
+            'orderFixedFee','transactionFeeRate','ipSwitch',
             'upperLimit', 'lowerLimit', 'agentUsername', 'agentRealname', 'salesmanUsername', 'salesmanRealname', 'activitiSync')
 
           that.form.setFieldsValue(filedsVal)
