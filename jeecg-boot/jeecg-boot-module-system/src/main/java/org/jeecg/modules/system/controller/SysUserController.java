@@ -31,7 +31,7 @@ import org.jeecg.modules.system.entity.*;
 import org.jeecg.modules.system.model.DepartIdModel;
 import org.jeecg.modules.system.service.*;
 import org.jeecg.modules.system.vo.SysDepartUsersVO;
-import org.jeecg.modules.system.vo.SysUserPage;
+import org.jeecg.modules.system.vo.SysUserVO;
 import org.jeecg.modules.system.vo.SysUserRoleVO;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
@@ -91,9 +91,9 @@ public class SysUserController {
 	private IOrderInfoEntityService orderService;
 
 	@RequestMapping(value = "/list", method = RequestMethod.GET)
-	public Result<IPage<SysUserPage>> queryPageList(SysUser user, @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
-													@RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize, HttpServletRequest req) {
-		Result<IPage<SysUserPage>> result = new Result<IPage<SysUserPage>>();
+	public Result<IPage<SysUserVO>> queryPageList(SysUser user, @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
+												  @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize, HttpServletRequest req) {
+		Result<IPage<SysUserVO>> result = new Result<IPage<SysUserVO>>();
 		Map<String, Object> map = BeanUtil.beanToMap(user);
 
 		LoginUser opUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
@@ -109,8 +109,8 @@ public class SysUserController {
 				default:
 			}
 		}
-		Page<SysUserPage> page = new Page<SysUserPage>(pageNo, pageSize);
-		IPage<SysUserPage> pageList = sysUserService.pageUserWithPaymentInfo(page, map);
+		Page<SysUserVO> page = new Page<SysUserVO>(pageNo, pageSize);
+		IPage<SysUserVO> pageList = sysUserService.pageUserWithPaymentInfo(page, map);
 //        Page<List<Map<String, Object>>> page = new Page<List<Map<String, Object>>>(pageNo, pageSize);
 //        IPage<List<Map<String, Object>>> pageList = sysUserService.pageUserWithPaymentInfo(page, queryWrapper);
 		result.setSuccess(true);
