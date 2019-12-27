@@ -167,6 +167,9 @@ public class YsfPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
             case BaseConstant.REQUEST_WECHAT_BANK:
                 channel = 7;
                 break;
+            case BaseConstant.REQUEST_INTERNET_BANK:
+                channel = 8;
+                break;
             default:
                 channel = 3;
                 break;
@@ -220,8 +223,10 @@ public class YsfPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
         PayServiceFactory.register(BaseConstant.REQUEST_ALI_BANK, this);
         PayServiceFactory.register(BaseConstant.REQUEST_ALI_ZZ, this);
         PayServiceFactory.register(BaseConstant.REQUEST_WECHAT_BANK, this);
+        PayServiceFactory.register(BaseConstant.REQUEST_INTERNET_BANK, this);
         PayServiceFactory.registerUrl(BaseConstant.REQUEST_ALI_BANK, utils.getRequestUrl(BaseConstant.REQUEST_ALI_BANK));
         PayServiceFactory.registerUrl(BaseConstant.REQUEST_ALI_ZZ, utils.getRequestUrl(BaseConstant.REQUEST_ALI_ZZ));
         PayServiceFactory.registerUrl(BaseConstant.REQUEST_WECHAT_BANK, utils.getRequestUrl(BaseConstant.REQUEST_WECHAT_BANK));
+        PayServiceFactory.registerUrl(BaseConstant.REQUEST_INTERNET_BANK, utils.getRequestUrl(BaseConstant.REQUEST_INTERNET_BANK));
     }
 }

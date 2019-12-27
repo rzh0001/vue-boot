@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.system.mapper.DashboardMapper">
+
+
+    <select id="summaryPayOrderAmount" parameterType="map" resultType="java.util.Map">
+        select COALESCE(sum(submit_amount),0) as payAmount, COALESCE(sum(poundage),0) as payFee
+        from pay_order_info
+        where status in ('2', '3')
+
+        <if test="map.userId!=null and map.userId!=''">
+            and user_id = #{map.userId}
+        </if>
+        <if test="map.agentId!=null and map.agentId!=''">
+            and agent_id = #{map.agentId}
+        </if>
+        <if test="map.salesmanId!=null and map.salesmanId!=''">
+            and salesman_Id = #{map.salesmanId}
+        </if>
+        <if test="map.today!=null and map.today!=''">
+            and (to_days(create_time) = to_days(now()) or (to_days(success_time) = to_days(now())))
+        </if>
+    </select>
+
+    <select id="summaryCashOutAmount" parameterType="map" resultType="java.util.Map">
+        select COALESCE(sum(amount),0) as cashOutAmount
+        from pay_cash_out_apply
+        where status = '2'
+
+        <if test="map.userId!=null and map.userId!=''">
+            and user_id = #{map.userId}
+        </if>
+        <if test="map.agentId!=null and map.agentId!=''">
+            and agent_id = #{map.agentId}
+        </if>
+        <if test="map.salesmanId!=null and map.salesmanId!=''">
+            and user_id = #{map.salesmanId}
+        </if>
+        <if test="map.today!=null and map.today!=''">
+            and (to_days(create_time) = to_days(now()) )
+        </if>
+    </select>
+
+    <select id="summaryUserAmount" parameterType="map" resultType="java.util.Map">
+        select COALESCE(sum(amount),0) as userAmount
+        from sys_user_amount
+        where 1=1
+
+        <if test="map.userId!=null and map.userId!=''">
+            and user_id = #{map.userId}
+        </if>
+        <if test="map.agentId!=null and map.agentId!=''">
+            and agent_id = #{map.agentId}
+        </if>
+        <if test="map.salesmanId!=null and map.salesmanId!=''">
+            and user_id = #{map.salesmanId}
+        </if>
+
+    </select>
+</mapper>

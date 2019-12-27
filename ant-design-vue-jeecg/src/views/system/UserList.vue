@@ -24,15 +24,20 @@
 
 
           <template v-if="toggleSearchStatus">
-            <!--            <a-col :md="6" :sm="8">-->
-            <!--              <a-form-item label="邮箱">-->
-            <!--                <a-input placeholder="请输入邮箱查询" v-model="queryParam.email"></a-input>-->
-            <!--              </a-form-item>-->
-            <!--            </a-col>-->
+            <a-col :md="6" :sm="8">
+              <a-form-item label="代理">
+                <a-input placeholder="" v-model="queryParam.agentUsername"></a-input>
+              </a-form-item>
+            </a-col>
+            <a-col :md="6" :sm="8">
+              <a-form-item label="介绍人">
+                <a-input placeholder="" v-model="queryParam.salesmanUsername"></a-input>
+              </a-form-item>
+            </a-col>
 
             <a-col :md="6" :sm="8">
-              <a-form-item label="手机号码">
-                <a-input placeholder="请输入手机号码查询" v-model="queryParam.phone"></a-input>
+              <a-form-item label="姓名">
+                <a-input placeholder="" v-model="queryParam.realname"></a-input>
               </a-form-item>
             </a-col>
 
@@ -41,7 +46,17 @@
                 <a-select v-model="queryParam.status" placeholder="请选择用户状态查询">
                   <a-select-option value="">请选择用户状态</a-select-option>
                   <a-select-option value="1">正常</a-select-option>
-                  <a-select-option value="2">解冻</a-select-option>
+                  <a-select-option value="2">冻结</a-select-option>
+                </a-select>
+              </a-form-item>
+            </a-col>
+            <a-col :md="6" :sm="8">
+              <a-form-item label="会员类型">
+                <a-select v-model="queryParam.memberType" placeholder="">
+                  <a-select-option value="">请选择用户状态</a-select-option>
+                  <a-select-option value="1">代理</a-select-option>
+                  <a-select-option value="2">介绍人</a-select-option>
+                  <a-select-option value="3">商户</a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
@@ -69,10 +84,10 @@
       <a-button @click="handleAddSalesman" v-has="'user:addSalesman'" type="primary" icon="plus">添加介绍人</a-button>
       <a-button @click="handleAddMember" v-has="'user:addMember'" type="primary" icon="plus">添加商户</a-button>
       <a-button type="primary" icon="download" @click="handleExportXls('用户信息')">导出</a-button>
-<!--      <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl"-->
-<!--                @change="handleImportExcel">-->
-<!--        <a-button type="primary" icon="import">导入</a-button>-->
-<!--      </a-upload>-->
+      <!--      <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl"-->
+      <!--                @change="handleImportExcel">-->
+      <!--        <a-button type="primary" icon="import">导入</a-button>-->
+      <!--      </a-upload>-->
       <a-dropdown v-if="selectedRowKeys.length > 0">
         <a-menu slot="overlay" @click="handleMenuClick">
           <a-menu-item key="1">
@@ -97,11 +112,11 @@
 
     <!-- table区域-begin -->
     <div>
-<!--      <div class="ant-alert ant-alert-info" style="margin-bottom: 16px;">-->
-<!--        <i class="anticon anticon-info-circle ant-alert-icon"></i>已选择&nbsp;<a style="font-weight: 600">{{-->
-<!--        selectedRowKeys.length }}</a>项&nbsp;&nbsp;-->
-<!--        <a style="margin-left: 24px" @click="onClearSelected">清空</a>-->
-<!--      </div>-->
+      <!--      <div class="ant-alert ant-alert-info" style="margin-bottom: 16px;">-->
+      <!--        <i class="anticon anticon-info-circle ant-alert-icon"></i>已选择&nbsp;<a style="font-weight: 600">{{-->
+      <!--        selectedRowKeys.length }}</a>项&nbsp;&nbsp;-->
+      <!--        <a style="margin-left: 24px" @click="onClearSelected">清空</a>-->
+      <!--      </div>-->
 
       <a-table
         ref="table"
@@ -146,9 +161,9 @@
                 </a-popconfirm>
               </a-menu-item>
               <!--<a-menu-item>-->
-                <!--<a-popconfirm title="确定删除吗?" @confirm="() => handleDelete(record.id)">-->
-                  <!--<a>删除</a>-->
-                <!--</a-popconfirm>-->
+              <!--<a-popconfirm title="确定删除吗?" @confirm="() => handleDelete(record.id)">-->
+              <!--<a>删除</a>-->
+              <!--</a-popconfirm>-->
               <!--</a-menu-item>-->
 
               <a-menu-item v-if="record.status==1">
@@ -181,7 +196,7 @@
             </a-menu>
           </a-dropdown>
          <a-dropdown>
-            <a-button >
+            <a-button>
               关联子账号
             </a-button>
             <a-menu slot="overlay">
@@ -245,7 +260,7 @@
   import UserBusinessModal from './modules/UserBusinessModal'
   import UserRateModal from './modules/UserRateModal'
   import ActiveBusinessModal from './modules/ActiveBusinessModal'
-  import {getAction,httpAction} from '@/api/manage'
+  import { getAction, httpAction } from '@/api/manage'
 
   export default {
     name: 'UserList',
@@ -267,7 +282,7 @@
       return {
         description: '这是用户管理页面',
         queryParam: {},
-        isAgent:true,
+        isAgent: true,
         columns: [
           {
             title: '用户账号',
@@ -276,7 +291,7 @@
             width: 80
           },
           {
-            title: '真实姓名',
+            title: '姓名',
             align: 'center',
             width: 100,
             dataIndex: 'realname'
@@ -344,7 +359,7 @@
           deleteBatch: '/sys/user/deleteBatch',
           exportXlsUrl: '/sys/user/exportXls',
           importExcelUrl: 'sys/user/importExcel',
-          cleanGoogle:'/sys/user/cleanGoogle'
+          cleanGoogle: '/sys/user/cleanGoogle'
         }
       }
     },
@@ -354,49 +369,49 @@
       }
     },
     methods: {
-      rateDeatil:function(record){
-        this.$refs.userRateModal.title='已添加费率详情';
-        this.$refs.userRateModal.detail(record);
+      rateDeatil: function(record) {
+        this.$refs.userRateModal.title = '已添加费率详情'
+        this.$refs.userRateModal.detail(record)
       },
-      addRate: function(record){
-        this.$refs.userRateModal.title='添加费率';
-        this.$refs.userRateModal.addRate(record);
+      addRate: function(record) {
+        this.$refs.userRateModal.title = '添加费率'
+        this.$refs.userRateModal.addRate(record)
       },
-      businessDeatil:function(record){
-        if(record.memberType != "1"){
-          alert("会员类型不是代理，无挂马信息");
-          return;
+      businessDeatil: function(record) {
+        if (record.memberType != '1') {
+          alert('会员类型不是代理，无挂马信息')
+          return
         }
-        this.$refs.userBusinessModal.title='已添加挂马详情';
-        this.$refs.userBusinessModal.detail(record);
+        this.$refs.userBusinessModal.title = '已添加挂马详情'
+        this.$refs.userBusinessModal.detail(record)
       },
-      addBusiness:function(record){
-        if(record.memberType != "1"){
-          alert("无操作权限");
-          return;
+      addBusiness: function(record) {
+        if (record.memberType != '1') {
+          alert('无操作权限')
+          return
         }
-        this.$refs.userBusinessModal.title='添加挂马信息';
-        this.$refs.userBusinessModal.addUserBusiness(record);
+        this.$refs.userBusinessModal.title = '添加挂马信息'
+        this.$refs.userBusinessModal.addUserBusiness(record)
       },
-      channelDetail: function(record){
-        this.$refs.userChannelModal.detail(record);
+      channelDetail: function(record) {
+        this.$refs.userChannelModal.detail(record)
       },
-      addChannel: function(record){
-        this.$refs.userChannelModal.addChannel(record);
+      addChannel: function(record) {
+        this.$refs.userChannelModal.addChannel(record)
       },
-      activeBusiness: function(record){
-        if(record.memberType != "1"){
-          alert("无操作权限");
-          return;
+      activeBusiness: function(record) {
+        if (record.memberType != '1') {
+          alert('无操作权限')
+          return
         }
-        this.$refs.activeBusinessModal.activeBusiness(record);
+        this.$refs.activeBusinessModal.activeBusiness(record)
       },
-      rechargeAmount: function(record){
-        if(record.memberType != "1"){
-          alert("无操作权限");
-          return;
+      rechargeAmount: function(record) {
+        if (record.memberType != '1') {
+          alert('无操作权限')
+          return
         }
-        this.$refs.activeBusinessModal.rechargeAmount(record);
+        this.$refs.activeBusinessModal.rechargeAmount(record)
       },
       getAvatarView: function(avatar) {
         return this.url.imgerver + '/' + avatar
@@ -464,14 +479,14 @@
           }
         })
       },
-      cleanGoogle:function(name){
-        var params = {username:name};//查询条件
-        getAction(this.url.cleanGoogle,params).then((res)=>{
-          if(res.success){
+      cleanGoogle: function(name) {
+        var params = { username: name }//查询条件
+        getAction(this.url.cleanGoogle, params).then((res) => {
+          if (res.success) {
             alert(res.result)
-        }else{
-        }
-      })
+          } else {
+          }
+        })
       },
       handleChangePassword(username) {
         this.$refs.passwordmodal.show(username)

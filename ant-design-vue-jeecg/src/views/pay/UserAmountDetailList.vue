@@ -6,11 +6,11 @@
       <a-form layout="inline">
         <a-row :gutter="24">
 
-<!--          <a-col :md="6" :sm="8">-->
-<!--            <a-form-item label="userId">-->
-<!--              <a-input placeholder="请输入userId" v-model="queryParam.userId"></a-input>-->
-<!--            </a-form-item>-->
-<!--          </a-col>-->
+          <!--          <a-col :md="6" :sm="8">-->
+          <!--            <a-form-item label="userId">-->
+          <!--              <a-input placeholder="请输入userId" v-model="queryParam.userId"></a-input>-->
+          <!--            </a-form-item>-->
+          <!--          </a-col>-->
           <a-col :md="6" :sm="8">
             <a-form-item label="用户名">
               <a-input placeholder="请输入用户名" v-model="queryParam.userName"></a-input>
@@ -23,7 +23,7 @@
                 <a-select-option value="1">手续费收入</a-select-option>
                 <a-select-option value="2">提现</a-select-option>
                 <a-select-option value="3">冲正</a-select-option>
-                <a-select-option value="3">手动调账</a-select-option>
+                <a-select-option value="4">手动调账</a-select-option>
               </a-select>
             </a-form-item>
           </a-col>
@@ -57,12 +57,12 @@
 
     <!-- 操作按钮区域 -->
     <div class="table-operator">
-<!--      <a-button @click="handleAdd" type="primary" icon="plus">新增</a-button>-->
-<!--      <a-button type="primary" icon="download" @click="handleExportXls('用户收入流水详情')">导出</a-button>-->
-<!--      <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl"-->
-<!--                @change="handleImportExcel">-->
-<!--        <a-button type="primary" icon="import">导入</a-button>-->
-<!--      </a-upload>-->
+      <!--      <a-button @click="handleAdd" type="primary" icon="plus">新增</a-button>-->
+      <!--      <a-button type="primary" icon="download" @click="handleExportXls('用户收入流水详情')">导出</a-button>-->
+      <!--      <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl"-->
+      <!--                @change="handleImportExcel">-->
+      <!--        <a-button type="primary" icon="import">导入</a-button>-->
+      <!--      </a-upload>-->
       <a-dropdown v-if="selectedRowKeys.length > 0">
         <a-menu slot="overlay">
           <a-menu-item key="1" @click="batchDel">
@@ -164,7 +164,7 @@
                 return '提现'
               } else if (text == 3) {
                 return '冲正'
-              }  else if (text == 4) {
+              } else if (text == 4) {
                 return '手工调账'
               } else {
                 return text
@@ -200,7 +200,7 @@
             title: '时间',
             align: 'center',
             dataIndex: 'createTime'
-          },
+          }
           // {
           //   title: '代理',
           //   align: 'center',

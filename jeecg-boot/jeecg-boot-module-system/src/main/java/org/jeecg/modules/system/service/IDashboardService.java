@@ -10,11 +10,11 @@ import java.util.Map;
  * @author ruanzh
  * @since 2019-09-01
  */
-public interface IHomepageService {
-    /**
-     * 汇总用户数据
-     *
-     * @return
-     */
-    Result<Map<String, Object>> homepageSummary();
+public interface IDashboardService {
+	/**
+	 * 汇总用户数据
+	 *
+	 * @return
+	 */
+	Result<Map<String, Object>> homepageSummary();
 }
