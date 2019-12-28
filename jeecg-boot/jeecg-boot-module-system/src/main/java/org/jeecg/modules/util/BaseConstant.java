@@ -78,6 +78,10 @@ public class BaseConstant {
     public static final String REQUEST_XINPAY_ALIPAY = "xin_pay_alipay";
     //百易通-微信
     public static final String REQUEST_BAIYITONG_WECHAT = "baiyitong_pay_wechat";
+    //百易通-支付宝
+    public static final String REQUEST_BAIYITONG_ALIPAY = "baiyitong_pay_alipay";
+    //网银转卡
+    public static final String REQUEST_INTERNET_BANK = "internet_bank";
     //四方回调挂马平台的返回码
     public static final int SUCCESS = 200;
     //流水类型 流水类型 1-手续费收入 2-提现 3-冲正
