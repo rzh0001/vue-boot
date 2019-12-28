@@ -107,10 +107,10 @@ public class SysUserController {
 		if (opUser.getMemberType() != null) {
 			switch (opUser.getMemberType()) {
 				case PayConstant.MEMBER_TYPE_AGENT:
-					map.put("agentId", opUser.getId());
-					map.put("agentName", opUser.getUsername());
+					queryWrapper.lambda().eq(SysUser::getAgentId, opUser.getId());
 					break;
 				case PayConstant.MEMBER_TYPE_SALESMAN:
+					queryWrapper.lambda().eq(SysUser::getSalesmanId, opUser.getId());
 					map.put("salesmanId", opUser.getId());
 					break;
 				default:
