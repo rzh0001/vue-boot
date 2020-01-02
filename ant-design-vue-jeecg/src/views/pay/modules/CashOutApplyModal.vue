@@ -27,8 +27,13 @@
           </a-select>
         </a-form-item>
 
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="提现密码">
+          <a-input type="password" placeholder="请输入原提现密码,若未设置请留空" v-decorator="[ 'paymentPassword']"/>
+        </a-form-item>
 
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="银行名称" v-show="!statusDisabled">
+
+        <a-form-item :labelCol=" labelCol
+          " :wrapperCol="wrapperCol" label="银行名称" v-show="!statusDisabled">
           <a-input placeholder="" disabled :readOnly="true" v-decorator="['bankName', {}]"/>
         </a-form-item>
         <a-form-item
@@ -94,7 +99,7 @@
 </template>
 
 <script>
-  import { httpAction, getAction } from '@/api/manage'
+  import { httpAction, getAction, postAction } from '@/api/manage'
   import pick from 'lodash.pick'
   import moment from 'moment'
   import { queryBankCard } from '@/api/api'
@@ -179,7 +184,7 @@
         this.model = Object.assign({}, record)
         this.visible = true
         this.$nextTick(() => {
-          this.form.setFieldsValue(pick(this.model, 'userId', 'username', 'amount', 'bankCardId', 'bankName', 'branchName', 'accountName', 'cardNumber', 'status', 'delFlag'))
+          this.form.setFieldsValue(pick(this.model, 'userId', 'username', 'amount', 'bankCardId', 'bankName', 'branchName', 'paymentPassword', 'accountName', 'cardNumber', 'status', 'delFlag'))
           //时间格式化
           this.form.setFieldsValue({ applyTime: this.model.applyTime ? moment(this.model.applyTime) : null })
           this.form.setFieldsValue({ approvalTime: this.model.approvalTime ? moment(this.model.approvalTime) : null })
@@ -198,31 +203,42 @@
             that.confirmLoading = true
             let httpurl = ''
             let method = ''
-            if (!this.model.id) {
-              httpurl += this.url.add
-              method = 'post'
-            } else {
-              httpurl += this.url.edit
-              method = 'put'
-            }
             let formData = Object.assign(this.model, values)
             formData.bankCardId = this.selectedBankCard
             //时间格式化
             formData.applyTime = formData.applyTime ? formData.applyTime.format('YYYY-MM-DD HH:mm:ss') : null
             formData.approvalTime = formData.approvalTime ? formData.approvalTime.format('YYYY-MM-DD HH:mm:ss') : null
-
             console.log(formData)
-            httpAction(httpurl, formData, method).then((res) => {
-              if (res.success) {
-                that.$message.success(res.message)
-                that.$emit('ok')
-              } else {
-                that.$message.warning(res.message)
-              }
-            }).finally(() => {
-              that.confirmLoading = false
-              that.close()
-            })
+
+            if (!this.model.id) {
+              httpurl += this.url.add
+              method = 'post'
+              getAction(httpurl, formData).then((res) => {
+                if (res.success) {
+                  that.$message.success(res.message)
+                  that.$emit('ok')
+                } else {
+                  that.$message.warning(res.message)
+                }
+              }).finally(() => {
+                that.confirmLoading = false
+                that.close()
+              })
+            } else {
+              httpurl += this.url.edit
+              method = 'put'
+              httpAction(httpurl, formData, method).then((res) => {
+                if (res.success) {
+                  that.$message.success(res.message)
+                  that.$emit('ok')
+                } else {
+                  that.$message.warning(res.message)
+                }
+              }).finally(() => {
+                that.confirmLoading = false
+                that.close()
+              })
+            }
 
 
           }

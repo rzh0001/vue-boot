@@ -12,12 +12,12 @@
         <span v-if="isDesktop()">欢迎您，{{ nickname() }}</span>
       </span>
       <a-menu slot="overlay" class="user-dropdown-menu-wrapper">
-<!--        <a-menu-item key="0">-->
-<!--          <router-link :to="{ name: 'account-center' }">-->
-<!--            <a-icon type="user"/>-->
-<!--            <span>个人中心</span>-->
-<!--          </router-link>-->
-<!--        </a-menu-item>-->
+        <!--        <a-menu-item key="0">-->
+        <!--          <router-link :to="{ name: 'account-center' }">-->
+        <!--            <a-icon type="user"/>-->
+        <!--            <span>个人中心</span>-->
+        <!--          </router-link>-->
+        <!--        </a-menu-item>-->
         <a-menu-item key="1">
           <router-link :to="{ name: 'account-settings-apiKey' }">
             <a-icon type="setting"/>
@@ -26,7 +26,11 @@
         </a-menu-item>
         <a-menu-item key="2" @click="updatePassword">
           <a-icon type="setting"/>
-          <span>密码修改</span>
+          <span>密码登录修改</span>
+        </a-menu-item>
+        <a-menu-item key="2" @click="updatePaymentPassword">
+          <a-icon type="setting"/>
+          <span>密码提现修改</span>
         </a-menu-item>
       </a-menu>
     </a-dropdown>
@@ -37,6 +41,7 @@
       </a>
     </span>
     <user-password ref="userPassword"></user-password>
+    <user-payment-password ref="userPaymentPassword"></user-payment-password>
     <depart-select ref="departSelect" :closable="true" title="部门切换"></depart-select>
   </div>
 </template>
@@ -44,6 +49,7 @@
 <script>
   import HeaderNotice from './HeaderNotice'
   import UserPassword from './UserPassword'
+  import UserPaymentPassword from './UserPaymentPassword'
   import DepartSelect from './DepartSelect'
   import { mapActions, mapGetters } from 'vuex'
   import { mixinDevice } from '@/utils/mixin.js'
@@ -53,7 +59,7 @@
     mixins: [mixinDevice],
     components: {
       HeaderNotice,
-      UserPassword,
+      UserPassword, UserPaymentPassword,
       DepartSelect
     },
     props: {
@@ -94,6 +100,10 @@
       updatePassword() {
         let username = this.userInfo().username
         this.$refs.userPassword.show(username)
+      },
+      updatePaymentPassword() {
+        let username = this.userInfo().username
+        this.$refs.userPaymentPassword.show(username)
       },
       updateCurrentDepart() {
         this.$refs.departSelect.show()
