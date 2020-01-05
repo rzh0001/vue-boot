@@ -58,6 +58,16 @@
                 <j-date v-model="queryParam.createTime_end" :showTime="true" dateFormat="YYYY-MM-DD HH:mm:ss"/>
               </a-form-item>
             </a-col>
+
+            <a-col :md="6" :sm="8">
+              <a-form-item label="是否补单">
+                <a-select v-model="queryParam.replacementOrder" placeholder="">
+                  <a-select-option value="">全部</a-select-option>
+                  <a-select-option value="1">是</a-select-option>
+                  <a-select-option value="2">否</a-select-option>
+                </a-select>
+              </a-form-item>
+            </a-col>
           </template>
           <a-col :md="6" :sm="8">
             <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
