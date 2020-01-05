@@ -4,7 +4,9 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
+import org.jeecg.common.util.RedisUtil;
 import org.jeecg.modules.pay.controller.ApiController;
+import org.jeecg.modules.pay.controller.RedisController;
 import org.jeecg.modules.pay.service.impl.OrderInfoEntityServiceImpl;
 import org.jeecg.modules.util.AES128Util;
 import org.jeecg.modules.util.BareBonesBrowserLaunch;
@@ -34,7 +36,8 @@ import java.util.Random;
 public class PayTest {
     @Resource
     private ApiController api;
-
+    @Resource
+    private RedisController redis;
     @Autowired
     private OrderInfoEntityServiceImpl order;
     private MockHttpServletRequest request;
@@ -46,7 +49,20 @@ public class PayTest {
         request.setCharacterEncoding("UTF-8");
         response = new MockHttpServletResponse();
     }
-
+    @Test
+    public void redisTest(){
+        for(int i=0;i<10;i++){
+            Thread h = new Thread(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            redis.test();
+                        }
+                    }
+            );
+            h.run();
+        }
+    }
     @Test
     public void create(){
         JSONObject req = new JSONObject();

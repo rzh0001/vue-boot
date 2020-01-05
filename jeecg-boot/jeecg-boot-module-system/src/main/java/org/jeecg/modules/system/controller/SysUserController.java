@@ -107,10 +107,10 @@ public class SysUserController {
 		if (opUser.getMemberType() != null) {
 			switch (opUser.getMemberType()) {
 				case PayConstant.MEMBER_TYPE_AGENT:
-					map.put("agentId", opUser.getId());
-					map.put("agentName", opUser.getUsername());
+					queryWrapper.lambda().eq(SysUser::getAgentId, opUser.getId());
 					break;
 				case PayConstant.MEMBER_TYPE_SALESMAN:
+					queryWrapper.lambda().eq(SysUser::getSalesmanId, opUser.getId());
 					map.put("salesmanId", opUser.getId());
 					break;
 				default:
@@ -1057,36 +1057,46 @@ public class SysUserController {
 	}
 
 	@PutMapping(value = "/updatePaymentPassword")
-	public Result<Object> updatePaymentPassword(@RequestBody JSONObject json) {
-		LoginUser ou = (LoginUser) SecurityUtils.getSubject().getPrincipal();
-
+	public Result<SysUser> changPaymentPassword(@RequestBody JSONObject json) {
+		Result<SysUser> result = new Result<SysUser>();
 		String username = json.getString("username");
+		String loginPassword = json.getString("loginPassword");
 		String oldPassword = json.getString("oldPassword");
-		SysUser user = this.sysUserService.getOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getId, ou.getId()));
-		if (BeanUtil.isEmpty(user)) {
-			return Result.error("获取用户数据失败");
+		SysUser user = this.sysUserService.getOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getUsername, username));
+		if (user == null) {
+			result.error500("未找到用户!");
+			return result;
+		}
+		// 验证登录密码
+		String passwordEncode = PasswordUtil.encrypt(username, loginPassword, user.getSalt());
+		if (!user.getPassword().equals(passwordEncode)) {
+			result.error500("登录密码输入错误!");
+			return result;
 		}
 
-		// 检查是否已设置过支付密码,若已设置检查旧密码
-		if (!StrUtil.isEmpty(user.getPaymentPassword())) {
-			String passwordEncode = PasswordUtil.encrypt(username, oldPassword, user.getSalt());
-			if (!StrUtil.equals(passwordEncode, user.getPaymentPassword())) {
-				return Result.error("旧密码错误");
+		//验证原提现密码
+		if (StrUtil.isNotBlank(user.getPaymentPassword())) {
+			passwordEncode = PasswordUtil.encrypt(username, oldPassword, user.getSalt());
+			if (!user.getPassword().equals(passwordEncode)) {
+				result.error500("提现密码输入错误!");
+				return result;
 			}
 		}
-
 		String password = json.getString("password");
 		String confirmPassword = json.getString("confirmPassword");
-		if (StrUtil.isEmpty(password)) {
-			return Result.error("请输入新密码!");
+		if (StrUtil.isBlank(password)) {
+			result.error500("新密码不存在!");
+			return result;
 		}
 
 		if (!password.equals(confirmPassword)) {
-			return Result.error("两次输入密码不一致!");
+			result.error500("两次输入密码不一致!");
+			return result;
 		}
 		String newPassword = PasswordUtil.encrypt(username, password, user.getSalt());
-		this.sysUserService.update(new SysUser().setPassword(newPassword), new LambdaQueryWrapper<SysUser>().eq(SysUser::getId, user.getId()));
-		return Result.ok("密码修改完成！");
+		this.sysUserService.update(new SysUser().setPaymentPassword(newPassword), new LambdaQueryWrapper<SysUser>().eq(SysUser::getId, user.getId()));
+		result.success("密码修改完成！");
+		return result;
 	}
 
 	@RequestMapping(value = "/cleanGoogle", method = RequestMethod.GET)

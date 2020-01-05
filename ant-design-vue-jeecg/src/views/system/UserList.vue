@@ -7,42 +7,31 @@
         <a-row :gutter="24">
 
           <a-col :md="6" :sm="12">
-            <a-form-item label="账号">
+            <a-form-item label="用户账号">
               <a-input placeholder="请输入账号查询" v-model="queryParam.username"></a-input>
             </a-form-item>
           </a-col>
 
-          <!--          <a-col :md="6" :sm="8">-->
-          <!--            <a-form-item label="性别">-->
-          <!--              <a-select v-model="queryParam.sex" placeholder="请选择性别查询">-->
-          <!--                <a-select-option value="">请选择性别查询</a-select-option>-->
-          <!--                <a-select-option value="1">男性</a-select-option>-->
-          <!--                <a-select-option value="2">女性</a-select-option>-->
-          <!--              </a-select>-->
-          <!--            </a-form-item>-->
-          <!--          </a-col>-->
-
+          <a-col :md="6" :sm="8">
+            <a-form-item label="用户姓名">
+              <a-input placeholder="" v-model="queryParam.realname"></a-input>
+            </a-form-item>
+          </a-col>
 
           <template v-if="toggleSearchStatus">
             <a-col :md="6" :sm="8">
-              <a-form-item label="代理">
+              <a-form-item label="代理账号">
                 <a-input placeholder="" v-model="queryParam.agentUsername"></a-input>
               </a-form-item>
             </a-col>
             <a-col :md="6" :sm="8">
-              <a-form-item label="介绍人">
+              <a-form-item label="介绍人账号">
                 <a-input placeholder="" v-model="queryParam.salesmanUsername"></a-input>
               </a-form-item>
             </a-col>
 
             <a-col :md="6" :sm="8">
-              <a-form-item label="姓名">
-                <a-input placeholder="" v-model="queryParam.realname"></a-input>
-              </a-form-item>
-            </a-col>
-
-            <a-col :md="6" :sm="8">
-              <a-form-item label="状态">
+              <a-form-item label="用户状态">
                 <a-select v-model="queryParam.status" placeholder="请选择用户状态查询">
                   <a-select-option value="">请选择用户状态</a-select-option>
                   <a-select-option value="1">正常</a-select-option>

@@ -230,21 +230,21 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         //2 校验订单状态 ，从挂马平台查询
         //校验在此通道下的该商户对应的代理是否有定义挂码账号
         SysUser user = userService.getUserByName(userName);
-        List<UserBusinessEntity> useBusinesses =
-                businessEntityService.queryBusinessCodeByUserName(user.getAgentUsername(), payType);
-        String queryUrl = null;
-        //通过支付通道从数据字典中获取要查询的地址
-        List<DictModel> queryOrderStatusUrls = dictService.queryDictItemsByCode(BaseConstant.QUERY_ORDER_STATUS_URL);
-        for (DictModel model : queryOrderStatusUrls) {
-            if (payType.equals(model.getText())) {
-                queryUrl = model.getValue();
-                break;
-            }
-        }
-        log.info("==>请求通道为：{},二次查询订单状态地址为：{}",payType,queryUrl);
-        if (StringUtils.isBlank(queryUrl)) {
-            throw new RRException("未配置四方系统查询挂马平台的订单状态地址,单号：" + orderId + ";通道为：" + payType);
-        }
+//        List<UserBusinessEntity> useBusinesses =
+//                businessEntityService.queryBusinessCodeByUserName(user.getAgentUsername(), payType);
+//        String queryUrl = null;
+//        //通过支付通道从数据字典中获取要查询的地址
+//        List<DictModel> queryOrderStatusUrls = dictService.queryDictItemsByCode(BaseConstant.QUERY_ORDER_STATUS_URL);
+//        for (DictModel model : queryOrderStatusUrls) {
+//            if (payType.equals(model.getText())) {
+//                queryUrl = model.getValue();
+//                break;
+//            }
+//        }
+//        log.info("==>请求通道为：{},二次查询订单状态地址为：{}",payType,queryUrl);
+//        if (StringUtils.isBlank(queryUrl)) {
+//            throw new RRException("未配置四方系统查询挂马平台的订单状态地址,单号：" + orderId + ";通道为：" + payType);
+//        }
         order.setStatus(BaseConstant.ORDER_STATUS_SUCCESS_NOT_RETURN);
         updateById(order);
         //校验订单信息，并更新订单状态
