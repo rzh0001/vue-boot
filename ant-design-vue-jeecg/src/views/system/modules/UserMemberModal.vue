@@ -118,31 +118,17 @@
           </a-select>
         </a-form-item>
 
-<!--        <a-form-item label="单笔金额限制" :labelCol="labelCol"-->
-<!--                     :wrapperCol="wrapperCol">-->
-<!--          <a-input-group compact>-->
-<!--            <a-input-number placeholder="下限" :disabled="isDisabledAuth('user:form:lowerLimit')"-->
-<!--                            v-decorator="[ 'lowerLimit']" style="width: 30%;text-align: center"-->
-<!--                            min="0.01"/>-->
-<!--            <a-input placeholder="~" disabled-->
-<!--                     style="width: 35px; border-left: 0px; pointer-events: none;background-color: #fff;text-align: center"/>-->
-<!--            <a-input-number placeholder="上限" :disabled="isDisabledAuth('user:form:upperLimit')"-->
-<!--                            v-decorator="[ 'upperLimit']" style="width: 35%; border-left: 0px;text-align: center"-->
-<!--                            min="0.01"/>-->
-<!--          </a-input-group>-->
-<!--        </a-form-item>-->
         <a-form-item label="订单单笔手续费" :labelCol="labelCol" :wrapperCol="wrapperCol">
-            <a-input-number placeholder="" :disabled="isDisabledAuth('user:form:orderFixedFee')"
-                            v-decorator="[ 'orderFixedFee']"
-                            min="0.01"/>
+          <a-input-number placeholder="" :disabled="isDisabledAuth('user:form:orderFixedFee')"
+                          v-decorator="[ 'orderFixedFee',validatorRules.orderFixedFee]"
+                          min="0.01"/>
         </a-form-item>
         <a-form-item label="交易手续费率" :labelCol="labelCol" :wrapperCol="wrapperCol">
-            <a-input-number placeholder="" :disabled="isDisabledAuth('user:form:transactionFeeRate')"
-                            v-decorator="[ 'transactionFeeRate']"
-                            min="0.0001"/>
+          <a-input-number placeholder="" :disabled="isDisabledAuth('user:form:transactionFeeRate')"
+                          v-decorator="[ 'transactionFeeRate',validatorRules.transactionFeeRate]"
+                          min="0.0001"/>
         </a-form-item>
-
-
+        
         <a-form-item label="工作流引擎" :labelCol="labelCol" :wrapperCol="wrapperCol" v-show="false">
           <j-dict-select-tag v-decorator="['activitiSync', {}]" placeholder="请选择是否同步工作流引擎" :type="'radio'"
                              :triggerChange="true" dictCode="activiti_sync"/>
@@ -220,6 +206,8 @@
             }]
           },
           realname: { rules: [{ required: true, message: '请输入用户名称!' }] },
+          orderFixedFee: { rules: [{ required: true, message: '请输入订单单笔手续费!' }] },
+          transactionFeeRate: { rules: [{ required: true, message: '请输入交易手续费率!' }] },
           phone: { rules: [{ validator: this.validatePhone }] },
           email: {
             rules: [{
