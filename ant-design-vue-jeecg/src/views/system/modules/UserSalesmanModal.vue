@@ -119,7 +119,16 @@
         <!--            </a-select-option>-->
         <!--          </a-select>-->
         <!--        </a-form-item>-->
-
+        <a-form-item label="订单单笔手续费" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input-number placeholder="" :disabled="isDisabledAuth('user:form:orderFixedFee')"
+                          v-decorator="[ 'orderFixedFee',validatorRules.orderFixedFee]"
+                          min="0.01"/>
+        </a-form-item>
+        <a-form-item label="交易手续费率" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input-number placeholder="" :disabled="isDisabledAuth('user:form:transactionFeeRate')"
+                          v-decorator="[ 'transactionFeeRate',validatorRules.transactionFeeRate]"
+                          min="0.0001"/>
+        </a-form-item>
 
         <a-form-item label="工作流引擎" :labelCol="labelCol" :wrapperCol="wrapperCol" v-show="false">
           <j-dict-select-tag v-decorator="['activitiSync', {}]" placeholder="请选择是否同步工作流引擎" :type="'radio'"
@@ -197,6 +206,8 @@
             }]
           },
           realname: { rules: [{ required: true, message: '请输入用户名称!' }] },
+          orderFixedFee: { rules: [{ required: true, message: '请输入订单单笔手续费!' }] },
+          transactionFeeRate: { rules: [{ required: true, message: '请输入交易手续费率!' }] },
           phone: { rules: [{ validator: this.validatePhone }] },
           email: {
             rules: [{
