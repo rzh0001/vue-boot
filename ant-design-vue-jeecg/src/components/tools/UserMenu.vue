@@ -26,11 +26,11 @@
         </a-menu-item>
         <a-menu-item key="2" @click="updatePassword">
           <a-icon type="setting"/>
-          <span>密码登录修改</span>
+          <span>修改登录密码</span>
         </a-menu-item>
         <a-menu-item key="2" @click="updatePaymentPassword">
           <a-icon type="setting"/>
-          <span>密码提现修改</span>
+          <span>修改提现密码</span>
         </a-menu-item>
       </a-menu>
     </a-dropdown>

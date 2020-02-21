@@ -1,17 +1,13 @@
 package org.jeecg;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.base.Splitter;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.RandomUtils;
-import org.jeecg.common.util.RedisUtil;
 import org.jeecg.modules.pay.controller.ApiController;
-import org.jeecg.modules.pay.controller.RedisController;
+import org.jeecg.modules.pay.entity.DianJinPayParam;
 import org.jeecg.modules.pay.service.impl.OrderInfoEntityServiceImpl;
-import org.jeecg.modules.util.AES128Util;
-import org.jeecg.modules.util.BareBonesBrowserLaunch;
-import org.jeecg.modules.util.BaseConstant;
-import org.jeecg.modules.util.R;
+import org.jeecg.modules.util.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,7 +19,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
+import java.util.stream.StreamSupport;
 
 /**
  * @title:
@@ -31,13 +30,13 @@ import java.util.Random;
  * @author: wangjb
  * @create: 2019-07-30 09:53
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
+//@RunWith(SpringRunner.class)
+//@SpringBootTest
 public class PayTest {
     @Resource
     private ApiController api;
     @Resource
-    private RedisController redis;
+    //private RedisController redis;
     @Autowired
     private OrderInfoEntityServiceImpl order;
     private MockHttpServletRequest request;
@@ -56,7 +55,7 @@ public class PayTest {
                     new Runnable() {
                         @Override
                         public void run() {
-                            redis.test();
+                            //redis.test();
                         }
                     }
             );
@@ -142,5 +141,36 @@ public class PayTest {
         System.out.println(a);
     }
 
+    @Test
+    public void dianPayTest() throws Exception {
+        String key = "44843f1629e8b1142636fd799fb2e373b1feb096eb79bdcbeba8be8b1a65e752a2d08b88e0e0732a3b6a5f5572b1f7464e11f769d140d2675c74f9cdc99cfd2f1d33ecb9d0ffdb45df2e1665678c788c1a6ce5b69e539fdfb6c1daef8703c1e2";
+        String url ="http://47.240.10.174/api/order/CreateOrderUrl";
+        DianJinPayParam param = new DianJinPayParam();
+        param.setUid("6");
+        param.setMerchantTransNo("123456789Test");
+        param.setTotalAmount("500.00");
+        param.setPaymentType("1");
+        param.setRemark("qiPayAlipay");
+        StringBuilder sign = new StringBuilder();
+        sign.append("merchantTransNo=").append(param.getMerchantTransNo())
+            .append("&").append("paymentType=").append(param.getPaymentType())
+            .append("&").append("totalAmount=").append(param.getTotalAmount())
+            .append("&").append("uid=").append(param.getUid())
+            .append("&").append("key=").append(key);
+        System.out.println("签名值sign="+sign.toString());
+        System.out.println("签名值sign的MD5值="+DigestUtils.md5Hex(sign.toString()));
+        param.setSign(DigestUtils.md5Hex(sign.toString()));
+        String jsonstring = JSON.toJSONString(param);
+        Map map = JSON.parseObject(jsonstring);
+        System.out.println("请求入参为："+map);
+        HttpResult result = HttpUtils.doPost(url, map);
+        System.out.println(result.getBody());
+        String body = result.getBody();
+        if(body.contains("href")){
+            String[] htmls = body.split("href=\"");
+            String urlpay = htmls[1].split("\"")[0];
+            System.out.println(urlpay);
+        }
+    }
 
 }
