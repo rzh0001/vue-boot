@@ -27,6 +27,8 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -119,7 +121,8 @@ public class AliPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
     }
 
     @Override
-    public boolean orderInfoOk(OrderInfoEntity order, String url, UserBusinessEntity userBusinessEntity) throws IOException, URISyntaxException {
+    public boolean orderInfoOk(OrderInfoEntity order, String url, UserBusinessEntity userBusinessEntity)
+        throws IOException, URISyntaxException, KeyManagementException, NoSuchAlgorithmException {
         Map<String, String> data = new HashMap();
         data.put("id", order.getOrderId());
         String result = HttpUtils.doGet(url, data);
