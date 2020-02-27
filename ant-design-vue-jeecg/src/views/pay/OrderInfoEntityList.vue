@@ -68,6 +68,11 @@
                 </a-select>
               </a-form-item>
             </a-col>
+            <a-col :md="6" :sm="8">
+              <a-form-item label="IP">
+                <a-input placeholder="" v-model="queryParam.ip"></a-input>
+              </a-form-item>
+            </a-col>
           </template>
           <a-col :md="6" :sm="8">
             <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
