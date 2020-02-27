@@ -33,6 +33,7 @@ import org.jeecgframework.poi.excel.entity.ExportParams;
 import org.jeecgframework.poi.excel.entity.ImportParams;
 import org.jeecgframework.poi.excel.view.JeecgEntityExcelView;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -303,6 +304,7 @@ public class OrderInfoEntityController {
 
 	@RequestMapping(value = "/againRequest", method = RequestMethod.GET)
 	@RequiresPermissions("business::order::againRequest")
+	@Transactional(rollbackFor = Exception.class)
 	public R againRequest(@RequestParam(name = "id") String id) {
 		OrderInfoEntity order = orderInfoEntityService.queryOrderInfoByOrderId(id);
 		//手动补单，密钥取订单中用户的密钥
