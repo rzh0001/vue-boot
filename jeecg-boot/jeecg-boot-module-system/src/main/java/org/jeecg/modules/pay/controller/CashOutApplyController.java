@@ -213,27 +213,26 @@ public class CashOutApplyController {
 		Result<CashOutApply> result = new Result<CashOutApply>();
 		CashOutApply apply = cashOutApplyService.getById(jsonObject.getString("id"));
 		if (apply == null) {
-			result.error500("未找到对应实体");
-		} else {
-			apply.setStatus(jsonObject.getString("status"));
-			apply.setApprovalTime(new Date());
-			boolean ok = cashOutApplyService.updateById(apply);
-
-			// 审核拒绝须冲正余额
-			if ("3".equals(jsonObject.getString("status"))) {
-				UserAmountEntity amount = userAmountService.getUserAmountByUserName(apply.getUsername());
-				userAmountService.changeAmount(apply.getUserId(), apply.getAmount());
-
-				// 插入流水表
-				userAmountDetailService.addAmountDetail(apply.getAmount(), amount.getAmount(), "3", sysUserService.getById(apply.getUserId()));
-			}
-			//TODO 返回false说明什么？
-			if (ok) {
-				result.success("修改成功!");
-			}
+			return result.error500("未找到对应实体");
+		}
+		if ("2".equals(apply.getStatus()) || "3".equals(apply.getStatus())) {
+			return result.error500("已审核，请刷新列表！");
 		}
 
-		return result;
+		apply.setStatus(jsonObject.getString("status"));
+		apply.setApprovalTime(new Date());
+		cashOutApplyService.updateById(apply);
+
+		// 审核拒绝须冲正余额
+		if ("3".equals(jsonObject.getString("status"))) {
+			UserAmountEntity amount = userAmountService.getUserAmountByUserName(apply.getUsername());
+			userAmountService.changeAmount(apply.getUserId(), apply.getAmount());
+
+			// 插入流水表
+			userAmountDetailService.addAmountDetail(apply.getAmount(), amount.getAmount(), "3", sysUserService.getById(apply.getUserId()));
+		}
+
+		return result.success("修改成功");
 	}
 
 	/**
