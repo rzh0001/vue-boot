@@ -7,26 +7,29 @@
         <a-row :gutter="24">
 
           <a-col :md="6" :sm="8">
-            <a-form-item label="登录账号">
+            <a-form-item label="用户">
               <a-input placeholder="" v-model="queryParam.username"></a-input>
             </a-form-item>
           </a-col>
+          <a-col :md="6" :sm="8">
+            <a-form-item label="状态">
+              <a-select v-model="queryParam.status" placeholder="">
+                <a-select-option value="">全部</a-select-option>
+                <a-select-option value="0">未处理</a-select-option>
+                <a-select-option value="1">开始处理</a-select-option>
+                <a-select-option value="2">已打款</a-select-option>
+                <a-select-option value="3">已拒绝</a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
           <template v-if="toggleSearchStatus">
+
             <a-col :md="6" :sm="8">
               <a-form-item label="提现金额">
                 <a-input placeholder="请输入提现金额" v-model="queryParam.amount"></a-input>
               </a-form-item>
             </a-col>
-            <a-col :md="6" :sm="8">
-              <a-form-item label="银行卡表ID">
-                <a-input placeholder="请输入银行卡表ID" v-model="queryParam.bankCardId"></a-input>
-              </a-form-item>
-            </a-col>
-            <a-col :md="6" :sm="8">
-              <a-form-item label="银行名称">
-                <a-input placeholder="请输入银行名称" v-model="queryParam.bankName"></a-input>
-              </a-form-item>
-            </a-col>
+
           </template>
           <a-col :md="6" :sm="8">
             <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
