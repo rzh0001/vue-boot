@@ -124,9 +124,9 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder>
 			userAmountService.changeAmount(order.getAgentId(), order.getOrderFee(), order.getOrderId(), remark, "1");
 		}
 
-		if (StrUtil.isNotBlank(order.getCallbackUrl())) {
-			apiService.callback(order.getId());
-		}
+//		if (StrUtil.isNotBlank(order.getCallbackUrl())) {
+//			apiService.callback(order.getId());
+//		}
 		return true;
 	}
 
