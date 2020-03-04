@@ -1,162 +1,163 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration debug="false">
-	<!--配置规则类的位置-->
-	<conversionRule conversionWord="ip" converterClass="org.jeecg.config.IPLogConfig" />
-	<!--定义日志文件的存储地址 -->
-	<property name="LOG_HOME" value="../logs" />
-	<!--配置日志的格式-->
-	<property name="COLOR_PATTERN" value="%black(%contextName-%ip) %red(%d{yyyy-MM-dd HH:mm:ss}) %green([%thread]) %highlight(%-5level) %boldMagenta( %replace(%caller{1}){'\t|Caller.{1}0|\r\n', ''})- %gray(%msg%xEx%n)" />
-	<property name="STD_PATTERN" value="%black(%contextName-%ip) %red(%d{yyyy-MM-dd HH:mm:ss}) %green([%thread]) %-5level %logger{50}:%L - %mdc{username} - %msg%n" />
-	<!-- 控制台输出 -->
-	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-			<!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符 -->
-			<pattern>${STD_PATTERN}</pattern>
-		</encoder>
-	</appender>
+    <!--配置规则类的位置-->
+    <conversionRule conversionWord="ip" converterClass="org.jeecg.config.IPLogConfig"/>
+    <!--定义日志文件的存储地址 -->
+    <property name="LOG_HOME" value="../logs"/>
+    <!--配置日志的格式-->
+    <property name="COLOR_PATTERN"
+              value="%black(%contextName-%ip) %red(%d{yyyy-MM-dd HH:mm:ss}) %green([%thread]) %highlight(%-5level) %boldMagenta( %replace(%caller{1}){'\t|Caller.{1}0|\r\n', ''})- %gray(%msg%xEx%n)"/>
+    <property name="STD_PATTERN" value="%black(%contextName-%ip) %red(%d{yyyy-MM-dd HH:mm:ss}) %green([%thread]) %-5level %logger{50}:%L - %mdc{username} - %msg%n"/>
+    <!-- 控制台输出 -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符 -->
+            <pattern>${STD_PATTERN}</pattern>
+        </encoder>
+    </appender>
 
-	<!-- 按照每天生成日志文件 -->
-	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<!--日志文件输出的文件名 -->
-			<FileNamePattern>${LOG_HOME}/jeecgboot.%d{yyyy-MM-dd}.log</FileNamePattern>
-			<!--日志文件保留天数 -->
-			<MaxHistory>30</MaxHistory>
-		</rollingPolicy>
-		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-			<!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符 -->
-			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50}:%L - %mdc{username} - %msg%n</pattern>
-		</encoder>
-		<!--日志文件最大的大小 -->
-		<triggeringPolicy
-			class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-			<MaxFileSize>10MB</MaxFileSize>
-		</triggeringPolicy>
-	</appender>
+    <!-- 按照每天生成日志文件 -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!--日志文件输出的文件名 -->
+            <FileNamePattern>${LOG_HOME}/{yyyy-MM-dd}/jeecgboot.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <!--日志文件保留天数 -->
+            <MaxHistory>30</MaxHistory>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符 -->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50}:%L - %mdc{username} - %msg%n</pattern>
+        </encoder>
+        <!--日志文件最大的大小 -->
+        <triggeringPolicy
+                class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>10MB</MaxFileSize>
+        </triggeringPolicy>
+    </appender>
 
-	<!-- 生成html格式日志开始 -->
-	<appender name="HTML" class="ch.qos.logback.core.FileAppender">
-		<!-- 过滤器，只记录WARN级别的日志 -->
-		<!-- <filter class="ch.qos.logback.classic.filter.LevelFilter"> <level>info</level> 
-			<onMatch>ACCEPT</onMatch> <onMismatch>DENY</onMismatch> </filter> -->
+    <!-- 生成html格式日志开始 -->
+    <appender name="HTML" class="ch.qos.logback.core.FileAppender">
+        <!-- 过滤器，只记录WARN级别的日志 -->
+        <!-- <filter class="ch.qos.logback.classic.filter.LevelFilter"> <level>info</level>
+            <onMatch>ACCEPT</onMatch> <onMismatch>DENY</onMismatch> </filter> -->
 
-		<encoder
-			class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-			<layout class="ch.qos.logback.classic.html.HTMLLayout">
-				<pattern>%p%d%msg%M%F{32}%L</pattern>
-			</layout>
-		</encoder>
-		<file>${LOG_HOME}/error-log.html</file>
-	</appender>
-	<!-- 生成html格式日志结束 -->
+        <encoder
+                class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="ch.qos.logback.classic.html.HTMLLayout">
+                <pattern>%p%d%msg%M%F{32}%L</pattern>
+            </layout>
+        </encoder>
+        <file>${LOG_HOME}/error-log.html</file>
+    </appender>
+    <!-- 生成html格式日志结束 -->
 
-	<!-- 每天生成一个html格式的日志开始 -->
-	<appender name="FILE_HTML"
-		class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<rollingPolicy
-			class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<!--日志文件输出的文件名 -->
-			<FileNamePattern>${LOG_HOME}/jeecgboot.%d{yyyy-MM-dd}.html
-			</FileNamePattern>
-			<!--日志文件保留天数 -->
-			<MaxHistory>30</MaxHistory>
-		</rollingPolicy>
-		<encoder
-			class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-			<layout class="ch.qos.logback.classic.html.HTMLLayout">
-				<pattern>%p%d%msg%M%F{32}%L</pattern>
-			</layout>
-		</encoder>
-		<!--日志文件最大的大小 -->
-		<triggeringPolicy
-			class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-			<MaxFileSize>10MB</MaxFileSize>
-		</triggeringPolicy>
-	</appender>
-	<!-- 每天生成一个html格式的日志结束 -->
+    <!-- 每天生成一个html格式的日志开始 -->
+    <appender name="FILE_HTML"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy
+                class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!--日志文件输出的文件名 -->
+            <FileNamePattern>${LOG_HOME}/{yyyy-MM-dd}/jeecgboot.%d{yyyy-MM-dd}.html
+            </FileNamePattern>
+            <!--日志文件保留天数 -->
+            <MaxHistory>30</MaxHistory>
+        </rollingPolicy>
+        <encoder
+                class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="ch.qos.logback.classic.html.HTMLLayout">
+                <pattern>%p%d%msg%M%F{32}%L</pattern>
+            </layout>
+        </encoder>
+        <!--日志文件最大的大小 -->
+        <triggeringPolicy
+                class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>10MB</MaxFileSize>
+        </triggeringPolicy>
+    </appender>
+    <!-- 每天生成一个html格式的日志结束 -->
 
-	<!-- SiftingAppender实现每个线程一个独立的日志文件 -->
-	<appender name="Async_FileLog" class="ch.qos.logback.classic.sift.SiftingAppender">
-		<discriminator>
-			<key>username</key>
-			<defaultValue>service</defaultValue>
-		</discriminator>
-		<sift>
-			<appender name="FileLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
-				<filter class="ch.qos.logback.classic.filter.LevelFilter">
-					<level>INFO</level>
-					<onMatch>ACCEPT</onMatch>
-					<onMismatch>DENY</onMismatch>
-				</filter>
-				<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-					<fileNamePattern>${LOG_HOME}/${username}.jeecgboot.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-					<maxHistory>7</maxHistory>
-					<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-						<maxFileSize>200MB</maxFileSize>
-					</timeBasedFileNamingAndTriggeringPolicy>
-				</rollingPolicy>
-				<encoder>
-					<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50}:%L - %mdc{username} - %msg%n</pattern>
-				</encoder>
-			</appender>
-		</sift>
-	</appender>
-
-
-	<!--api 日志-->
-	<appender name="API" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<!--滚动策略-->
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<!--路径-->
-			<fileNamePattern>${LOG_HOME}/api/api.%d{yyyy-MM-dd}.log</fileNamePattern>
-		</rollingPolicy>
-		<encoder>
-			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50}:%L - %mdc{username} - %msg%n</pattern>
-		</encoder>
-		<!--日志文件最大的大小 -->
-		<triggeringPolicy
-				class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-			<MaxFileSize>10MB</MaxFileSize>
-		</triggeringPolicy>
-	</appender>
-
-	<!--api 日志-->
-	<appender name="API_SERVICE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<!--滚动策略-->
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<!--路径-->
-			<fileNamePattern>${LOG_HOME}/api/apiService.%d{yyyy-MM-dd}.log</fileNamePattern>
-		</rollingPolicy>
-		<encoder>
-			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50}:%L - %mdc{username} - %msg%n</pattern>
-		</encoder>
-		<!--日志文件最大的大小 -->
-		<triggeringPolicy
-				class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-			<MaxFileSize>10MB</MaxFileSize>
-		</triggeringPolicy>
-	</appender>
+    <!-- SiftingAppender实现每个线程一个独立的日志文件 -->
+    <appender name="Async_FileLog" class="ch.qos.logback.classic.sift.SiftingAppender">
+        <discriminator>
+            <key>username</key>
+            <defaultValue>service</defaultValue>
+        </discriminator>
+        <sift>
+            <appender name="FileLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+                <filter class="ch.qos.logback.classic.filter.LevelFilter">
+                    <level>INFO</level>
+                    <onMatch>ACCEPT</onMatch>
+                    <onMismatch>DENY</onMismatch>
+                </filter>
+                <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                    <fileNamePattern>${LOG_HOME}/{yyyy-MM-dd}/${username}.jeecgboot.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+                    <maxHistory>7</maxHistory>
+                    <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                        <maxFileSize>200MB</maxFileSize>
+                    </timeBasedFileNamingAndTriggeringPolicy>
+                </rollingPolicy>
+                <encoder>
+                    <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50}:%L - %mdc{username} - %msg%n</pattern>
+                </encoder>
+            </appender>
+        </sift>
+    </appender>
 
 
-	<!--myibatis log configure -->
-	<Logger name="com.apache.ibatis" level="TRACE" />
-	<Logger name="java.sql.Connection" level="DEBUG" />
-	<Logger name="java.sql.Statement" level="DEBUG" />
-	<Logger name="java.sql.PreparedStatement" level="DEBUG" />
-	<Logger name="org.jeecg.aspect.ApiLogAspect" level="INFO"  additivity="false">
-		<appender-ref ref="API"/>
-	</Logger>
-	<Logger name="org.jeecg.modules.pay.service.impl.OrderInfoEntityServiceImpl" level="INFO">
-		<appender-ref ref="API_SERVICE"/>
-	</Logger>
-	<!-- 日志输出级别 -->
-	<root level="INFO">
-		<appender-ref ref="STDOUT" />
-		<appender-ref ref="FILE" />
-		<appender-ref ref="HTML" />
-		<appender-ref ref="FILE_HTML" />
-		<appender-ref ref="Async_FileLog" />
-	</root>
+    <!--api 日志-->
+    <appender name="API" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!--滚动策略-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!--路径-->
+            <fileNamePattern>${LOG_HOME}/api/api.%d{yyyy-MM-dd}.log</fileNamePattern>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50}:%L - %mdc{username} - %msg%n</pattern>
+        </encoder>
+        <!--日志文件最大的大小 -->
+        <triggeringPolicy
+                class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>10MB</MaxFileSize>
+        </triggeringPolicy>
+    </appender>
+
+    <!--api 日志-->
+    <appender name="API_SERVICE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!--滚动策略-->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!--路径-->
+            <fileNamePattern>${LOG_HOME}/api/apiService.%d{yyyy-MM-dd}.log</fileNamePattern>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50}:%L - %mdc{username} - %msg%n</pattern>
+        </encoder>
+        <!--日志文件最大的大小 -->
+        <triggeringPolicy
+                class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>10MB</MaxFileSize>
+        </triggeringPolicy>
+    </appender>
+
+
+    <!--myibatis log configure -->
+    <Logger name="com.apache.ibatis" level="TRACE"/>
+    <Logger name="java.sql.Connection" level="DEBUG"/>
+    <Logger name="java.sql.Statement" level="DEBUG"/>
+    <Logger name="java.sql.PreparedStatement" level="DEBUG"/>
+    <Logger name="org.jeecg.aspect.ApiLogAspect" level="INFO" additivity="false">
+        <appender-ref ref="API"/>
+    </Logger>
+    <Logger name="org.jeecg.modules.pay.service.impl.OrderInfoEntityServiceImpl" level="INFO">
+        <appender-ref ref="API_SERVICE"/>
+    </Logger>
+    <!-- 日志输出级别 -->
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="HTML"/>
+        <appender-ref ref="FILE_HTML"/>
+        <appender-ref ref="Async_FileLog"/>
+    </root>
 
 
 </configuration>
