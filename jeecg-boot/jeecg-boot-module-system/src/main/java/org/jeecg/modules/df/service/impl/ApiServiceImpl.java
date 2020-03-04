@@ -72,6 +72,7 @@ public class ApiServiceImpl implements IApiService {
 		JSONObject jsonObject = JSONUtil.parseObj(data);
 		PayOrderData payOrderData = jsonObject.toBean(PayOrderData.class);
 		log.info("\n=======>订单[{}]：解密成功", payOrderData.getBizOrderNo());
+		log.info("\n=======>订单[{}]：{}", payOrderData.getBizOrderNo(), payOrderData.toJsonString());
 
 		// 检查订单信息
 		PayOrder order = payOrderData.toPayOrder(user);
