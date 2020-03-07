@@ -4,4 +4,11 @@
     <select id="queryChannelAndUser" parameterType="String"  resultType="org.jeecg.modules.pay.entity.UserChannelEntity">
         select * from sys_user_channel where user_name=#{userName} and channel_code=#{channelCode}  and del_flag is null
     </select>
+    <select id="queryUserChannel" resultType="java.lang.String" parameterType="java.lang.String">
+        select channel_code from sys_user_channel where user_name=#{userName} and channel_code in
+        <foreach collection="channelCodes" item="code" index="index" open="(" close=")" separator=",">
+            #{code}
+        </foreach>
+        order by update_time DESC
+    </select>
 </mapper>

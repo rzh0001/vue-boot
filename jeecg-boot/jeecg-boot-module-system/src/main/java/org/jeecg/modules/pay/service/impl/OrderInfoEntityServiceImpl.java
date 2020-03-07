@@ -18,6 +18,7 @@ import org.jeecg.modules.pay.mapper.OrderInfoEntityMapper;
 import org.jeecg.modules.pay.service.*;
 import org.jeecg.modules.pay.service.factory.PayServiceFactory;
 import org.jeecg.modules.pay.service.requestPayUrl.RequestPayUrl;
+import org.jeecg.modules.productChannel.service.IProductChannelService;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.service.ISysDictService;
 import org.jeecg.modules.system.service.ISysUserService;
@@ -29,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.*;
@@ -600,7 +602,6 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      */
     private R addOrder(R checkParam, HttpServletRequest req) throws Exception {
         String ip = (String) checkParam.get(BaseConstant.IP);
-        //String ip = IPUtils.getIpAddr(req);
         if (!org.springframework.util.StringUtils.isEmpty(ip) && isIpBlacklist(ip)) {
             throw new RRException("非法访问，请联系管理员");
         }
@@ -851,22 +852,25 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             JSONObject dataObj = (JSONObject) decryptData.get(BaseConstant.DECRYPT_DATA);
             RequestPayUrl request = null;
             String requestUrl = null;
+            //产品代码
+            String productCode = dataObj.getString(BaseConstant.PRODUCT_NAME);
+            String payType = this.getChannelByProduct(userName,productCode);
             if (!isQuery) {
-                request = PayServiceFactory.getPay(dataObj.getString(BaseConstant.PAY_TYPE));
-                requestUrl = PayServiceFactory.getRequestUrl(dataObj.getString(BaseConstant.PAY_TYPE));
+                request = PayServiceFactory.getPay(payType);
+                requestUrl = PayServiceFactory.getRequestUrl(payType);
             }
             if (!createOrder) {
                 return R.ok().put(BaseConstant.ORDER_ID, dataObj.getString(BaseConstant.ORDER_ID))
                         .put(BaseConstant.USER_NAME, user.getUsername())
                         .put(BaseConstant.AGENT_NAME, user.getAgentUsername())
-                        .put(BaseConstant.PAY_TYPE, dataObj.getString(BaseConstant.PAY_TYPE))
+                        .put(BaseConstant.PAY_TYPE, payType)
                         .put(BaseConstant.REQUEST, request)
                         .put(BaseConstant.REQUEST_URL, requestUrl);
             }
             return R.ok().put(BaseConstant.OUTER_ORDER_ID, dataObj.getString(BaseConstant.OUTER_ORDER_ID))
                     .put(BaseConstant.USER_NAME, dataObj.getString(BaseConstant.USER_NAME))
                     .put(BaseConstant.SUBMIT_AMOUNT, dataObj.getString(BaseConstant.SUBMIT_AMOUNT))
-                    .put(BaseConstant.PAY_TYPE, dataObj.getString(BaseConstant.PAY_TYPE))
+                    .put(BaseConstant.PAY_TYPE, payType)
                     .put(BaseConstant.CALLBACK_URL, dataObj.getString(BaseConstant.CALLBACK_URL))
                     .put(BaseConstant.IP, dataObj.getString(BaseConstant.IP))
                     .put(BaseConstant.AGENT_NAME, user.getAgentUsername())
@@ -878,6 +882,30 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         }
     }
 
+    @Autowired
+    private IProductChannelService productChannelService;
+    /**
+     * 根据产品名称获取通道
+     * @param userName
+     * @param product
+     * @return
+     */
+    public String getChannelByProduct(String userName,String product) throws Exception{
+        String channelCode = null;
+        //根据product获取通道
+        List<String> channels = productChannelService.getChannelByProductCode(product);
+        if(CollectionUtils.isEmpty(channels)){
+            throw new ServletException("非法访问，无对应产品通道");
+        }
+        //根据 通道列表和用户，查看用户具备哪些通道
+        List<String> channelCodes = channelUserDao.queryUserChannel(channels,userName);
+        if(CollectionUtils.isEmpty(channelCodes)){
+            throw new ServletException("非法访问，无通道权限");
+        }
+        channelCode = channelCodes.get(0);
+        channelUserDao.updateUseTime(channelCode,userName);
+        return channelCode;
+    }
     /**
      * 检查用户的费率是否完整
      *

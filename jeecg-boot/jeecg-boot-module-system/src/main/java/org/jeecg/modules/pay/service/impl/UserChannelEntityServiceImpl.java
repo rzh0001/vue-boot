@@ -31,4 +31,14 @@ public class UserChannelEntityServiceImpl extends ServiceImpl<UserChannelEntityM
     public void deleteUserChannel(String userName, String channelCode) {
         baseMapper.deleteUserChannel(userName,channelCode);
     }
+
+    @Override
+    public List<String> queryUserChannel(List<String> channelCodes, String userName) {
+        return this.baseMapper.queryUserChannel(channelCodes,userName);
+    }
+
+    @Override
+    public void updateUseTime(String channelCode, String userName) {
+        this.baseMapper.updateUseTime(channelCode,userName);
+    }
 }

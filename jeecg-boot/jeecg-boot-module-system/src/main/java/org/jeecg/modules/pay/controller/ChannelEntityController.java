@@ -15,6 +15,7 @@ import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.aspect.annotation.AutoLog;
 import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.oConvertUtils;
+import org.jeecg.modules.pay.entity.BusinessLabelValue;
 import org.jeecg.modules.pay.entity.ChannelEntity;
 import org.jeecg.modules.pay.service.IChannelEntityService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -22,6 +23,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 
+import org.jeecg.modules.productChannel.service.IProductChannelService;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.service.ISysUserService;
 import org.jeecg.modules.util.BaseConstant;
@@ -99,10 +101,46 @@ public class ChannelEntityController {
 		 	 //商户或介绍人登录 ,展示其代理的通道
 			 list = channelEntityService.queryAgentChannelCodeByAgentName(sysUser.getAgentUsername());
 		 }
+
 		 Result<List<ChannelEntity>> result = new Result<>();
 		 result.setResult(list);
 		return result;
 	}
+
+	@Autowired
+	private IProductChannelService productChannelService;
+	 @GetMapping(value = "/showChannel")
+	 public Result<Map<String, Object>> getChannel(@RequestParam(name = "productCode") String productCode){
+		 //获取系统用户
+		 LoginUser user = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+		 SysUser sysUser = sysUserService.getUserByName(user.getUsername());
+		 List<ChannelEntity> list = new ArrayList<>();
+		 List<BusinessLabelValue> all = new ArrayList<>();
+		 //产品已关联的通道
+		 List<String> associated  = productChannelService.getChannelByProductCode(productCode);
+		 //管理员登录 展示全部的通道
+		 if(StringUtils.isEmpty(sysUser.getMemberType())){
+			 list = channelEntityService.queryAllChannelCode();
+		 }else if(BaseConstant.USER_AGENT.equals(sysUser.getMemberType())){
+			 //代理登录，则展示代理的通道
+			 list = channelEntityService.queryAgentChannelCodeByAgentName(sysUser.getUsername());
+		 }else{
+			 //商户或介绍人登录 ,展示其代理的通道
+			 list = channelEntityService.queryAgentChannelCodeByAgentName(sysUser.getAgentUsername());
+		 }
+		 for(ChannelEntity channel:list){
+			 BusinessLabelValue labelValue = new BusinessLabelValue();
+			 labelValue.setLabel(channel.getChannelName());
+			 labelValue.setValue(channel.getChannelCode());
+			 all.add(labelValue);
+		 }
+		 Result<Map<String, Object>> result = new Result<Map<String, Object>>();
+		 Map<String, Object> re = new HashMap<>();
+		 re.put("all", all);
+		 re.put("associated", org.apache.commons.lang.StringUtils.join(associated.toArray(), ","));
+		 result.setResult(re);
+		 return result;
+	 }
 	/**
 	  *   添加
 	 * @param channelEntity

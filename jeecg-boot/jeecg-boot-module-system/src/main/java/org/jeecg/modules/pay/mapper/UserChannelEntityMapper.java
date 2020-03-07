@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import org.jeecg.modules.pay.entity.UserChannelEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
@@ -22,4 +23,9 @@ public interface UserChannelEntityMapper extends BaseMapper<UserChannelEntity> {
 
     @Delete("delete from sys_user_channel where user_name=#{userName} and channel_code=#{channelCode}")
     void deleteUserChannel(@Param("userName")String userName, @Param("channelCode")String channelCode);
+
+    List<String> queryUserChannel(@Param("channelCodes") List<String> channelCodes, @Param("userName") String userName);
+
+    @Update("update sys_user_channel set update_time=now() where user_name=#{userName} and channel_code=#{channelCode}")
+    void updateUseTime(@Param("channelCode") String channelCode, @Param("userName") String userName);
 }
