@@ -478,9 +478,12 @@
         var params = {username:name};//查询条件
         getAction(this.url.cleanGoogle,params).then((res)=>{
           if(res.success){
-            alert(res.result)
+            this.$message.success(res.result)
+            this.loadData()
         }else{
-        }
+            this.$message.warning(res.message)
+
+          }
       })
       },
       handleChangePassword(username) {
