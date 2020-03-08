@@ -75,13 +75,13 @@
       <div class="ant-alert ant-alert-info" style="margin-bottom: 16px;">
         总订单数：<a-tag color="cyan">{{summary.totalOrderCount}} </a-tag>
         已付订单数：<a-tag color="cyan">{{summary.paidOrderCount}} </a-tag>
-<!--        失败订单数：<a-tag color="red">{{summary.unpaidOrderCount}} </a-tag>-->
+        待处理订单数：<a-tag color="red">{{summary.unpaidOrderCount}} </a-tag>
         总金额：<a-tag color="cyan">{{summary.totalOrderAmount}}元 </a-tag>
         已付金额：<a-tag color="cyan">{{summary.paidOrderAmount}}元 </a-tag>
-        已返回金额：<a-tag color="cyan">{{summary.paidOrderAmount}}元 </a-tag>
-<!--        失败金额：<a-tag color="red">{{summary.unpaidOrderAmount}}元 </a-tag>-->
+<!--        已返回金额：<a-tag color="cyan">{{summary.paidOrderAmount}}元 </a-tag>-->
+        待处理金额：<a-tag color="red">{{summary.unpaidOrderAmount}}元 </a-tag>
 <!--        预计收入：<a-tag color="cyan">{{summary.income}}元 </a-tag>-->
-        预计手续费：<a-tag color="cyan">{{summary.fee}}元 </a-tag>
+        订单手续费：<a-tag color="cyan">{{summary.fee}}元 </a-tag>
       </div>
 
       <a-table
@@ -340,6 +340,11 @@
         },
         summary: {},
       }
+    },
+    created() {
+      // this.columns = colAuthFilter(this.columns,'orderList:');
+      this.searchQueryLocal();
+      // this.initDictConfig();
     },
     computed: {
       importExcelUrl: function() {
