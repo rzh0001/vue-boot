@@ -11,39 +11,39 @@ public interface DashboardMapper extends BaseMapper {
 
 
 	@Select("select sum(amount) from sys_user_amount")
-	BigDecimal summaryUserAmount();
+	BigDecimal summaryTotalUserAmount();
 
 	@Select("select sum(amount) from sys_user_amount where agent_id = #{agentId}")
 	BigDecimal summaryUserAmount(@Param("agentId") String agentId);
 
 	@Select("select sum(amount) from df_pay_order where status = '2'")
-	BigDecimal summaryDfPayAmount();
+	BigDecimal summaryTotalDfPayAmount();
 
 	@Select("select sum(amount) from df_pay_order where agent_id = #{agentId} and status = '2'")
 	BigDecimal summaryDfPayAmount(@Param("agentId") String agentId);
 
 	@Select("select sum(order_fee) from df_pay_order where status = '2'")
-	BigDecimal summaryDfOrderFee();
+	BigDecimal summaryTotalDfOrderFee();
 
 	@Select("select sum(order_fee) from df_pay_order where agent_id = #{agentId} and status = '2'")
 	BigDecimal summaryDfOrderFee(@Param("agentId") String agentId);
 
 	@Select("select sum(amount) from df_recharge_order where status = '2' and to_days(create_time) = to_days(now())")
-	BigDecimal summaryTodayRechargeAmount();
+	BigDecimal summaryTodayTotalRechargeAmount();
 
 	@Select("select sum(amount) from df_recharge_order where agent_id = #{agentId} "
 			+ "and status = '2' and to_days(create_time) = to_days(now())")
 	BigDecimal summaryTodayRechargeAmount(@Param("agentId") String agentId);
 
 	@Select("select sum(amount) from df_pay_order where status = '2' and to_days(create_time) = to_days(now())")
-	BigDecimal summaryTodayDfPayAmount();
+	BigDecimal summaryTodayTotalDfPayAmount();
 
 	@Select("select sum(amount) from df_pay_order where agent_id = #{agentId} "
 			+ "and status = '2' and to_days(create_time) = to_days(now())")
 	BigDecimal summaryTodayDfPayAmount(@Param("agentId") String agentId);
 
 	@Select("select sum(order_fee) from df_pay_order where status = '2' and to_days(create_time) = to_days(now())")
-	BigDecimal summaryTodayDfOrderFee();
+	BigDecimal summaryTodayTotalDfOrderFee();
 
 	@Select("select sum(order_fee) from df_pay_order where agent_id = #{agentId} "
 			+ "and status = '2' and to_days(create_time) = to_days(now())")

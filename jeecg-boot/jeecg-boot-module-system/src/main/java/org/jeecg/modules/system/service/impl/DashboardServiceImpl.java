@@ -1,6 +1,5 @@
 package org.jeecg.modules.system.service.impl;
 
-import cn.hutool.core.map.MapUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
 import org.jeecg.common.api.vo.Result;
@@ -58,17 +57,17 @@ public class DashboardServiceImpl extends IBaseService implements IDashboardServ
 	public Map<String, Object> adminSummary() {
 		Map map = new HashMap();
 		// 剩余额度
-		BigDecimal userAmount = mapper.summaryUserAmount();
+		BigDecimal userAmount = mapper.summaryTotalUserAmount();
 		// 已代付总额
-		BigDecimal payAmount = mapper.summaryDfPayAmount();
+		BigDecimal payAmount = mapper.summaryTotalDfPayAmount();
 		// 手续费收入
-		BigDecimal orderFee = mapper.summaryDfOrderFee();
+		BigDecimal orderFee = mapper.summaryTotalDfOrderFee();
 		// 今日充值
-		BigDecimal todayRechargeAmount = mapper.summaryTodayRechargeAmount();
+		BigDecimal todayRechargeAmount = mapper.summaryTodayTotalRechargeAmount();
 		// 今日代付
-		BigDecimal todayDfPayAmount = mapper.summaryTodayDfPayAmount();
+		BigDecimal todayDfPayAmount = mapper.summaryTodayTotalDfPayAmount();
 		// 今日手续费收入
-		BigDecimal todayDfOrderFee = mapper.summaryTodayDfOrderFee();
+		BigDecimal todayDfOrderFee = mapper.summaryTodayTotalDfOrderFee();
 		map.put("userAmount", userAmount);
 		map.put("payAmount", payAmount);
 		map.put("orderFee", orderFee);
