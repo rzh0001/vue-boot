@@ -106,17 +106,17 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder>
 				log.info("\n=======>订单[{}]：获取介绍人费率配置失败", order.getOuterOrderId());
 				throw new ApiException(1006, "获取介绍人费率配置失败！");
 			}
-			// 计算介绍人收入
+			// 计算代理收入
 			BigDecimal bigDecimal = order.getAmount().multiply(salesman.getTransactionFeeRate()).setScale(2, BigDecimal.ROUND_HALF_UP);
 			BigDecimal orderFee = bigDecimal.add(salesman.getOrderFixedFee());
 
-			// 增加介绍人收入
-			String remark = "单笔固定手续费：" + salesman.getOrderFixedFee() + "，交易手续费：" + bigDecimal;
-			userAmountService.changeAmount(order.getSalesmanId(), orderFee, order.getOrderId(), remark, "1");
-
 			// 增加代理收入
-			remark = "扣除介绍人分润后，单笔固定手续费：" + order.getFixedFee().subtract(salesman.getOrderFixedFee()) + "，交易手续费：" + order.getTransactionFee().subtract(bigDecimal);
-			userAmountService.changeAmount(order.getAgentId(), order.getOrderFee().subtract(orderFee), order.getOrderId(), remark, "1");
+			String remark = "单笔固定手续费：" + salesman.getOrderFixedFee() + "，交易手续费：" + bigDecimal;
+			userAmountService.changeAmount(order.getAgentId(), orderFee, order.getOrderId(), remark, "1");
+
+			// 增加介绍人收入
+			remark = "单笔固定手续费：" + order.getFixedFee().subtract(salesman.getOrderFixedFee()) + "，交易手续费：" + order.getTransactionFee().subtract(bigDecimal);
+			userAmountService.changeAmount(order.getSalesmanId(), order.getOrderFee().subtract(orderFee), order.getOrderId(), remark, "1");
 
 		} else {
 			// 增加代理收入
@@ -124,9 +124,13 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder>
 			userAmountService.changeAmount(order.getAgentId(), order.getOrderFee(), order.getOrderId(), remark, "1");
 		}
 
-//		if (StrUtil.isNotBlank(order.getCallbackUrl())) {
-//			apiService.callback(order.getId());
-//		}
+		if (StrUtil.isNotBlank(order.getCallbackUrl())) {
+			try {
+				apiService.callback(order.getId());
+			} catch (Exception e) {
+				log.info("\n=======>订单[{}]：回调失败", order.getOuterOrderId());
+			}
+		}
 		return true;
 	}
 
