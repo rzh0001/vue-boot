@@ -1,8 +1,8 @@
 package org.jeecg.modules.df.entity;
 
-import com.alibaba.fastjson.JSON;
 import lombok.Data;
-import org.jeecg.modules.util.AES128Util;
+import lombok.EqualsAndHashCode;
+import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotBlank;
 
@@ -11,17 +11,15 @@ import javax.validation.constraints.NotBlank;
  * @since 2019/11/17
  */
 @Data
-public class QueryOrderData {
-    
-    @NotBlank
-    private String orderNo;
-    private String bizOrderNo;
-    
-    public String toJsonString() {
-        return JSON.toJSONString(this);
-    }
-    
-    public String encodeData(String apiKey) {
-        return AES128Util.encryptBase64(toJsonString(), apiKey);
-    }
+@EqualsAndHashCode(callSuper = true)
+public class QueryOrderData extends ApiData {
+
+
+	private String orderNo;
+
+	@NotBlank(message = "bizOrderNo 不能为空")
+	@Length(max = 32, message = "bizOrderNo 最大长度为32")
+	private String bizOrderNo;
+
+
 }
