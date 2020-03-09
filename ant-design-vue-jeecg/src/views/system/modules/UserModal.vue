@@ -65,12 +65,12 @@
           <a-input placeholder="" :disabled="isDisabledAuth('user:form:apiKey')"
                    v-decorator="[ 'apiKey']" disabled/>
         </a-form-item>
-        <a-form-item v-if="model.memberType == 3" label="订单单笔手续费" :labelCol="labelCol" :wrapperCol="wrapperCol">
+        <a-form-item v-if="model.memberType === '2' || model.memberType === '3'" label="订单单笔手续费" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input-number placeholder="" :disabled="isDisabledAuth('user:form:orderFixedFee')"
                           v-decorator="[ 'orderFixedFee']"
                           min="0.01"/>
         </a-form-item>
-        <a-form-item v-if="model.memberType == 3" label="交易手续费率" :labelCol="labelCol" :wrapperCol="wrapperCol">
+        <a-form-item v-if="model.memberType === '2' || model.memberType === '3'"  label="交易手续费率" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input-number placeholder="" :disabled="isDisabledAuth('user:form:transactionFeeRate')"
                           v-decorator="[ 'transactionFeeRate']"
                           min="0.0001"/>

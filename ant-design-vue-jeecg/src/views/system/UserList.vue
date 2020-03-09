@@ -24,11 +24,6 @@
 
 
           <template v-if="toggleSearchStatus">
-            <!--            <a-col :md="6" :sm="8">-->
-            <!--              <a-form-item label="邮箱">-->
-            <!--                <a-input placeholder="请输入邮箱查询" v-model="queryParam.email"></a-input>-->
-            <!--              </a-form-item>-->
-            <!--            </a-col>-->
 
             <a-col :md="6" :sm="8">
               <a-form-item label="手机号码">
