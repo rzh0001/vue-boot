@@ -259,53 +259,35 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
 
     @Override
     public R notifyCustomer(OrderInfoEntity order, SysUser user, String payType) throws Exception {
-        boolean flag = false;
-        String submitAmount = order.getSubmitAmount().toString();
         order.setStatus(1);
         JSONObject callobj = encryptAESData(order, user.getApiKey());
         StringBuilder msg = new StringBuilder();
-        String body = null;
-        try {
-            log.info("===回调商户，url:{},param:{}", order.getSuccessCallbackUrl(), callobj.toJSONString());
-            //捕获异常的目的是为了防止各种异常情况下，仍然会去修改订单状态
-            //3 数据加密之后，通知下游商户
-            HttpResult result = HttpUtils.doPostJson(order.getSuccessCallbackUrl(), callobj.toJSONString());
-            redisUtil.del("callBack"+order.getOrderId());
-            //4、修改订单状态,同时更新订单的update_time;标示订单的回调时间
-            body = result.getBody();
-            log.info("===商户返回信息：{}", body);
-            if (result.getCode() == BaseConstant.SUCCESS) {
-                JSONObject callBackResult = JSON.parseObject(result.getBody());
-                //CallBackResult callBackResult = JSONObject.parseObject(result.getBody(), CallBackResult.class);
-                if ("200".equals(callBackResult.get("code").toString())) {
-                    updateOrderStatusSuccessByOrderId(order.getOrderId());
-                    updateBusinessIncomeAmount(order);
-                    log.info("通知商户成功，并且商户返回成功,orderID:{}", order.getOrderId());
-                    flag = true;
-                    msg.append("通知商户成功，并且商户返回成功");
-                    return R.ok(msg.toString());
-                } else {
-                    log.info("通通知商户失败,orderID:{}", order.getOrderId());
-                    updateOrderStatusNoBackByOrderId(order.getOrderId());
-                    msg.append("通知商户失败，原因：").append(callBackResult.get("msg"));
-                    return R.error(msg.toString());
-                }
+        log.info("===回调商户，url:{},param:{}", order.getSuccessCallbackUrl(), callobj.toJSONString());
+        HttpResult result = HttpUtils.doPostJson(order.getSuccessCallbackUrl(), callobj.toJSONString());
+        redisUtil.del("callBack"+order.getOrderId());
+        String body = result.getBody();
+        log.info("===商户返回信息：{}", body);
+        if (result.getCode() == BaseConstant.SUCCESS) {
+            JSONObject callBackResult = JSON.parseObject(result.getBody());
+            //CallBackResult callBackResult = JSONObject.parseObject(result.getBody(), CallBackResult.class);
+            if ("200".equals(callBackResult.get("code").toString())) {
+                updateOrderStatusSuccessByOrderId(order.getOrderId());
+                updateBusinessIncomeAmount(order);
+                log.info("通知商户成功，并且商户返回成功,orderID:{}", order.getOrderId());
+                msg.append("通知商户成功，并且商户返回成功");
+                countAmount(order.getOrderId(), user.getUsername(), order.getSubmitAmount().toString(), payType);
+                return R.ok(msg.toString());
             } else {
                 log.info("通通知商户失败,orderID:{}", order.getOrderId());
                 updateOrderStatusNoBackByOrderId(order.getOrderId());
-                msg.append("通知商户失败，返回状态码为：").append(result.getCode());
+                msg.append("通知商户失败，原因：").append(callBackResult.get("msg"));
                 return R.error(msg.toString());
             }
-        } catch (Exception e) {
-            log.info("订单回调商户异常，异常信息为:{}", e);
+        } else {
+            log.info("通通知商户失败,orderID:{}", order.getOrderId());
             updateOrderStatusNoBackByOrderId(order.getOrderId());
-            msg.append("通知商户失败，原因：商户未返回json格式数据,返回内容：").append(body);
+            msg.append("通知商户失败，返回状态码为：").append(result.getCode());
             return R.error(msg.toString());
-        } finally {
-            if (flag) {
-                //5、只有在通知商户成功，才统计高级代理。商户。介绍人的收入情况
-                countAmount(order.getOrderId(), user.getUsername(), submitAmount, payType);
-            }
         }
     }
 

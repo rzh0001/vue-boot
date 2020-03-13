@@ -38,7 +38,7 @@ import java.util.Map;
 @Service
 public class DianJinPayImpl implements RequestPayUrl<OrderInfoEntity, String, String, String, String, UserBusinessEntity,
     Object>, InitializingBean, ApplicationContextAware {
-    public static final String DOMAIN = "http://47.240.10.174";
+    public static final String DOMAIN = "http://39.98.76.217";
     public static final String key = "44843f1629e8b1142636fd799fb2e373b1feb096eb79bdcbeba8be8b1a65e752a2d08b88e0e0732a3b6a5f5572b1f7464e11f769d140d2675c74f9cdc99cfd2f1d33ecb9d0ffdb45df2e1665678c788c1a6ce5b69e539fdfb6c1daef8703c1e2";
     @Autowired
     private RedisUtil redisUtil;

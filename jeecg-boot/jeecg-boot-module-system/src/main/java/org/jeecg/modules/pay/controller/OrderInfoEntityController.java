@@ -314,9 +314,6 @@ public class OrderInfoEntityController {
 		if (order == null) {
 			return R.error("订单不存在");
 		}
-//        if (order.getStatus() != BaseConstant.ORDER_STATUS_SUCCESS_NOT_RETURN) {
-//            return R.error("订单状态不是‘成功未返回’，不能补单");
-//        }
 		if (order.getStatus() == BaseConstant.ORDER_STATUS_SUCCESS) {
 			return R.error("订单状态已成功，不能补单");
 		}
@@ -403,6 +400,8 @@ public class OrderInfoEntityController {
 	private R notifyCustomer(OrderInfoEntity order, String id) {
 		boolean flag = false;
 		try {
+			//成功未返回
+			order.setStatus(1);
 			order.setReplacementOrder("1");
 			orderInfoEntityService.updateById(order);
 			StringBuilder msg = new StringBuilder();
