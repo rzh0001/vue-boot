@@ -84,6 +84,8 @@ public class BaseConstant {
     public static final String REQUEST_INTERNET_BANK = "internet_bank";
 
     public static final String REQUEST_DIANJIN_ALIPAY = "daiJinAlipay";
+    //赤诚支付-支付宝个码
+    public static final String REQUEST_CHICHENG_ALIPAY = "chiChengAlipay";
     //四方回调挂马平台的返回码
     public static final int SUCCESS = 200;
     //流水类型 流水类型 1-手续费收入 2-提现 3-冲正
