@@ -44,11 +44,10 @@ public class DashboardServiceImpl extends IBaseService implements IDashboardServ
 			summary = adminSummary();
 		} else if (user.getMemberType().equals("1")) {
 			summary = agentSummary(user.getId());
-			r.setSuccess(true);
 		} else if (user.getMemberType().equals("3")) {
 			summary = userSummary(user.getId());
-			r.setSuccess(true);
 		}
+		r.setSuccess(true);
 		r.setResult(summary);
 
 		return r;

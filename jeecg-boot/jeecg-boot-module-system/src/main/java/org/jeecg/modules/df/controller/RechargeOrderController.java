@@ -46,67 +46,68 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
- /**
+/**
  * @Description: 代付充值订单
  * @Author: jeecg-boot
-  * @Date: 2019-10-26
+ * @Date: 2019-10-26
  * @Version: V1.0
  */
 @Slf4j
-@Api(tags="代付充值订单")
+@Api(tags = "代付充值订单")
 @RestController
 @RequestMapping("/df/rechargeOrder")
 public class RechargeOrderController {
 	@Autowired
 	private IRechargeOrderService rechargeOrderService;
-	
-	 @Autowired
-	 private IUserBankcardService bankcardService;
-	
-	 @Autowired
-	 private IUserAmountEntityService userAmountService;
-	
-	 @Autowired
-	 private ISysUserService userService;
-	
-	 // 查询条件独立成方法，查询、统计、导出 三个接口使用
-	 private QueryWrapper<RechargeOrder> initQueryCondition(RechargeOrder order, HttpServletRequest req) {
-		 LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
-		 SysUser opUser = userService.getUserByName(loginUser.getUsername());
-		
-		 QueryWrapper<RechargeOrder> queryWrapper = QueryGenerator.initQueryWrapper(order,
-				 req.getParameterMap());
-		 if (StringUtils.isNotBlank(opUser.getMemberType())) {
-			 switch (opUser.getMemberType()) {
-				 case PayConstant.MEMBER_TYPE_AGENT:
-					 queryWrapper.lambda().eq(RechargeOrder::getAgentId, opUser.getId());
-					 break;
-				 case PayConstant.MEMBER_TYPE_SALESMAN:
-					 queryWrapper.lambda().eq(RechargeOrder::getSalesmanId, opUser.getId());
-					 break;
-				 case PayConstant.MEMBER_TYPE_MEMBER:
-					 queryWrapper.lambda().eq(RechargeOrder::getUserId, opUser.getId());
-					 break;
-				 default:
-			 }
-		 }
-		 return queryWrapper;
-	 }
-	
-	 /**
+
+	@Autowired
+	private IUserBankcardService bankcardService;
+
+	@Autowired
+	private IUserAmountEntityService userAmountService;
+
+	@Autowired
+	private ISysUserService userService;
+
+	// 查询条件独立成方法，查询、统计、导出 三个接口使用
+	private QueryWrapper<RechargeOrder> initQueryCondition(RechargeOrder order, HttpServletRequest req) {
+		LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+		SysUser opUser = userService.getUserByName(loginUser.getUsername());
+
+		QueryWrapper<RechargeOrder> queryWrapper = QueryGenerator.initQueryWrapper(order,
+				req.getParameterMap());
+		if (StringUtils.isNotBlank(opUser.getMemberType())) {
+			switch (opUser.getMemberType()) {
+				case PayConstant.MEMBER_TYPE_AGENT:
+					queryWrapper.lambda().eq(RechargeOrder::getAgentId, opUser.getId());
+					break;
+				case PayConstant.MEMBER_TYPE_SALESMAN:
+					queryWrapper.lambda().eq(RechargeOrder::getSalesmanId, opUser.getId());
+					break;
+				case PayConstant.MEMBER_TYPE_MEMBER:
+					queryWrapper.lambda().eq(RechargeOrder::getUserId, opUser.getId());
+					break;
+				default:
+			}
+		}
+		return queryWrapper;
+	}
+
+	/**
 	 * 分页列表查询
-	  * @param order
+	 *
+	 * @param order
 	 * @param pageNo
 	 * @param pageSize
 	 * @param req
 	 * @return
 	 */
 	@AutoLog(value = "代付充值订单-分页列表查询")
-	@ApiOperation(value="代付充值订单-分页列表查询", notes="代付充值订单-分页列表查询")
+	@ApiOperation(value = "代付充值订单-分页列表查询", notes = "代付充值订单-分页列表查询")
 	@GetMapping(value = "/list")
 	public Result<IPage<RechargeOrder>> queryPageList(RechargeOrder order,
-													  @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
-													  @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
+													  @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
+													  @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
 													  HttpServletRequest req) {
 		Result<IPage<RechargeOrder>> result = new Result<IPage<RechargeOrder>>();
 		QueryWrapper<RechargeOrder> queryWrapper = initQueryCondition(order, req);
@@ -117,30 +118,31 @@ public class RechargeOrderController {
 		result.setResult(pageList);
 		return result;
 	}
-	
-	 @GetMapping(value = "getBankcard")
-	 public Result<Object> getBankcard() {
-		 LoginUser ou = (LoginUser) SecurityUtils.getSubject().getPrincipal();
-		 SysUser user = userService.getById(ou.getId());
-		 QueryWrapper<UserBankcard> qw = new QueryWrapper<>();
-		 qw.lambda()
-				 .eq(UserBankcard::getUserId, user.getAgentId())
-				 .eq(UserBankcard::getIsOpen, "1");
-		 List<UserBankcard> list = bankcardService.list(qw);
-		 if (list.isEmpty()) {
-			 throw new RRException("获取银行卡失败，代理未配置收款银行卡，请联系代理配置！");
-		 }
-		 UserBankcard bankcard = list.get(RandomUtil.randomInt(list.size()));
-		 return Result.ok(bankcard);
-	 }
-	
-	 /**
-	 *   添加
-	  * @param order
+
+	@GetMapping(value = "getBankcard")
+	public Result<Object> getBankcard() {
+		LoginUser ou = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+		SysUser user = userService.getById(ou.getId());
+		QueryWrapper<UserBankcard> qw = new QueryWrapper<>();
+		qw.lambda()
+				.eq(UserBankcard::getUserId, user.getAgentId())
+				.eq(UserBankcard::getIsOpen, "1");
+		List<UserBankcard> list = bankcardService.list(qw);
+		if (list.isEmpty()) {
+			throw new RRException("获取银行卡失败，代理未配置收款银行卡，请联系代理配置！");
+		}
+		UserBankcard bankcard = list.get(RandomUtil.randomInt(list.size()));
+		return Result.ok(bankcard);
+	}
+
+	/**
+	 * 添加
+	 *
+	 * @param order
 	 * @return
 	 */
 	@AutoLog(value = "代付充值订单-添加")
-	@ApiOperation(value="代付充值订单-添加", notes="代付充值订单-添加")
+	@ApiOperation(value = "代付充值订单-添加", notes = "代付充值订单-添加")
 	@PostMapping(value = "/add")
 	public Result<RechargeOrder> add(@RequestBody RechargeOrder order) {
 		Result<RechargeOrder> result = new Result<RechargeOrder>();
@@ -152,188 +154,190 @@ public class RechargeOrderController {
 		order.setAgentId(user.getAgentId());
 		order.setAgentUsername(user.getAgentUsername());
 		order.setAgentRealname(user.getAgentRealname());
-		
+
 		order.setOrderId(IDUtil.genRechargeOrderId());
 		order.setStatus(DfConstant.STATUS_PAID);
 		try {
 			rechargeOrderService.save(order);
 			result.success("添加成功！");
 		} catch (Exception e) {
-			log.error(e.getMessage(),e);
+			log.error(e.getMessage(), e);
 			result.error500("操作失败");
 		}
 		return result;
 	}
-	
+
 	/**
-	 *  编辑
+	 * 编辑
+	 *
 	 * @param rechargeOrder
 	 * @return
 	 */
 	@AutoLog(value = "代付充值订单-编辑")
-	@ApiOperation(value="代付充值订单-编辑", notes="代付充值订单-编辑")
+	@ApiOperation(value = "代付充值订单-编辑", notes = "代付充值订单-编辑")
 	@PutMapping(value = "/edit")
 	public Result<RechargeOrder> edit(@RequestBody RechargeOrder rechargeOrder) {
 		Result<RechargeOrder> result = new Result<RechargeOrder>();
 		RechargeOrder rechargeOrderEntity = rechargeOrderService.getById(rechargeOrder.getId());
-		if(rechargeOrderEntity==null) {
+		if (rechargeOrderEntity == null) {
 			result.error500("未找到对应实体");
-		}else {
+		} else {
 			boolean ok = rechargeOrderService.updateById(rechargeOrder);
 			//TODO 返回false说明什么？
-			if(ok) {
+			if (ok) {
 				result.success("修改成功!");
 			}
 		}
-		
+
 		return result;
 	}
-	
-	 /**
-	  * 审核
-	  *
-	  * @param jsonObject
-	  * @return
-	  */
-	 @AutoLog(value = "提现申请-审核")
-	 @ApiOperation(value = "提现申请-审核", notes = "提现申请-审核")
-	 @PutMapping(value = "/approval")
-	 @Transactional(rollbackFor = Exception.class)
-	 public Result<Object> approval(@RequestBody JSONObject jsonObject) {
-		
-		 RechargeOrder order = rechargeOrderService.getById(jsonObject.getString("id"));
-		 if (order == null) {
-			 return Result.error("未找到对应实体");
-		 }
-		
-		 order.setStatus(jsonObject.getString("status"));
-		 order.setSuccessTime(new Date());
-		 boolean ok = rechargeOrderService.updateById(order);
-		
-		 // 审核通过增加余额
-		 if (DfConstant.STATUS_CHECKED.equals(jsonObject.getString("status"))) {
-			 UserAmountEntity amount = userAmountService.getUserAmountByUserName(order.getUserName());
-			 userAmountService.changeAmount(order.getUserId(), order.getAmount(), order.getOrderId(), order.getRemark(), "2");
-			
-			 // 插入流水表
-//			 userAmountDetailService.addAmountDetail(order.getAmount(), amount.getAmount(), "1", order.getUserId());
-		 }
-		
-		 return Result.ok("修改成功!");
-	 }
-	
+
 	/**
-	 *   通过id删除
+	 * 审核
+	 *
+	 * @param jsonObject
+	 * @return
+	 */
+	@AutoLog(value = "充值订单-审核")
+	@ApiOperation(value = "充值订单-审核", notes = "充值订单-审核")
+	@PutMapping(value = "/approval")
+	@Transactional(rollbackFor = Exception.class)
+	public Result<Object> approval(@RequestBody JSONObject jsonObject) {
+
+		log.info("充值订单-审核:" + jsonObject.toJSONString());
+		RechargeOrder order = rechargeOrderService.getById(jsonObject.getString("id"));
+		if (order == null) {
+			return Result.error("未找到对应实体");
+		}
+
+		order.setStatus(jsonObject.getString("status"));
+		order.setSuccessTime(new Date());
+		rechargeOrderService.updateById(order);
+
+		// 审核通过增加余额
+		if (DfConstant.STATUS_CHECKED.equals(jsonObject.getString("status"))) {
+			log.info("充值订单-审核通过:{} 金额:{}", order.getOrderId(), order.getAmount());
+			userAmountService.changeAmount(order.getUserId(), order.getAmount(), order.getOrderId(), order.getRemark(), "2");
+		}
+
+		return Result.ok("修改成功!");
+	}
+
+	/**
+	 * 通过id删除
+	 *
 	 * @param id
 	 * @return
 	 */
 	@AutoLog(value = "代付充值订单-通过id删除")
-	@ApiOperation(value="代付充值订单-通过id删除", notes="代付充值订单-通过id删除")
+	@ApiOperation(value = "代付充值订单-通过id删除", notes = "代付充值订单-通过id删除")
 	@DeleteMapping(value = "/delete")
-	public Result<?> delete(@RequestParam(name="id",required=true) String id) {
+	public Result<?> delete(@RequestParam(name = "id", required = true) String id) {
 		try {
 			rechargeOrderService.removeById(id);
 		} catch (Exception e) {
-			log.error("删除失败",e.getMessage());
+			log.error("删除失败", e.getMessage());
 			return Result.error("删除失败!");
 		}
 		return Result.ok("删除成功!");
 	}
-	
+
 	/**
-	 *  批量删除
+	 * 批量删除
+	 *
 	 * @param ids
 	 * @return
 	 */
 	@AutoLog(value = "代付充值订单-批量删除")
-	@ApiOperation(value="代付充值订单-批量删除", notes="代付充值订单-批量删除")
+	@ApiOperation(value = "代付充值订单-批量删除", notes = "代付充值订单-批量删除")
 	@DeleteMapping(value = "/deleteBatch")
-	public Result<RechargeOrder> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
+	public Result<RechargeOrder> deleteBatch(@RequestParam(name = "ids", required = true) String ids) {
 		Result<RechargeOrder> result = new Result<RechargeOrder>();
-		if(ids==null || "".equals(ids.trim())) {
+		if (ids == null || "".equals(ids.trim())) {
 			result.error500("参数不识别！");
-		}else {
+		} else {
 			this.rechargeOrderService.removeByIds(Arrays.asList(ids.split(",")));
 			result.success("删除成功!");
 		}
 		return result;
 	}
-	
+
 	/**
 	 * 通过id查询
+	 *
 	 * @param id
 	 * @return
 	 */
 	@AutoLog(value = "代付充值订单-通过id查询")
-	@ApiOperation(value="代付充值订单-通过id查询", notes="代付充值订单-通过id查询")
+	@ApiOperation(value = "代付充值订单-通过id查询", notes = "代付充值订单-通过id查询")
 	@GetMapping(value = "/queryById")
-	public Result<RechargeOrder> queryById(@RequestParam(name="id",required=true) String id) {
+	public Result<RechargeOrder> queryById(@RequestParam(name = "id", required = true) String id) {
 		Result<RechargeOrder> result = new Result<RechargeOrder>();
 		RechargeOrder rechargeOrder = rechargeOrderService.getById(id);
-		if(rechargeOrder==null) {
+		if (rechargeOrder == null) {
 			result.error500("未找到对应实体");
-		}else {
+		} else {
 			result.setResult(rechargeOrder);
 			result.setSuccess(true);
 		}
 		return result;
 	}
 
-  /**
-   * 导出excel
-   *
-   * @param request
-   * @param response
-   */
-  @RequestMapping(value = "/exportXls")
-  public ModelAndView exportXls(RechargeOrder order, HttpServletRequest request, HttpServletResponse response) {
-      // Step.1 组装查询条件
-	  QueryWrapper<RechargeOrder> queryWrapper = initQueryCondition(order, request);
-	
-	  //Step.2 AutoPoi 导出Excel
-      ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
-      List<RechargeOrder> pageList = rechargeOrderService.list(queryWrapper);
-      //导出文件名称
-      mv.addObject(NormalExcelConstants.FILE_NAME, "代付充值订单列表");
-      mv.addObject(NormalExcelConstants.CLASS, RechargeOrder.class);
-      mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("代付充值订单列表数据", "导出人:Jeecg", "导出信息"));
-      mv.addObject(NormalExcelConstants.DATA_LIST, pageList);
-      return mv;
-  }
+	/**
+	 * 导出excel
+	 *
+	 * @param request
+	 * @param response
+	 */
+	@RequestMapping(value = "/exportXls")
+	public ModelAndView exportXls(RechargeOrder order, HttpServletRequest request, HttpServletResponse response) {
+		// Step.1 组装查询条件
+		QueryWrapper<RechargeOrder> queryWrapper = initQueryCondition(order, request);
 
-  /**
-   * 通过excel导入数据
-   *
-   * @param request
-   * @param response
-   * @return
-   */
-  @RequestMapping(value = "/importExcel", method = RequestMethod.POST)
-  public Result<?> importExcel(HttpServletRequest request, HttpServletResponse response) {
-      MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
-      Map<String, MultipartFile> fileMap = multipartRequest.getFileMap();
-      for (Map.Entry<String, MultipartFile> entity : fileMap.entrySet()) {
-          MultipartFile file = entity.getValue();// 获取上传文件对象
-          ImportParams params = new ImportParams();
-          params.setTitleRows(2);
-          params.setHeadRows(1);
-          params.setNeedSave(true);
-          try {
-              List<RechargeOrder> listRechargeOrders = ExcelImportUtil.importExcel(file.getInputStream(), RechargeOrder.class, params);
-              rechargeOrderService.saveBatch(listRechargeOrders);
-              return Result.ok("文件导入成功！数据行数:" + listRechargeOrders.size());
-          } catch (Exception e) {
-              log.error(e.getMessage(),e);
-              return Result.error("文件导入失败:"+e.getMessage());
-          } finally {
-              try {
-                  file.getInputStream().close();
-              } catch (IOException e) {
-                  e.printStackTrace();
-              }
-          }
-      }
-      return Result.ok("文件导入失败！");
-  }
+		//Step.2 AutoPoi 导出Excel
+		ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
+		List<RechargeOrder> pageList = rechargeOrderService.list(queryWrapper);
+		//导出文件名称
+		mv.addObject(NormalExcelConstants.FILE_NAME, "代付充值订单列表");
+		mv.addObject(NormalExcelConstants.CLASS, RechargeOrder.class);
+		mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("代付充值订单列表数据", "导出人:Jeecg", "导出信息"));
+		mv.addObject(NormalExcelConstants.DATA_LIST, pageList);
+		return mv;
+	}
+
+	/**
+	 * 通过excel导入数据
+	 *
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping(value = "/importExcel", method = RequestMethod.POST)
+	public Result<?> importExcel(HttpServletRequest request, HttpServletResponse response) {
+		MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+		Map<String, MultipartFile> fileMap = multipartRequest.getFileMap();
+		for (Map.Entry<String, MultipartFile> entity : fileMap.entrySet()) {
+			MultipartFile file = entity.getValue();// 获取上传文件对象
+			ImportParams params = new ImportParams();
+			params.setTitleRows(2);
+			params.setHeadRows(1);
+			params.setNeedSave(true);
+			try {
+				List<RechargeOrder> listRechargeOrders = ExcelImportUtil.importExcel(file.getInputStream(), RechargeOrder.class, params);
+				rechargeOrderService.saveBatch(listRechargeOrders);
+				return Result.ok("文件导入成功！数据行数:" + listRechargeOrders.size());
+			} catch (Exception e) {
+				log.error(e.getMessage(), e);
+				return Result.error("文件导入失败:" + e.getMessage());
+			} finally {
+				try {
+					file.getInputStream().close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return Result.ok("文件导入失败！");
+	}
 
 }

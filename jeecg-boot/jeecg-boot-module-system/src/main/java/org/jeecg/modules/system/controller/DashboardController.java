@@ -28,43 +28,20 @@ import java.util.Map;
 @RequestMapping("/sys/dashboard")
 public class DashboardController {
 
-  @Autowired private ISysUserService userService;
+	@Autowired
+	private ISysUserService userService;
 
-  @Autowired private IUserAmountEntityService amountService;
+	@Autowired
+	private IUserAmountEntityService amountService;
 
-  @Autowired private IUserAmountDetailService amountDetailService;
+	@Autowired
+	private IUserAmountDetailService amountDetailService;
 
-  @Autowired private IDashboardService dashboardService;
+	@Autowired
+	private IDashboardService dashboardService;
 
-  @GetMapping("/summary")
-  public Result summary() {
-    LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
-    SysUser opUser = userService.getUserByName(loginUser.getUsername());
-
-    Result result = new Result();
-    Map<String, Object> map = new HashMap<>();
-
-    // 剩余额度
-    // 已代付总额
-    // 手续费收入
-    // 今日充值
-    // 今日代付
-    // 今日手续费收入
-
-    // 获取会员余额、总收入、今日收入
-    //    UserAmountEntity userAmount = amountService.getUserAmountByUserName(opUser.getUsername());
-    //    map.put("userAmount", userAmount.getAmount());
-    //
-    //    BigDecimal totalIncome = amountDetailService.getTotalIncome(opUser.getId());
-    //    map.put("totalIncome", totalIncome);
-    //
-    //    BigDecimal todayIncome = amountDetailService.getTodayIncome(opUser.getId());
-    //    map.put("todayIncome", todayIncome);
-    //
-    //    // 今日提现金额
-    //
-    //    result.setSuccess(true);
-    //    result.setResult(map);
-    return dashboardService.homepageSummary();
-  }
+	@GetMapping("/summary")
+	public Result summary() {
+		return dashboardService.homepageSummary();
+	}
 }
