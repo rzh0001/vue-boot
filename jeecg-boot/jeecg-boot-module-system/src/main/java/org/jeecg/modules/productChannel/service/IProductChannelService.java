@@ -15,4 +15,7 @@ public interface IProductChannelService extends IService<ProductChannel> {
 
     List<String> getChannelByProductCode(String productCode);
 
+    void remove(String productCode);
+
+    Integer batchSave(List<String> channelCodes,String productCode);
 }

@@ -1,20 +1,19 @@
 package org.jeecg.modules.productChannel.controller;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang.StringUtils;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.aspect.annotation.AutoLog;
 import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.productChannel.entity.ProductChannel;
 import org.jeecg.modules.productChannel.service.IProductChannelService;
-import java.util.Date;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -92,7 +91,18 @@ public class ProductChannelController {
 		}
 		return result;
 	}
-	
+	 @GetMapping(value = "/saveProductAndChannels")
+	public Result<String> addProductAndChannel(@RequestParam(name = "productCode")String productCode,@RequestParam(name = "channelCodes")String channels){
+		 List<String> channelCodes = new ArrayList<>();
+		 Result<String> result = new Result<String>();
+		if(StringUtils.isNotBlank(channels)){
+			channelCodes = Arrays.asList(channels.split(","));
+		}
+		productChannelService.remove(productCode);
+		productChannelService.batchSave(channelCodes,productCode);
+		return result.success("success");
+
+	}
 	/**
 	 *  编辑
 	 * @param productChannel

@@ -6,7 +6,7 @@
       :visible="visible4Add"
       :confirmLoading="confirmLoading"
       @ok="handleOk"
-      @cancel="close4Add"
+      @cancel="close"
       cancelText="关闭">
 
       <a-spin :spinning="confirmLoading">
@@ -35,6 +35,7 @@
     },
     data() {
       return {
+        title4add:'关联通道',
         productCode:'',
         visible4Add:false,
         model: {},
@@ -46,12 +47,11 @@
         confirmLoading: false,
         form: this.$form.createForm(this),
         validatorRules:{
-          channelCode:{rules: [{ required: true, message: '请选择通道!' }]},
-          rechargeAmount:{rules: [{ required: true, message: '充值金额不能为空' }]},
         },
         url: {
           queryBusinessByUserName: "/pay/userBusinessEntity/queryBusinessByUserName",
-          channel: "/pay/channelEntity/showChannel"
+          channel: "/pay/channelEntity/showChannel",
+          saveProductAndChannels: "/productChannel/productChannel/saveProductAndChannels"
         },
       }
     },
@@ -75,30 +75,13 @@
         this.visible4Add=true;
         this.productCode = record.productCode;
       },
-      getBusinessCodesByAgentName:function(){
-        let formData = [];
-        formData.channelCode = this.selected;
-        formData.userName = this.userName;
-        getAction(this.url.getBusinessCodesByAgentName,formData).then((res)=>{
-          if(res.success){
-            console.log( res.result)
-            this.businessCodes = res.result;
-        }else{
-        }
-      })
-      },
       handleOk () {
         let formData = [];
-        formData.userName = this.userName;
-        formData.channelCode = this.selected;
-        formData.businesses = this.businesses.values;
-        console.log(formData);
-        getAction(this.url.activeBusiness,formData).then((res)=>{
+        formData.productCode = this.productCode;
+        formData.channelCodes = this.channels.values;
+        getAction(this.url.saveProductAndChannels,formData).then((res)=>{
           if(res.success){
           this.visible4Add=false;
-          this.selected = "";
-          this.businesses.values="";
-          this.businesses.options=[];
           this.$message.success(res.message);
           this.$emit('ok');
         }else{
@@ -108,7 +91,7 @@
       },
       close() {
         this.$emit('close');
-        this.visible = false;
+        this.visible4Add = false;
       },
       handleCancel() {
         this.close()

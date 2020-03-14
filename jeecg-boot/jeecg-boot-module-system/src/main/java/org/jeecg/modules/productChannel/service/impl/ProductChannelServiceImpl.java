@@ -24,4 +24,14 @@ public class ProductChannelServiceImpl extends ServiceImpl<ProductChannelMapper,
     public List<String> getChannelByProductCode(String productCode) {
         return productChannelMapper.getProductChannelByProductCode(productCode);
     }
+
+    @Override
+    public void remove(String productCode) {
+        productChannelMapper.remove(productCode);
+    }
+
+    @Override
+    public Integer batchSave(List<String> channelCodes, String productCode) {
+        return productChannelMapper.batchSave(channelCodes,productCode);
+    }
 }
