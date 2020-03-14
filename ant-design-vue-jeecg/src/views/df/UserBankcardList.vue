@@ -175,6 +175,11 @@
             dataIndex: 'branchName'
           },
           {
+            title: '今日充值',
+            align: 'center',
+            dataIndex: 'todayAmount'
+          },
+          {
             title: '备注',
             align: 'center',
             dataIndex: 'remark'

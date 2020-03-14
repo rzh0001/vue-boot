@@ -2,4 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.jeecg.modules.df.mapper.UserBankcardMapper">
 
+    <select id="selectPageVo" resultType="org.jeecg.modules.df.entity.UserBankcardVo">
+        SELECT *
+        FROM df_user_bankcard b
+                 left join (select bankcard_id, sum(amount) as todayAmount from df_recharge_order where to_days(update_time) = to_days(now()) and status = 2 group by bankcard_id) t
+                           on b.id = t.bankcard_id ${ew.customSqlSegment}
+    </select>
 </mapper>

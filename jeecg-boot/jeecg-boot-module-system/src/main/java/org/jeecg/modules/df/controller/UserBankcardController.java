@@ -1,6 +1,5 @@
 package org.jeecg.modules.df.controller;
 
-import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -10,10 +9,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.aspect.annotation.AutoLog;
-import org.jeecg.common.constant.PayConstant;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.modules.df.entity.UserBankcard;
+import org.jeecg.modules.df.entity.UserBankcardVo;
 import org.jeecg.modules.df.service.IUserBankcardService;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
@@ -81,15 +80,16 @@ public class UserBankcardController {
 	@AutoLog(value = "代付平台用户银行卡-分页列表查询")
 	@ApiOperation(value = "代付平台用户银行卡-分页列表查询", notes = "代付平台用户银行卡-分页列表查询")
 	@GetMapping(value = "/list")
-	public Result<IPage<UserBankcard>> queryPageList(UserBankcard userBankcard,
-													 @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
-													 @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
-													 HttpServletRequest req) {
-		Result<IPage<UserBankcard>> result = new Result<IPage<UserBankcard>>();
+	public Result<IPage<UserBankcardVo>> queryPageList(UserBankcard userBankcard,
+													   @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
+													   @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
+													   HttpServletRequest req) {
+		Result<IPage<UserBankcardVo>> result = new Result<IPage<UserBankcardVo>>();
 		LoginUser ou = (LoginUser) SecurityUtils.getSubject().getPrincipal();
 		QueryWrapper<UserBankcard> qw = initQueryCondition(userBankcard, req);
 		Page<UserBankcard> page = new Page<UserBankcard>(pageNo, pageSize);
-		IPage<UserBankcard> pageList = userBankcardService.page(page, qw);
+
+		IPage<UserBankcardVo> pageList = userBankcardService.selectUserBankcardPage(page, qw);
 		result.setSuccess(true);
 		result.setResult(pageList);
 		return result;
