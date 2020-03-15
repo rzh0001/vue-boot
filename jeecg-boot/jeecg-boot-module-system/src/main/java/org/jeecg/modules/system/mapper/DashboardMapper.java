@@ -72,4 +72,10 @@ public interface DashboardMapper extends BaseMapper {
 			"select sum(order_fee) from df_pay_order where user_id = #{userId} "
 					+ "and status = '2' and to_days(create_time) = to_days(now())")
 	BigDecimal summaryUserTodayDfOrderFee(@Param("userId") String userId);
+
+	@Select("select count(*) from df_recharge_order where agent_id = #{agentId} and status = '0'")
+	Integer countCzOrder(@Param("agentId") String agentId);
+
+	@Select("select count(*) from df_pay_order where agent_id = #{agentId} and status = '0'")
+	Integer countDfOrder(@Param("agentId") String agentId);
 }

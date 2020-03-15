@@ -63,20 +63,6 @@
   import { getLoginfo, getVisitInfo } from '@/api/api'
   import { getAction } from '../../api/manage'
 
-  const rankList = []
-  for (let i = 0; i < 7; i++) {
-    rankList.push({
-      name: '白鹭岛 ' + (i + 1) + ' 号店',
-      total: 1234.56 - i * 100
-    })
-  }
-  const barData = []
-  for (let i = 0; i < 12; i += 1) {
-    barData.push({
-      x: `${i + 1}月`,
-      y: Math.floor(Math.random() * 1000) + 200
-    })
-  }
   export default {
     name: 'Analysis',
     components: {
@@ -96,8 +82,6 @@
       return {
         loading: true,
         center: null,
-        rankList,
-        barData,
         loginfo: {},
         data: {},
         visitFields: ['ip', 'visit'],

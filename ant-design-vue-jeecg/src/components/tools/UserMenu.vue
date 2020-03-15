@@ -1,11 +1,29 @@
 <template>
   <div class="user-wrapper" :class="theme">
+<!--
     <span class="action">
       <a class="logout_title" target="_blank" href="http://jeecg-boot.mydoc.io">
         <a-icon type="question-circle-o"></a-icon>
       </a>
     </span>
-    <header-notice class="action"/>
+-->
+<!--
+    <span class="action">
+      <a-badge :count="czOrder">
+        <a class="logout_title" href="javascript:;" @click="">
+          <span>待处理充值订单</span>
+        </a>
+      </a-badge>
+    </span>
+    <span class="action">
+      <a-badge :count="data.czCount">
+        <a class="logout_title" href="javascript:;" @click="">
+          <span>待处理代付订单</span>
+        </a>
+      </a-badge>
+    </span>
+-->
+<!--    <header-notice class="action"/>-->
     <a-dropdown>
       <span class="action action-full ant-dropdown-link user-dropdown-menu">
         <a-avatar class="avatar" size="small" :src="getAvatar()"/>
@@ -42,16 +60,20 @@
 </template>
 
 <script>
+  import BusinessNotice from './BusinessNotice'
   import HeaderNotice from './HeaderNotice'
   import UserPassword from './UserPassword'
   import DepartSelect from './DepartSelect'
   import { mapActions, mapGetters } from 'vuex'
   import { mixinDevice } from '@/utils/mixin.js'
+  import { getAction,putAction } from '@/api/manage'
+
 
   export default {
     name: 'UserMenu',
     mixins: [mixinDevice],
     components: {
+      BusinessNotice,
       HeaderNotice,
       UserPassword,
       DepartSelect
@@ -63,6 +85,25 @@
         default: 'dark'
       }
     },
+    data () {
+      return {
+        loadding: false,
+        url:{
+          getBusinessInfo:"/sys/dashboard/businessInfo",
+        },
+        data: {}
+      }
+    },
+    created() {
+      this.loadData();
+      this.timer();
+    },
+    computed:{
+      czOrder () {
+        return this.data.czOrder;
+      }
+    },
+
     methods: {
       ...mapActions(['Logout']),
       ...mapGetters(['nickname', 'avatar', 'userInfo']),
@@ -97,6 +138,38 @@
       },
       updateCurrentDepart() {
         this.$refs.departSelect.show()
+      },
+      timer() {
+        return setInterval(()=>{
+          this.loadData()
+        },60000)
+      },
+      loadData (){
+        // 获取系统消息
+        try {
+          getAction(this.url.getBusinessInfo).then((res) => {
+            if (res.success) {
+              console.log(res)
+              this.data = res.result
+
+              if (res.result.czOrder >0 || res.result.dfOrder >0){
+                this.$notification.open({
+                  message: '订单提示',
+                  description:
+                    '您有新的订单待处理',
+                  onClick: () => {
+                    console.log('Notification Clicked!');
+                  },
+                });
+
+                // this.$refs.audio.play();
+                new Audio('http://tts.baidu.com/text2audio?cuid=baiduid&lan=zh&ctp=1&pdt=311&tex=您有新的订单，请即时处理').play()
+              }
+            }
+          });
+
+        } catch (err) {
+        }
       }
     }
   }

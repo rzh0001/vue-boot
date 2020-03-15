@@ -11,10 +11,17 @@ import java.util.Map;
  * @since 2019-09-01
  */
 public interface IDashboardService {
-  /**
-   * 汇总用户数据
-   *
-   * @return
-   */
-  Result<Map<String, Object>> homepageSummary();
+	/**
+	 * 汇总用户数据
+	 *
+	 * @return
+	 */
+	Result<Map<String, Object>> homepageSummary();
+
+	/**
+	 * 获取待办业务
+	 *
+	 * @return
+	 */
+	Result<Map<String, Object>> getBusinessInfo();
 }

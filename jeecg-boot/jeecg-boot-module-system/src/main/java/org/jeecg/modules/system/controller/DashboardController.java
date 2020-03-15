@@ -44,4 +44,9 @@ public class DashboardController {
 	public Result summary() {
 		return dashboardService.homepageSummary();
 	}
+
+	@GetMapping("/businessInfo")
+	public Result getBusinessInfo() {
+		return dashboardService.getBusinessInfo();
+	}
 }

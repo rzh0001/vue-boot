@@ -1,5 +1,6 @@
 package org.jeecg.modules.system.service.impl;
 
+import cn.hutool.core.map.MapUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
 import org.jeecg.common.api.vo.Result;
@@ -51,6 +52,16 @@ public class DashboardServiceImpl extends IBaseService implements IDashboardServ
 		r.setResult(summary);
 
 		return r;
+	}
+
+	@Override
+	public Result getBusinessInfo() {
+		LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+
+		HashMap<Object, Object> map = MapUtil.newHashMap();
+		map.put("czOrder", mapper.countCzOrder(loginUser.getId()));
+		map.put("dfOrder", mapper.countDfOrder(loginUser.getId()));
+		return Result.ok(map);
 	}
 
 	public Map<String, Object> adminSummary() {
