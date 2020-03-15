@@ -74,6 +74,7 @@
       relationChannel:function(record){
         this.visible4Add=true;
         this.productCode = record.productCode;
+        this.channel();
       },
       handleOk () {
         let formData = [];

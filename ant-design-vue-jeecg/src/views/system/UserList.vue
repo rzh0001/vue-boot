@@ -184,6 +184,19 @@
               </a-menu-item>
             </a-menu>
           </a-dropdown>
+          <a-dropdown>
+            <a-button>
+              产品配置
+            </a-button>
+            <a-menu slot="overlay">
+              <a-menu-item>
+                <a @click="channelDetail(record)">已配置通道</a>
+              </a-menu-item>
+              <a-menu-item>
+                <a @click="addChannel(record)">添加通道</a>
+              </a-menu-item>
+            </a-menu>
+          </a-dropdown>
          <a-dropdown>
             <a-button>
               关联子账号
@@ -231,6 +244,7 @@
     <user-business-modal ref="userBusinessModal"></user-business-modal>
     <user-rate-modal ref="userRateModal"></user-rate-modal>
     <active-business-modal ref="activeBusinessModal"></active-business-modal>
+    <user-product-modal ref="userProductModal"></user-product-modal>
   </a-card>
 </template>
 
@@ -249,12 +263,14 @@
   import UserBusinessModal from './modules/UserBusinessModal'
   import UserRateModal from './modules/UserRateModal'
   import ActiveBusinessModal from './modules/ActiveBusinessModal'
+  import UserProductModal from './modules/UserProductModal'
   import { getAction, httpAction } from '@/api/manage'
 
   export default {
     name: 'UserList',
     mixins: [JeecgListMixin],
     components: {
+      UserProductModal,
       SysUserAgentModal,
       UserModal,
       UserAgentModal,
