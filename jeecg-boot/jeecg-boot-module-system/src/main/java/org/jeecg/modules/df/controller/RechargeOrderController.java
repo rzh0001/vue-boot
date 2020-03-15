@@ -16,6 +16,7 @@ import org.jeecg.common.constant.PayConstant;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.modules.df.constant.DfConstant;
+import org.jeecg.modules.df.entity.PayOrder;
 import org.jeecg.modules.df.entity.RechargeOrder;
 import org.jeecg.modules.df.entity.UserBankcard;
 import org.jeecg.modules.df.service.IRechargeOrderService;
@@ -116,6 +117,16 @@ public class RechargeOrderController {
 		IPage<RechargeOrder> pageList = rechargeOrderService.page(page, queryWrapper);
 		result.setSuccess(true);
 		result.setResult(pageList);
+		return result;
+	}
+
+	@GetMapping(value = "/summary")
+	public Result<Map<String, Object>> summary(RechargeOrder order, HttpServletRequest req) {
+		Result<Map<String, Object>> result = new Result<>();
+		QueryWrapper<RechargeOrder> queryWrapper = initQueryCondition(order, req);
+		Map<String, Object> map = rechargeOrderService.summary(queryWrapper);
+		result.setResult(map);
+		result.setSuccess(true);
 		return result;
 	}
 
