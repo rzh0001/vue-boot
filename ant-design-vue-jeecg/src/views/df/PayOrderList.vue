@@ -23,6 +23,16 @@
               </a-form-item>
             </a-col>
             <a-col :md="6" :sm="8">
+              <a-form-item label="账户名">
+                <a-input placeholder="" v-model="queryParam.accountName"></a-input>
+              </a-form-item>
+            </a-col>
+            <a-col :md="6" :sm="8">
+              <a-form-item label="开号">
+                <a-input placeholder="" v-model="queryParam.cardNumber"></a-input>
+              </a-form-item>
+            </a-col>
+            <a-col :md="6" :sm="8">
               <a-form-item label="开始时间">
                 <j-date v-model="queryParam.createTime_begin" :showTime="true" dateFormat="YYYY-MM-DD HH:mm:ss"/>
               </a-form-item>
