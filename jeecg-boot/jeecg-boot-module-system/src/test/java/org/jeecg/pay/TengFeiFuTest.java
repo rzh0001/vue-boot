@@ -1,10 +1,14 @@
 package org.jeecg.pay;
 
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.http.HttpUtil;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import org.jeecg.modules.plugin.entity.TengFeiFuOrder;
 import org.jeecg.modules.plugin.entity.TengFeiFuQuery;
+import org.jeecg.modules.plugin.entity.TengFeiFuResponse;
 import org.junit.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -18,7 +22,7 @@ public class TengFeiFuTest {
 	private String url = "http://pop099.com/initPayOrder?";
 	private String queryUrl = "http://pop099.com/queryOrder?";
 
-	private String orderId = "sf123456789";
+	private String orderId = "sf1a343562789";
 
 	@Test
 	public void createOrder() {
@@ -36,6 +40,12 @@ public class TengFeiFuTest {
 
 		order.encode(apiKey);
 		String s = HttpUtil.get(url + order.buildStr());
+		JSONObject json = JSONUtil.parseObj(s);
+		TengFeiFuResponse response = json.toBean(TengFeiFuResponse.class);
+		if (StrUtil.isNotBlank(response.getData())) {
+			response.setPayurl((String) JSONUtil.parseObj(response.getData()).get("payurl"));
+		}
+
 		System.out.println(s);
 		System.out.println(url + order.buildStr());
 
