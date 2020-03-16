@@ -2,6 +2,7 @@ package org.jeecg.modules.pay.service.impl;
 
 import cn.hutool.crypto.SecureUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.jeecg.common.util.RedisUtil;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import org.jeecg.modules.pay.service.ICallBackService;
@@ -50,15 +51,17 @@ public class CallBackServiceImpl implements ICallBackService {
         String sign = (String)map.get("sign");
         StringBuilder md5buffer = new StringBuilder();
         md5buffer.append("merCode=").append(merCode)
-            .append("&orderNo=").append(orderNo)
             .append("&orderAmount=").append(orderAmount)
-            .append("&payDate=").append(payDate)
+            .append("&orderNo=").append(orderNo)
             .append("&payCompletionDate=").append(payCompletionDate)
+            .append("&payDate=").append(payDate)
             .append("&resultCode=").append(resultCode)
             .append("&resultStatus=").append(resultStatus)
-            .append("&resultMsg=").append(resultMsg)
-            .append("&resultTime=").append(resultTime)
-            .append("156f65ad6fde4f11b6be73552f143bdb");
+            .append("&resultTime=").append(resultTime);
+        if(StringUtils.isNotBlank(resultMsg)){
+            md5buffer.append("&resultMsg=").append(resultMsg);
+        }
+        md5buffer.append("156f65ad6fde4f11b6be73552f143bdb");
         log.info("==>牛腩支付 回调，签名：{}",md5buffer.toString());
         String localSign = this.md5Hash(md5buffer.toString());
         log.info("==>牛腩支付 回调，MD5 :{}",localSign);
