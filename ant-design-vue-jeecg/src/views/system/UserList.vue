@@ -190,10 +190,7 @@
             </a-button>
             <a-menu slot="overlay">
               <a-menu-item>
-                <a @click="channelDetail(record)">已配置通道</a>
-              </a-menu-item>
-              <a-menu-item>
-                <a @click="addChannel(record)">添加通道</a>
+                <a @click="relationProduct(record)">关联产品</a>
               </a-menu-item>
             </a-menu>
           </a-dropdown>
@@ -403,6 +400,10 @@
       },
       addChannel: function(record) {
         this.$refs.userChannelModal.addChannel(record)
+      },
+      //关联产品信息
+      relationProduct: function(record){
+        this.$refs.userProductModal.relationProduct(record);
       },
       activeBusiness: function(record) {
         if (record.memberType != '1') {

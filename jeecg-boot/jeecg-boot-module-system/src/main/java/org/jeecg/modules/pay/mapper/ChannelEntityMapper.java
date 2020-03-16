@@ -16,4 +16,5 @@ public interface ChannelEntityMapper extends BaseMapper<ChannelEntity> {
     ChannelEntity queryChannelByCode(@Param("channelCode") String channelCode);
     List<ChannelEntity> queryAllChannelCode();
     List<ChannelEntity> queryAgentChannelCodeByAgentName(@Param("userName") String userName);
+    List<ChannelEntity> queryChannelByCodes(@Param("codes") List<String> codes);
 }

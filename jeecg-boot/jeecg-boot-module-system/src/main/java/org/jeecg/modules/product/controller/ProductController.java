@@ -12,6 +12,7 @@ import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.aspect.annotation.AutoLog;
 import org.jeecg.common.util.oConvertUtils;
+import org.jeecg.modules.pay.entity.ChannelEntity;
 import org.jeecg.modules.product.entity.Product;
 import org.jeecg.modules.product.service.IProductService;
 import java.util.Date;
@@ -72,7 +73,12 @@ public class ProductController {
 		result.setResult(pageList);
 		return result;
 	}
-	
+	 @GetMapping(value = "/getAllProduct")
+	public Result<List<Product>> getAllProduct(){
+		 Result<List<Product>> result = new Result<>();
+		 result.setResult(productService.getAllProduct());
+		return result;
+	}
 	/**
 	 *   添加
 	 * @param product

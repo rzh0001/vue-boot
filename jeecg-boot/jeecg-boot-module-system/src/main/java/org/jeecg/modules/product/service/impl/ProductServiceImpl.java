@@ -3,9 +3,12 @@ package org.jeecg.modules.product.service.impl;
 import org.jeecg.modules.product.entity.Product;
 import org.jeecg.modules.product.mapper.ProductMapper;
 import org.jeecg.modules.product.service.IProductService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+
+import java.util.List;
 
 /**
  * @Description: 产品表
@@ -16,4 +19,10 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 @Service
 public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> implements IProductService {
 
+    @Autowired
+    private ProductMapper mapper;
+    @Override
+    public List<Product> getAllProduct() {
+        return mapper.getAllProduct();
+    }
 }

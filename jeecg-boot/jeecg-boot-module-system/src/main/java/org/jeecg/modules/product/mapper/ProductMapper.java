@@ -3,6 +3,7 @@ package org.jeecg.modules.product.mapper;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import org.jeecg.modules.product.entity.Product;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
@@ -14,4 +15,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface ProductMapper extends BaseMapper<Product> {
 
+    @Select("select * from pay_product")
+    List<Product> getAllProduct();
 }

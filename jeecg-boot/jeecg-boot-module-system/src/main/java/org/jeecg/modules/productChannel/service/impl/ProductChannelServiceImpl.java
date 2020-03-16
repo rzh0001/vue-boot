@@ -1,5 +1,6 @@
 package org.jeecg.modules.productChannel.service.impl;
 
+import org.jeecg.modules.pay.entity.ChannelEntity;
 import org.jeecg.modules.productChannel.entity.ProductChannel;
 import org.jeecg.modules.productChannel.mapper.ProductChannelMapper;
 import org.jeecg.modules.productChannel.service.IProductChannelService;
@@ -31,7 +32,12 @@ public class ProductChannelServiceImpl extends ServiceImpl<ProductChannelMapper,
     }
 
     @Override
-    public Integer batchSave(List<String> channelCodes, String productCode) {
+    public Integer batchSave(List<ChannelEntity> channelCodes, String productCode) {
         return productChannelMapper.batchSave(channelCodes,productCode);
+    }
+
+    @Override
+    public List<ProductChannel> getChannelProduct(String productCode) {
+        return productChannelMapper.getChannelProduct(productCode);
     }
 }

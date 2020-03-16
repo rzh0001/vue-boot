@@ -1,8 +1,10 @@
 package org.jeecg.modules.pay.service.impl;
 
+import org.jeecg.modules.pay.entity.ChannelEntity;
 import org.jeecg.modules.pay.entity.UserChannelEntity;
 import org.jeecg.modules.pay.mapper.UserChannelEntityMapper;
 import org.jeecg.modules.pay.service.IUserChannelEntityService;
+import org.jeecg.modules.system.entity.SysUser;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -40,5 +42,20 @@ public class UserChannelEntityServiceImpl extends ServiceImpl<UserChannelEntityM
     @Override
     public void updateUseTime(String channelCode, String userName) {
         this.baseMapper.updateUseTime(channelCode,userName);
+    }
+
+    @Override
+    public List<String> getChannelCodeByUserName(String userName) {
+        return baseMapper.getChannelCodeByUserName(userName);
+    }
+
+    @Override
+    public void deleteChannel(String userName,List<String> codes) {
+        baseMapper.deleteChannel(userName,codes);
+    }
+
+    @Override
+    public void batchSave(List<ChannelEntity> channels, SysUser sysUser) {
+        baseMapper.batchSave(channels,sysUser);
     }
 }

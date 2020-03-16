@@ -12,6 +12,10 @@ import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.aspect.annotation.AutoLog;
 import org.jeecg.common.util.oConvertUtils;
+import org.jeecg.modules.pay.entity.BusinessLabelValue;
+import org.jeecg.modules.pay.entity.ChannelEntity;
+import org.jeecg.modules.pay.service.IChannelEntityService;
+import org.jeecg.modules.pay.service.IUserChannelEntityService;
 import org.jeecg.modules.productChannel.entity.ProductChannel;
 import org.jeecg.modules.productChannel.service.IProductChannelService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -47,7 +51,8 @@ import io.swagger.annotations.ApiOperation;
 public class ProductChannelController {
 	@Autowired
 	private IProductChannelService productChannelService;
-	
+	@Autowired
+	private IUserChannelEntityService userChannelEntityService;
 	/**
 	 * 分页列表查询
 	 * @param productChannel
@@ -71,7 +76,27 @@ public class ProductChannelController {
 		result.setResult(pageList);
 		return result;
 	}
-	
+	 @GetMapping(value = "/getUserProductChannel")
+	 public Result<Map<String, Object>> getChannel(@RequestParam(name = "productCode") String productCode,
+		 @RequestParam(name="userName")String userName){
+		 //产品已关联的通道
+		 List<ProductChannel> productChannels  = productChannelService.getChannelProduct(productCode);
+		 List<BusinessLabelValue> all = new ArrayList<>();
+		 for(ProductChannel channel:productChannels){
+			 BusinessLabelValue labelValue = new BusinessLabelValue();
+			 labelValue.setLabel(channel.getChannelName());
+			 labelValue.setValue(channel.getChannelCode());
+			 all.add(labelValue);
+		 }
+		 //获取用户已关联的通道code
+		 List<String> userChannel = userChannelEntityService.getChannelCodeByUserName(userName);
+		 Result<Map<String, Object>> result = new Result<Map<String, Object>>();
+		 Map<String, Object> re = new HashMap<>();
+		 re.put("all", all);
+		 re.put("associated", org.apache.commons.lang.StringUtils.join(userChannel.toArray(), ","));
+		 result.setResult(re);
+		 return result;
+	 }
 	/**
 	 *   添加
 	 * @param productChannel
@@ -91,6 +116,8 @@ public class ProductChannelController {
 		}
 		return result;
 	}
+	@Autowired
+	private IChannelEntityService channelEntityService;
 	 @GetMapping(value = "/saveProductAndChannels")
 	public Result<String> addProductAndChannel(@RequestParam(name = "productCode")String productCode,@RequestParam(name = "channelCodes")String channels){
 		 List<String> channelCodes = new ArrayList<>();
@@ -98,8 +125,10 @@ public class ProductChannelController {
 		if(StringUtils.isNotBlank(channels)){
 			channelCodes = Arrays.asList(channels.split(","));
 		}
+		//根据通道code查询通道
+		 List<ChannelEntity> channelEntities = channelEntityService.queryChannelByCodes(channelCodes);
 		productChannelService.remove(productCode);
-		productChannelService.batchSave(channelCodes,productCode);
+		productChannelService.batchSave(channelEntities,productCode);
 		return result.success("success");
 
 	}

@@ -1,5 +1,6 @@
 package org.jeecg.modules.productChannel.service;
 
+import org.jeecg.modules.pay.entity.ChannelEntity;
 import org.jeecg.modules.productChannel.entity.ProductChannel;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -17,5 +18,7 @@ public interface IProductChannelService extends IService<ProductChannel> {
 
     void remove(String productCode);
 
-    Integer batchSave(List<String> channelCodes,String productCode);
+    Integer batchSave(List<ChannelEntity> channelCodes,String productCode);
+
+    List<ProductChannel> getChannelProduct(String productCode);
 }

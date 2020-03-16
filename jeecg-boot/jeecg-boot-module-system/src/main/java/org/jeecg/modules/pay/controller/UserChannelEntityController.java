@@ -4,6 +4,7 @@ import java.util.*;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -15,8 +16,10 @@ import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.aspect.annotation.AutoLog;
 import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.oConvertUtils;
+import org.jeecg.modules.pay.entity.ChannelEntity;
 import org.jeecg.modules.pay.entity.UserBusinessEntity;
 import org.jeecg.modules.pay.entity.UserChannelEntity;
+import org.jeecg.modules.pay.service.IChannelEntityService;
 import org.jeecg.modules.pay.service.IUserBusinessEntityService;
 import org.jeecg.modules.pay.service.IUserChannelEntityService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -24,6 +27,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 
+import org.jeecg.modules.productChannel.service.IProductChannelService;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.service.ISysUserService;
 import org.jeecg.modules.util.BaseConstant;
@@ -60,7 +64,28 @@ public class UserChannelEntityController {
     private ISysUserService userService;
     @Autowired
     private IUserBusinessEntityService userBusinessEntityService;
+    @Autowired
+    private IChannelEntityService channelEntityService;
 
+    @Autowired
+    private IProductChannelService productChannelService;
+    @GetMapping(value = "/saveUserChannels")
+    public Result<String> getChannel(@RequestParam(name = "channelCodes") String channelCodes,
+        @RequestParam(name="userName")String userName,@RequestParam(name = "productCode")String productCode){
+        List<String> productChannel = productChannelService.getChannelByProductCode(productCode);
+        //删除已关联信息
+        userChannelEntityService.deleteChannel(userName,productChannel);
+        if(StringUtils.isNotBlank(channelCodes)){
+            List<String> codes = Arrays.asList(channelCodes.split(","));
+            codes = codes.stream().filter(code -> productChannel.contains(code)).collect(Collectors.toList());
+            SysUser sysUser = userService.getUserByName(userName);
+            List<ChannelEntity> channels = channelEntityService.queryChannelByCodes(codes);
+            userChannelEntityService.batchSave(channels,sysUser);
+        }
+        Result<String> result = new Result<>();
+        result.setMessage("success");
+        return result;
+    }
     /**
      * 分页列表查询
      *
@@ -116,6 +141,7 @@ public class UserChannelEntityController {
         result.setResult(pageList);
         return result;
     }
+
 
     @GetMapping(value = "/queryChannelByUserName")
     @RequiresPermissions("channel::detail")

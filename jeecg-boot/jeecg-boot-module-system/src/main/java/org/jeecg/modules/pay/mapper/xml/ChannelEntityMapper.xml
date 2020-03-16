@@ -17,4 +17,18 @@
         WHERE
             u.user_name = #{userName}
     </select>
+    <select id="queryChannelByCodes" resultType="org.jeecg.modules.pay.entity.ChannelEntity">
+        SELECT
+            channel_code,
+            channel_name
+        FROM
+            sys_channel
+          where
+           channel_code in
+        <foreach collection="codes" item="code" index="index"
+                 open="(" close=")" separator=",">
+            #{code}
+        </foreach>
+
+    </select>
 </mapper>

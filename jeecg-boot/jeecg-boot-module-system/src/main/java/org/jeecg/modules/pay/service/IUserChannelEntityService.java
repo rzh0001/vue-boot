@@ -1,7 +1,9 @@
 package org.jeecg.modules.pay.service;
 
+import org.jeecg.modules.pay.entity.ChannelEntity;
 import org.jeecg.modules.pay.entity.UserChannelEntity;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.jeecg.modules.system.entity.SysUser;
 
 import java.util.List;
 
@@ -17,4 +19,7 @@ public interface IUserChannelEntityService extends IService<UserChannelEntity> {
     void deleteUserChannel(String userName,String channelCode);
     List<String> queryUserChannel(List<String> channelCodes,String userName);
     void updateUseTime(String channelCode,String userName);
+    List<String> getChannelCodeByUserName(String userName);
+    void deleteChannel(String userName,List<String> codes);
+    void batchSave(List<ChannelEntity> channels, SysUser sysUser);
 }
