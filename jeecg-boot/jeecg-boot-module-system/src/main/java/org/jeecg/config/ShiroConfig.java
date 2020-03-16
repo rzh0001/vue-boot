@@ -47,6 +47,7 @@ public class ShiroConfig {
 		filterChainDefinitionMap.put("/sys/getGoogle", "anon");
 		filterChainDefinitionMap.put("/sys/bind", "anon");
 		filterChainDefinitionMap.put("/api/*", "anon"); //api接口排除
+		filterChainDefinitionMap.put("/callBack/*", "anon"); //callBack接口排除
 		filterChainDefinitionMap.put("/sys/getEncryptedString", "anon"); //获取加密串
 		filterChainDefinitionMap.put("/sys/sms", "anon");//短信验证码
 		filterChainDefinitionMap.put("/sys/phoneLogin", "anon");//手机登录		

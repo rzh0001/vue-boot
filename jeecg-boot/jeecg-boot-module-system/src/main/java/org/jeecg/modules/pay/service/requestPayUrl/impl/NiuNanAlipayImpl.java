@@ -17,6 +17,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.security.MessageDigest;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +38,9 @@ public class NiuNanAlipayImpl implements
         NiuNanAlipayParam param = new NiuNanAlipayParam();
         param.setMerCode(userBusiness.getBusinessCode());
         param.setOrderNo(order.getOrderId());
-        param.setOrderAmount(order.getSubmitAmount().toString());
+        //金额单位为分
+        String amount = order.getSubmitAmount().multiply(new BigDecimal("100")).toString();
+        param.setOrderAmount(amount);
         param.setCallbackUrl(this.getDomain()+CALLBACK_URL);
         param.setPayType("2");
         param.setProductDesc("alipay");
