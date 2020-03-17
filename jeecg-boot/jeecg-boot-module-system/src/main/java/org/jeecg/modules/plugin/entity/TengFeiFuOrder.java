@@ -39,11 +39,7 @@ public class TengFeiFuOrder {
 	public String buildStr() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("member_name=").append(member_name);
-		try {
-			builder.append("&notifyUrl=").append(URLEncoder.encode(notifyUrl.toString(), "UTF-8"));
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
+		builder.append("&notifyUrl=").append(notifyUrl);
 		builder.append("&openid=").append(openid);
 		builder.append("&orderNo=").append(orderNo);
 		builder.append("&orderPrice=").append(orderPrice);
@@ -55,10 +51,8 @@ public class TengFeiFuOrder {
 		if (StrUtil.isNotBlank(sign)) {
 			builder.append("&sign=").append(sign);
 		}
-
 		return builder.toString();
 	}
-
 
 	public void encode(String apiKey) {
 		String s = buildStr() + "&key=" + apiKey;
