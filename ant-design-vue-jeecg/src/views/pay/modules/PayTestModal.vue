@@ -26,10 +26,10 @@
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
-          label="通道代码">
-          <select v-decorator="['payType', validatorRules.payType ]">
-            <option v-for="option in channels" v-bind:value="option.channelCode">
-              {{ option.channelName}}
+          label="产品选择">
+          <select v-decorator="['productName', validatorRules.productName ]">
+            <option v-for="option in products" v-bind:value="option.productCode">
+              {{ option.productName}}
             </option>
           </select>
         </a-form-item>
@@ -56,7 +56,7 @@
     data () {
       return {
         title:"操作",
-        channels: [],
+        products: [],
         visible: false,
         model: {},
         labelCol: {
@@ -73,11 +73,11 @@
         validatorRules:{
           submitAmount:{rules: [{ required: true, message: '请输入金额!' }]},
           username:{rules: [{ required: true, message: '请输入用户名!' }]},
-          payType:{rules: [{ required: true, message: '请输入通道代码' }]}
+          productName:{rules: [{ required: true, message: '请选择产品' }]}
         },
         url: {
           add: "/api/create",
-          channel: "/pay/channelEntity/channel"
+          channel: "/product/product/getAllProduct"
         },
       }
     },
@@ -90,7 +90,7 @@
       channel(){
         httpAction(this.url.channel,null,'get').then((res)=>{
           if(res.success){
-          this.channels = res.result;
+          this.products = res.result;
         }else{
           this.$message.warning(res.message);
         }

@@ -26,6 +26,12 @@
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
+          label="通过利率">
+          <a-input placeholder="请输入通道利率,如：0.003代表千分三" v-decorator="['rate', validatorRules.rate]" />
+        </a-form-item>
+        <a-form-item
+          :labelCol="labelCol"
+          :wrapperCol="wrapperCol"
           label="状态">
           <select v-decorator="[ 'status', validatorRules.status]">
             <option value="0">关闭</option>
@@ -63,6 +69,7 @@
         validatorRules:{
           channelName:{rules: [{ required: true, message: '请输入通道名称!' }]},
           channelCode:{rules: [{ required: true, message: '请输入通道代码' }]},
+          rate:{rules: [{ required: true, message: '请输入通道利率' }]},
           status:{rules: [{ required: true, message: '请选择状态!' }]},
         },
         url: {
@@ -82,7 +89,7 @@
         this.model = Object.assign({}, record);
         this.visible = true;
         this.$nextTick(() => {
-          this.form.setFieldsValue(pick(this.model,'channelName','channelCode','status','delFlag','createUser','updateUser'))
+          this.form.setFieldsValue(pick(this.model,'channelName','channelCode','rate','status','delFlag','createUser','updateUser'))
 		  //时间格式化
         });
 

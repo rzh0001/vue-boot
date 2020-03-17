@@ -55,7 +55,7 @@ public class UserChannelEntityServiceImpl extends ServiceImpl<UserChannelEntityM
     }
 
     @Override
-    public void batchSave(List<ChannelEntity> channels, SysUser sysUser) {
-        baseMapper.batchSave(channels,sysUser);
+    public void save(ChannelEntity channel, SysUser sysUser) {
+        baseMapper.save(channel,sysUser);
     }
 }

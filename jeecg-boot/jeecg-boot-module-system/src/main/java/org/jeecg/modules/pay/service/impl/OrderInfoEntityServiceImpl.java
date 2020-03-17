@@ -584,9 +584,6 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      */
     private R addOrder(R checkParam, HttpServletRequest req) throws Exception {
         String ip = (String) checkParam.get(BaseConstant.IP);
-        if (!org.springframework.util.StringUtils.isEmpty(ip) && isIpBlacklist(ip)) {
-            throw new RRException("非法访问，请联系管理员");
-        }
         String outerOrderId = (String) checkParam.get(BaseConstant.OUTER_ORDER_ID);
         String userName = (String) checkParam.get(BaseConstant.USER_NAME);
         String submitAmount = (String) checkParam.get(BaseConstant.SUBMIT_AMOUNT);
@@ -598,6 +595,31 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         String remark = (String) checkParam.get(BaseConstant.REMARK);
         log.info("请求创建订单，商户单号为:{};通道为：{};用户名为:{};申请金额为:{}", new String[]{outerOrderId, payType, userName,
                 submitAmount});
+        //信息校验
+        Map<String,Object>  check = this.check( outerOrderId , userName,  payType, submitAmount,ip);
+        SysUser user = (SysUser)check.get("user");
+        UserBusinessEntity userBusinessEntity =(UserBusinessEntity) check.get("userBusinessEntity");
+        String rate = (String) check.get("rate");
+        //保存订单信息
+        OrderInfoEntity order = this.saveOrder(submitAmount, outerOrderId, userName, userBusinessEntity, payType, callbackUrl, agentName, ip, remark, user,rate);
+        //请求挂马平台
+        return requestPayUrl.requestPayUrl(order, userName, requestUrl, key, innerCallBackUrl, userBusinessEntity);
+    }
+
+    /**
+     * 校验请求的用户信息是否完善
+     * @param outerOrderId
+     * @param userName
+     * @param payType
+     * @param submitAmount
+     * @return
+     * @throws Exception
+     */
+    private Map<String,Object> check(String outerOrderId ,String userName, String payType,String submitAmount,String ip) throws Exception{
+        Map<String,Object> result = new HashMap<>();
+        if (!org.springframework.util.StringUtils.isEmpty(ip) && isIpBlacklist(ip)) {
+            throw new RRException("非法访问，请联系管理员");
+        }
         //校验是否是重复订单
         if (!outerOrderIdIsOnly(outerOrderId)) {
             log.info("该订单已经创建过，无需重复创建;orderid:{}", outerOrderId);
@@ -615,7 +637,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         }
         //校验在此通道下的该商户对应的代理是否有定义挂码账号
         List<UserBusinessEntity> useBusinesses =
-                businessEntityService.queryBusinessCodeByUserName(user.getAgentUsername(), payType);
+            businessEntityService.queryBusinessCodeByUserName(user.getAgentUsername(), payType);
         if (CollectionUtils.isEmpty(useBusinesses)) {
             log.info("用户:{},无对应商户信息", userName);
             throw new RRException("通道：" + payType + ",未配置账号或账号未激活，请联系管理员");
@@ -627,15 +649,34 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         //校验金额的合法性
         checkAmountValidity(userName, submitAmount, payType);
         //校验用户费率是否有填写
-        checkRate(user, payType);
-
-        String orderId = generateOrderId();
+        String rate = checkRate(user, payType);
+        result.put("user",user);
+        result.put("rate",rate);
+        result.put("userBusinessEntity",userBusinessEntity);
+        return result;
+    }
+    /**
+     * 保存订单信息
+     * @param submitAmount
+     * @param outerOrderId
+     * @param userName
+     * @param userBusinessEntity
+     * @param payType
+     * @param callbackUrl
+     * @param agentName
+     * @param ip
+     * @param remark
+     * @param user
+     * @return
+     */
+    private OrderInfoEntity saveOrder(String submitAmount,String outerOrderId,String userName,UserBusinessEntity userBusinessEntity
+    ,String payType,String callbackUrl,String agentName,String ip,String remark,SysUser user,String rate){
         OrderInfoEntity order = new OrderInfoEntity();
         BigDecimal amount = new BigDecimal(submitAmount);
-        String rate = rateEntityService.getUserRateByUserNameAndAngetCode(userName, agentName, payType);
         BigDecimal poundage = amount.multiply(new BigDecimal(rate)).setScale(2, BigDecimal.ROUND_HALF_UP);
         order.setPoundage(poundage);
         order.setActualAmount(amount.subtract(poundage).setScale(2, BigDecimal.ROUND_HALF_UP));
+        String orderId = generateOrderId();
         order.setOrderId(orderId);
         order.setOuterOrderId(outerOrderId);
         order.setUserName(userName);
@@ -660,10 +701,8 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         order.setSalesmanRealname(user.getSalesmanRealname());
         //保存订单信息
         this.save(order);
-        //请求挂马平台
-        return requestPayUrl.requestPayUrl(order, userName, requestUrl, key, innerCallBackUrl, userBusinessEntity);
+        return order;
     }
-
     private UserBusinessEntity checkBusinessAccount(List<UserBusinessEntity> useBusinesses,String submitAmount){
         UserBusinessEntity userBusinessEntity = null;
         if (useBusinesses.size() == 1) {
@@ -894,14 +933,15 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * @param user
      * @throws Exception
      */
-    private void checkRate(SysUser user, String payType) throws Exception {
+    private String checkRate(SysUser user, String payType) throws Exception {
         if (StringUtils.isBlank(user.getAgentUsername())) {
             throw new RRException("用户未配置高级代理");
         }
         //商户
+        ChannelEntity channel = chnannelDao.queryChannelByCode(payType);
         String rate = rateEntityService.getUserRateByUserNameAndAngetCode(user.getUsername(), user.getAgentUsername()
                 , payType);
-        if (StringUtils.isBlank(rate)) {
+        if (StringUtils.isBlank(rate) && StringUtils.isBlank(channel.getRate())) {
             throw new RRException("用户未配置费率，请联系管理员配置");
         }
         if (StringUtils.isNotBlank(user.getSalesmanUsername())) {
@@ -920,6 +960,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
                 throw new RRException("代理未对介绍人设置费率，请联系管理员");
             }
         }
+        return rate == null?channel.getRate():rate;
     }
 
     /**

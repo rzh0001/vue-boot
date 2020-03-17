@@ -112,6 +112,11 @@
             dataIndex: 'channelCode'
            },
           {
+            title: '通道利率',
+            align:"center",
+            dataIndex: 'rate'
+          },
+          {
             title: '操作',
             dataIndex: 'action',
             align:"center",

@@ -171,7 +171,7 @@
               </a-menu-item>
             </a-menu>
           </a-dropdown>
-          <a-dropdown>
+          <!--<a-dropdown>
             <a-button>
               通道配置
             </a-button>
@@ -183,7 +183,7 @@
                 <a @click="addChannel(record)">添加通道</a>
               </a-menu-item>
             </a-menu>
-          </a-dropdown>
+          </a-dropdown>-->
           <a-dropdown>
             <a-button>
               产品配置

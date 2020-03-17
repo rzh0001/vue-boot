@@ -68,4 +68,9 @@ public class ChannelEntity {
     @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "更新时间")
 	private java.util.Date updateTime;
+
+	/**利率*/
+	@Excel(name = "利率", width = 15)
+	@ApiModelProperty(value = "利率")
+	private java.lang.String rate;
 }

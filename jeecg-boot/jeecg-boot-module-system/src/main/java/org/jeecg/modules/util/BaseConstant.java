@@ -28,7 +28,7 @@ public class BaseConstant {
     //创建订单的入参字段
     public static final String SUBMIT_AMOUNT= "submitAmount";
     public static final String  PAY_TYPE= "payType";
-    public static final String PRODUCT_NAME="product_name";
+    public static final String PRODUCT_NAME="productName";
 
     //订单状态
     //无效

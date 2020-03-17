@@ -21,5 +21,5 @@ public interface IUserChannelEntityService extends IService<UserChannelEntity> {
     void updateUseTime(String channelCode,String userName);
     List<String> getChannelCodeByUserName(String userName);
     void deleteChannel(String userName,List<String> codes);
-    void batchSave(List<ChannelEntity> channels, SysUser sysUser);
+    void save(ChannelEntity channels, SysUser sysUser);
 }

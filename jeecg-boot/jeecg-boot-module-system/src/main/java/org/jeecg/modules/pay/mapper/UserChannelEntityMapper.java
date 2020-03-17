@@ -2,10 +2,7 @@ package org.jeecg.modules.pay.mapper;
 
 import java.util.List;
 
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
 import org.jeecg.modules.pay.entity.ChannelEntity;
 import org.jeecg.modules.pay.entity.UserChannelEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -36,5 +33,6 @@ public interface UserChannelEntityMapper extends BaseMapper<UserChannelEntity> {
 
     void deleteChannel(@Param("userName") String userName,@Param("codes") List<String> codes);
 
-    void batchSave(@Param("channels") List<ChannelEntity> channels, @Param("sysUser") SysUser sysUser);
+    @Insert("insert into sys_user_channel (id,user_id,user_name,channel_code,member_type) values (SELECT REPLACE(UUID(), '-', '') AS id),#{sysUser.id},#{sysUser.username},#{channel.channelCode},#{sysUser.memberType}")
+    void save(@Param("channel") ChannelEntity channel, @Param("sysUser") SysUser sysUser);
 }

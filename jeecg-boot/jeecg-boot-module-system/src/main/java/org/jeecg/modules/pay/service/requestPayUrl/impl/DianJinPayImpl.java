@@ -151,12 +151,14 @@ public class DianJinPayImpl implements RequestPayUrl<OrderInfoEntity, String, St
         }
     }
 
-    @Override public void afterPropertiesSet() throws Exception {
+    @Override
+    public void afterPropertiesSet() throws Exception {
         PayServiceFactory.register(BaseConstant.REQUEST_DIANJIN_ALIPAY, this);
         PayServiceFactory.registerUrl(BaseConstant.REQUEST_DIANJIN_ALIPAY, utils.getRequestUrl(BaseConstant.REQUEST_DIANJIN_ALIPAY));
     }
 
-    @Override public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 
     }
 }

@@ -8,12 +8,12 @@ import java.net.URISyntaxException;
 public interface RequestPayUrl<O, N, U, K, C, B,P> {
 
     /**
-     * @param order        订单
-     * @param userName     用户名
-     * @param url          支付地址
-     * @param key          秘钥
-     * @param callbackUrl  回调地址
-     * @param userBusiness
+     * @param order        订单信息
+     * @param userName     当前请求的商户用户名
+     * @param url          请求的支付地址
+     * @param key          请求秘钥
+     * @param callbackUrl  挂马的回调地址
+     * @param userBusiness 商户信息
      * @return
      * @throws Exception
      */
@@ -41,8 +41,7 @@ public interface RequestPayUrl<O, N, U, K, C, B,P> {
 
     /**
      * 回调商户
-     * 如果是使用post方式回调的话，要求必须是json格式的入参，且必须要有payType字段
-     * 如果是使用get方式回调的话，必要要有payType参数
+     * 使用条件：要想使用此回调，必须要求第三方在创建订单的时候，有一个参数，在回调的时候，原样返回。如果没有的话，则不能使用此回调
      * @param object ：挂马平台传递过来的参数
      * @return
      * @throws Exception

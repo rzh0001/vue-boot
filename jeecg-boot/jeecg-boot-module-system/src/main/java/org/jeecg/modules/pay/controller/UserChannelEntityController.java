@@ -80,7 +80,15 @@ public class UserChannelEntityController {
             codes = codes.stream().filter(code -> productChannel.contains(code)).collect(Collectors.toList());
             SysUser sysUser = userService.getUserByName(userName);
             List<ChannelEntity> channels = channelEntityService.queryChannelByCodes(codes);
-            userChannelEntityService.batchSave(channels,sysUser);
+            for(ChannelEntity channel:channels){
+                UserChannelEntity userChannelEntity = new UserChannelEntity();
+                userChannelEntity.setMemberType(sysUser.getMemberType());
+                userChannelEntity.setUserId(sysUser.getId());
+                userChannelEntity.setUserName(sysUser.getUsername());
+                userChannelEntity.setChannelCode(channel.getChannelCode());
+                userChannelEntity.setChannelId(channel.getId());
+                userChannelEntityService.save(userChannelEntity);
+            }
         }
         Result<String> result = new Result<>();
         result.setMessage("success");
