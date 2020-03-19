@@ -358,12 +358,13 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     public void countAmount(String orderId, String userName, String submitAmount, String payType) throws Exception {
         SysUser user = userService.getUserByName(userName);
         BigDecimal submit = new BigDecimal(submitAmount);
+        ChannelEntity channel = chnannelDao.queryChannelByCode(payType);
         //介绍人为空
         if (org.springframework.util.StringUtils.isEmpty(user.getSalesmanUsername())) {
             //商户的费率
             String rateString = rateEntityService.getUserRateByUserNameAndAngetCode(userName,
                     user.getAgentUsername(), payType);
-            BigDecimal rate = new BigDecimal(rateString);
+            BigDecimal rate = new BigDecimal(rateString == null ? channel.getRate():rateString);
             UserAmountEntity agent = amountService.getUserAmountByUserName(user.getAgentUsername());
             //代理获利
             BigDecimal agentAmount = submit.multiply(rate).setScale(2, BigDecimal.ROUND_HALF_UP);
@@ -374,7 +375,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
                     payType, null);
         } else {
             //介绍人不为空
-            //介绍人对商户设置的费率
+            //介绍人对商户设置的费率,如果为空，则取通道费率
             String introducerRate = rateEntityService.getBeIntroducerRate(userName, user.getAgentUsername(),
                     user.getSalesmanUsername(), payType);
             //代理对介绍人设置的费率
@@ -382,7 +383,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             String agentRate = rateEntityService.getUserRateByUserNameAndAngetCode(user.getSalesmanUsername(),
                     sale.getAgentUsername(), payType);
             //介绍人对商户设置的费率 - 代理对介绍人的费率 = 介绍人的利率差
-            BigDecimal rateDifference = new BigDecimal(introducerRate).subtract(new BigDecimal(agentRate));
+            BigDecimal rateDifference = new BigDecimal(introducerRate==null?channel.getRate():introducerRate).subtract(new BigDecimal(agentRate));
             //介绍人获利 = 订单金额*（介绍人费率-代理费率）
             BigDecimal saleAmount = submit.multiply(rateDifference).setScale(2, BigDecimal.ROUND_HALF_UP);
             UserAmountEntity saleDbAmount = amountService.getUserAmountByUserName(user.getSalesmanUsername());
