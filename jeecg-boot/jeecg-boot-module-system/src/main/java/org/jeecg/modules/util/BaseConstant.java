@@ -60,6 +60,7 @@ public class BaseConstant {
     public static final String REQUEST_BUSINESS_URL = "requestBusinessUrl";
     public static final String QUERY_ORDER_STATUS_URL = "queryOrderStatusUrl";
     public static final String NOTIFY_ORDER_FINISH_URL = "notifyOrderFinishUrl";
+    public static final String DOMAIN = "domain";
     //支付通道
     //云闪付
     public static final String REQUEST_YSF = "ysf";
@@ -85,6 +86,12 @@ public class BaseConstant {
     public static final String REQUEST_INTERNET_BANK = "internet_bank";
 
     public static final String REQUEST_DIANJIN_ALIPAY = "daiJinAlipay";
+    //赤诚支付-支付宝个码
+    public static final String REQUEST_CHICHENG_ALIPAY = "chiChengAlipay";
+    //牛腩支付-支付宝
+    public static final String REQUEST_NIUNAN_ALIPAY="niuNanAlipay";
+    //腾飞支付-支付宝
+    public static final String REQUEST_TENGFEI_ALIPAY = "XTFF";
     //四方回调挂马平台的返回码
     public static final int SUCCESS = 200;
     //流水类型 流水类型 1-手续费收入 2-提现 3-冲正
