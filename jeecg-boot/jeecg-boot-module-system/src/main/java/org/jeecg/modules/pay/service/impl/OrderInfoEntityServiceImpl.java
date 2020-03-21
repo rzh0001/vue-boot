@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.util.StringUtil;
 import org.jeecg.common.system.vo.DictModel;
 import org.jeecg.common.util.DateUtils;
+import org.jeecg.common.util.GuavaCacheUtils;
 import org.jeecg.common.util.RedisUtil;
 import org.jeecg.modules.exception.RRException;
 import org.jeecg.modules.pay.entity.*;
@@ -596,6 +597,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         String remark = (String) checkParam.get(BaseConstant.REMARK);
         log.info("请求创建订单，商户单号为:{};通道为：{};用户名为:{};申请金额为:{}", new String[]{outerOrderId, payType, userName,
                 submitAmount});
+        //校验订单是否重复
         //信息校验
         Map<String,Object>  check = this.check( outerOrderId , userName,  payType, submitAmount,ip);
         SysUser user = (SysUser)check.get("user");
@@ -607,6 +609,17 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         return requestPayUrl.requestPayUrl(order, userName, requestUrl, key, innerCallBackUrl, userBusinessEntity);
     }
 
+    /**
+     * 预防重复提交
+     * @param ip
+     * @param amount
+     * @return
+     */
+    private boolean checkRepeatSubmit(String ip,String amount){
+        StringBuilder repratValue = new StringBuilder();
+        repratValue.append(ip).append("_").append(amount);
+        return GuavaCacheUtils.alreadyExists(ip,repratValue.toString());
+    }
     /**
      * 校验请求的用户信息是否完善
      * @param outerOrderId
