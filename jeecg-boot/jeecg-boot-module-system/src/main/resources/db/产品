@@ -1,14 +1,22 @@
+DROP TABLE IF EXISTS `pay_product`;
 CREATE TABLE `pay_product` (
-  `id` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
-  `product_code` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '产品代码',
-  `product_name` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '产品名称',
+  `id` varchar(32) NOT NULL,
+  `product_code` varchar(32) DEFAULT NULL COMMENT '产品代码',
+  `product_name` varchar(32) DEFAULT NULL COMMENT '产品名称',
   `status` int(2) DEFAULT NULL COMMENT '状态 0：关闭；1：开启',
-  `create_user` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '创建人',
+  `create_user` varchar(32) DEFAULT NULL COMMENT '创建人',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_user` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '更新人',
+  `update_user` varchar(32) DEFAULT NULL COMMENT '更新人',
   `update_time` datetime DEFAULT NULL COMMENT '更新时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='产品列表';
+
+
+INSERT INTO `pay_product` VALUES ('0797e13601e4bab5a93d1e945064a592', 'WeChatH5', '微信h5', '1', null, '2020-03-21 20:19:25', null, '2020-03-21 20:19:58');
+INSERT INTO `pay_product` VALUES ('120975a9189769772a3fd90a38615e97', 'AlipayH5', '支付宝h5', '1', null, '2020-03-21 20:20:21', null, null);
+INSERT INTO `pay_product` VALUES ('9621996069639bcffb60dfa5a7b76e47', 'WeChatScan', '微信扫码', '1', null, '2020-03-21 20:19:07', null, '2020-03-21 20:20:07');
+INSERT INTO `pay_product` VALUES ('98fcdbdbb0b3a24bdcfd4ad87b7ff95e', 'AlipayScan', '支付宝扫码', '1', null, '2020-03-21 20:19:41', null, null);
+INSERT INTO `pay_product` VALUES ('fabb8d4d7710f6d34d9d93ff192f36d7', 'OnlineBankScan', '网银扫码', '1', null, '2020-03-21 20:20:34', null, null);
 
 CREATE TABLE `pay_product_channel` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -24,5 +32,5 @@ CREATE TABLE `pay_product_channel` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8 COMMENT='产品下的通道';
 
-alter table sys_channel add rate varchar(6) default NULL COMMENT='利率';
+alter table sys_channel add rate varchar(6) default NULL;
 
