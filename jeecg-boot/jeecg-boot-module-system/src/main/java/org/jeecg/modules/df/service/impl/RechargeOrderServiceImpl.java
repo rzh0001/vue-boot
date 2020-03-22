@@ -5,9 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
 import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.modules.df.constant.DfConstant;
-import org.jeecg.modules.df.entity.PayOrder;
 import org.jeecg.modules.df.entity.RechargeOrder;
-import org.jeecg.modules.df.entity.UserBankcard;
 import org.jeecg.modules.df.entity.UserBankcardConfigDO;
 import org.jeecg.modules.df.mapper.RechargeOrderMapper;
 import org.jeecg.modules.df.service.IRechargeOrderService;
@@ -39,7 +37,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
 	}
 
 	@Override
-	public void add(RechargeOrder order) {
+	public RechargeOrder add(RechargeOrder order) {
 		LoginUser ou = (LoginUser) SecurityUtils.getSubject().getPrincipal();
 		order.setUserId(ou.getId());
 		order.setUserName(ou.getUsername());
@@ -59,5 +57,6 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
 		order.setCardNumber(randomBankcard.getCardNumber());
 
 		save(order);
+		return order;
 	}
 }

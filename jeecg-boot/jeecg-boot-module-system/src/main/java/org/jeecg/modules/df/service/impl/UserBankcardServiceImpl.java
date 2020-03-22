@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.SecurityUtils;
+import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.modules.df.entity.UserBankcard;
 import org.jeecg.modules.df.entity.UserBankcardConfig;
 import org.jeecg.modules.df.entity.UserBankcardConfigDO;
@@ -75,6 +77,9 @@ public class UserBankcardServiceImpl extends ServiceImpl<UserBankcardMapper, Use
 
 	@Override
 	public void add(UserBankcard userBankcard) {
+		LoginUser opUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+		userBankcard.setUserId(opUser.getId());
+		userBankcard.setUsername(opUser.getUsername());
 		save(userBankcard);
 
 		// 插入 df_user_bankcard_config

@@ -106,11 +106,7 @@ public class UserBankcardController {
 	@PostMapping(value = "/add")
 	public Result<UserBankcard> add(@RequestBody UserBankcard userBankcard) {
 		Result<UserBankcard> result = new Result<UserBankcard>();
-		LoginUser opUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
-		userBankcard.setUserId(opUser.getId());
-		userBankcard.setUsername(opUser.getUsername());
 		try {
-
 			userBankcardService.add(userBankcard);
 			result.success("添加成功！");
 		} catch (Exception e) {

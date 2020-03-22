@@ -157,9 +157,9 @@ public class RechargeOrderController {
 	@PostMapping(value = "/add")
 	public Result<RechargeOrder> add(@RequestBody RechargeOrder order) {
 		Result<RechargeOrder> result = new Result<RechargeOrder>();
-
 		try {
-			rechargeOrderService.add(order);
+			RechargeOrder data = rechargeOrderService.add(order);
+			result.setResult(data);
 			result.success("添加成功！");
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);

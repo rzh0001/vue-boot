@@ -63,17 +63,22 @@
 
       </a-form>
     </a-spin>
+    <rechargeOrderResult-modal ref="modalForm" @ok="modalFormOk"></rechargeOrderResult-modal>
+
   </a-modal>
 </template>
 
 <script>
-  import { httpAction } from '@/api/manage'
+  import { getAction,httpAction } from '@/api/manage'
   import pick from 'lodash.pick'
   import moment from "moment"
-  import { getAction } from '../../../api/manage'
+  import RechargeOrderResultModal from './RechargeOrderResultModal'
 
   export default {
     name: "RechargeOrderModal",
+    components: {
+      RechargeOrderResultModal,
+    },
     data () {
       return {
         title:"操作",
@@ -104,13 +109,14 @@
           getBankcard: "/df/rechargeOrder/getBankcard"
         },
         bankcard: {},
+        text: "",
       }
     },
     created () {
     },
     methods: {
       add () {
-        this.edit(this.bankcard);
+        this.edit();
       },
       getBankcard(){
         getAction(this.url.getBankcard, {}).then((res) => {
@@ -166,13 +172,16 @@
             httpAction(httpurl,formData,method).then((res)=>{
               if(res.success){
                 that.$message.success(res.message);
-                that.$emit('ok');
+                // that.$emit('ok');
+                let record = res.result;
+                that.close();
+                this.$refs.modalForm.edit(record);
               }else{
                 that.$message.warning(res.message);
               }
             }).finally(() => {
               that.confirmLoading = false;
-              that.close();
+              // that.close();
             })
 
 
