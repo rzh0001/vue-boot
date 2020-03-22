@@ -2,10 +2,23 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.jeecg.modules.df.mapper.UserBankcardMapper">
 
-    <select id="selectPageVo" resultType="org.jeecg.modules.df.entity.UserBankcardVo">
+    <select id="selectPageVo" resultType="org.jeecg.modules.df.entity.UserBankcardVO">
         SELECT *
         FROM df_user_bankcard b
                  left join (select bankcard_id, sum(amount) as todayAmount from df_recharge_order where to_days(update_time) = to_days(now()) and status = 2 group by bankcard_id) t
                            on b.id = t.bankcard_id ${ew.customSqlSegment}
+    </select>
+    <select id="getRandomBankcard" parameterType="Map" resultType="org.jeecg.modules.df.entity.UserBankcardConfigDO">
+        select c.*,b.account_type,b.account_name,b.card_number,b.bank_name,b.branch_name,b.remark
+        from df_user_bankcard_config c
+        left join df_user_bankcard b on c.card_id = b.id
+        where b.is_open = 1 and (b.del_flag != 1 or b.del_flag is null)
+        <if test="map.agent_id!=null and map.agent_id!=''">
+            and c.agent_id = #{map.agent_id}
+        </if>
+        <if test="map.user_id!=null and map.user_id!=''">
+            and c.user_id = #{map.user_id}
+        </if>
+        order by c.last_time, c.create_time limit 1;
     </select>
 </mapper>

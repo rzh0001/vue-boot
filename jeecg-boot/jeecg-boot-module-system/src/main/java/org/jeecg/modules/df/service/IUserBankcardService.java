@@ -5,7 +5,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.jeecg.modules.df.entity.UserBankcard;
 import com.baomidou.mybatisplus.extension.service.IService;
-import org.jeecg.modules.df.entity.UserBankcardVo;
+import org.jeecg.modules.df.entity.UserBankcardConfigDO;
+import org.jeecg.modules.df.entity.UserBankcardVO;
 
 
 /**
@@ -15,5 +16,22 @@ import org.jeecg.modules.df.entity.UserBankcardVo;
  * @Version: V1.0
  */
 public interface IUserBankcardService extends IService<UserBankcard> {
-	public IPage<UserBankcardVo> selectUserBankcardPage(Page<UserBankcard> page, Wrapper wrapper);
+	IPage<UserBankcardVO> selectUserBankcardPage(Page<UserBankcard> page, Wrapper wrapper);
+
+	/**
+	 * 获取商户本次匹配打款银行卡
+	 *
+	 * @param agentId
+	 * @return
+	 */
+	UserBankcardConfigDO getRandomBankcard(String agentId, String userId);
+
+	/**
+	 * 逻辑删除银行卡
+	 *
+	 * @param id
+	 */
+	void delete(String id);
+
+	void add(UserBankcard userBankcard);
 }

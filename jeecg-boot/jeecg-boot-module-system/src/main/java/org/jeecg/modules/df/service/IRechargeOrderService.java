@@ -15,4 +15,6 @@ import java.util.Map;
  */
 public interface IRechargeOrderService extends IService<RechargeOrder> {
 	Map<String, Object> summary(QueryWrapper<RechargeOrder> queryWrapper);
+
+	void add(RechargeOrder order);
 }

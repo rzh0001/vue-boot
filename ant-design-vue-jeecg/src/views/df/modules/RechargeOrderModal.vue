@@ -11,8 +11,9 @@
     <a-spin :spinning="confirmLoading">
       <a-form :form="form">
         <a-form-item>
-          <a-alert :message="'请向匹配的账户打款！'" type="info" showIcon/>
+          <a-alert :message="'充值订单提交后，显示银行卡信息，请向匹配的银行卡打款！'" type="info" showIcon/>
         </a-form-item>
+<!--
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="订单号" v-show="false">
           <a-input placeholder="请输入订单号" v-decorator="['orderId', validatorRules.orderId ]" />
         </a-form-item>
@@ -43,6 +44,7 @@
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="开户行全称">
           <a-input placeholder="" v-decorator="['branchName', {}]"  disabled="disabled"/>
         </a-form-item>
+-->
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="充值金额">
           <a-input-number v-decorator="[ 'amount', validatorRules.amount]" :min="0"/>
         </a-form-item>
@@ -108,6 +110,9 @@
     },
     methods: {
       add () {
+        this.edit(this.bankcard);
+      },
+      getBankcard(){
         getAction(this.url.getBankcard, {}).then((res) => {
           if (res.success) {
             this.bankcard.bankcardId = res.result.id;

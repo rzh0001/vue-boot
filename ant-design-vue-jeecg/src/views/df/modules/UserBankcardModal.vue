@@ -15,7 +15,7 @@
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
           label="账户类型">
-          <a-select v-decorator="['accountType', {}]" placeholder="" >
+          <a-select v-decorator="['accountType',  validatorRules.accountType]" placeholder="" >
             <a-select-option value="1">对私</a-select-option>
             <a-select-option value="2">对公</a-select-option>
           </a-select>
@@ -24,19 +24,19 @@
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
           label="账户名">
-          <a-input placeholder="请输入账户名" v-decorator="['accountName', {}]" />
+          <a-input placeholder="请输入账户名" v-decorator="['accountName', validatorRules.accountName]" />
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
           label="卡号">
-          <a-input placeholder="请输入卡号" v-decorator="['cardNumber', {}]" />
+          <a-input placeholder="请输入卡号" v-decorator="['cardNumber', validatorRules.cardNumber]" />
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
           label="银行名称">
-          <a-input placeholder="请输入银行名称" v-decorator="['bankName', {}]" />
+          <a-input placeholder="请输入银行名称" v-decorator="['bankName', validatorRules.bankName]" />
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"
@@ -54,7 +54,7 @@
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
           label="开启状态">
-          <a-select v-decorator="['isOpen', {}]" placeholder="" >
+          <a-select v-decorator="['isOpen', validatorRules.isOpen]" placeholder="" >
             <a-select-option value="0">关闭</a-select-option>
             <a-select-option value="1">打开</a-select-option>
           </a-select>
@@ -90,6 +90,11 @@
         confirmLoading: false,
         form: this.$form.createForm(this),
         validatorRules:{
+          accountType:{rules: [{ required: true, message: '请选择账户类型!' }], initialValue: "1"},
+          isOpen:{rules: [{ required: true, message: '请选择开启状态!' }], initialValue: "1"},
+          accountName:{rules: [{ required: true, message: '请输入账户名!' }]},
+          cardNumber:{rules: [{ required: true, message: '请输入卡号!' }]},
+          bankName:{rules: [{ required: true, message: '请输入银行名称!' }]},
         },
         url: {
           add: "/df/userBankcard/add",
@@ -98,6 +103,12 @@
       }
     },
     created () {
+    },
+    mounted(){
+      this.form.setFieldsValue({
+        "accountType": 1,
+        "isOpen": 1,
+      })
     },
     methods: {
       add () {

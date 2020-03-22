@@ -7,7 +7,10 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
 import org.jeecg.modules.df.entity.UserBankcard;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.jeecg.modules.df.entity.UserBankcardVo;
+import org.jeecg.modules.df.entity.UserBankcardConfigDO;
+import org.jeecg.modules.df.entity.UserBankcardVO;
+
+import java.util.Map;
 
 /**
  * @Description: 代付平台用户银行卡
@@ -17,5 +20,7 @@ import org.jeecg.modules.df.entity.UserBankcardVo;
  */
 public interface UserBankcardMapper extends BaseMapper<UserBankcard> {
 
-	IPage<UserBankcardVo> selectPageVo(Page<?> page, @Param(Constants.WRAPPER) Wrapper wrapper);
+	IPage<UserBankcardVO> selectPageVo(Page<?> page, @Param(Constants.WRAPPER) Wrapper wrapper);
+
+	UserBankcardConfigDO getRandomBankcard(@Param("map") Map map);
 }

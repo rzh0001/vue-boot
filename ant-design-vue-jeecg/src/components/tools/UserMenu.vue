@@ -60,7 +60,6 @@
 </template>
 
 <script>
-  import BusinessNotice from './BusinessNotice'
   import HeaderNotice from './HeaderNotice'
   import UserPassword from './UserPassword'
   import DepartSelect from './DepartSelect'
@@ -73,7 +72,6 @@
     name: 'UserMenu',
     mixins: [mixinDevice],
     components: {
-      BusinessNotice,
       HeaderNotice,
       UserPassword,
       DepartSelect

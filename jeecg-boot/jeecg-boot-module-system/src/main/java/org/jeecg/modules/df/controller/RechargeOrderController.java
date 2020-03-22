@@ -157,19 +157,9 @@ public class RechargeOrderController {
 	@PostMapping(value = "/add")
 	public Result<RechargeOrder> add(@RequestBody RechargeOrder order) {
 		Result<RechargeOrder> result = new Result<RechargeOrder>();
-		LoginUser ou = (LoginUser) SecurityUtils.getSubject().getPrincipal();
-		SysUser user = userService.getById(ou.getId());
-		order.setUserId(user.getId());
-		order.setUserName(user.getUsername());
-		order.setUserRealname(user.getRealname());
-		order.setAgentId(user.getAgentId());
-		order.setAgentUsername(user.getAgentUsername());
-		order.setAgentRealname(user.getAgentRealname());
 
-		order.setOrderId(IDUtil.genRechargeOrderId());
-		order.setStatus(DfConstant.STATUS_PAID);
 		try {
-			rechargeOrderService.save(order);
+			rechargeOrderService.add(order);
 			result.success("添加成功！");
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
