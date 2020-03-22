@@ -182,6 +182,7 @@
             }).finally(() => {
               that.confirmLoading = false;
               // that.close();
+              that.$emit('ok');
             })
 
 
