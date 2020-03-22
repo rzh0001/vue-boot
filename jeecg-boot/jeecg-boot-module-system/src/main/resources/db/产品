@@ -34,3 +34,5 @@ CREATE TABLE `pay_product_channel` (
 
 alter table sys_channel add rate varchar(6) default NULL;
 
+update sys_user_channel set update_time=now();
+

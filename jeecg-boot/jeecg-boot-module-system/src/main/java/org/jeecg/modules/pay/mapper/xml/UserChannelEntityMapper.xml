@@ -9,7 +9,7 @@
         <foreach collection="channelCodes" item="code" index="index" open="(" close=")" separator=",">
             #{code}
         </foreach>
-        order by update_time DESC
+        order by update_time ASC
     </select>
     <delete id="deleteChannel">
         delete from sys_user_channel where user_name=#{userName} and channel_code in
