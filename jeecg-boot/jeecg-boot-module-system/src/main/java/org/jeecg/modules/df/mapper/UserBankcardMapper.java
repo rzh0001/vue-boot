@@ -8,7 +8,7 @@ import org.apache.ibatis.annotations.Param;
 import org.jeecg.modules.df.entity.UserBankcard;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.jeecg.modules.df.entity.UserBankcardConfigDO;
-import org.jeecg.modules.df.entity.UserBankcardVO;
+import org.jeecg.modules.df.entity.UserBankcardVo;
 
 import java.util.Map;
 
@@ -20,7 +20,7 @@ import java.util.Map;
  */
 public interface UserBankcardMapper extends BaseMapper<UserBankcard> {
 
-	IPage<UserBankcardVO> selectPageVo(Page<?> page, @Param(Constants.WRAPPER) Wrapper wrapper);
+	IPage<UserBankcardVo> selectPageVo(Page<?> page, @Param(Constants.WRAPPER) Wrapper wrapper);
 
 	UserBankcardConfigDO getRandomBankcard(@Param("map") Map map);
 }

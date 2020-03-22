@@ -1,16 +1,13 @@
 package org.jeecg.modules.df.service.impl;
 
-import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.modules.df.entity.UserBankcard;
 import org.jeecg.modules.df.entity.UserBankcardConfig;
 import org.jeecg.modules.df.entity.UserBankcardConfigDO;
-import org.jeecg.modules.df.entity.UserBankcardVO;
+import org.jeecg.modules.df.entity.UserBankcardVo;
 import org.jeecg.modules.df.mapper.UserBankcardMapper;
 import org.jeecg.modules.df.service.IUserBankcardConfigService;
 import org.jeecg.modules.df.service.IUserBankcardService;
@@ -40,7 +37,7 @@ public class UserBankcardServiceImpl extends ServiceImpl<UserBankcardMapper, Use
 	private IUserBankcardConfigService configService;
 
 	@Override
-	public IPage<UserBankcardVO> selectUserBankcardPage(Page<UserBankcard> page, Wrapper wrapper) {
+	public IPage<UserBankcardVo> selectUserBankcardPage(Page<UserBankcard> page, Wrapper wrapper) {
 		return baseMapper.selectPageVo(page, wrapper);
 	}
 
