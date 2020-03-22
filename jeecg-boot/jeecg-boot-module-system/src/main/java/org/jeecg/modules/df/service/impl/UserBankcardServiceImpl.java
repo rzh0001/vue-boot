@@ -67,8 +67,7 @@ public class UserBankcardServiceImpl extends ServiceImpl<UserBankcardMapper, Use
 
 	@Override
 	public void delete(String id) {
-		lambdaUpdate().set(UserBankcard::getIsOpen, 0).set(UserBankcard::getDelFlag, 1)
-				.eq(UserBankcard::getId, id);
+		removeById(id);
 		HashMap<String, Object> map = new HashMap<String, Object>();
 		map.put("card_id", id);
 		configService.removeByMap(map);
@@ -80,6 +79,7 @@ public class UserBankcardServiceImpl extends ServiceImpl<UserBankcardMapper, Use
 		LoginUser opUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
 		userBankcard.setUserId(opUser.getId());
 		userBankcard.setUsername(opUser.getUsername());
+		userBankcard.setDelFlag("0");
 		save(userBankcard);
 
 		// 插入 df_user_bankcard_config

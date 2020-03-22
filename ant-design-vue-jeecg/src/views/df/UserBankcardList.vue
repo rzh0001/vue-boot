@@ -212,11 +212,20 @@
           //     }
           //   }
           // },
-          // {
-          //   title: '删除状态(0-正常;1-已删除)',
-          //   align: 'center',
-          //   dataIndex: 'delFlag'
-          // },
+          {
+            title: '删除状态',
+            align: 'center',
+            dataIndex: 'delFlag',
+            customRender: function(text) {
+              if (text === '0') {
+                return '正常'
+              } else if (text === '1') {
+                return '已删除'
+              } else {
+                return text
+              }
+            }
+          },
           // {
           //   title: '乐观锁',
           //   align: 'center',

@@ -78,4 +78,5 @@ public class UserBankcardVo {
 	@Excel(name = "今日充值", width = 15)
 	private BigDecimal todayAmount;
 
+	private java.lang.String delFlag;
 }

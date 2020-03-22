@@ -124,41 +124,7 @@
         this.visible = false
       },
       handleOk() {
-        const that = this
-        // 触发表单验证
-        this.form.validateFields((err, values) => {
-          if (!err) {
-            that.confirmLoading = true
-            let httpurl = ''
-            let method = ''
-            if (!this.model.id) {
-              httpurl += this.url.add
-              method = 'post'
-            } else {
-              httpurl += this.url.edit
-              method = 'put'
-            }
-            let formData = Object.assign(this.model, values)
-            //时间格式化
-            formData.successTime = formData.successTime ? formData.successTime.format('YYYY-MM-DD HH:mm:ss') : null
-
-            console.log(formData)
-            httpAction(httpurl, formData, method).then((res) => {
-              if (res.success) {
-                that.$message.success(res.message)
-                // that.$emit('ok');
-                that.add(res.result)
-              } else {
-                that.$message.warning(res.message)
-              }
-            }).finally(() => {
-              that.confirmLoading = false
-              // that.close();
-            })
-
-
-          }
-        })
+        this.close()
       },
       handleCancel() {
         this.close()

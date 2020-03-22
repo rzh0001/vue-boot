@@ -119,6 +119,11 @@
 	        <artifactId>mybatis-plus-boot-starter</artifactId>
 	        <version>${mybatis-plus.version}</version>
 	    </dependency>
+		<dependency>
+			<groupId>com.baomidou</groupId>
+			<artifactId>mybatis-plus-extension</artifactId>
+			<version>${mybatis-plus.version}</version>
+		</dependency>
 		
 		<!-- druid -->
        <dependency>
