@@ -105,10 +105,6 @@
     created () {
     },
     mounted(){
-      this.form.setFieldsValue({
-        "accountType": 1,
-        "isOpen": 1,
-      })
     },
     methods: {
       add () {
