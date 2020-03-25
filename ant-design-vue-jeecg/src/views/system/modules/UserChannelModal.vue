@@ -189,6 +189,10 @@
       })
       },
       addChannel:function(record){
+        if(record.memberType ==="2" || record.memberType ==="3"){
+          alert("无操作权限");
+          return;
+        }
         this.isAgent=false;
         this.isMenber = true;
         this.visible4Add=true;

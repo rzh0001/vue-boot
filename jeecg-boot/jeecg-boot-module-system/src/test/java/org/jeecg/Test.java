@@ -2,9 +2,11 @@ package org.jeecg;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.jeecg.modules.exception.RRException;
 import org.jeecg.modules.pay.entity.BaiyitongParam;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
+import org.jeecg.modules.util.AES128Util;
 import org.jeecg.modules.util.BaseConstant;
 import org.jeecg.modules.util.HttpResult;
 import org.jeecg.modules.util.HttpUtils;
@@ -24,6 +26,15 @@ import java.util.*;
  */
 
 public class Test {
+    @org.junit.Test
+    public void entry(){
+        JSONObject json = new JSONObject();
+        json.put("orderId","20200323192459gAAyC");
+        String a = AES128Util.encryptBase64(json.toJSONString(),"3c6a3ce41ec44a6c");
+        System.out.println(a);
+
+        System.out.println(DigestUtils.md5Hex("NJ081584965437613NP61O2aa7S4mfookaeGOfIFl6XaAQYY913aF9TEfQcAEP73D58LvB/EeEK2NB+Ra3c6a3ce41ec44a6c"));
+    }
     private static final String MD5_KEY="UoVoRPwckOZgYWBDZ15kQnzAZeY2140d";
     @org.junit.Test
     public void test1(){

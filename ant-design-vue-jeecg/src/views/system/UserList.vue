@@ -171,19 +171,32 @@
               </a-menu-item>
             </a-menu>
           </a-dropdown>
-          <!--<a-dropdown>
+         <!-- <a-dropdown>
             <a-button>
-              通道配置
+              挂马账号配置
             </a-button>
             <a-menu slot="overlay">
               <a-menu-item>
-                <a @click="channelDetail(record)">已配置通道</a>
-              </a-menu-item>
-              <a-menu-item>
-                <a @click="addChannel(record)">添加通道</a>
+                <a @click="addChannel(record)">添加挂马账号</a>
               </a-menu-item>
             </a-menu>
           </a-dropdown>-->
+         <a-dropdown>
+            <a-button>
+              关联子账号
+            </a-button>
+            <a-menu slot="overlay">
+               <a-menu-item>
+                <a @click="addChannel(record)">添加子账号</a>
+              </a-menu-item>
+              <a-menu-item>
+                <a @click="activeBusiness(record)">激活子账号</a>
+              </a-menu-item>
+               <a-menu-item>
+                <a @click="rechargeAmount(record)">子账号充值</a>
+              </a-menu-item>
+            </a-menu>
+          </a-dropdown>
           <a-dropdown>
             <a-button>
               产品配置
@@ -191,19 +204,6 @@
             <a-menu slot="overlay">
               <a-menu-item>
                 <a @click="relationProduct(record)">关联产品</a>
-              </a-menu-item>
-            </a-menu>
-          </a-dropdown>
-         <a-dropdown>
-            <a-button>
-              关联子账号
-            </a-button>
-            <a-menu slot="overlay">
-              <a-menu-item>
-                <a @click="activeBusiness(record)">激活子账号</a>
-              </a-menu-item>
-               <a-menu-item>
-                <a @click="rechargeAmount(record)">子账号充值</a>
               </a-menu-item>
             </a-menu>
           </a-dropdown>
