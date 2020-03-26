@@ -115,7 +115,7 @@ public class ChannelEntityController {
 	 	String innerCallBackUrl = null;
 		 List<DictModel> innerUrl = dictService.queryDictItemsByCode(BaseConstant.INNER_CALL_BACK_URL);
 		 for (DictModel k : innerUrl) {
-			 if (BaseConstant.INNER_CALL_BACK_URL.equals(k.getText())) {
+			 if (BaseConstant.TEST_CALL_BACK_URL.equals(k.getText())) {
 				 innerCallBackUrl = k.getValue();
 				 break;
 			 }

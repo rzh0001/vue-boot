@@ -56,6 +56,7 @@ public class BaseConstant {
     public static final String SKIP_GOOGLE_CHECK_NAMES = "skipGoogleCheckNames";
     public static final String IP_BLACK_LIST = "ipBlacklist";
     public static final String INNER_CALL_BACK_URL= "innerCallBackUrl";
+    public static final String TEST_CALL_BACK_URL="testCallBackUrl";
     public static final String REQUEST_URL = "requestPay";
     public static final String REQUEST_BUSINESS_URL = "requestBusinessUrl";
     public static final String QUERY_ORDER_STATUS_URL = "queryOrderStatusUrl";

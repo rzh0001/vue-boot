@@ -888,8 +888,11 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             RequestPayUrl request = null;
             String requestUrl = null;
             //产品代码
-            String productCode = dataObj.getString(BaseConstant.PRODUCT_NAME);
-            String payType = this.getChannelByProduct(userName,productCode);
+            String payType = dataObj.getString(BaseConstant.PAY_TYPE);
+            if(createOrder){
+                String productCode = dataObj.getString(BaseConstant.PRODUCT_NAME);
+                payType = this.getChannelByProduct(userName,productCode);
+            }
             if (!isQuery) {
                 request = PayServiceFactory.getPay(payType);
                 requestUrl = PayServiceFactory.getRequestUrl(payType);
