@@ -13,6 +13,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.aspect.annotation.AutoLog;
+import org.jeecg.common.system.vo.DictModel;
 import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.pay.entity.BusinessLabelValue;
@@ -25,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.jeecg.modules.productChannel.service.IProductChannelService;
 import org.jeecg.modules.system.entity.SysUser;
+import org.jeecg.modules.system.service.ISysDictService;
 import org.jeecg.modules.system.service.ISysUserService;
 import org.jeecg.modules.util.BaseConstant;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
@@ -106,7 +108,22 @@ public class ChannelEntityController {
 		 result.setResult(list);
 		return result;
 	}
-
+	 @Autowired
+	 public ISysDictService dictService;
+	 @GetMapping(value = "/getCallbackUrl")
+	public Result<String> getCallbackUrl(){
+	 	String innerCallBackUrl = null;
+		 List<DictModel> innerUrl = dictService.queryDictItemsByCode(BaseConstant.INNER_CALL_BACK_URL);
+		 for (DictModel k : innerUrl) {
+			 if (BaseConstant.INNER_CALL_BACK_URL.equals(k.getText())) {
+				 innerCallBackUrl = k.getValue();
+				 break;
+			 }
+		 }
+		 Result<String> result = new Result<>();
+		 result.setResult(innerCallBackUrl);
+		 return result;
+	}
 	@Autowired
 	private IProductChannelService productChannelService;
 	 @GetMapping(value = "/showChannel")

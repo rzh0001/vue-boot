@@ -56,6 +56,7 @@
     data () {
       return {
         title:"操作",
+        callBackUrl:"",
         products: [],
         visible: false,
         model: {},
@@ -77,7 +78,8 @@
         },
         url: {
           add: "/api/create",
-          channel: "/product/product/getAllProduct"
+          channel: "/product/product/getAllProduct",
+          getCallbackUrl:"/pay/channelEntity/getCallbackUrl"
         },
       }
     },
@@ -85,12 +87,22 @@
     },
     mounted:function () {
       this.channel();
+      this.getCallbackUrl();
     },
     methods: {
       channel(){
         httpAction(this.url.channel,null,'get').then((res)=>{
           if(res.success){
           this.products = res.result;
+        }else{
+          this.$message.warning(res.message);
+        }
+      })
+      },
+      getCallbackUrl(){
+        httpAction(this.url.getCallbackUrl,null,'get').then((res)=>{
+          if(res.success){
+          this.callBackUrl = res.result;
         }else{
           this.$message.warning(res.message);
         }
@@ -123,7 +135,8 @@
             let method =  'post';
             let formData = Object.assign(this.model, values);
             let outerOrderId = Date.parse(new Date())+'abc';
-            let form = Object.assign(this.model, {"callbackUrl":"http://www.btcode123.com/pay/api/testCallBack","outerOrderId":outerOrderId});
+            let callback = this.callBackUrl;
+            let form = Object.assign(this.model, {"callbackUrl":callback,"outerOrderId":outerOrderId});
             let data = JSON.stringify(form);
           var jsondata =  JSON.parse(data);
             let key = jsondata.apikey;
