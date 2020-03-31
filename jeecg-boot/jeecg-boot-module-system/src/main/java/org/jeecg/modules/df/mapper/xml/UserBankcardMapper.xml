@@ -12,7 +12,7 @@
         select c.*,b.account_type,b.account_name,b.card_number,b.bank_name,b.branch_name,b.remark
         from df_user_bankcard_config c
         left join df_user_bankcard b on c.card_id = b.id
-        where b.is_open = 1 and (b.del_flag != 1 or b.del_flag is null)
+        where b.is_open = 1 and b.del_flag = 0
         <if test="map.agent_id!=null and map.agent_id!=''">
             and c.agent_id = #{map.agent_id}
         </if>
