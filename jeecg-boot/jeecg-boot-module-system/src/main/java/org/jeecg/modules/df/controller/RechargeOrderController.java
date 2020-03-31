@@ -15,6 +15,7 @@ import org.jeecg.common.aspect.annotation.AutoLog;
 import org.jeecg.common.constant.PayConstant;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.vo.LoginUser;
+import org.jeecg.common.util.RedisUtil;
 import org.jeecg.modules.df.constant.DfConstant;
 import org.jeecg.modules.df.entity.PayOrder;
 import org.jeecg.modules.df.entity.RechargeOrder;
@@ -69,6 +70,9 @@ public class RechargeOrderController {
 
 	@Autowired
 	private ISysUserService userService;
+
+	@Autowired
+	private RedisUtil redis;
 
 	// 查询条件独立成方法，查询、统计、导出 三个接口使用
 	private QueryWrapper<RechargeOrder> initQueryCondition(RechargeOrder order, HttpServletRequest req) {
@@ -206,6 +210,12 @@ public class RechargeOrderController {
 	public Result<Object> approval(@RequestBody JSONObject jsonObject) {
 
 		log.info("充值订单-审核:" + jsonObject.toJSONString());
+		String key = "CZ-" + jsonObject.getString("id") + "-" + jsonObject.getString("status");
+		if (redis.hasKey(key)) {
+			return Result.ok("修改成功!");
+		} else {
+			redis.set(key, 1, 600);
+		}
 		RechargeOrder order = rechargeOrderService.getById(jsonObject.getString("id"));
 		if (order == null) {
 			return Result.error("未找到对应实体");
