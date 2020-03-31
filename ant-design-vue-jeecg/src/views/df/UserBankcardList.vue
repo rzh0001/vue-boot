@@ -5,7 +5,11 @@
     <div class="table-page-search-wrapper">
       <a-form layout="inline">
         <a-row :gutter="24">
-
+          <a-col :md="6" :sm="8">
+            <a-form-item label="账户名">
+              <a-input placeholder="请输入账户名" v-model="queryParam.accountName"></a-input>
+            </a-form-item>
+          </a-col>
           <a-col :md="6" :sm="8">
             <a-form-item label="开关">
               <a-select v-model="queryParam.isOpen" defaultValue="1" placeholder="">
@@ -16,21 +20,25 @@
             </a-form-item>
           </a-col>
           <a-col :md="6" :sm="8">
-            <a-form-item label="用户">
-              <a-input placeholder="" v-model="queryParam.username"></a-input>
+            <a-form-item label="删除状态">
+              <a-select v-model="queryParam.delFlag" defaultValue="0" placeholder="">
+                <a-select-option value="">全部</a-select-option>
+                <a-select-option value="0">正常</a-select-option>
+                <a-select-option value="1">删除</a-select-option>
+              </a-select>
             </a-form-item>
           </a-col>
           <template v-if="toggleSearchStatus">
             <a-col :md="6" :sm="8">
               <a-form-item label="账户类型">
-                <a-input placeholder="请输入账户类型(1-对私;2-对公)" v-model="queryParam.accountType"></a-input>
+                <a-select v-model="queryParam.accountType" placeholder="">
+                  <a-select-option value="">全部</a-select-option>
+                  <a-select-option value="1">对私</a-select-option>
+                  <a-select-option value="2">对公</a-select-option>
+                </a-select>
               </a-form-item>
             </a-col>
-            <a-col :md="6" :sm="8">
-              <a-form-item label="账户名">
-                <a-input placeholder="请输入账户名" v-model="queryParam.accountName"></a-input>
-              </a-form-item>
-            </a-col>
+
             <a-col :md="6" :sm="8">
               <a-form-item label="卡号">
                 <a-input placeholder="请输入卡号" v-model="queryParam.cardNumber"></a-input>
