@@ -7,8 +7,12 @@
         <a-row :gutter="24">
 
           <a-col :md="6" :sm="8">
-            <a-form-item label="用户ID">
-              <a-input placeholder="请输入用户ID" v-model="queryParam.userId"></a-input>
+            <a-form-item label="开关">
+              <a-select v-model="queryParam.isOpen" defaultValue="1" placeholder="">
+                <a-select-option value="">全部</a-select-option>
+                <a-select-option value="0">关闭</a-select-option>
+                <a-select-option value="1">开启</a-select-option>
+              </a-select>
             </a-form-item>
           </a-col>
           <a-col :md="6" :sm="8">
@@ -18,7 +22,7 @@
           </a-col>
           <template v-if="toggleSearchStatus">
             <a-col :md="6" :sm="8">
-              <a-form-item label="账户类型(1-对私;2-对公)">
+              <a-form-item label="账户类型">
                 <a-input placeholder="请输入账户类型(1-对私;2-对公)" v-model="queryParam.accountType"></a-input>
               </a-form-item>
             </a-col>

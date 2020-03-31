@@ -65,6 +65,7 @@ public class UserBankcardController {
 //				default:
 //			}
 //		}
+		qw.orderByAsc("del_flag", "is_open", "create_time");
 		return qw;
 	}
 

@@ -81,7 +81,8 @@
         url: {
           add: '/df/rechargeOrder/add',
           edit: '/df/rechargeOrder/edit',
-          getBankcard: '/df/rechargeOrder/getBankcard'
+          getBankcard: '/df/rechargeOrder/getBankcard',
+          query: '/df/rechargeOrder/queryById'
         },
         bankcard: {},
         text:"",
@@ -104,6 +105,15 @@
             this.bankcard.branchName = res.result.branchName
             this.bankcard.bankName = res.result.bankName
             this.edit(this.bankcard)
+          } else {
+            this.$message.error('操作失败，' + res.message)
+          }
+        })
+      },
+      show(orderId){
+        getAction(this.url.query, orderId).then((res) => {
+          if (res.success) {
+            this.edit(res.result);
           } else {
             this.$message.error('操作失败，' + res.message)
           }
