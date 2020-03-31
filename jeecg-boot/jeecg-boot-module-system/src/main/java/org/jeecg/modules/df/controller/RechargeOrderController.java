@@ -212,8 +212,10 @@ public class RechargeOrderController {
 		log.info("充值订单-审核:" + jsonObject.toJSONString());
 		String key = "CZ-" + jsonObject.getString("id") + "-" + jsonObject.getString("status");
 		if (redis.hasKey(key)) {
+			log.info("充值订单-审核:缓存已存在{}", key);
 			return Result.ok("修改成功!");
 		} else {
+			log.info("充值订单-审核:插入缓存{}", key);
 			redis.set(key, 1, 600);
 		}
 		RechargeOrder order = rechargeOrderService.getById(jsonObject.getString("id"));
