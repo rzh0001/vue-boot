@@ -7,4 +7,5 @@ package org.jeecg.modules.pay.service;
 public interface ICallBackService {
     String callBack4niuNanAlipay() throws Exception;
     String callBackTengFeiAlipay() throws  Exception;
+    String callBackLeTianAlipay() throws Exception;
 }

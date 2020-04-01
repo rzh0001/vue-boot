@@ -11,6 +11,7 @@ import org.jeecg.modules.system.service.ISysUserService;
 import org.jeecg.modules.util.BaseConstant;
 import org.jeecg.modules.util.R;
 import org.jeecg.modules.util.RequestHandleUtil;
+import org.jeecg.modules.util.SignatureUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.MessageDigest;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Author: wangjianbin
@@ -69,7 +70,7 @@ public class CallBackServiceImpl implements ICallBackService {
 			log.info("==>签名验证不通过，入参sign:{},本地：{}", sign, localSign);
 			return "fail";
 		}
-		return this.notify(orderNo);
+		return this.notify(orderNo,BaseConstant.REQUEST_NIUNAN_ALIPAY);
 	}
 
 	@Override
@@ -98,6 +99,31 @@ public class CallBackServiceImpl implements ICallBackService {
 		log.info("回复success");
 		return "success";
 	}
+	public static final String LETIAN_KEY = "08966fd914e9c23b8c3c99c039466835cf";
+	@Override
+	public String callBackLeTianAlipay() throws Exception {
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+		Object param = RequestHandleUtil.getReqParam(request);
+		Map<String, String> map = (Map<String, String>) param;
+		log.info("==>乐天支付 回调，回调参数为：{}", map);
+		String sign = map.get("Signature");
+		String outTradeNo = map.get("outTradeNo");
+		map.remove("Signature");
+		String localSign = SignatureUtils.signature(LETIAN_KEY,map);
+		if(!localSign.equals(sign)){
+			log.info("=>乐天支付，签名校验失败,入参签名：{}，本地签名：{}",sign,localSign);
+			return "fail";
+		}
+		return this.notify(outTradeNo,BaseConstant.REQUEST_LETIAN_ALIPAY);
+	}
+
+	public static void main(String[] args) {
+		Map<String,String> map = new HashMap<>();
+		map.put("a","a");
+		map.put("b","b");
+		map.remove("a");
+		System.out.println(map);
+	}
 
 	@Async
 	void notify1(String orderNo) throws Exception {
@@ -117,19 +143,15 @@ public class CallBackServiceImpl implements ICallBackService {
 //		}
 	}
 
-	private String notify(String orderNo) throws Exception {
+	private String notify(String orderNo,String payType) throws Exception {
 		OrderInfoEntity order = orderInfoEntityService.queryOrderInfoByOrderId(orderNo);
 		if (order == null || order.getStatus() == 2) {
 			return "非法访问";
 		}
 		order.setStatus(BaseConstant.ORDER_STATUS_SUCCESS_NOT_RETURN);
 		SysUser user = userService.getUserByName(order.getUserName());
-		R r = orderInfoEntityService.notifyCustomer(order, user, BaseConstant.REQUEST_NIUNAN_ALIPAY);
-		if ("0".equals(r.get("code"))) {
-			return "success";
-		} else {
-			return "fail";
-		}
+		orderInfoEntityService.notifyCustomer(order, user, payType);
+		return "success";
 	}
 
 	/**

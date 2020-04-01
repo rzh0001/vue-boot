@@ -34,4 +34,14 @@ public class CallBackController {
         }
         return "fail";
     }
+    @RequestMapping(value = "/leTianAlipay", method = RequestMethod.POST, produces = "application/x-www-form-urlencoded;charset=UTF-8")
+    @ResponseBody
+    public String leTianAlipay(){
+        try{
+            return  callBackService.callBackLeTianAlipay();
+        }catch (Exception e){
+            log.info("==>乐天支付，回调异常：{}",e);
+        }
+        return "fail";
+    }
 }
