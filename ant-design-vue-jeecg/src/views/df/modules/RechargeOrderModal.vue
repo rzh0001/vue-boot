@@ -175,7 +175,7 @@
                 // that.$emit('ok');
                 let record = res.result;
                 that.close();
-                this.$refs.modalForm.show(record);
+                // this.$refs.modalForm.show(record);
               }else{
                 that.$message.warning(res.message);
               }
