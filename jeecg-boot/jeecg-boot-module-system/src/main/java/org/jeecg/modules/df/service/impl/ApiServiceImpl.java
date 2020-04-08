@@ -132,11 +132,11 @@ public class ApiServiceImpl implements IApiService {
 		SysUser user = userService.getById(order.getUserId());
 
 		PayOrderResult result = PayOrderResult.fromPayOrder(order);
-		CallbackBody body = new CallbackBody();
-		body.setUsername(user.getUsername());
-		body.setTimestamp(System.currentTimeMillis());
-		body.setData(result.encodeData(user.getApiKey()));
-		body.setSign(body.sign(user.getApiKey()));
+		CallbackBody body = CallbackBody.builder()
+				.username(user.getUsername())
+				.data(result.encodeData(user.getApiKey()))
+				.remark(order.getRemark()).build();
+		body.sign(user.getApiKey());
 
 		log.info("\n=======>订单[{}][{}]：发送异步回调", order.getOrderId(), order.getOuterOrderId());
 		String post = HttpUtil.post(order.getCallbackUrl(), body.toJsonString());
