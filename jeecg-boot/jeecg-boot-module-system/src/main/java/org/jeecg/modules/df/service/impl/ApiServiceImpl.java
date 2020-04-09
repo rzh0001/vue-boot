@@ -5,6 +5,7 @@ import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONException;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.constant.CommonConstant;
 import org.jeecg.modules.df.entity.*;
@@ -132,13 +133,15 @@ public class ApiServiceImpl implements IApiService {
 		SysUser user = userService.getById(order.getUserId());
 
 		PayOrderResult result = PayOrderResult.fromPayOrder(order);
-		CallbackBody body = CallbackBody.builder()
-				.username(user.getUsername())
-				.data(result.encodeData(user.getApiKey()))
-				.remark(order.getRemark()).build();
+		CallbackBody body = new CallbackBody();
+		body.setUsername(user.getUsername());
+		body.setTimestamp(System.currentTimeMillis());
+		body.setData(result.encodeData(user.getApiKey()));
+		body.setRemark(order.getRemark());
 		body.sign(user.getApiKey());
 
-		log.info("\n=======>订单[{}][{}]：发送异步回调", order.getOrderId(), order.getOuterOrderId());
+		log.info("=======>订单[{}][{}]：发送异步回调", order.getOrderId(), order.getOuterOrderId());
+		log.info("=======>订单[{}][{}]：回调报文{}}", order.getOrderId(), order.getOuterOrderId(), body.toJsonString());
 		String post = HttpUtil.post(order.getCallbackUrl(), body.toJsonString());
 		// 先更新为已发送未返回
 		order.setCallbackStatus("1");
