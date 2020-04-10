@@ -16,6 +16,17 @@
               <a-input placeholder="请输入外部订单号" v-model="queryParam.outerOrderId"></a-input>
             </a-form-item>
           </a-col>
+          <a-col :md="6" :sm="8">
+            <a-form-item label="订单状态">
+              <a-select v-model="queryParam.status"  placeholder="">
+                <a-select-option value="">全部</a-select-option>
+                <a-select-option value="0">待处理</a-select-option>
+                <a-select-option value="1">已接单</a-select-option>
+                <a-select-option value="2">已支付</a-select-option>
+                <a-select-option value="3">已拒绝</a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
           <template v-if="toggleSearchStatus">
             <a-col :md="6" :sm="8">
               <a-form-item label="用户">
