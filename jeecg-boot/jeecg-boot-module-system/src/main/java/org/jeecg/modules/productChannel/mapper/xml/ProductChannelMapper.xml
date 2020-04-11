@@ -8,4 +8,12 @@
             (#{productCode},#{channel.channelCode},#{channel.channelName},1,now())
         </foreach>
     </insert>
+
+    <select id="getProductCodeByChannelCodes" resultType="java.lang.String">
+        SELECT distinct product_code from pay_product_channel WHERE channel_code in
+        <foreach collection="channels" item="channel" open="(" close=")" separator=",">
+            #{channel}
+        </foreach>
+    </select>
+
 </mapper>

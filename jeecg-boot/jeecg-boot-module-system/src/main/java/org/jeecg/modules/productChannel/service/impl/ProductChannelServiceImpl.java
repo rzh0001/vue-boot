@@ -40,4 +40,14 @@ public class ProductChannelServiceImpl extends ServiceImpl<ProductChannelMapper,
     public List<ProductChannel> getChannelProduct(String productCode) {
         return productChannelMapper.getChannelProduct(productCode);
     }
+
+    @Override
+    public List<String> getProductCodeByChannelCodes(List<String> channelCodes) {
+        return productChannelMapper.getProductCodeByChannelCodes(channelCodes);
+    }
+
+    @Override
+    public List<String> getChannelCodeNotInProductCode(String productCode) {
+        return productChannelMapper.getChannelCodeNotInProductCode(productCode);
+    }
 }

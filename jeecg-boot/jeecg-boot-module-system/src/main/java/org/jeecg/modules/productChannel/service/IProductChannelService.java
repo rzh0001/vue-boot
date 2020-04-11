@@ -21,4 +21,8 @@ public interface IProductChannelService extends IService<ProductChannel> {
     Integer batchSave(List<ChannelEntity> channelCodes,String productCode);
 
     List<ProductChannel> getChannelProduct(String productCode);
+
+    List<String> getProductCodeByChannelCodes(List<String> channelCodes);
+
+    List<String> getChannelCodeNotInProductCode(String productCode);
 }

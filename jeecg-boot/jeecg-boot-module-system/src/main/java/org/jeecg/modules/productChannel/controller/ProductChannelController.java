@@ -30,6 +30,7 @@ import org.jeecgframework.poi.excel.entity.ImportParams;
 import org.jeecgframework.poi.excel.view.JeecgEntityExcelView;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -124,6 +125,20 @@ public class ProductChannelController {
 		 Result<String> result = new Result<String>();
 		if(StringUtils.isNotBlank(channels)){
 			channelCodes = Arrays.asList(channels.split(","));
+		}
+		//其余产品中已经关联的通道；一条通道只能关联一个产品渠道
+		 List<String> codes = productChannelService.getChannelCodeNotInProductCode(productCode);
+		boolean flat = false;
+		if(!CollectionUtils.isEmpty(codes)){
+			for(String code:codes){
+				if(channelCodes.contains(code)){
+					flat = true;
+					break;
+				}
+			}
+		}
+		if(flat){
+			return result.error500("一条通道只能关联一个产品类型");
 		}
 		//根据通道code查询通道
 		 List<ChannelEntity> channelEntities = channelEntityService.queryChannelByCodes(channelCodes);

@@ -74,11 +74,18 @@ public class UserChannelEntityController {
         @RequestParam(name="userName")String userName,@RequestParam(name = "productCode")String productCode){
         List<String> productChannel = productChannelService.getChannelByProductCode(productCode);
         //删除已关联信息
-        userChannelEntityService.deleteChannel(userName,productChannel);
+        if(!CollectionUtils.isEmpty(productChannel)){
+            userChannelEntityService.deleteChannel(userName,productChannel);
+        }
+        Result<String> result = new Result<>();
         if(StringUtils.isNotBlank(channelCodes)){
             List<String> codes = Arrays.asList(channelCodes.split(","));
             codes = codes.stream().filter(code -> productChannel.contains(code)).collect(Collectors.toList());
             SysUser sysUser = userService.getUserByName(userName);
+            if(CollectionUtils.isEmpty(codes)){
+                result.setMessage("success");
+                return result;
+            }
             List<ChannelEntity> channels = channelEntityService.queryChannelByCodes(codes);
             for(ChannelEntity channel:channels){
                 UserChannelEntity userChannelEntity = new UserChannelEntity();
@@ -90,7 +97,7 @@ public class UserChannelEntityController {
                 userChannelEntityService.save(userChannelEntity);
             }
         }
-        Result<String> result = new Result<>();
+
         result.setMessage("success");
         return result;
     }

@@ -48,6 +48,8 @@
         isAgent:false,
         isMenber:true,
         userName: '',
+        memberType:'',
+        agentUsername:'',
         title: "通道详细",
         title4add:"添加",
         visible: false,
@@ -74,11 +76,18 @@
       }
     },
     mounted:function () {
-      this.getProduct();
+
     },
     methods: {
       getProduct(){
-        httpAction(this.url.getAllProduct,null,'get').then((res)=>{
+        let formData = [];
+        formData.userName = this.userName;
+        formData.memberType = this.memberType;
+        formData.agentUsername = this.agentUsername;
+        if(this.agentUsername===null){
+          formData.agentUsername = "";
+        }
+        getAction(this.url.getAllProduct,formData).then((res)=>{
           if(res.success){
           this.products = res.result;
         }else{
@@ -100,15 +109,18 @@
       },
       //关联产品信息
       relationProduct: function(record){
+        this.products=[];
         this.isAgent=false;
         this.isMenber = true;
         this.visible4Add=true;
-        console.log(record);
         if(record.memberType==="1"){
           this.isAgent=true;
           this.isMenber = false;
         }
         this.userName = record.username;
+        this.memberType = record.memberType;
+        this.agentUsername=record.agentUsername;
+        this.getProduct();
       },
       handleOk () {
         let formData = [];
@@ -117,10 +129,12 @@
         formData.productCode = this.selected;
         getAction(this.url.saveUserChannels,formData).then((res)=>{
           if(res.success){
+            formData = [];
           this.visible4Add=false;
           this.$message.success(res.message);
           this.$emit('ok');
         }else{
+            formData = [];
           this.$message.warning(res.message);
         }
       })

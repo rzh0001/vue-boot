@@ -8,11 +8,14 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.aspect.annotation.AutoLog;
 import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.pay.entity.ChannelEntity;
+import org.jeecg.modules.pay.service.IUserChannelEntityService;
 import org.jeecg.modules.product.entity.Product;
 import org.jeecg.modules.product.service.IProductService;
 import java.util.Date;
@@ -21,6 +24,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 
+import org.jeecg.modules.productChannel.service.IProductChannelService;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -73,10 +77,27 @@ public class ProductController {
 		result.setResult(pageList);
 		return result;
 	}
+	@Autowired
+	private IUserChannelEntityService userChannelEntityService;
+	@Autowired
+	private IProductChannelService productChannelService;
+
 	 @GetMapping(value = "/getAllProduct")
-	public Result<List<Product>> getAllProduct(){
+	public Result<List<Product>> getAllProduct(@RequestParam(name="memberType",required = false) String memberType,
+		 @RequestParam(name="userName")String userName,@RequestParam(name="agentUsername",required = false)String agentUsername){
 		 Result<List<Product>> result = new Result<>();
-		 result.setResult(productService.getAllProduct());
+		 if("1".equals(memberType)){
+			 result.setResult(productService.getAllProduct());
+		 }else if("3".equals(memberType)){
+			//代理关联了哪些通道
+			 List<String> channelCodes = userChannelEntityService.getChannelCodeByUserName(agentUsername);
+			 if(CollectionUtils.isNotEmpty(channelCodes)){
+				 //这些通道关联了哪些产品
+				 List<String> productCodes = productChannelService.getProductCodeByChannelCodes(channelCodes);
+				 //获取这些产品
+				 result.setResult(productService.getProductByCodes(productCodes));
+			 }
+		 }
 		return result;
 	}
 	/**

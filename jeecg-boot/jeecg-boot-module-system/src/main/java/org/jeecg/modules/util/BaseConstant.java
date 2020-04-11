@@ -71,6 +71,8 @@ public class BaseConstant {
     public static final String  REQUEST_ALI_TT= "ali_taobao";
     //支付宝转卡
     public static final String REQUEST_ALI_BANK = "ali_bank";
+    //支付宝复制转卡
+    public static final String REQUEST_COPY_ALI_BANK = "ali_bank_copy";
     //农信 微信
     public static final String REQUEST_NXYS_WX = "nxys_wx";
     //农信 支付宝

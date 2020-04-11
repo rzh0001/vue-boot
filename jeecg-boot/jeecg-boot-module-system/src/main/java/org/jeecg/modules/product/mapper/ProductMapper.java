@@ -17,4 +17,6 @@ public interface ProductMapper extends BaseMapper<Product> {
 
     @Select("select * from pay_product")
     List<Product> getAllProduct();
+
+    List<Product> getProductByCodes(@Param("codes") List<String> codes);
 }

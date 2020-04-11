@@ -25,4 +25,9 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
     public List<Product> getAllProduct() {
         return mapper.getAllProduct();
     }
+
+    @Override
+    public List<Product> getProductByCodes(List<String> codes) {
+        return mapper.getProductByCodes(codes);
+    }
 }

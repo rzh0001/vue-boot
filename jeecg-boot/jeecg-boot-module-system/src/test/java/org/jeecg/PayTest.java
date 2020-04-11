@@ -116,6 +116,7 @@ public class PayTest {
         StringBuilder sign = new StringBuilder();
         sign.append("www").append(time).append(dataEn).append("1234123412ABCDEF");
         req.put(BaseConstant.SIGN, DigestUtils.md5Hex(sign.toString()));
+        System.out.println(req.toJSONString());
         R r = api.queryOrder(req);
         System.out.println(r.get("orderInfo").toString());
     }

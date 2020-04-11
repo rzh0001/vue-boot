@@ -89,7 +89,9 @@ public class ChannelBusinessEntityController {
 		try {
 			ChannelBusinessEntity businessEntity = channelBusinessEntityService.queryChannelBusiness(channelBusinessEntity.getBusinessCode(),channelBusinessEntity.getChannelCode());
 			if(businessEntity != null){
-				result.error500("该商户已经关联过该通道");
+				businessEntity.setApiKey(channelBusinessEntity.getApiKey());
+				channelBusinessEntityService.updateById(businessEntity);
+				result.success("更新成功");
 				return result;
 			}
 			channelBusinessEntityService.save(channelBusinessEntity);

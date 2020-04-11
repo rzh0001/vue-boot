@@ -13,4 +13,5 @@ import java.util.List;
  */
 public interface IProductService extends IService<Product> {
     List<Product> getAllProduct();
+    List<Product> getProductByCodes(List<String> codes);
 }

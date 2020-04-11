@@ -45,7 +45,7 @@
 </template>
 
 <script>
-  import { httpAction } from '@/api/manage'
+  import { httpAction,getAction } from '@/api/manage'
  import { Encrypt } from '@/utils/encryption/secret.js'
   import { MD5 } from '@/utils/encryption/secret.js'
   import pick from 'lodash.pick'
@@ -91,7 +91,14 @@
     },
     methods: {
       channel(){
-        httpAction(this.url.channel,null,'get').then((res)=>{
+        let formData = [];
+        formData.userName = "1";
+        formData.memberType = "1";
+        formData.agentUsername = "1";
+        if(this.agentUsername===null){
+          formData.agentUsername = "";
+        }
+        getAction(this.url.channel,formData).then((res)=>{
           if(res.success){
           this.products = res.result;
         }else{
