@@ -1077,8 +1077,8 @@ public class SysUserController {
 		//验证原提现密码
 		if (StrUtil.isNotBlank(user.getPaymentPassword())) {
 			passwordEncode = PasswordUtil.encrypt(username, oldPassword, user.getSalt());
-			if (!user.getPassword().equals(passwordEncode)) {
-				result.error500("提现密码输入错误!");
+			if (!user.getPaymentPassword().equals(passwordEncode)) {
+				result.error500("原提现密码输入错误!");
 				return result;
 			}
 		}

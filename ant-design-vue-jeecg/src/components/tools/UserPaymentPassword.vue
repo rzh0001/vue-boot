@@ -22,8 +22,7 @@
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
           label="原提现密码">
-          <a-input type="password" placeholder="请输入原提现密码,若未设置请留空"/>
-          <!--          <a-input type="password" placeholder="请输入原提现密码" v-decorator="[ 'oldPassword', validatorRules.oldpassword]" />-->
+          <a-input type="password" placeholder="请输入原提现密码" v-decorator="[ 'oldPassword',{}]" />
         </a-form-item>
 
         <a-form-item
