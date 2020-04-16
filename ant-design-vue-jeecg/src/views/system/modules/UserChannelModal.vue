@@ -119,7 +119,13 @@
                 return '信付-支付宝'
               }  else if (text == 'baiyitong_pay_wechat') {
                 return '百易通-微信'
-              } else {
+              } else if (text == 'paofen_pay_wechat') {
+                return '跑分-微信'
+              } else if (text == 'paofen_pay_alipay') {
+                return '跑分-支付宝'
+              } else if (text == 'paofen_pay_yinlian') {
+                return '跑分-银联'
+              }else {
                 return text
               }
             }
