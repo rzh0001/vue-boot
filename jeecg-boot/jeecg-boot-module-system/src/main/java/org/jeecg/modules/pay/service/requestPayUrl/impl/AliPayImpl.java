@@ -5,17 +5,15 @@ import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.jeecg.common.system.vo.DictModel;
 import org.jeecg.common.util.RedisUtil;
+import org.jeecg.common.util.encryption.AES128Util;
 import org.jeecg.modules.exception.RRException;
 import org.jeecg.modules.pay.entity.AliPayCallBackParam;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import org.jeecg.modules.pay.entity.QueryOrderStatusResult;
 import org.jeecg.modules.pay.entity.UserBusinessEntity;
 import org.jeecg.modules.pay.service.IOrderInfoEntityService;
-import org.jeecg.modules.pay.service.factory.PayServiceFactory;
 import org.jeecg.modules.pay.service.requestPayUrl.RequestPayUrl;
-import org.jeecg.modules.system.service.ISysDictService;
 import org.jeecg.modules.util.*;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
@@ -30,9 +28,7 @@ import java.net.URISyntaxException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * 支付宝转卡请求挂码

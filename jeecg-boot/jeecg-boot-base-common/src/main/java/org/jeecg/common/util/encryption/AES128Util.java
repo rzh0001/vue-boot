@@ -1,4 +1,4 @@
-package org.jeecg.modules.util;
+package org.jeecg.common.util.encryption;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
