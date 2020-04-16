@@ -1,4 +1,4 @@
-package org.jeecg.modules.df.entity;
+package org.jeecg.modules.api.entity;
 
 import com.alibaba.fastjson.JSON;
 import lombok.Data;

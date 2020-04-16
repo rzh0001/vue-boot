@@ -1,9 +1,11 @@
-package org.jeecg.modules.df.entity;
+package org.jeecg.modules.api.entity;
 
 import cn.hutool.core.bean.BeanUtil;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.validator.constraints.Length;
+import org.jeecg.modules.api.entity.ApiData;
+import org.jeecg.modules.df.entity.PayOrder;
 import org.jeecg.modules.system.entity.SysUser;
 
 import javax.validation.constraints.NotBlank;

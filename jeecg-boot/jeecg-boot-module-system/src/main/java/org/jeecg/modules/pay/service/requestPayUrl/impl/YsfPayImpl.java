@@ -5,8 +5,8 @@ import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jeecg.common.util.encryption.AES128Util;
 import org.jeecg.modules.exception.RRException;
-import org.jeecg.modules.pay.entity.ChannelBusinessEntity;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import org.jeecg.modules.pay.entity.UserBusinessEntity;
 import org.jeecg.modules.pay.entity.YsfQueryOrderResult;
@@ -16,9 +16,8 @@ import org.jeecg.modules.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.net.URISyntaxException;
+
 @Service
 @Slf4j
 public class YsfPayImpl implements RequestPayUrl<OrderInfoEntity, String, String, String,String, UserBusinessEntity> {

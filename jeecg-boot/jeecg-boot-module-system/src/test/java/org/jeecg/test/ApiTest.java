@@ -1,20 +1,13 @@
 package org.jeecg.test;
 
 import cn.hutool.http.HttpUtil;
-import org.jeecg.modules.df.entity.ApiRequestBody;
-import org.jeecg.modules.df.entity.CallbackBody;
-import org.jeecg.modules.df.entity.PayOrderData;
-import org.jeecg.modules.df.entity.QueryOrderData;
+import org.jeecg.modules.api.entity.ApiRequestBody;
+import org.jeecg.modules.api.entity.CallbackBody;
+import org.jeecg.modules.api.entity.PayOrderData;
+import org.jeecg.modules.api.entity.QueryOrderData;
 import org.junit.Test;
-import springfox.documentation.service.ApiKey;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Set;
 
 /**
  * @author ruanzh

@@ -1,9 +1,8 @@
-package org.jeecg.modules.df.entity;
+package org.jeecg.modules.api.entity;
 
-import com.alibaba.fastjson.JSON;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.jeecg.modules.util.AES128Util;
+import org.jeecg.modules.df.entity.PayOrder;
 
 import java.math.BigDecimal;
 import java.util.Date;

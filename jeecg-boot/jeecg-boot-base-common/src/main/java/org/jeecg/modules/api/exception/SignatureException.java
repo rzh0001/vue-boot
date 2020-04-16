@@ -1,6 +1,9 @@
-package org.jeecg.modules.exception;
+package org.jeecg.modules.api.exception;
+
+import org.jeecg.modules.api.exception.ApiException;
 
 /**
+ * 签名异常
  * @author ruanzh
  * @since 2019/11/17
  */

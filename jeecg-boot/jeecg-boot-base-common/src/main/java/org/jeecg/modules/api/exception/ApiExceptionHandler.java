@@ -1,7 +1,8 @@
-package org.jeecg.modules.exception;
+package org.jeecg.modules.api.exception;
 
 import lombok.extern.slf4j.Slf4j;
-import org.jeecg.modules.df.entity.ApiResponseBody;
+import org.jeecg.modules.api.entity.ApiResponseBody;
+import org.jeecg.modules.api.exception.ApiException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import javax.servlet.http.HttpServletRequest;
 
 /**
+ * API异常处理器
  * @author ruanzh
  * @since 2019/11/17
  */

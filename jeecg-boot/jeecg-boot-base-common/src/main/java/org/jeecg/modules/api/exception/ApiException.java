@@ -1,6 +1,7 @@
-package org.jeecg.modules.exception;
+package org.jeecg.modules.api.exception;
 
 /**
+ * API异常基类
  * @author ruanzh
  * @since 2019/11/17
  */

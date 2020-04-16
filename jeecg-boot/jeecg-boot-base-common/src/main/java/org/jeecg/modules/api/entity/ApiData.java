@@ -1,9 +1,9 @@
-package org.jeecg.modules.df.entity;
+package org.jeecg.modules.api.entity;
 
 import com.alibaba.fastjson.JSON;
 import lombok.Data;
-import org.jeecg.modules.exception.MissingRequiredParameterException;
-import org.jeecg.modules.util.AES128Util;
+import org.jeecg.modules.api.exception.MissingRequiredParameterException;
+import org.jeecg.common.util.encryption.AES128Util;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;

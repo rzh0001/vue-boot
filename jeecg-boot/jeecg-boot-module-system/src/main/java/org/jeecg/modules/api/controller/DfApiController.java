@@ -1,8 +1,8 @@
-package org.jeecg.modules.df.controller;
+package org.jeecg.modules.api.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.jeecg.modules.df.entity.ApiRequestBody;
-import org.jeecg.modules.df.entity.ApiResponseBody;
+import org.jeecg.modules.api.entity.ApiRequestBody;
+import org.jeecg.modules.api.entity.ApiResponseBody;
 import org.jeecg.modules.df.service.IApiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +16,7 @@ import javax.validation.Valid;
 @RestController("dfApiController")
 @RequestMapping("/api")
 @Slf4j
-public class ApiController {
+public class DfApiController {
     @Autowired
     private IApiService apiService;
     

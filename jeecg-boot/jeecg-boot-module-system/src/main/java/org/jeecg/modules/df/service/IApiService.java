@@ -1,7 +1,7 @@
 package org.jeecg.modules.df.service;
 
-import org.jeecg.modules.df.entity.ApiRequestBody;
-import org.jeecg.modules.df.entity.ApiResponseBody;
+import org.jeecg.modules.api.entity.ApiRequestBody;
+import org.jeecg.modules.api.entity.ApiResponseBody;
 
 /**
  * @author ruanzh

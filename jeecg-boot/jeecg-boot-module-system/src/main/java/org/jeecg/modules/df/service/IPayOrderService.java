@@ -3,7 +3,7 @@ package org.jeecg.modules.df.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.jeecg.modules.df.entity.PayOrder;
-import org.jeecg.modules.df.entity.PayOrderResult;
+import org.jeecg.modules.api.entity.PayOrderResult;
 
 import java.util.Map;
 

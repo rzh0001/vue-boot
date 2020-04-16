@@ -1,8 +1,9 @@
-package org.jeecg.modules.df.entity;
+package org.jeecg.modules.api.entity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.validator.constraints.Length;
+import org.jeecg.modules.api.entity.ApiData;
 
 import javax.validation.constraints.NotBlank;
 

@@ -1,4 +1,6 @@
-package org.jeecg.modules.exception;
+package org.jeecg.modules.api.exception;
+
+import org.jeecg.modules.api.exception.ApiException;
 
 /**
  * @author ruanzh

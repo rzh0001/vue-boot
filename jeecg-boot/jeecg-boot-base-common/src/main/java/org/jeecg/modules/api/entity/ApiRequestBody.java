@@ -1,11 +1,11 @@
-package org.jeecg.modules.df.entity;
+package org.jeecg.modules.api.entity;
 
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.jeecg.modules.util.AES128Util;
+import org.jeecg.common.util.encryption.AES128Util;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;

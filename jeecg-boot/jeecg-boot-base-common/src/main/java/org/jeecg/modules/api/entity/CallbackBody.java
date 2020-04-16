@@ -1,11 +1,8 @@
-package org.jeecg.modules.df.entity;
+package org.jeecg.modules.api.entity;
 
-import com.alibaba.fastjson.JSON;
-import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.jeecg.modules.util.AES128Util;
 
 /**
  * @author ruanzh
