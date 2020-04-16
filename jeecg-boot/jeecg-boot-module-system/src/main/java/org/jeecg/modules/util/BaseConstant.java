@@ -89,13 +89,19 @@ public class BaseConstant {
     public static final String REQUEST_INTERNET_BANK = "internet_bank";
 
     public static final String REQUEST_DIANJIN_ALIPAY = "daiJinAlipay";
-    //赤诚支付-支付宝个码
+	//赤诚支付-支付宝个码
     public static final String REQUEST_CHICHENG_ALIPAY = "chiChengAlipay";
+    public static final String REQUEST_LETIAN_ALIPAY="leTianAlipay";
     //牛腩支付-支付宝
     public static final String REQUEST_NIUNAN_ALIPAY="niuNanAlipay";
     //腾飞支付-支付宝
     public static final String REQUEST_TENGFEI_ALIPAY = "XTFF";
-    public static final String REQUEST_LETIAN_ALIPAY="leTianAlipay";
+    //跑分-微信
+    public static final String REQUEST_PAOFEN_WECHAT = "paofen_pay_wechat";
+    //跑分-支付宝
+    public static final String REQUEST_PAOFEN_ALIPAY = "paofen_pay_alipay";
+    //跑分-银联
+    public static final String REQUEST_PAOFEN_YINLIAN = "paofen_pay_yinlian";
     //四方回调挂马平台的返回码
     public static final int SUCCESS = 200;
     //流水类型 流水类型 1-手续费收入 2-提现 3-冲正
