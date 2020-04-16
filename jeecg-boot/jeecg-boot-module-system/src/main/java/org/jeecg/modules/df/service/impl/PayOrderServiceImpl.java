@@ -11,7 +11,7 @@ import org.jeecg.modules.df.constant.DfConstant;
 import org.jeecg.modules.df.entity.PayOrder;
 import org.jeecg.modules.api.entity.PayOrderResult;
 import org.jeecg.modules.df.mapper.PayOrderMapper;
-import org.jeecg.modules.df.service.IApiService;
+import org.jeecg.modules.api.service.IDfApiService;
 import org.jeecg.modules.df.service.IPayOrderService;
 import org.jeecg.modules.df.util.IDUtil;
 import org.jeecg.modules.api.exception.ApiException;
@@ -40,7 +40,7 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder>
 
 	@Autowired
 	@Lazy
-	private IApiService apiService;
+	private IDfApiService apiService;
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)

@@ -1,4 +1,4 @@
-package org.jeecg.modules.df.service.impl;
+package org.jeecg.modules.api.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.http.HttpUtil;
@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.constant.CommonConstant;
 import org.jeecg.modules.api.entity.*;
 import org.jeecg.modules.df.entity.*;
-import org.jeecg.modules.df.service.IApiService;
+import org.jeecg.modules.api.service.IDfApiService;
 import org.jeecg.modules.df.service.IPayOrderService;
 import org.jeecg.modules.api.exception.AccountAbnormalException;
 import org.jeecg.modules.api.exception.ApiException;
@@ -27,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Slf4j
 @Service
-public class ApiServiceImpl implements IApiService {
+public class DfApiServiceImpl implements IDfApiService {
 
 	@Autowired
 	private ISysUserService userService;

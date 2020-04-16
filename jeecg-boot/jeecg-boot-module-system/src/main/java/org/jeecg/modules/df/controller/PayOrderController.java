@@ -17,9 +17,8 @@ import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.modules.df.constant.DfConstant;
 import org.jeecg.modules.df.entity.PayOrder;
-import org.jeecg.modules.df.service.IApiService;
+import org.jeecg.modules.api.service.IDfApiService;
 import org.jeecg.modules.df.service.IPayOrderService;
-import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.service.ISysUserService;
 import org.jeecg.modules.system.service.IUserAmountEntityService;
@@ -58,7 +57,7 @@ public class PayOrderController {
 	private ISysUserService userService;
 
 	@Autowired
-	private IApiService apiService;
+	private IDfApiService apiService;
 
 	// 查询条件独立成方法，查询、统计、导出 三个接口使用
 	private QueryWrapper<PayOrder> initQueryCondition(PayOrder order, HttpServletRequest req) {

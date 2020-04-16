@@ -3,7 +3,7 @@ package org.jeecg.modules.api.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.modules.api.entity.ApiRequestBody;
 import org.jeecg.modules.api.entity.ApiResponseBody;
-import org.jeecg.modules.df.service.IApiService;
+import org.jeecg.modules.api.service.IDfApiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +18,7 @@ import javax.validation.Valid;
 @Slf4j
 public class DfApiController {
     @Autowired
-    private IApiService apiService;
+    private IDfApiService apiService;
     
     
     @PostMapping(value = "/order/create", produces = "application/json;charset=UTF-8")

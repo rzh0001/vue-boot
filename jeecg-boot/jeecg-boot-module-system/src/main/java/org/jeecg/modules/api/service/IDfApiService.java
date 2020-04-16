@@ -1,4 +1,4 @@
-package org.jeecg.modules.df.service;
+package org.jeecg.modules.api.service;
 
 import org.jeecg.modules.api.entity.ApiRequestBody;
 import org.jeecg.modules.api.entity.ApiResponseBody;
@@ -7,7 +7,7 @@ import org.jeecg.modules.api.entity.ApiResponseBody;
  * @author ruanzh
  * @since 2019/11/17
  */
-public interface IApiService {
+public interface IDfApiService {
     /**
      * 创建订单
      *
