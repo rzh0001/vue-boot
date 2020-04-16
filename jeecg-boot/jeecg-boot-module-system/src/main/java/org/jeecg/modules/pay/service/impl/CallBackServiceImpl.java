@@ -17,6 +17,7 @@ import org.jeecg.modules.util.SignatureUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -69,7 +70,13 @@ public class CallBackServiceImpl implements ICallBackService {
 
 		//TODO 未做判空处理
 		OrderInfoEntity order = orderInfoEntityService.queryOrderInfoByOrderId(orderNo);
-		UserBusinessEntity business = businessService.getUserBusiness(order.getUserId(), merCode, BaseConstant.REQUEST_NIUNAN_ALIPAY);
+		List<UserBusinessEntity> useBusinesses =
+			businessService.queryBusinessCodeByUserName(order.getAgentUsername(), BaseConstant.REQUEST_NIUNAN_ALIPAY);
+		if(CollectionUtils.isEmpty(useBusinesses)){
+			log.info("==>查询秘钥异常");
+			return "fail";
+		}
+		UserBusinessEntity business = useBusinesses.get(0);
 		log.info("==>牛腩支付 回调，getApiKey：{}", business.getApiKey());
 		md5buffer.append(business.getApiKey());
 
