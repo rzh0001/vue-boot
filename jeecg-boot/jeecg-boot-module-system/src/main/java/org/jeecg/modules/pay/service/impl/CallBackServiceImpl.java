@@ -4,8 +4,10 @@ import cn.hutool.crypto.SecureUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
+import org.jeecg.modules.pay.entity.UserBusinessEntity;
 import org.jeecg.modules.pay.service.ICallBackService;
 import org.jeecg.modules.pay.service.IOrderInfoEntityService;
+import org.jeecg.modules.pay.service.IUserBusinessEntityService;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.service.ISysUserService;
 import org.jeecg.modules.util.BaseConstant;
@@ -15,6 +17,7 @@ import org.jeecg.modules.util.SignatureUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -33,6 +36,8 @@ public class CallBackServiceImpl implements ICallBackService {
 	private IOrderInfoEntityService orderInfoEntityService;
 	@Autowired
 	private ISysUserService userService;
+	@Autowired
+	private IUserBusinessEntityService businessService;
 
 	@Override
 	public String callBack4niuNanAlipay() throws Exception {
@@ -62,15 +67,27 @@ public class CallBackServiceImpl implements ICallBackService {
 		if (StringUtils.isNotBlank(resultMsg)) {
 			md5buffer.append("&resultMsg=").append(resultMsg);
 		}
-		md5buffer.append("156f65ad6fde4f11b6be73552f143bdb");
+
+		//TODO 未做判空处理
+		OrderInfoEntity order = orderInfoEntityService.queryOrderInfoByOrderId(orderNo);
+		List<UserBusinessEntity> useBusinesses =
+			businessService.queryBusinessCodeByUserName(order.getAgentUsername(), BaseConstant.REQUEST_NIUNAN_ALIPAY);
+		if(CollectionUtils.isEmpty(useBusinesses)){
+			log.info("==>查询秘钥异常");
+			return "fail";
+		}
+		UserBusinessEntity business = useBusinesses.get(0);
+		log.info("==>牛腩支付 回调，getApiKey：{}", business.getApiKey());
+		md5buffer.append(business.getApiKey());
+
 		log.info("==>牛腩支付 回调，签名：{}", md5buffer.toString());
 		String localSign = this.md5Hash(md5buffer.toString());
 		log.info("==>牛腩支付 回调，MD5 :{}", localSign);
 		if (!localSign.equals(sign)) {
-			log.info("==>签名验证不通过，入参sign:{},本地：{}", sign, localSign);
+			log.error("==>签名验证不通过，入参sign:{},本地：{}", sign, localSign);
 			return "fail";
 		}
-		return this.notify(orderNo,BaseConstant.REQUEST_NIUNAN_ALIPAY);
+		return this.notify(orderNo, BaseConstant.REQUEST_NIUNAN_ALIPAY);
 	}
 
 	@Override
@@ -99,7 +116,9 @@ public class CallBackServiceImpl implements ICallBackService {
 		log.info("回复success");
 		return "success";
 	}
+
 	public static final String LETIAN_KEY = "08966fd914e9c23b8c3c99c039466835cf";
+
 	@Override
 	public String callBackLeTianAlipay() throws Exception {
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
@@ -109,18 +128,18 @@ public class CallBackServiceImpl implements ICallBackService {
 		String sign = map.get("Signature");
 		String outTradeNo = map.get("outTradeNo");
 		map.remove("Signature");
-		String localSign = SignatureUtils.signature(LETIAN_KEY,map);
-		if(!localSign.equals(sign)){
-			log.info("=>乐天支付，签名校验失败,入参签名：{}，本地签名：{}",sign,localSign);
+		String localSign = SignatureUtils.signature(LETIAN_KEY, map);
+		if (!localSign.equals(sign)) {
+			log.info("=>乐天支付，签名校验失败,入参签名：{}，本地签名：{}", sign, localSign);
 			return "fail";
 		}
-		return this.notify(outTradeNo,BaseConstant.REQUEST_LETIAN_ALIPAY);
+		return this.notify(outTradeNo, BaseConstant.REQUEST_LETIAN_ALIPAY);
 	}
 
 	public static void main(String[] args) {
-		Map<String,String> map = new HashMap<>();
-		map.put("a","a");
-		map.put("b","b");
+		Map<String, String> map = new HashMap<>();
+		map.put("a", "a");
+		map.put("b", "b");
 		map.remove("a");
 		System.out.println(map);
 	}
@@ -143,7 +162,7 @@ public class CallBackServiceImpl implements ICallBackService {
 //		}
 	}
 
-	private String notify(String orderNo,String payType) throws Exception {
+	private String notify(String orderNo, String payType) throws Exception {
 		OrderInfoEntity order = orderInfoEntityService.queryOrderInfoByOrderId(orderNo);
 		if (order == null || order.getStatus() == 2) {
 			return "非法访问";

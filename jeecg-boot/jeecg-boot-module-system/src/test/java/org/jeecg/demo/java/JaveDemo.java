@@ -5,9 +5,8 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.jeecg.demo.HttpResult;
 import org.jeecg.demo.HttpUtils;
-import org.jeecg.modules.util.AES128Util;
+import org.jeecg.common.util.encryption.AES128Util;
 import org.jeecg.modules.util.BaseConstant;
-import org.jeecg.modules.util.R;
 import org.junit.Test;
 
 import java.util.Date;

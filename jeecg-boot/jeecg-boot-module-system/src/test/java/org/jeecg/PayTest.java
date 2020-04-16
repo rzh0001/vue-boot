@@ -2,27 +2,21 @@ package org.jeecg;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.google.common.base.Splitter;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.jeecg.common.util.encryption.AES128Util;
 import org.jeecg.modules.pay.controller.ApiController;
 import org.jeecg.modules.pay.entity.DianJinPayParam;
 import org.jeecg.modules.pay.service.impl.OrderInfoEntityServiceImpl;
 import org.jeecg.modules.util.*;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Random;
-import java.util.stream.StreamSupport;
 
 /**
  * @title:

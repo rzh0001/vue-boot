@@ -6,7 +6,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.jeecg.modules.exception.RRException;
 import org.jeecg.modules.pay.entity.BaiyitongParam;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
-import org.jeecg.modules.util.AES128Util;
+import org.jeecg.common.util.encryption.AES128Util;
 import org.jeecg.modules.util.BaseConstant;
 import org.jeecg.modules.util.HttpResult;
 import org.jeecg.modules.util.HttpUtils;
