@@ -4,7 +4,6 @@ import cn.hutool.core.bean.BeanUtil;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.validator.constraints.Length;
-import org.jeecg.modules.api.entity.ApiData;
 import org.jeecg.modules.df.entity.PayOrder;
 import org.jeecg.modules.system.entity.SysUser;
 
@@ -63,7 +62,7 @@ public class PayOrderData extends ApiData {
 
 
 	public PayOrder toPayOrder(SysUser u) {
-		check();
+		checkData();
 
 		PayOrder o = new PayOrder();
 		BeanUtil.copyProperties(this, o);

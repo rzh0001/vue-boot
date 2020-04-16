@@ -17,7 +17,7 @@ import java.util.Set;
 @Data
 public class ApiData {
 
-	public void check() {
+	public void checkData() {
 		ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
 		Validator validator = validatorFactory.getValidator();
 		Set<ConstraintViolation<ApiData>> validate = validator.validate(this);
