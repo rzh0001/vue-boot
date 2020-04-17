@@ -22,6 +22,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.util.*;
 
@@ -67,18 +68,9 @@ public class CallBackServiceImpl implements ICallBackService {
 		if (StringUtils.isNotBlank(resultMsg)) {
 			md5buffer.append("&resultMsg=").append(resultMsg);
 		}
-
-		//TODO 未做判空处理
-		OrderInfoEntity order = orderInfoEntityService.queryOrderInfoByOrderId(orderNo);
-		List<UserBusinessEntity> useBusinesses =
-			businessService.queryBusinessCodeByUserName(order.getAgentUsername(), BaseConstant.REQUEST_NIUNAN_ALIPAY);
-		if(CollectionUtils.isEmpty(useBusinesses)){
-			log.info("==>查询秘钥异常");
-			return "fail";
-		}
-		UserBusinessEntity business = useBusinesses.get(0);
-		log.info("==>牛腩支付 回调，getApiKey：{}", business.getApiKey());
-		md5buffer.append(business.getApiKey());
+		String apiKey = this.getApikey(orderNo);
+		log.info("==>牛腩支付 回调，getApiKey：{}", apiKey);
+		md5buffer.append(apiKey);
 
 		log.info("==>牛腩支付 回调，签名：{}", md5buffer.toString());
 		String localSign = this.md5Hash(md5buffer.toString());
@@ -89,7 +81,17 @@ public class CallBackServiceImpl implements ICallBackService {
 		}
 		return this.notify(orderNo, BaseConstant.REQUEST_NIUNAN_ALIPAY);
 	}
-
+	private String getApikey(String orderNo){
+		OrderInfoEntity order = orderInfoEntityService.queryOrderInfoByOrderId(orderNo);
+		List<UserBusinessEntity> useBusinesses =
+			businessService.queryBusinessCodeByUserName(order.getAgentUsername(), BaseConstant.REQUEST_NIUNAN_ALIPAY);
+		if(CollectionUtils.isEmpty(useBusinesses)){
+			log.info("==>查询秘钥异常");
+			return "fail";
+		}
+		UserBusinessEntity business = useBusinesses.get(0);
+		return business.getApiKey();
+	}
 	@Override
 	public String callBackTengFeiAlipay() throws Exception {
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
@@ -136,6 +138,79 @@ public class CallBackServiceImpl implements ICallBackService {
 		return this.notify(outTradeNo, BaseConstant.REQUEST_LETIAN_ALIPAY);
 	}
 
+	@Override
+	public String callBackAntAlipay() throws Exception {
+		Map<String, String> map = getParam();
+		log.info("==>蚁支付，回调参数为：{}",map);
+		String sign = map.get("sign");
+		String orderNo = map.get("out_trade_no");
+		String apiKey = this.getApikey(orderNo);
+		String localSign = this.generateSignature(map,apiKey);
+		if(!localSign.equals(sign)){
+			log.info("==>蚁支付，回调签名为：{}，本地签名为：{}",sign,localSign);
+			return "签名验证不通过";
+		}
+		return this.notify(orderNo, BaseConstant.REQUEST_ANT_ALIPAY);
+	}
+	public String generateSignature(final Map<String, String> params, final String key) throws Exception {
+		String paramUrl = formatUrlMap(params, true, false, false) + "&key=" + key;
+		return MD5(paramUrl).toUpperCase();
+	}
+	public static String MD5(String data) throws Exception {
+		java.security.MessageDigest md = MessageDigest.getInstance("MD5");
+		byte[] array = md.digest(data.getBytes("UTF-8"));
+		StringBuilder sb = new StringBuilder();
+		for (byte item : array) {
+			sb.append(Integer.toHexString((item & 0xFF) | 0x100).substring(1, 3));
+		}
+		return sb.toString().toUpperCase();
+	}
+	public static String formatUrlMap(Map<String, String> paraMap, boolean removeEmptyValue, boolean urlEncode, boolean keyToLower) {
+		String buff = "";
+		Map<String, String> tmpMap = paraMap;
+		//开启空值筛选，则移除数据
+		try {
+			List<Map.Entry<String, String>> infoIds = new ArrayList<Map.Entry<String, String>>(tmpMap.entrySet());
+			// 对所有传入参数按照字段名的 ASCII 码从小到大排序（字典序）
+			Collections.sort(infoIds, new Comparator<Map.Entry<String, String>>() {
+				@Override
+				public int compare(Map.Entry<String, String> o1, Map.Entry<String, String> o2) {
+					return (o1.getKey()).toString().compareTo(o2.getKey());
+				}
+			});
+			// 构造URL 键值对的格式
+			StringBuilder buf = new StringBuilder();
+			for (Map.Entry<String, String> item : infoIds) {
+				if (StringUtils.isNotBlank(item.getKey())) {
+					String key = item.getKey();
+					String val = item.getValue();
+					if (removeEmptyValue && StringUtils.isBlank(val)) {
+						continue;
+					}
+					if (urlEncode) {
+						val = URLEncoder.encode(val, "utf-8");
+					}
+					if (keyToLower) {
+						key = key.toLowerCase();
+					}
+					buf.append(key + "=" + val).append("&");
+				}
+			}
+			buff = buf.toString();
+			if (buff.isEmpty() == false) {
+				buff = buff.substring(0, buff.length() - 1);
+			}
+		} catch (Exception e) {
+			return "";
+		}
+		return buff;
+	}
+	private Map<String, String> getParam(){
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+		Object param = RequestHandleUtil.getReqParam(request);
+		Map<String, String> map = (Map<String, String>) param;
+		return map;
+	}
 	public static void main(String[] args) {
 		Map<String, String> map = new HashMap<>();
 		map.put("a", "a");
@@ -148,18 +223,10 @@ public class CallBackServiceImpl implements ICallBackService {
 	void notify1(String orderNo) throws Exception {
 		log.info("异步通知notify1开始");
 		OrderInfoEntity order = orderInfoEntityService.queryOrderInfoByOrderId(orderNo);
-//		if (order == null || order.getStatus() == 2) {
-//			return "非法访问";
-//		}
 		order.setStatus(BaseConstant.ORDER_STATUS_SUCCESS_NOT_RETURN);
 		SysUser user = userService.getUserByName(order.getUserName());
 		R r = orderInfoEntityService.notifyCustomer(order, user, BaseConstant.REQUEST_TENGFEI_ALIPAY);
 		log.info("异步通知notify1结束");
-//		if ("0".equals(r.get("code"))) {
-//			return "success";
-//		} else {
-//			return "fail";
-//		}
 	}
 
 	private String notify(String orderNo, String payType) throws Exception {

@@ -44,4 +44,14 @@ public class CallBackController {
         }
         return "fail";
     }
+    @RequestMapping(value = "/antAlipayCallback", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+    @ResponseBody
+    public String antAlipay(){
+        try{
+            return  callBackService.callBackAntAlipay();
+        }catch (Exception e){
+            log.info("==>蚁支付，回调异常：{}",e);
+        }
+        return "fail";
+    }
 }

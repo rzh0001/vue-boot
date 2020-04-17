@@ -8,4 +8,5 @@ public interface ICallBackService {
     String callBack4niuNanAlipay() throws Exception;
     String callBackTengFeiAlipay() throws  Exception;
     String callBackLeTianAlipay() throws Exception;
+    String callBackAntAlipay() throws Exception;
 }
