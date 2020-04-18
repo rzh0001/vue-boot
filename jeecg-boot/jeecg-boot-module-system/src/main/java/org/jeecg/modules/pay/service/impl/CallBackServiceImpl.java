@@ -68,7 +68,7 @@ public class CallBackServiceImpl implements ICallBackService {
 		if (StringUtils.isNotBlank(resultMsg)) {
 			md5buffer.append("&resultMsg=").append(resultMsg);
 		}
-		String apiKey = this.getApikey(orderNo);
+		String apiKey = this.getApikey(orderNo,BaseConstant.REQUEST_NIUNAN_ALIPAY);
 		log.info("==>牛腩支付 回调，getApiKey：{}", apiKey);
 		md5buffer.append(apiKey);
 
@@ -81,10 +81,10 @@ public class CallBackServiceImpl implements ICallBackService {
 		}
 		return this.notify(orderNo, BaseConstant.REQUEST_NIUNAN_ALIPAY);
 	}
-	private String getApikey(String orderNo){
+	private String getApikey(String orderNo,String type){
 		OrderInfoEntity order = orderInfoEntityService.queryOrderInfoByOrderId(orderNo);
 		List<UserBusinessEntity> useBusinesses =
-			businessService.queryBusinessCodeByUserName(order.getAgentUsername(), BaseConstant.REQUEST_NIUNAN_ALIPAY);
+			businessService.queryBusinessCodeByUserName(order.getAgentUsername(), type);
 		if(CollectionUtils.isEmpty(useBusinesses)){
 			log.info("==>查询秘钥异常");
 			return "fail";
@@ -144,7 +144,12 @@ public class CallBackServiceImpl implements ICallBackService {
 		log.info("==>蚁支付，回调参数为：{}",map);
 		String sign = map.get("sign");
 		String orderNo = map.get("out_trade_no");
-		String apiKey = this.getApikey(orderNo);
+		String apiKey = this.getApikey(orderNo,BaseConstant.REQUEST_ANT_ALIPAY);
+		map.remove("sign");
+		map.remove("code");
+		map.remove("msg");
+		map.remove("sub_code");
+		map.remove("sub_msg");
 		String localSign = this.generateSignature(map,apiKey);
 		if(!localSign.equals(sign)){
 			log.info("==>蚁支付，回调签名为：{}，本地签名为：{}",sign,localSign);
@@ -156,7 +161,7 @@ public class CallBackServiceImpl implements ICallBackService {
 		String paramUrl = formatUrlMap(params, true, false, false) + "&key=" + key;
 		return MD5(paramUrl).toUpperCase();
 	}
-	public static String MD5(String data) throws Exception {
+	public  String MD5(String data) throws Exception {
 		java.security.MessageDigest md = MessageDigest.getInstance("MD5");
 		byte[] array = md.digest(data.getBytes("UTF-8"));
 		StringBuilder sb = new StringBuilder();
@@ -165,7 +170,7 @@ public class CallBackServiceImpl implements ICallBackService {
 		}
 		return sb.toString().toUpperCase();
 	}
-	public static String formatUrlMap(Map<String, String> paraMap, boolean removeEmptyValue, boolean urlEncode, boolean keyToLower) {
+	public  String formatUrlMap(Map<String, String> paraMap, boolean removeEmptyValue, boolean urlEncode, boolean keyToLower) {
 		String buff = "";
 		Map<String, String> tmpMap = paraMap;
 		//开启空值筛选，则移除数据
@@ -183,12 +188,12 @@ public class CallBackServiceImpl implements ICallBackService {
 			for (Map.Entry<String, String> item : infoIds) {
 				if (StringUtils.isNotBlank(item.getKey())) {
 					String key = item.getKey();
-					String val = item.getValue();
-					if (removeEmptyValue && StringUtils.isBlank(val)) {
+					Object val = item.getValue();
+					if (removeEmptyValue && val == null) {
 						continue;
 					}
 					if (urlEncode) {
-						val = URLEncoder.encode(val, "utf-8");
+						val = URLEncoder.encode(val.toString(), "utf-8");
 					}
 					if (keyToLower) {
 						key = key.toLowerCase();
@@ -201,8 +206,10 @@ public class CallBackServiceImpl implements ICallBackService {
 				buff = buff.substring(0, buff.length() - 1);
 			}
 		} catch (Exception e) {
+			log.info("==>蚁支付，拼接MD5字符串异常，异常信息为：{}",e);
 			return "";
 		}
+		log.info("==>蚁支付，拼接MD5字符串 buffer=:{}",buff);
 		return buff;
 	}
 	private Map<String, String> getParam(){

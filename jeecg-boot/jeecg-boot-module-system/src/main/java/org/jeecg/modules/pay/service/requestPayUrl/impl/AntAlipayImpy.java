@@ -60,7 +60,7 @@ public class AntAlipayImpy implements
         String paramStr = JSON.toJSONString(param);
         log.info("==>蚁支付支付宝，请求入参为：{}",paramStr);
         Map jsonObject = JSON.parseObject(paramStr);
-        String sign = null;//this.generateSignature(jsonObject,userBusiness.getApiKey());
+        String sign = this.generateSignature(jsonObject,userBusiness.getApiKey());
         log.info("==>蚁支付支付宝，请求签名为：{}",sign);
         param.setSign(sign);
         HttpResult result = HttpUtils.doPostJson(url, JSON.toJSONString(param));
@@ -103,12 +103,12 @@ public class AntAlipayImpy implements
         }
         return domain;
     }
-    public static String generateSignature(final Map<String, String> params, final String key) throws Exception {
+    public  String generateSignature(final Map<String, String> params, final String key) throws Exception {
         String paramUrl = formatUrlMap(params, true, false, false) + "&key=" + key;
         log.info("==》签名串为：{}",paramUrl);
         return MD5(paramUrl).toUpperCase();
     }
-    public static String MD5(String data) throws Exception {
+    public  String MD5(String data) throws Exception {
         java.security.MessageDigest md = MessageDigest.getInstance("MD5");
         byte[] array = md.digest(data.getBytes("UTF-8"));
         StringBuilder sb = new StringBuilder();
@@ -117,7 +117,7 @@ public class AntAlipayImpy implements
         }
         return sb.toString().toUpperCase();
     }
-    public static String formatUrlMap(Map<String, String> paraMap, boolean removeEmptyValue, boolean urlEncode, boolean keyToLower) {
+    public  String formatUrlMap(Map<String, String> paraMap, boolean removeEmptyValue, boolean urlEncode, boolean keyToLower) {
         String buff = "";
         Map<String, String> tmpMap = paraMap;
         //开启空值筛选，则移除数据
