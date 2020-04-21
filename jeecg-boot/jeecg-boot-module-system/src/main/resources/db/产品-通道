@@ -1,0 +1,3 @@
+alter table sys_user_channel add product_code varchar(32) default NULL;
+
+alter table sys_user_business add product_code varchar(32) default NULL;

@@ -50,12 +50,17 @@ public class UserChannelEntityServiceImpl extends ServiceImpl<UserChannelEntityM
     }
 
     @Override
-    public void deleteChannel(String userName,List<String> codes) {
-        baseMapper.deleteChannel(userName,codes);
+    public void deleteChannel(String userName,List<String> codes,String productCode) {
+        baseMapper.deleteChannel(userName,codes,productCode);
     }
 
     @Override
     public void save(ChannelEntity channel, SysUser sysUser) {
         baseMapper.save(channel,sysUser);
+    }
+
+    @Override
+    public void deleteProductChannle(String product, List<String> channels) {
+        baseMapper.deleteProductChannle(product,channels);
     }
 }

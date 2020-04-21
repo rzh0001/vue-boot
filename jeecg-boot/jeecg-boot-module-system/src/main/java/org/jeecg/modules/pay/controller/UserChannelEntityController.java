@@ -69,24 +69,55 @@ public class UserChannelEntityController {
 
     @Autowired
     private IProductChannelService productChannelService;
+
+    /**
+     * 保存用户的通道、产品信息
+     * @param channelCodes
+     * @param userName
+     * @param productCode
+     * @return
+     */
     @GetMapping(value = "/saveUserChannels")
-    public Result<String> getChannel(@RequestParam(name = "channelCodes") String channelCodes,
+    public Result<String> saveUserChannels(@RequestParam(name = "channelCodes") String channelCodes,
         @RequestParam(name="userName")String userName,@RequestParam(name = "productCode")String productCode){
-        List<String> productChannel = productChannelService.getChannelByProductCode(productCode);
-        //删除已关联信息
-        if(!CollectionUtils.isEmpty(productChannel)){
-            userChannelEntityService.deleteChannel(userName,productChannel);
-        }
         Result<String> result = new Result<>();
+        SysUser currentUser = userService.getUserByName(userName);
+        if(BaseConstant.USER_REFERENCES.equals(currentUser.getMemberType())){
+            return result.error500("介绍人无法关联通道");
+        }
+        //产品下关联的通道
+        List<String> productChannel = productChannelService.getChannelByProductCode(productCode);
         if(StringUtils.isNotBlank(channelCodes)){
             List<String> codes = Arrays.asList(channelCodes.split(","));
             codes = codes.stream().filter(code -> productChannel.contains(code)).collect(Collectors.toList());
-            SysUser sysUser = userService.getUserByName(userName);
             if(CollectionUtils.isEmpty(codes)){
                 result.setMessage("success");
                 return result;
             }
+            //如果是商户，则需要先判断代理是否已经关联了对应的通道
+            if(BaseConstant.USER_MERCHANTS.equals(currentUser.getMemberType())){
+                String agentName = currentUser.getAgentUsername();
+                boolean flat = false;
+                String noRelationChannel = null;
+                for(String code:codes){
+                    UserChannelEntity agentChannel = userChannelEntityService.queryChannelAndUserName(code,agentName);
+                    if(agentChannel == null){
+                        flat = true;
+                        noRelationChannel = code;
+                        break;
+                    }
+                }
+                if(flat){
+                    result.setMessage("代理：["+agentName+"]，还未配置通道："+noRelationChannel+"，请先为代理配置通道信息");
+                    return result;
+                }
+            }
+            //删除商户已关联对应产品下的所有通道信息
+            if(!CollectionUtils.isEmpty(productChannel)){
+                userChannelEntityService.deleteChannel(userName,productChannel,productCode);
+            }
             List<ChannelEntity> channels = channelEntityService.queryChannelByCodes(codes);
+            SysUser sysUser = userService.getUserByName(userName);
             for(ChannelEntity channel:channels){
                 UserChannelEntity userChannelEntity = new UserChannelEntity();
                 userChannelEntity.setMemberType(sysUser.getMemberType());
@@ -94,6 +125,7 @@ public class UserChannelEntityController {
                 userChannelEntity.setUserName(sysUser.getUsername());
                 userChannelEntity.setChannelCode(channel.getChannelCode());
                 userChannelEntity.setChannelId(channel.getId());
+                userChannelEntity.setProductCode(productCode);
                 userChannelEntityService.save(userChannelEntity);
             }
         }
@@ -224,7 +256,10 @@ public class UserChannelEntityController {
             } else if (BaseConstant.USER_AGENT.equals(user.getMemberType())) {
                 List<UserBusinessEntity> ub = userBusinessEntityService.queryBusiness2(userChannelEntity.getUserName(),userChannelEntity.getChannelCode(),userChannelEntity.getBusinessCode());
                 if(!CollectionUtils.isEmpty(ub)){
-                    result.error500("该账号已经关联过此通道");
+                    UserBusinessEntity old = ub.get(0);
+                    old.setApiKey(userChannelEntity.getApiKey());
+                    userBusinessEntityService.updateById(old);
+                    result.success("更新成功");
                     return result;
                 }
                 //如果是代理，则需要设置和挂马账号的关联关系
@@ -234,6 +269,7 @@ public class UserChannelEntityController {
                 }
                 if(channel == null){
                     userChannelEntity.setMemberType(user.getMemberType());
+                    userChannelEntity.setProductCode(userChannelEntity.getProductCode());
                     userChannelEntityService.save(userChannelEntity);
                 }
                 UserBusinessEntity business = new UserBusinessEntity();
@@ -242,6 +278,7 @@ public class UserChannelEntityController {
                 business.setChannelCode(userChannelEntity.getChannelCode());
                 business.setApiKey(userChannelEntity.getApiKey());
                 business.setBusinessCode(userChannelEntity.getBusinessCode());
+                business.setProductCode(userChannelEntity.getProductCode());
                 userBusinessEntityService.add(business);
             }else {
                 return result.error500("操作失败");

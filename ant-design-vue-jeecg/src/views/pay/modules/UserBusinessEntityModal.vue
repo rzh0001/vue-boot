@@ -29,16 +29,17 @@
           label="秘钥">
           <a-input placeholder="秘钥" v-decorator="['apiKey', validatorRules.apiKey]" />
         </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="通道">
-          <select v-decorator="['channelCode', validatorRules.channelCode ]">
-            <option v-for="option in channels" v-bind:value="option.channelCode">
-              {{ option.channelName}}
-            </option>
-          </select>
-        </a-form-item>
+        <!--<a-form-item-->
+          <!--:labelCol="labelCol"-->
+          <!--:wrapperCol="wrapperCol"-->
+          <!--label="通道">-->
+          <!--<select v-decorator="['channelCode', validatorRules.channelCode ]">-->
+            <!--<option v-for="option in channels" v-bind:value="option.channelCode">-->
+              <!--{{ option.channelName}}-->
+            <!--</option>-->
+          <!--</select>-->
+        <!--</a-form-item>-->
+
       </a-form>
     </a-spin>
   </a-modal>
@@ -54,6 +55,8 @@
     data () {
       return {
         title:"操作",
+        selected:'',
+        products: [],
         visible: false,
         model: {},
         channels: [],
@@ -76,7 +79,9 @@
         url: {
           add: "/pay/userBusinessEntity/add",
           edit: "/pay/userBusinessEntity/edit",
-          channel: "/pay/channelEntity/channel"
+          channel: "/pay/channelEntity/channel",
+          getAllProduct: "/product/product/getAllProduct",
+          getUserProductChannel: "/productChannel/productChannel/getUserProductChannel"
         },
       }
     },
@@ -86,6 +91,22 @@
       this.channel();
     },
     methods: {
+      getProduct(){
+        let formData = [];
+        formData.userName = form.userName;
+        formData.memberType = "1";
+        formData.agentUsername = "";
+        if(this.agentUsername===null){
+          formData.agentUsername = "";
+        }
+        getAction(this.url.getAllProduct,formData).then((res)=>{
+          if(res.success){
+            this.products = res.result;
+          }else{
+            this.$message.warning(res.message);
+          }
+        })
+      },
       channel(){
         httpAction(this.url.channel,null,'get').then((res)=>{
           if(res.success){
@@ -94,6 +115,18 @@
           this.$message.warning(res.message);
         }
       })
+      },
+      getProductChannel:function(){
+        let formData = [];
+        formData.productCode = this.selected;
+        formData.userName = form.userName;
+        getAction(this.url.getUserProductChannel,formData).then((res)=>{
+          if(res.success){
+            this.channels.values = res.result.associated;
+            this.channels.options = res.result.all;
+          }else{
+          }
+        })
       },
       add () {
         this.edit({});

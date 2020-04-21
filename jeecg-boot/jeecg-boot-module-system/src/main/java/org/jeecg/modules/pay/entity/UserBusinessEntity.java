@@ -98,4 +98,6 @@ public class UserBusinessEntity {
 	@Excel(name = "收入金额", width = 15)
 	@ApiModelProperty(value = "收入金额")
 	private BigDecimal incomeAmount;
+
+	private String productCode;
 }

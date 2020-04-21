@@ -140,7 +140,17 @@ public class UserBusinessEntityController {
     public Result<UserBusinessEntity> add(@RequestBody UserBusinessEntity userBusinessEntity) {
         Result<UserBusinessEntity> result = new Result<UserBusinessEntity>();
         try {
-            result = userBusinessEntityService.add(userBusinessEntity);
+            List<UserBusinessEntity> infos = userBusinessEntityService.queryBusiness2(userBusinessEntity.getUserName(),
+                userBusinessEntity.getChannelCode(), userBusinessEntity.getBusinessCode());
+            if(!CollectionUtils.isEmpty(infos)&& infos.size()>0){
+                UserBusinessEntity old = infos.get(0);
+                old.setApiKey(userBusinessEntity.getApiKey());
+                userBusinessEntityService.updateById(old);
+                result.success("更新成功");
+            }else {
+                result = userBusinessEntityService.add(userBusinessEntity);
+            }
+
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             result.error500("操作失败");

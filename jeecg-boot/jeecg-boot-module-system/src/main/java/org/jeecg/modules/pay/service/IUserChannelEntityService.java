@@ -20,6 +20,7 @@ public interface IUserChannelEntityService extends IService<UserChannelEntity> {
     List<String> queryUserChannel(List<String> channelCodes,String userName);
     void updateUseTime(String channelCode,String userName);
     List<String> getChannelCodeByUserName(String userName);
-    void deleteChannel(String userName,List<String> codes);
+    void deleteChannel(String userName,List<String> codes,String productCode);
     void save(ChannelEntity channels, SysUser sysUser);
+    void deleteProductChannle(String product,List<String> channels);
 }

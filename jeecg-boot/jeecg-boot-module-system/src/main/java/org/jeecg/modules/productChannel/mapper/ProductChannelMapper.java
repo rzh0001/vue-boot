@@ -31,4 +31,7 @@ public interface ProductChannelMapper extends BaseMapper<ProductChannel> {
     List<String> getProductCodeByChannelCodes(@Param("channels") List<String> channelCodes);
     @Select("SELECT distinct channel_code from pay_product_channel where product_code != #{productCode}")
     List<String> getChannelCodeNotInProductCode(@Param("productCode") String productCode);
+
+    @Select("SELECT distinct channel_code from pay_product_channel where product_code = #{productCode}")
+    List<String> alreadyRelationChannelCodes(@Param("productCode")String productCode);
 }

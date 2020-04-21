@@ -4,6 +4,7 @@ import java.util.*;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -30,6 +31,7 @@ import org.jeecgframework.poi.excel.entity.ImportParams;
 import org.jeecgframework.poi.excel.view.JeecgEntityExcelView;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -98,6 +100,15 @@ public class ProductChannelController {
 		 result.setResult(re);
 		 return result;
 	 }
+	 @GetMapping(value = "/getChannelByProductAndUserName")
+	 public Result<List<ProductChannel>> getChannelByProductAndUserName(@RequestParam(name = "productCode") String productCode,
+		 @RequestParam(name="userName")String userName){
+		 Result<List<ProductChannel>> result = new Result<>();
+		 //产品已关联的通道
+		 List<ProductChannel> productChannels  = productChannelService.getChannelProduct(productCode);
+		 result.setResult(productChannels);
+		 return result;
+	 }
 	/**
 	 *   添加
 	 * @param productChannel
@@ -119,13 +130,43 @@ public class ProductChannelController {
 	}
 	@Autowired
 	private IChannelEntityService channelEntityService;
+
+	 /**
+	  * 1、删除该产品下的所有通道
+	  * 2、重新关联通道
+	  * 3、一条通道目前只能关联一个产品
+	  * 4、将所有商户下的该产品删除的通道均删除
+	  * @param productCode
+	  * @param channels
+	  * @return
+	  */
 	 @GetMapping(value = "/saveProductAndChannels")
+	 @Transactional
 	public Result<String> addProductAndChannel(@RequestParam(name = "productCode")String productCode,@RequestParam(name = "channelCodes")String channels){
 		 List<String> channelCodes = new ArrayList<>();
 		 Result<String> result = new Result<String>();
+		 //产品下，取消关联的通道
+		 List<String> deleteChannelCodes = new ArrayList<>();
+		 List<String> alreadyRelationChannelCodes =productChannelService.alreadyRelationChannelCodes(productCode);
+
 		if(StringUtils.isNotBlank(channels)){
 			channelCodes = Arrays.asList(channels.split(","));
 		}
+		 if(!CollectionUtils.isEmpty(alreadyRelationChannelCodes) && alreadyRelationChannelCodes.size()>0
+		 && !CollectionUtils.isEmpty(channelCodes)){
+			//将产品下面对应删除的通道
+			 for(String exixt:alreadyRelationChannelCodes){
+			 	if(!channelCodes.contains(exixt)){
+					deleteChannelCodes.add(exixt);
+					continue;
+				}
+			 }
+			 if(!CollectionUtils.isEmpty(deleteChannelCodes)){
+				 //批量删除所有用户关联的产品下的已取消的通道
+				 userChannelEntityService.deleteProductChannle(productCode,deleteChannelCodes);
+			 }
+		 }
+
 		//其余产品中已经关联的通道；一条通道只能关联一个产品渠道
 		 List<String> codes = productChannelService.getChannelCodeNotInProductCode(productCode);
 		boolean flat = false;
@@ -140,12 +181,18 @@ public class ProductChannelController {
 		if(flat){
 			return result.error500("一条通道只能关联一个产品类型");
 		}
-		//根据通道code查询通道
-		 List<ChannelEntity> channelEntities = channelEntityService.queryChannelByCodes(channelCodes);
 		productChannelService.remove(productCode);
-		productChannelService.batchSave(channelEntities,productCode);
+		if(!CollectionUtils.isEmpty(channelCodes)){
+			//根据通道code查询通道
+			List<ChannelEntity> channelEntities = channelEntityService.queryChannelByCodes(channelCodes);
+			productChannelService.batchSave(channelEntities,productCode);
+		}
 		return result.success("success");
 
+	}
+
+	private boolean filter(final List<String> channelCodes,String exixt){
+	 	return channelCodes.contains(exixt);
 	}
 	/**
 	 *  编辑

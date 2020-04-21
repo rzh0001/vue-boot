@@ -12,8 +12,14 @@
         order by update_time ASC
     </select>
     <delete id="deleteChannel">
-        delete from sys_user_channel where user_name=#{userName} and channel_code in
+        delete from sys_user_channel where user_name=#{userName} and product_code=#{productCode} and channel_code in
         <foreach collection="codes" item="code" separator="," open="(" close=")">
+            #{code}
+        </foreach>
+    </delete>
+    <delete id="deleteProductChannle">
+        delete from sys_user_channel where product_code=#{productCode} and channel_code in
+        <foreach collection="channels" item="code" separator="," open="(" close=")">
             #{code}
         </foreach>
     </delete>
