@@ -61,14 +61,35 @@
                             />
           </a-input-group>
         </a-form-item>
-        <a-form-item
-          label="通道">
-          <select v-decorator="['channelCode', validatorRules.channelCode ]">
-            <option v-for="option in channels" v-bind:value="option.channelCode">
-              {{ option.channelName}}
-            </option>
-          </select>
-        </a-form-item>
+        <!--<a-form-item-->
+          <!--label="通道">-->
+          <!--<select v-decorator="['channelCode', validatorRules.channelCode ]">-->
+            <!--<option v-for="option in channels" v-bind:value="option.channelCode">-->
+              <!--{{ option.channelName}}-->
+            <!--</option>-->
+          <!--</select>-->
+        <!--</a-form-item>-->
+        请选择产品：<br/>
+        <select v-model="selected"  @change="getProductChannel()">
+          <option v-for="option in products" v-bind:value="option.productCode">
+            {{ option.productName}}
+          </option>
+        </select>
+        <br/> <br/>
+        请选择通道：<br/>
+        <select v-model="channelCode"  @change="getProductChannel()">
+          <option v-for="option in channels" v-bind:value="option.channelCode">
+            {{ option.channelName}}
+          </option>
+        </select>
+
+        <!--<a-form-item-->
+          <!--label="通道选择:">-->
+          <!--<j-checkbox-->
+            <!--v-model="channels.values"-->
+            <!--:options="channels.options"-->
+          <!--/>-->
+        <!--</a-form-item>-->
       </a-form>
     </a-spin>
   </a-modal>
@@ -77,17 +98,25 @@
 
 <script>
   import {getAction,httpAction} from '@/api/manage'
+  import JCheckbox from '@/components/jeecg/JCheckbox'
   export default {
     name: "UserChannelModal",
+    components: {
+      JCheckbox,
+    },
     data() {
       return {
+        selected:'',
+        channelCode:'',
+        products: [],
         isAgent:false,
         isMenber:true,
         userName: '',
         title: "通道详细",
         title4add:"添加",
         visible: false,
-        channels: [],
+        channels: {
+        },
         visible4Add:false,
         model: {},
         columns: [
@@ -168,22 +197,52 @@
           channel: "/pay/channelEntity/channel",
           deleteUserChannel:"/pay/userChannelEntity/deleteUserChannel",
           addUserChannel:"/pay/userChannelEntity/add",
+          getAllProduct: "/product/product/getAllProduct",
+          getUserProductChannel: "/productChannel/productChannel/getChannelByProductAndUserName"
         },
       }
     },
     mounted:function () {
-      this.channel();
+      //this.channel();
     },
     methods: {
-      channel(){
-        httpAction(this.url.channel,null,'get').then((res)=>{
-          if(res.success){
-          this.channels = res.result;
-        }else{
-          this.$message.warning(res.message);
+      getProduct(){
+        let formData = [];
+        formData.userName = this.userName;
+        formData.memberType = "1";
+        formData.agentUsername = "";
+        if(this.agentUsername===null){
+          formData.agentUsername = "";
         }
-      })
+        getAction(this.url.getAllProduct,formData).then((res)=>{
+          if(res.success){
+            this.products = res.result;
+          }else{
+            this.$message.warning(res.message);
+          }
+        })
       },
+      getProductChannel:function(){
+        let formData = [];
+        formData.productCode = this.selected;
+        formData.userName = this.userName;
+        console.log("请求通道入参："+formData)
+        getAction(this.url.getUserProductChannel,formData).then((res)=>{
+          if(res.success){
+            this.channels = res.result
+          }else{
+          }
+        })
+      },
+      // channel(){
+      //   httpAction(this.url.channel,null,'get').then((res)=>{
+      //     if(res.success){
+      //     this.channels = res.result;
+      //   }else{
+      //     this.$message.warning(res.message);
+      //   }
+      // })
+      // },
       detail:function(record) {
         this.visible = true;
         var params = {username:record.username};//查询条件
@@ -195,6 +254,7 @@
       })
       },
       addChannel:function(record){
+        this.getProduct();
         if(record.memberType ==="2" || record.memberType ==="3"){
           alert("无操作权限");
           return;
@@ -218,6 +278,8 @@
           that.confirmLoading = true;
           let formData = Object.assign(this.model, values);
           formData.userName=this.userName;
+          formData.channelCode = this.channelCode;
+          formData.productCode = this.selected;
           console.log(formData);
           //时间格式化
           httpAction(this.url.addUserChannel,formData,"post").then((res)=>{

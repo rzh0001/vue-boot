@@ -50,4 +50,9 @@ public class ProductChannelServiceImpl extends ServiceImpl<ProductChannelMapper,
     public List<String> getChannelCodeNotInProductCode(String productCode) {
         return productChannelMapper.getChannelCodeNotInProductCode(productCode);
     }
+
+    @Override
+    public List<String> alreadyRelationChannelCodes(String productCode) {
+        return productChannelMapper.alreadyRelationChannelCodes(productCode);
+    }
 }

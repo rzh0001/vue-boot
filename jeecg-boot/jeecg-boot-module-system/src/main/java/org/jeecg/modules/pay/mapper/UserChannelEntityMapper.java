@@ -31,8 +31,10 @@ public interface UserChannelEntityMapper extends BaseMapper<UserChannelEntity> {
     @Select("select channel_code from sys_user_channel where user_name=#{userName}")
     List<String> getChannelCodeByUserName(@Param("userName")String userName);
 
-    void deleteChannel(@Param("userName") String userName,@Param("codes") List<String> codes);
+    void deleteChannel(@Param("userName") String userName,@Param("codes") List<String> codes,@Param("productCode") String productCode);
 
     @Insert("insert into sys_user_channel (id,user_id,user_name,channel_code,member_type) values (SELECT REPLACE(UUID(), '-', '') AS id),#{sysUser.id},#{sysUser.username},#{channel.channelCode},#{sysUser.memberType}")
     void save(@Param("channel") ChannelEntity channel, @Param("sysUser") SysUser sysUser);
+
+    void deleteProductChannle(@Param("productCode") String product, @Param("channels") List<String> channels);
 }

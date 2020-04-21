@@ -25,4 +25,6 @@ public interface IProductChannelService extends IService<ProductChannel> {
     List<String> getProductCodeByChannelCodes(List<String> channelCodes);
 
     List<String> getChannelCodeNotInProductCode(String productCode);
+
+    List<String> alreadyRelationChannelCodes(String productCode);
 }

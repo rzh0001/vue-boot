@@ -51,7 +51,7 @@ public class AntAlipayImpy implements
         param.setApp_id(userBusiness.getBusinessCode());
         param.setNonce_str(UUIDGenerator.generate());
         param.setTrade_type("ali_qr");
-        param.setTotal_amount(order.getSubmitAmount().multiply(new BigDecimal("100")).toString());
+        param.setTotal_amount(order.getSubmitAmount().multiply(new BigDecimal("100")).stripTrailingZeros().toPlainString());
         param.setOut_trade_no(order.getOrderId());
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         param.setTrade_time(df.format(new Date()));

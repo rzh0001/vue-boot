@@ -104,4 +104,8 @@ public class UserChannelEntity {
 	@Excel(name = "当天交易金额上限", width = 15)
 	@ApiModelProperty(value = "当天交易金额上限")
 	private BigDecimal todayMaxAmount;
+
+	//产品信息
+	private String productId;
+	private String productCode;
 }
