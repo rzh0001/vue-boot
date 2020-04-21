@@ -103,6 +103,8 @@ public class BaseConstant {
     public static final String REQUEST_PAOFEN_ALIPAY = "paofen_pay_alipay";
     //跑分-银联
     public static final String REQUEST_PAOFEN_YINLIAN = "paofen_pay_yinlian";
+    //gt派支付
+    public static final String REQUEST_GTPAI_ALIPAY = "gtpaiAlipay";
     //四方回调挂马平台的返回码
     public static final int SUCCESS = 200;
     //流水类型 流水类型 1-手续费收入 2-提现 3-冲正

@@ -54,4 +54,15 @@ public class CallBackController {
         }
         return "fail";
     }
+
+    @RequestMapping(value = "/gtpaiAlipayCallback", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+    @ResponseBody
+    public String gtpaiAlipay(){
+        try{
+            return  callBackService.callBackGtpaiAlipay();
+        }catch (Exception e){
+            log.info("==>GT派支付，回调异常：{}",e);
+        }
+        return "fail";
+    }
 }

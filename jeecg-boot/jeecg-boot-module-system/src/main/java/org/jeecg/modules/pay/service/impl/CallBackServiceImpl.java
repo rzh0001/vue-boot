@@ -6,6 +6,7 @@ import org.apache.commons.lang.StringUtils;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import org.jeecg.modules.pay.entity.UserBusinessEntity;
 import org.jeecg.modules.pay.externalUtils.antUtil.AntUtil;
+import org.jeecg.modules.pay.externalUtils.antUtil.GtpaiUtil;
 import org.jeecg.modules.pay.service.ICallBackService;
 import org.jeecg.modules.pay.service.IOrderInfoEntityService;
 import org.jeecg.modules.pay.service.IUserBusinessEntityService;
@@ -157,6 +158,30 @@ public class CallBackServiceImpl implements ICallBackService {
 			return "签名验证不通过";
 		}
 		return this.notify(orderNo, BaseConstant.REQUEST_ANT_ALIPAY);
+	}
+
+	@Override
+	public String callBackGtpaiAlipay() throws Exception {
+		Map<String, String> map = getParam();
+		log.info("==>GT派支付，回调参数为：{}",map);
+		String sign = map.get("sign");
+		String orderNo = map.get("out_trade_no");
+		String apiKey = this.getApikey(orderNo,BaseConstant.REQUEST_GTPAI_ALIPAY);
+		String retCode = map.get("ret_code");
+		map.remove("sign");
+
+		String localSign = GtpaiUtil.generateSignature(map,apiKey);
+		if(!localSign.equals(sign)){
+			log.info("==>GT派支付，回调签名为：{}，本地签名为：{}",sign,localSign);
+			return "签名验证不通过";
+		}
+
+		if(!retCode.equals("00")){
+			log.info("==>GT派支付，返回码：{}",retCode);
+			return "sucess";
+		}
+
+		return this.notify(orderNo, BaseConstant.REQUEST_GTPAI_ALIPAY);
 	}
 
 	private Map<String, String> getParam(){
