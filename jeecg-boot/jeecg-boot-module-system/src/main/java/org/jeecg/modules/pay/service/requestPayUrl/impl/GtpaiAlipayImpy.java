@@ -45,7 +45,6 @@ public class GtpaiAlipayImpy implements
     @Autowired
     public ISysDictService dictService;
     private static final String CALLBACK_URL="/callBack/gtpaiAlipayCallback";
-    private static final String pay_html = "<html><head><title></title><script language=\"JavaScript\" type=\"text/JavaScript\">  function doSubmit() {document.toJiupai.submit(); }</script><meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />    	</head>    <body onload=\"doSubmit()\"> 	 <form name=\"toJiupai\" id=\"toJiupai\" action=\"http://shsuperhero.com:8089/ckpayops/gatewayPayment\" method=\"post\"> 	 		<table><input type=\"hidden\" value=\"mch_id_temp\" name=\"mch_id\"/><input type=\"hidden\" value=\"store_id_temp\" name=\"store_id\"/><input type=\"hidden\" value=\"pay_type_temp\" name=\"pay_type\"/><input type=\"hidden\" value=\"trans_amt_temp\" name=\"trans_amt\"/><input type=\"hidden\" value=\"bank_english_code_temp\" name=\"bank_english_code\"/><input type=\"hidden\" value=\"card_type_temp\" name=\"card_type\"/><input type=\"hidden\" value=\"out_trade_no_temp\" name=\"out_trade_no\"/><input type=\"hidden\" value=\"notify_url_temp\" name=\"notify_url\"/> <input type=\"hidden\" value=\"body_temp\" name=\"body\"/><input type=\"hidden\" value=\"sign_temp\" name=\"sign\"/></table></form></body></html>";
     private static final String store_id = "9999kkf";
     private static final String pay_type = "53";
 
@@ -56,54 +55,38 @@ public class GtpaiAlipayImpy implements
         param.setMch_id(userBusiness.getBusinessCode());
         param.setStore_id(store_id);
         param.setPay_type(pay_type);
-        param.setBody("");
-        param.setTrans_amt(order.getSubmitAmount().multiply(new BigDecimal("100")).toString());
+        param.setBody("alipay");
+        param.setTrans_amt(order.getSubmitAmount().toString());
         param.setOut_trade_no(order.getOrderId());
         param.setNotify_url(getDomain()+CALLBACK_URL);
         String paramStr = JSON.toJSONString(param);
         log.info("==>GT派支付支付宝，请求入参为：{}",paramStr);
         TreeMap<String, String> map =  new TreeMap<String,String>();
-        map.put("body", "");
+        map.put("body", "alipay");
         map.put("mch_id", userBusiness.getBusinessCode());
         map.put("notify_url", getDomain()+CALLBACK_URL);
         map.put("out_trade_no", order.getOrderId());
         map.put("pay_type", pay_type);
-        map.put("store_id", store_id);//0000000
-        map.put("trans_amt", order.getSubmitAmount().multiply(new BigDecimal("100")).toString());
+        map.put("store_id", store_id);
+        map.put("trans_amt", order.getSubmitAmount().toString());
 
         String sign = GtpaiUtil.generateSignature(map,userBusiness.getApiKey());
 
         log.info("==>GT派支付支付宝，请求签名为：{}",sign);
         param.setSign(sign);
-
-        Map<String, Object> mapTmp = (Map<String, Object>) param;
-        HttpResult result = HttpUtils.doPost(url, mapTmp);
+        String paramString = JSON.toJSONString(param);
+        Map jsonObject = JSON.parseObject(paramString);
+        HttpResult result = HttpUtils.doPost(url, jsonObject);
         String body = result.getBody();
         log.info("==>GT派支付支付宝，请求结果为：{}",body);
-        JSONObject bodyResult = JSON.parseObject(body);
-        String payUrl = bodyResult.getString("code_url");
+        //<script>window.location.href='https://gttffp.com:8443/zhifpops/getToPayForAlipay2Person/1497872655967991fc04a9cd10221efa'</script>
+        //JSONObject bodyResult = JSON.parseObject(body);
+        String[] list = body.split("'");
+        String payurl = list[1].split("'")[0];
+        //String payUrl = bodyResult.getString("code_url");
         redisUtil.del(order.getOuterOrderId());
-        return R.ok().put("url", payUrl);
+        return R.ok().put("url", payurl);
 
-
-        /*String submitHtml = pay_html;
-        submitHtml = StringUtils.replace(submitHtml, "mch_id_temp", param.getMch_id());
-        submitHtml = StringUtils.replace(submitHtml, "store_id_temp", store_id);
-        submitHtml = StringUtils.replace(submitHtml, "pay_type_temp", pay_type);
-        submitHtml = StringUtils.replace(submitHtml, "trans_amt_temp", param.getTrans_amt());
-        submitHtml = StringUtils.replace(submitHtml, "bank_english_code_temp", "");
-        submitHtml = StringUtils.replace(submitHtml, "card_type_temp", "");
-        submitHtml = StringUtils.replace(submitHtml, "out_trade_no_temp", param.getOut_trade_no());
-        submitHtml = StringUtils.replace(submitHtml, "notify_url_temp", param.getNotify_url());
-        submitHtml = StringUtils.replace(submitHtml, "body_temp", param.getBody());
-        submitHtml = StringUtils.replace(submitHtml, "sign_temp", sign);
-
-        PrintWriter out = resp.getWriter();
-        out.println(submitHtml);
-        out.flush();
-        out.close();
-
-        return  R.ok().put("url", "");*/
     }
 
     private String getDomain(){

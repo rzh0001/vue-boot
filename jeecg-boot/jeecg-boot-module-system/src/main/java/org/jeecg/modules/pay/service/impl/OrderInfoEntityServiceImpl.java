@@ -326,10 +326,11 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * @return
      */
     private void checkAmountValidity(String userName, String submitAmount, String payType) {
-        UserChannelEntity channel = channelUserDao.queryChannelAndUserName(payType, userName);
-        if (channel == null) {
+        List<UserChannelEntity> channels = channelUserDao.queryChannelAndUserName(payType, userName);
+        if (channels == null) {
             throw new RRException("用户通道通道不存在:" + payType);
         }
+        UserChannelEntity channel = channels.get(0);
         if (channel.getUpperLimit() != null && channel.getUpperLimit().doubleValue() < Double.parseDouble(submitAmount)) {
             throw new RRException("非法请求，申请金额超出申请上限");
         }
@@ -758,7 +759,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         if (channel == null) {
             return false;
         }
-        UserChannelEntity channelUser = channelUserDao.queryChannelAndUserName(channelCode, userName);
+        List<UserChannelEntity> channelUser = channelUserDao.queryChannelAndUserName(channelCode, userName);
         if (channelUser == null) {
             return false;
         }

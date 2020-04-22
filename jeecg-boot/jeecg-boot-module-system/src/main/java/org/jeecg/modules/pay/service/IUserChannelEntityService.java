@@ -23,4 +23,11 @@ public interface IUserChannelEntityService extends IService<UserChannelEntity> {
     void deleteChannel(String userName,List<String> codes,String productCode);
     void save(ChannelEntity channels, SysUser sysUser);
     void deleteProductChannle(String product,List<String> channels);
+
+    /**
+     * 获取代理已经关联过的产品
+     * @param agentName
+     * @return
+     */
+    List<String> getRelationProducts(String agentName);
 }

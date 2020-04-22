@@ -10,9 +10,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.shiro.SecurityUtils;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.aspect.annotation.AutoLog;
+import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.pay.service.IUserChannelEntityService;
 import org.jeecg.modules.pay.entity.Product;
@@ -23,6 +25,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 
 import org.jeecg.modules.pay.service.IProductChannelService;
+import org.jeecg.modules.system.entity.SysUser;
+import org.jeecg.modules.system.service.ISysUserService;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -79,22 +83,43 @@ public class ProductController {
 	private IUserChannelEntityService userChannelEntityService;
 	@Autowired
 	private IProductChannelService productChannelService;
-
+	 @Autowired
+	 private ISysUserService userService;
+	 /**
+	  * 查询用户对应拥有的产品
+	  * @param memberType
+	  * @param userName
+	  * @param agentUsername
+	  * @return
+	  */
 	 @GetMapping(value = "/getAllProduct")
 	public Result<List<Product>> getAllProduct(@RequestParam(name="memberType",required = false) String memberType,
 		 @RequestParam(name="userName")String userName,@RequestParam(name="agentUsername",required = false)String agentUsername){
 		 Result<List<Product>> result = new Result<>();
-		 if("1".equals(memberType)){
+		 //获取系统用户
+		 LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+		 SysUser sysUser = userService.getUserByName(loginUser.getUsername());
+		 if(sysUser.getUsername().equals("admin")){
 			 result.setResult(productService.getAllProduct());
+			 return result;
+		 }
+		 //代理
+		 if("1".equals(memberType)){
+		 	 //代理关联过的产品
+		 	 List<String> relationProducts =userChannelEntityService.getRelationProducts(userName);
+			 result.setResult(productService.getProductByCodes(relationProducts));
 		 }else if("3".equals(memberType)){
-			//代理关联了哪些通道
-			 List<String> channelCodes = userChannelEntityService.getChannelCodeByUserName(agentUsername);
-			 if(CollectionUtils.isNotEmpty(channelCodes)){
-				 //这些通道关联了哪些产品
-				 List<String> productCodes = productChannelService.getProductCodeByChannelCodes(channelCodes);
-				 //获取这些产品
-				 result.setResult(productService.getProductByCodes(productCodes));
-			 }
+		 	//商户的代理关联过哪些产品
+			 List<String> relationProducts =userChannelEntityService.getRelationProducts(agentUsername);
+			 result.setResult(productService.getProductByCodes(relationProducts));
+//			//代理关联了哪些通道
+//			 List<String> channelCodes = userChannelEntityService.getChannelCodeByUserName(agentUsername);
+//			 if(CollectionUtils.isNotEmpty(channelCodes)){
+//				 //这些通道关联了哪些产品
+//				 List<String> productCodes = productChannelService.getProductCodeByChannelCodes(channelCodes);
+//				 //获取这些产品
+//				 result.setResult(productService.getProductByCodes(productCodes));
+//			 }
 		 }
 		return result;
 	}

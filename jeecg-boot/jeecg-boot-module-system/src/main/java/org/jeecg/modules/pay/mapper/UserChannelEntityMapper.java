@@ -37,4 +37,7 @@ public interface UserChannelEntityMapper extends BaseMapper<UserChannelEntity> {
     void save(@Param("channel") ChannelEntity channel, @Param("sysUser") SysUser sysUser);
 
     void deleteProductChannle(@Param("productCode") String product, @Param("channels") List<String> channels);
+
+    @Select("select DISTINCT product_code from sys_user_channel where user_name=#{agentName}")
+    List<String> getRelationProducts(@Param("agentName") String agentName);
 }

@@ -63,4 +63,9 @@ public class UserChannelEntityServiceImpl extends ServiceImpl<UserChannelEntityM
     public void deleteProductChannle(String product, List<String> channels) {
         baseMapper.deleteProductChannle(product,channels);
     }
+
+    @Override
+    public List<String> getRelationProducts(String agentName) {
+        return baseMapper.getRelationProducts(agentName);
+    }
 }
