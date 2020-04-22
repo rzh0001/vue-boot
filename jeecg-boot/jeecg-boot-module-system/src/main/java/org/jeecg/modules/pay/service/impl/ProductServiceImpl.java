@@ -1,8 +1,8 @@
-package org.jeecg.modules.product.service.impl;
+package org.jeecg.modules.pay.service.impl;
 
-import org.jeecg.modules.product.entity.Product;
-import org.jeecg.modules.product.mapper.ProductMapper;
-import org.jeecg.modules.product.service.IProductService;
+import org.jeecg.modules.pay.entity.Product;
+import org.jeecg.modules.pay.mapper.ProductMapper;
+import org.jeecg.modules.pay.service.IProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

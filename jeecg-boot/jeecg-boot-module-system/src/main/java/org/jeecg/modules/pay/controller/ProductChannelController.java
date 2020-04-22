@@ -1,10 +1,9 @@
-package org.jeecg.modules.productChannel.controller;
+package org.jeecg.modules.pay.controller;
 
 import java.util.*;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -17,8 +16,8 @@ import org.jeecg.modules.pay.entity.BusinessLabelValue;
 import org.jeecg.modules.pay.entity.ChannelEntity;
 import org.jeecg.modules.pay.service.IChannelEntityService;
 import org.jeecg.modules.pay.service.IUserChannelEntityService;
-import org.jeecg.modules.productChannel.entity.ProductChannel;
-import org.jeecg.modules.productChannel.service.IProductChannelService;
+import org.jeecg.modules.pay.entity.ProductChannel;
+import org.jeecg.modules.pay.service.IProductChannelService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;

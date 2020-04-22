@@ -1,10 +1,10 @@
-package org.jeecg.modules.product.mapper;
+package org.jeecg.modules.pay.mapper;
 
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
-import org.jeecg.modules.product.entity.Product;
+import org.jeecg.modules.pay.entity.Product;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**

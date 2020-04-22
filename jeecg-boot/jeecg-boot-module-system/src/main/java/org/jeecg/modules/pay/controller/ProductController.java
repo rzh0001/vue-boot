@@ -1,4 +1,4 @@
-package org.jeecg.modules.product.controller;
+package org.jeecg.modules.pay.controller;
 
 import java.util.Arrays;
 import java.util.List;
@@ -14,17 +14,15 @@ import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.aspect.annotation.AutoLog;
 import org.jeecg.common.util.oConvertUtils;
-import org.jeecg.modules.pay.entity.ChannelEntity;
 import org.jeecg.modules.pay.service.IUserChannelEntityService;
-import org.jeecg.modules.product.entity.Product;
-import org.jeecg.modules.product.service.IProductService;
-import java.util.Date;
+import org.jeecg.modules.pay.entity.Product;
+import org.jeecg.modules.pay.service.IProductService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 
-import org.jeecg.modules.productChannel.service.IProductChannelService;
+import org.jeecg.modules.pay.service.IProductChannelService;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;

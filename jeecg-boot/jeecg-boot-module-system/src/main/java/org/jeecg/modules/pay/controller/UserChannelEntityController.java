@@ -27,7 +27,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 
-import org.jeecg.modules.productChannel.service.IProductChannelService;
+import org.jeecg.modules.pay.service.IProductChannelService;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.service.ISysUserService;
 import org.jeecg.modules.util.BaseConstant;
@@ -100,8 +100,8 @@ public class UserChannelEntityController {
                 boolean flat = false;
                 String noRelationChannel = null;
                 for(String code:codes){
-                    UserChannelEntity agentChannel = userChannelEntityService.queryChannelAndUserName(code,agentName);
-                    if(agentChannel == null){
+                    List<UserChannelEntity> agentChannel = userChannelEntityService.queryChannelAndUserName(code,agentName);
+                    if(CollectionUtils.isEmpty(agentChannel)){
                         flat = true;
                         noRelationChannel = code;
                         break;
@@ -117,12 +117,11 @@ public class UserChannelEntityController {
                 userChannelEntityService.deleteChannel(userName,productChannel,productCode);
             }
             List<ChannelEntity> channels = channelEntityService.queryChannelByCodes(codes);
-            SysUser sysUser = userService.getUserByName(userName);
             for(ChannelEntity channel:channels){
                 UserChannelEntity userChannelEntity = new UserChannelEntity();
-                userChannelEntity.setMemberType(sysUser.getMemberType());
-                userChannelEntity.setUserId(sysUser.getId());
-                userChannelEntity.setUserName(sysUser.getUsername());
+                userChannelEntity.setMemberType(currentUser.getMemberType());
+                userChannelEntity.setUserId(currentUser.getId());
+                userChannelEntity.setUserName(currentUser.getUsername());
                 userChannelEntity.setChannelCode(channel.getChannelCode());
                 userChannelEntity.setChannelId(channel.getId());
                 userChannelEntity.setProductCode(productCode);
@@ -245,7 +244,7 @@ public class UserChannelEntityController {
                 result.error500("介绍人无法关联通道");
                 return result;
             }
-            UserChannelEntity channel = userChannelEntityService.queryChannelAndUserName(userChannelEntity.getChannelCode(), userChannelEntity.getUserName());
+            List<UserChannelEntity> channel = userChannelEntityService.queryChannelAndUserName(userChannelEntity.getChannelCode(), userChannelEntity.getUserName());
             if (BaseConstant.USER_MERCHANTS.equals(user.getMemberType())) {
                 if (channel != null) {
                     result.error500("该用户已经添加过通道");

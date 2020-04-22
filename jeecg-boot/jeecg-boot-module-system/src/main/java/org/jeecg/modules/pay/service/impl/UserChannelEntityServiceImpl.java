@@ -20,7 +20,7 @@ import java.util.List;
 @Service
 public class UserChannelEntityServiceImpl extends ServiceImpl<UserChannelEntityMapper, UserChannelEntity> implements IUserChannelEntityService {
     @Override
-    public UserChannelEntity queryChannelAndUserName(String channelCode, String userName) {
+    public List<UserChannelEntity> queryChannelAndUserName(String channelCode, String userName) {
         return baseMapper.queryChannelAndUser(channelCode,userName);
     }
 

@@ -14,7 +14,7 @@ import java.util.List;
  * @Version: V1.0
  */
 public interface IUserChannelEntityService extends IService<UserChannelEntity> {
-    UserChannelEntity queryChannelAndUserName(String channelCode, String userName);
+    List<UserChannelEntity> queryChannelAndUserName(String channelCode, String userName);
     List<UserChannelEntity> queryChannelByUserName(String username);
     void deleteUserChannel(String userName,String channelCode);
     List<String> queryUserChannel(List<String> channelCodes,String userName);

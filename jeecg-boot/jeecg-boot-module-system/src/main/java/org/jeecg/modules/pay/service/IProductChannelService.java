@@ -1,7 +1,7 @@
-package org.jeecg.modules.productChannel.service;
+package org.jeecg.modules.pay.service;
 
 import org.jeecg.modules.pay.entity.ChannelEntity;
-import org.jeecg.modules.productChannel.entity.ProductChannel;
+import org.jeecg.modules.pay.entity.ProductChannel;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
