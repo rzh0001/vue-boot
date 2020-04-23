@@ -61,7 +61,7 @@ public class GtpaiAlipayImpy implements
         param.setNotify_url(getDomain()+CALLBACK_URL);
         String paramStr = JSON.toJSONString(param);
         log.info("==>GT派支付支付宝，请求入参为：{}",paramStr);
-        TreeMap<String, String> map =  new TreeMap<String,String>();
+        TreeMap<String, Object> map =  new TreeMap<String,Object>();
         map.put("body", "alipay");
         map.put("mch_id", userBusiness.getBusinessCode());
         map.put("notify_url", getDomain()+CALLBACK_URL);

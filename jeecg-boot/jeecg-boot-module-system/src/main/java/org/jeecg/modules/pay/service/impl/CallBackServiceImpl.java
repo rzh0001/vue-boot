@@ -1,6 +1,8 @@
 package org.jeecg.modules.pay.service.impl;
 
 import cn.hutool.crypto.SecureUtil;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
@@ -164,22 +166,23 @@ public class CallBackServiceImpl implements ICallBackService {
 	public String callBackGtpaiAlipay() throws Exception {
 		Map<String, String> map = getParam();
 		log.info("==>GT派支付，回调参数为：{}",map);
-		String sign = map.get("sign");
-		String orderNo = map.get("out_trade_no");
+		String json = map.get("reqData");
+		Map<String,Object> param = JSON.parseObject(json);
+		String sign = (String)param.get("sign");
+		String orderNo =(String) param.get("out_trade_no");
 		String apiKey = this.getApikey(orderNo,BaseConstant.REQUEST_GTPAI_ALIPAY);
-		String retCode = map.get("ret_code");
-		map.remove("sign");
-
-		String localSign = GtpaiUtil.generateSignature(map,apiKey);
+		String retCode = (String)param.get("ret_code");
+		param.remove("sign");
+		Map<String, Object> sortedMap = new TreeMap<String, Object>(param);
+		String localSign = GtpaiUtil.generateSignature(sortedMap,apiKey);
 		if(!localSign.equals(sign)){
 			log.info("==>GT派支付，回调签名为：{}，本地签名为：{}",sign,localSign);
 			return "签名验证不通过";
 		}
-
-		if(!retCode.equals("00")){
-			log.info("==>GT派支付，返回码：{}",retCode);
-			return "sucess";
-		}
+//		if(!retCode.equals("00")){
+//			log.info("==>GT派支付，返回码：{}",retCode);
+//			return "sucess";
+//		}
 
 		return this.notify(orderNo, BaseConstant.REQUEST_GTPAI_ALIPAY);
 	}
