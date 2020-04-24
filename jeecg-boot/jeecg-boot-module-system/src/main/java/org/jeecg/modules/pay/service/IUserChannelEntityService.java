@@ -5,6 +5,7 @@ import org.jeecg.modules.pay.entity.UserChannelEntity;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.jeecg.modules.system.entity.SysUser;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -30,4 +31,10 @@ public interface IUserChannelEntityService extends IService<UserChannelEntity> {
      * @return
      */
     List<String> getRelationProducts(String agentName);
+
+    List<UserChannelEntity> getChannelByLoginNameAndProduceCode(String loginName,String productCode);
+
+    void updateRate(String name,String channel,String productCode, BigDecimal lower,BigDecimal upper);
+
+    List<UserChannelEntity> getChannleByUserNameAndChannelAndProduct(String name,String channel,String product);
 }

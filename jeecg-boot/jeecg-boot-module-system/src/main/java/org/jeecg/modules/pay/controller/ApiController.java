@@ -45,7 +45,7 @@ public class ApiController {
             return orderInfoService.createOrder(reqobj, ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest());
         } catch (Exception e) {
             log.info("创建订单异常，异常信息为：", e);
-            return R.error(e.getMessage());
+            return R.error("创建订单异常，请联系管理员");
         }
     }
 

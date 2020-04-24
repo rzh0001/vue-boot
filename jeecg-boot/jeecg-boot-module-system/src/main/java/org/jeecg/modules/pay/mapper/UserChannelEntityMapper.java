@@ -1,5 +1,6 @@
 package org.jeecg.modules.pay.mapper;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.apache.ibatis.annotations.*;
@@ -40,4 +41,13 @@ public interface UserChannelEntityMapper extends BaseMapper<UserChannelEntity> {
 
     @Select("select DISTINCT product_code from sys_user_channel where user_name=#{agentName}")
     List<String> getRelationProducts(@Param("agentName") String agentName);
+
+    @Select("select * from sys_user_channel where user_name=#{loginName} and product_code=#{productCode}")
+    List<UserChannelEntity> getChannelByLoginNameAndProduceCode(@Param("loginName") String loginName,@Param("productCode") String productCode);
+    @Update("update sys_user_channel set upper_limit=#{upper},lower_limit=#{lower} where user_name=#{name} and channel_code=#{channel} and product_code=#{productCode}")
+    void updateRate(@Param("name") String name, @Param("channel")String channel,@Param("productCode") String productCode,@Param("lower") BigDecimal lower, @Param("upper")BigDecimal upper);
+
+    @Select("select * from sys_user_channel where user_name=#{name} and channel_code=#{channel} and product_code=#{product}")
+    List<UserChannelEntity> getChannleByUserNameAndChannelAndProduct(@Param("name") String name,@Param("channel") String channel,
+        @Param("product")String product);
 }

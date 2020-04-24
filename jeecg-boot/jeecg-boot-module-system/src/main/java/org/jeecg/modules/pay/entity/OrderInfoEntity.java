@@ -166,4 +166,6 @@ public class OrderInfoEntity {
 	private String ip;
 
 	private String remark;
+
+	private String productCode;
 }

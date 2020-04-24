@@ -1,5 +1,6 @@
 package org.jeecg.modules.pay.controller;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -69,7 +70,23 @@ public class UserChannelEntityController {
 
     @Autowired
     private IProductChannelService productChannelService;
-
+    @GetMapping(value = "/saveRate")
+    public Result<String> saveRate(@RequestParam(name = "channelCode") String channelCode,
+        @RequestParam(name="userName")String userName,@RequestParam(name = "productCode")String productCode,
+        @RequestParam(name="lowerLimit")String lowerLimit,@RequestParam(name = "upperLimit")String upperLimit){
+        Result<String> result = new Result<>();
+        List<UserChannelEntity> list = userChannelEntityService.getChannleByUserNameAndChannelAndProduct(userName, channelCode,
+            productCode);
+        if(CollectionUtils.isEmpty(list)){
+            result.error500("改商户无此通道权限");
+            return result;
+        }
+        BigDecimal lower = new BigDecimal(lowerLimit==null?"0":lowerLimit);
+        BigDecimal upper = new BigDecimal(upperLimit==null?"0":upperLimit);
+        userChannelEntityService.updateRate(userName, channelCode, productCode,  lower,  upper);
+        result.setResult("success");
+        return result;
+    }
     /**
      * 保存用户的通道、产品信息
      * @param channelCodes
@@ -127,8 +144,12 @@ public class UserChannelEntityController {
                 userChannelEntity.setProductCode(productCode);
                 userChannelEntityService.save(userChannelEntity);
             }
+        }else {
+            //删除商户已关联对应产品下的所有通道信息
+            if(!CollectionUtils.isEmpty(productChannel)){
+                userChannelEntityService.deleteChannel(userName,productChannel,productCode);
+            }
         }
-
         result.setMessage("success");
         return result;
     }

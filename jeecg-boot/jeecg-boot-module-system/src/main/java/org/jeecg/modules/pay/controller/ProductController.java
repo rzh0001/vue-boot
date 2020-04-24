@@ -103,23 +103,13 @@ public class ProductController {
 			 result.setResult(productService.getAllProduct());
 			 return result;
 		 }
-		 //代理
-		 if("1".equals(memberType)){
+		 //代理登录
+		 if("1".equals(sysUser.getMemberType())){
 		 	 //代理关联过的产品
-		 	 List<String> relationProducts =userChannelEntityService.getRelationProducts(userName);
-			 result.setResult(productService.getProductByCodes(relationProducts));
-		 }else if("3".equals(memberType)){
-		 	//商户的代理关联过哪些产品
-			 List<String> relationProducts =userChannelEntityService.getRelationProducts(agentUsername);
-			 result.setResult(productService.getProductByCodes(relationProducts));
-//			//代理关联了哪些通道
-//			 List<String> channelCodes = userChannelEntityService.getChannelCodeByUserName(agentUsername);
-//			 if(CollectionUtils.isNotEmpty(channelCodes)){
-//				 //这些通道关联了哪些产品
-//				 List<String> productCodes = productChannelService.getProductCodeByChannelCodes(channelCodes);
-//				 //获取这些产品
-//				 result.setResult(productService.getProductByCodes(productCodes));
-//			 }
+		 	 List<String> relationProducts =userChannelEntityService.getRelationProducts(sysUser.getUsername());
+		 	 if(CollectionUtils.isNotEmpty(relationProducts)){
+				 result.setResult(productService.getProductByCodes(relationProducts));
+			 }
 		 }
 		return result;
 	}

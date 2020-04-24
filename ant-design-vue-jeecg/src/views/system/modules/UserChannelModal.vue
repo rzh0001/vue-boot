@@ -77,7 +77,7 @@
         </select>
         <br/> <br/>
         请选择通道：<br/>
-        <select v-model="channelCode"  @change="getProductChannel()">
+        <select v-model="channelCode">
           <option v-for="option in channels" v-bind:value="option.channelCode">
             {{ option.channelName}}
           </option>
@@ -234,15 +234,6 @@
           }
         })
       },
-      // channel(){
-      //   httpAction(this.url.channel,null,'get').then((res)=>{
-      //     if(res.success){
-      //     this.channels = res.result;
-      //   }else{
-      //     this.$message.warning(res.message);
-      //   }
-      // })
-      // },
       detail:function(record) {
         this.visible = true;
         var params = {username:record.username};//查询条件
