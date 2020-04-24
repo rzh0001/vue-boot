@@ -204,7 +204,7 @@
             <a-menu slot="overlay">
               <a-menu-item>
                 <a @click="relationProduct(record)">关联产品</a>
-                <a @click="relationProductRate(record)">通道费率设置</a>
+                <a @click="relationProductRate(record)">通道限额</a>
               </a-menu-item>
             </a-menu>
           </a-dropdown>

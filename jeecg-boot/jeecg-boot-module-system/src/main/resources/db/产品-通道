@@ -3,3 +3,6 @@ alter table sys_user_channel add product_code varchar(32) default NULL;
 alter table sys_user_business add product_code varchar(32) default NULL;
 
 alter table pay_order_info add product_code varchar(32) default NULL;
+
+UPDATE sys_user_business b set b.product_code=(SELECT c.product_code from pay_product_channel c WHERE c.channel_code=b.channel_code);
+UPDATE sys_user_channel b set b.product_code=(SELECT c.product_code from pay_product_channel c WHERE c.channel_code=b.channel_code);

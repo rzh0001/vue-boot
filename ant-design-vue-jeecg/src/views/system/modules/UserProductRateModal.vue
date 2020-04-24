@@ -136,7 +136,7 @@
       },
       handleOk () {
         if(this.memberType!='3'){
-          alert("只能给商户设置通道费率")
+          alert("只能给商户设置通道限额")
           return;
         }
         let formData = [];
