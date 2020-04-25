@@ -93,6 +93,16 @@ public class CashOutApplyController {
 													 @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
 													 HttpServletRequest req) {
 		Result<IPage<CashOutApply>> result = new Result<IPage<CashOutApply>>();
+		QueryWrapper<CashOutApply> queryWrapper = initQueryCondition(cashOutApply, req);
+		Page<CashOutApply> page = new Page<CashOutApply>(pageNo, pageSize);
+		IPage<CashOutApply> pageList = cashOutApplyService.page(page, queryWrapper);
+		result.setSuccess(true);
+		result.setResult(pageList);
+		return result;
+	}
+
+	// 查询条件独立成方法，查询、统计、导出 三个接口使用
+	private QueryWrapper<CashOutApply> initQueryCondition(CashOutApply cashOutApply, HttpServletRequest req) {
 		QueryWrapper<CashOutApply> queryWrapper = QueryGenerator.initQueryWrapper(cashOutApply, req.getParameterMap());
 		LoginUser optUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
 		if (optUser.getMemberType() != null) {
@@ -106,11 +116,8 @@ public class CashOutApplyController {
 				default:
 			}
 		}
-		Page<CashOutApply> page = new Page<CashOutApply>(pageNo, pageSize);
-		IPage<CashOutApply> pageList = cashOutApplyService.page(page, queryWrapper);
-		result.setSuccess(true);
-		result.setResult(pageList);
-		return result;
+		queryWrapper.lambda().orderByDesc(CashOutApply::getCreateTime);
+		return queryWrapper;
 	}
 
 	/**
@@ -298,23 +305,13 @@ public class CashOutApplyController {
 	/**
 	 * 导出excel
 	 *
-	 * @param request
+	 * @param req
 	 * @param response
 	 */
 	@RequestMapping(value = "/exportXls")
-	public ModelAndView exportXls(HttpServletRequest request, HttpServletResponse response) {
+	public ModelAndView exportXls(CashOutApply cashOutApply, HttpServletRequest req, HttpServletResponse response) {
 		// Step.1 组装查询条件
-		QueryWrapper<CashOutApply> queryWrapper = null;
-		try {
-			String paramsStr = request.getParameter("paramsStr");
-			if (oConvertUtils.isNotEmpty(paramsStr)) {
-				String deString = URLDecoder.decode(paramsStr, "UTF-8");
-				CashOutApply cashOutApply = JSON.parseObject(deString, CashOutApply.class);
-				queryWrapper = QueryGenerator.initQueryWrapper(cashOutApply, request.getParameterMap());
-			}
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
+		QueryWrapper<CashOutApply> queryWrapper = initQueryCondition(cashOutApply, req);
 
 		//Step.2 AutoPoi 导出Excel
 		ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
