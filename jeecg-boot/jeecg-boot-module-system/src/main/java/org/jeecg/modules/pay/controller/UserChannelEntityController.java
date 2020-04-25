@@ -1,5 +1,6 @@
 package org.jeecg.modules.pay.controller;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -27,7 +28,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 
-import org.jeecg.modules.productChannel.service.IProductChannelService;
+import org.jeecg.modules.pay.service.IProductChannelService;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.service.ISysUserService;
 import org.jeecg.modules.util.BaseConstant;
@@ -69,7 +70,23 @@ public class UserChannelEntityController {
 
     @Autowired
     private IProductChannelService productChannelService;
-
+    @GetMapping(value = "/saveRate")
+    public Result<String> saveRate(@RequestParam(name = "channelCode") String channelCode,
+        @RequestParam(name="userName")String userName,@RequestParam(name = "productCode")String productCode,
+        @RequestParam(name="lowerLimit")String lowerLimit,@RequestParam(name = "upperLimit")String upperLimit){
+        Result<String> result = new Result<>();
+        List<UserChannelEntity> list = userChannelEntityService.getChannleByUserNameAndChannelAndProduct(userName, channelCode,
+            productCode);
+        if(CollectionUtils.isEmpty(list)){
+            result.error500("改商户无此通道权限");
+            return result;
+        }
+        BigDecimal lower = new BigDecimal(lowerLimit==null?"0":lowerLimit);
+        BigDecimal upper = new BigDecimal(upperLimit==null?"0":upperLimit);
+        userChannelEntityService.updateRate(userName, channelCode, productCode,  lower,  upper);
+        result.setResult("success");
+        return result;
+    }
     /**
      * 保存用户的通道、产品信息
      * @param channelCodes
@@ -100,8 +117,8 @@ public class UserChannelEntityController {
                 boolean flat = false;
                 String noRelationChannel = null;
                 for(String code:codes){
-                    UserChannelEntity agentChannel = userChannelEntityService.queryChannelAndUserName(code,agentName);
-                    if(agentChannel == null){
+                    List<UserChannelEntity> agentChannel = userChannelEntityService.queryChannelAndUserName(code,agentName);
+                    if(CollectionUtils.isEmpty(agentChannel)){
                         flat = true;
                         noRelationChannel = code;
                         break;
@@ -117,19 +134,22 @@ public class UserChannelEntityController {
                 userChannelEntityService.deleteChannel(userName,productChannel,productCode);
             }
             List<ChannelEntity> channels = channelEntityService.queryChannelByCodes(codes);
-            SysUser sysUser = userService.getUserByName(userName);
             for(ChannelEntity channel:channels){
                 UserChannelEntity userChannelEntity = new UserChannelEntity();
-                userChannelEntity.setMemberType(sysUser.getMemberType());
-                userChannelEntity.setUserId(sysUser.getId());
-                userChannelEntity.setUserName(sysUser.getUsername());
+                userChannelEntity.setMemberType(currentUser.getMemberType());
+                userChannelEntity.setUserId(currentUser.getId());
+                userChannelEntity.setUserName(currentUser.getUsername());
                 userChannelEntity.setChannelCode(channel.getChannelCode());
                 userChannelEntity.setChannelId(channel.getId());
                 userChannelEntity.setProductCode(productCode);
                 userChannelEntityService.save(userChannelEntity);
             }
+        }else {
+            //删除商户已关联对应产品下的所有通道信息
+            if(!CollectionUtils.isEmpty(productChannel)){
+                userChannelEntityService.deleteChannel(userName,productChannel,productCode);
+            }
         }
-
         result.setMessage("success");
         return result;
     }
@@ -245,7 +265,7 @@ public class UserChannelEntityController {
                 result.error500("介绍人无法关联通道");
                 return result;
             }
-            UserChannelEntity channel = userChannelEntityService.queryChannelAndUserName(userChannelEntity.getChannelCode(), userChannelEntity.getUserName());
+            List<UserChannelEntity> channel = userChannelEntityService.queryChannelAndUserName(userChannelEntity.getChannelCode(), userChannelEntity.getUserName());
             if (BaseConstant.USER_MERCHANTS.equals(user.getMemberType())) {
                 if (channel != null) {
                     result.error500("该用户已经添加过通道");

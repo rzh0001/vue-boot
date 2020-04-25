@@ -15,24 +15,23 @@ import java.util.*;
 @Slf4j
 @Service
 public class GtpaiUtil {
-    public static String generateSignature(final Map<String, String> params, final String key) throws Exception {
+    public static String generateSignature(final Map<String, Object> params, final String key) throws Exception {
         String paramSrc =getParamSrc(params);
         String paramSrcTemp = paramSrc+"&key="+ key;
+        log.info("==>签名串为：{}",paramSrcTemp);
         return MD5(paramSrcTemp).toUpperCase();
     }
 
-    public static String getParamSrc(Map<String, String> paramsMap) {
+    public static String getParamSrc(Map<String, Object> paramsMap) {
         StringBuffer paramstr = new StringBuffer();
         for (String pkey : paramsMap.keySet()) {
-            String pvalue = paramsMap.get(pkey);
+            String pvalue =(String) paramsMap.get(pkey);
             if (null != pvalue && "" != pvalue) {// 空值不传递，不签名
                 paramstr.append(pkey + "=" + pvalue + "&"); // 签名原串，不url编码
             }
         }
         // 去掉最后一个&
         String result = paramstr.substring(0, paramstr.length() - 1);
-        //System.out.println("签名原串：" + result);
-        //System.out.println("java.nio.charset.Charset.defaultCharset():" + java.nio.charset.Charset.defaultCharset());
         return result;
     }
 

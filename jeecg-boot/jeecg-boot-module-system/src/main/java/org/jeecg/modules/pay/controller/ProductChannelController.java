@@ -1,29 +1,33 @@
-package org.jeecg.modules.productChannel.controller;
+package org.jeecg.modules.pay.controller;
 
 import java.util.*;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.SecurityUtils;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.aspect.annotation.AutoLog;
+import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.pay.entity.BusinessLabelValue;
 import org.jeecg.modules.pay.entity.ChannelEntity;
+import org.jeecg.modules.pay.entity.UserChannelEntity;
 import org.jeecg.modules.pay.service.IChannelEntityService;
 import org.jeecg.modules.pay.service.IUserChannelEntityService;
-import org.jeecg.modules.productChannel.entity.ProductChannel;
-import org.jeecg.modules.productChannel.service.IProductChannelService;
+import org.jeecg.modules.pay.entity.ProductChannel;
+import org.jeecg.modules.pay.service.IProductChannelService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 
+import org.jeecg.modules.system.entity.SysUser;
+import org.jeecg.modules.system.service.ISysUserService;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -56,6 +60,11 @@ public class ProductChannelController {
 	private IProductChannelService productChannelService;
 	@Autowired
 	private IUserChannelEntityService userChannelEntityService;
+	 @Autowired
+	 private ISysUserService userService;
+	 @Autowired
+	 private IChannelEntityService channelEntityService;
+
 	/**
 	 * 分页列表查询
 	 * @param productChannel
@@ -79,20 +88,45 @@ public class ProductChannelController {
 		result.setResult(pageList);
 		return result;
 	}
+
+	 /**
+	  * 根据产品类型和用户获取对应的通道信息
+	  * @param productCode
+	  * @param userName
+	  * @return
+	  */
 	 @GetMapping(value = "/getUserProductChannel")
 	 public Result<Map<String, Object>> getChannel(@RequestParam(name = "productCode") String productCode,
 		 @RequestParam(name="userName")String userName){
-		 //产品已关联的通道
-		 List<ProductChannel> productChannels  = productChannelService.getChannelProduct(productCode);
-		 List<BusinessLabelValue> all = new ArrayList<>();
-		 for(ProductChannel channel:productChannels){
-			 BusinessLabelValue labelValue = new BusinessLabelValue();
-			 labelValue.setLabel(channel.getChannelName());
-			 labelValue.setValue(channel.getChannelCode());
-			 all.add(labelValue);
-		 }
+		 //获取系统用户，
+		 LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+		 SysUser sysUser = userService.getUserByName(loginUser.getUsername());
 		 //获取用户已关联的通道code
 		 List<String> userChannel = userChannelEntityService.getChannelCodeByUserName(userName);
+		 List<BusinessLabelValue> all = new ArrayList<>();
+		 //如果是admin操作，则显示产品下所有的通道
+		 if(sysUser.getUsername().equals("admin")){
+			 //产品已关联的通道
+			 List<ProductChannel> productChannels  = productChannelService.getChannelProduct(productCode);
+			 for(ProductChannel channel:productChannels){
+				 BusinessLabelValue labelValue = new BusinessLabelValue();
+				 labelValue.setLabel(channel.getChannelName());
+				 labelValue.setValue(channel.getChannelCode());
+				 all.add(labelValue);
+			 }
+		 }else{
+			//如果是代理，则只展示对应代理下的产品对应的通道
+			 List<UserChannelEntity> channels = userChannelEntityService.getChannelByLoginNameAndProduceCode(sysUser.getUsername(), productCode);
+			 if(!CollectionUtils.isEmpty(channels)){
+			 	for(UserChannelEntity channel:channels){
+					ChannelEntity c = channelEntityService.queryChannelByCode(channel.getChannelCode());
+					BusinessLabelValue labelValue = new BusinessLabelValue();
+					labelValue.setLabel(c.getChannelName());
+					labelValue.setValue(c.getChannelCode());
+					all.add(labelValue);
+				}
+			 }
+		 }
 		 Result<Map<String, Object>> result = new Result<Map<String, Object>>();
 		 Map<String, Object> re = new HashMap<>();
 		 re.put("all", all);
@@ -100,6 +134,7 @@ public class ProductChannelController {
 		 result.setResult(re);
 		 return result;
 	 }
+
 	 @GetMapping(value = "/getChannelByProductAndUserName")
 	 public Result<List<ProductChannel>> getChannelByProductAndUserName(@RequestParam(name = "productCode") String productCode,
 		 @RequestParam(name="userName")String userName){
@@ -128,8 +163,7 @@ public class ProductChannelController {
 		}
 		return result;
 	}
-	@Autowired
-	private IChannelEntityService channelEntityService;
+
 
 	 /**
 	  * 1、删除该产品下的所有通道

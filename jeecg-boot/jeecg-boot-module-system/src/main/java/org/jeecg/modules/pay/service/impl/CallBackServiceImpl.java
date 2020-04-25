@@ -1,8 +1,11 @@
 package org.jeecg.modules.pay.service.impl;
 
 import cn.hutool.crypto.SecureUtil;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.jeecg.common.util.DateUtils;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import org.jeecg.modules.pay.entity.UserBusinessEntity;
 import org.jeecg.modules.pay.externalUtils.antUtil.AntUtil;
@@ -12,10 +15,7 @@ import org.jeecg.modules.pay.service.IOrderInfoEntityService;
 import org.jeecg.modules.pay.service.IUserBusinessEntityService;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.service.ISysUserService;
-import org.jeecg.modules.util.BaseConstant;
-import org.jeecg.modules.util.R;
-import org.jeecg.modules.util.RequestHandleUtil;
-import org.jeecg.modules.util.SignatureUtils;
+import org.jeecg.modules.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -164,21 +164,42 @@ public class CallBackServiceImpl implements ICallBackService {
 	public String callBackGtpaiAlipay() throws Exception {
 		Map<String, String> map = getParam();
 		log.info("==>GT派支付，回调参数为：{}",map);
-		String sign = map.get("sign");
-		String orderNo = map.get("out_trade_no");
+		String json = map.get("reqData");
+		Map<String,Object> param = JSON.parseObject(json);
+		String sign = (String)param.get("sign");
+		String orderNo =(String) param.get("out_trade_no");
 		String apiKey = this.getApikey(orderNo,BaseConstant.REQUEST_GTPAI_ALIPAY);
-		String retCode = map.get("ret_code");
-		map.remove("sign");
-
-		String localSign = GtpaiUtil.generateSignature(map,apiKey);
+		String retCode = (String)param.get("ret_code");
+		param.remove("sign");
+		Map<String, Object> sortedMap = new TreeMap<String, Object>(param);
+		String localSign = GtpaiUtil.generateSignature(sortedMap,apiKey);
 		if(!localSign.equals(sign)){
 			log.info("==>GT派支付，回调签名为：{}，本地签名为：{}",sign,localSign);
 			return "签名验证不通过";
 		}
 
-		if(!retCode.equals("00")){
-			log.info("==>GT派支付，返回码：{}",retCode);
-			return "sucess";
+		//查询订单状态
+		TreeMap<String, Object> queryMap =  new TreeMap<String,Object>();
+		queryMap.put("mch_id", (String)param.get("mch_id"));
+		queryMap.put("out_trade_no", orderNo);
+		queryMap.put("store_id", (String)param.get("store_id"));
+		String dateStr = DateUtils.date2Str(DateUtils.yyyyMMdd);
+		queryMap.put("trans_date", dateStr);
+
+		String querySign = GtpaiUtil.generateSignature(queryMap,apiKey);
+
+		queryMap.put("sign", querySign);
+		String paramString = JSON.toJSONString(queryMap);
+		TreeMap<String, Object> tmpMap =  new TreeMap<String,Object>();
+		tmpMap.put("reqData", paramString);
+		log.info("==>GT派支付支付宝，查询签名为：{} 查询参数为：{}",querySign, tmpMap);
+		HttpResult result = HttpUtils.doPost("http://gttffp.com:8089/zhifpops/shOrderQuery", tmpMap);
+		String body = result.getBody();
+		log.info("==>GT派支付支付宝，查询返回结果为：{}",body);
+		JSONObject queryRet = JSON.parseObject(body);
+		if(!queryRet.getString("ret_code").equals("00")){
+			log.info("==>GT派支付，查询订单状态失败");
+			return "查询订单状态失败";
 		}
 
 		return this.notify(orderNo, BaseConstant.REQUEST_GTPAI_ALIPAY);

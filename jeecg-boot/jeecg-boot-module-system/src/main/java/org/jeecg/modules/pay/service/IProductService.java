@@ -1,6 +1,6 @@
-package org.jeecg.modules.product.service;
+package org.jeecg.modules.pay.service;
 
-import org.jeecg.modules.product.entity.Product;
+import org.jeecg.modules.pay.entity.Product;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;

@@ -19,7 +19,7 @@ import org.jeecg.modules.pay.mapper.OrderInfoEntityMapper;
 import org.jeecg.modules.pay.service.*;
 import org.jeecg.modules.pay.service.factory.PayServiceFactory;
 import org.jeecg.modules.pay.service.requestPayUrl.RequestPayUrl;
-import org.jeecg.modules.productChannel.service.IProductChannelService;
+import org.jeecg.modules.pay.service.IProductChannelService;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.service.ISysDictService;
 import org.jeecg.modules.system.service.ISysUserService;
@@ -326,10 +326,11 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * @return
      */
     private void checkAmountValidity(String userName, String submitAmount, String payType) {
-        UserChannelEntity channel = channelUserDao.queryChannelAndUserName(payType, userName);
-        if (channel == null) {
+        List<UserChannelEntity> channels = channelUserDao.queryChannelAndUserName(payType, userName);
+        if (channels == null) {
             throw new RRException("用户通道通道不存在:" + payType);
         }
+        UserChannelEntity channel = channels.get(0);
         if (channel.getUpperLimit() != null && channel.getUpperLimit().doubleValue() < Double.parseDouble(submitAmount)) {
             throw new RRException("非法请求，申请金额超出申请上限");
         }
@@ -595,6 +596,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         RequestPayUrl requestPayUrl = (RequestPayUrl) checkParam.get(BaseConstant.REQUEST);
         String requestUrl = (String) checkParam.get(BaseConstant.REQUEST_URL);
         String remark = (String) checkParam.get(BaseConstant.REMARK);
+        String product = (String)checkParam.get(BaseConstant.PRODUCT_NAME);
         log.info("请求创建订单，商户单号为:{};通道为：{};用户名为:{};申请金额为:{}", new String[]{outerOrderId, payType, userName,
                 submitAmount});
         //校验订单是否重复
@@ -604,7 +606,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         UserBusinessEntity userBusinessEntity =(UserBusinessEntity) check.get("userBusinessEntity");
         String rate = (String) check.get("rate");
         //保存订单信息
-        OrderInfoEntity order = this.saveOrder(submitAmount, outerOrderId, userName, userBusinessEntity, payType, callbackUrl, agentName, ip, remark, user,rate);
+        OrderInfoEntity order = this.saveOrder(submitAmount, outerOrderId, userName, userBusinessEntity, payType, callbackUrl, agentName, ip, remark, user,rate,product);
         //请求挂马平台
         return requestPayUrl.requestPayUrl(order, userName, requestUrl, key, innerCallBackUrl, userBusinessEntity);
     }
@@ -684,7 +686,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * @return
      */
     private OrderInfoEntity saveOrder(String submitAmount,String outerOrderId,String userName,UserBusinessEntity userBusinessEntity
-    ,String payType,String callbackUrl,String agentName,String ip,String remark,SysUser user,String rate){
+    ,String payType,String callbackUrl,String agentName,String ip,String remark,SysUser user,String rate,String productCode){
         OrderInfoEntity order = new OrderInfoEntity();
         BigDecimal amount = new BigDecimal(submitAmount);
         BigDecimal poundage = amount.multiply(new BigDecimal(rate)).setScale(2, BigDecimal.ROUND_HALF_UP);
@@ -698,6 +700,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         order.setSubmitAmount(amount);
         order.setStatus(BaseConstant.ORDER_STATUS_NOT_PAY);
         order.setPayType(payType);
+        order.setProductCode(productCode);
         order.setSuccessCallbackUrl(callbackUrl);
         order.setCreateTime(new Date());
         order.setCreateBy("api");
@@ -758,7 +761,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         if (channel == null) {
             return false;
         }
-        UserChannelEntity channelUser = channelUserDao.queryChannelAndUserName(channelCode, userName);
+        List<UserChannelEntity> channelUser = channelUserDao.queryChannelAndUserName(channelCode, userName);
         if (channelUser == null) {
             return false;
         }
@@ -889,8 +892,9 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             String requestUrl = null;
             //产品代码
             String payType = dataObj.getString(BaseConstant.PAY_TYPE);
+            String productCode = null;
             if(createOrder){
-                String productCode = dataObj.getString(BaseConstant.PRODUCT_NAME);
+                productCode = dataObj.getString(BaseConstant.PRODUCT_NAME);
                 payType = this.getChannelByProduct(userName,productCode);
             }
             if (!isQuery) {
@@ -914,6 +918,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
                     .put(BaseConstant.AGENT_NAME, user.getAgentUsername())
                     .put(BaseConstant.REQUEST, request)
                     .put(BaseConstant.REQUEST_URL, requestUrl)
+                    .put(BaseConstant.PRODUCT_NAME, productCode)
                     .put(BaseConstant.REMARK, remark);
         } else {
             return decryptData;

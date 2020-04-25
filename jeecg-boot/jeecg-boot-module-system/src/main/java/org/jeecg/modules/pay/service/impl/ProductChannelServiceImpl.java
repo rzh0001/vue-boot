@@ -1,9 +1,9 @@
-package org.jeecg.modules.productChannel.service.impl;
+package org.jeecg.modules.pay.service.impl;
 
 import org.jeecg.modules.pay.entity.ChannelEntity;
-import org.jeecg.modules.productChannel.entity.ProductChannel;
-import org.jeecg.modules.productChannel.mapper.ProductChannelMapper;
-import org.jeecg.modules.productChannel.service.IProductChannelService;
+import org.jeecg.modules.pay.entity.ProductChannel;
+import org.jeecg.modules.pay.mapper.ProductChannelMapper;
+import org.jeecg.modules.pay.service.IProductChannelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

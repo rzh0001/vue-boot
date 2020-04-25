@@ -204,6 +204,7 @@
             <a-menu slot="overlay">
               <a-menu-item>
                 <a @click="relationProduct(record)">关联产品</a>
+                <a @click="relationProductRate(record)">通道限额</a>
               </a-menu-item>
             </a-menu>
           </a-dropdown>
@@ -242,6 +243,7 @@
     <user-rate-modal ref="userRateModal"></user-rate-modal>
     <active-business-modal ref="activeBusinessModal"></active-business-modal>
     <user-product-modal ref="userProductModal"></user-product-modal>
+    <user-product-rate-modal ref="userProductRateModal"></user-product-rate-modal>
   </a-card>
 </template>
 
@@ -261,6 +263,7 @@
   import UserRateModal from './modules/UserRateModal'
   import ActiveBusinessModal from './modules/ActiveBusinessModal'
   import UserProductModal from './modules/UserProductModal'
+  import UserProductRateModal from './modules/UserProductRateModal'
   import { getAction, httpAction } from '@/api/manage'
 
   export default {
@@ -278,7 +281,8 @@
       UserBusinessModal,
       UserRateModal,
       UserAmountModal,
-      ActiveBusinessModal
+      ActiveBusinessModal,
+      UserProductRateModal
     },
     data() {
       return {
@@ -404,6 +408,10 @@
       //关联产品信息
       relationProduct: function(record){
         this.$refs.userProductModal.relationProduct(record);
+      },
+      //关联产品信息
+      relationProductRate: function(record){
+        this.$refs.userProductRateModal.relationProduct(record);
       },
       activeBusiness: function(record) {
         if (record.memberType != '1') {

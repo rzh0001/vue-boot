@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="org.jeecg.modules.product.mapper.ProductMapper">
-    <select id="getProductByCodes" resultType="org.jeecg.modules.product.entity.Product">
+<mapper namespace="org.jeecg.modules.pay.mapper.ProductMapper">
+    <select id="getProductByCodes" resultType="org.jeecg.modules.pay.entity.Product">
       SELECT * from pay_product WHERE product_code in
         <foreach collection="codes" item="product" open="(" close=")" separator=",">
             #{product}

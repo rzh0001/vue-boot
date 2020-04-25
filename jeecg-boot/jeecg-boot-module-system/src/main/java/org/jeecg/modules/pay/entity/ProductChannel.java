@@ -1,4 +1,4 @@
-package org.jeecg.modules.product.entity;
+package org.jeecg.modules.pay.entity;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -16,18 +16,26 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.jeecgframework.poi.excel.annotation.Excel;
 
 /**
- * @Description: 产品表
+ * @Description: 产品关联通道
  * @Author: jeecg-boot
  * @Date:   2020-03-05
  * @Version: V1.0
  */
 @Data
-@TableName("pay_product")
+@TableName("pay_product_channel")
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value="pay_product对象", description="产品表")
-public class Product {
+@ApiModel(value="pay_product_channel对象", description="产品关联通道")
+public class ProductChannel {
     
+	/**通道代码*/
+	@Excel(name = "通道代码", width = 15)
+    @ApiModelProperty(value = "通道代码")
+	private java.lang.String channelCode;
+	/**通道名称*/
+	@Excel(name = "通道名称", width = 15)
+    @ApiModelProperty(value = "通道名称")
+	private java.lang.String channelName;
 	/**创建时间*/
 	@Excel(name = "创建时间", width = 20, format = "yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")

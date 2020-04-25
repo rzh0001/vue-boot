@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -20,7 +21,7 @@ import java.util.List;
 @Service
 public class UserChannelEntityServiceImpl extends ServiceImpl<UserChannelEntityMapper, UserChannelEntity> implements IUserChannelEntityService {
     @Override
-    public UserChannelEntity queryChannelAndUserName(String channelCode, String userName) {
+    public List<UserChannelEntity> queryChannelAndUserName(String channelCode, String userName) {
         return baseMapper.queryChannelAndUser(channelCode,userName);
     }
 
@@ -62,5 +63,26 @@ public class UserChannelEntityServiceImpl extends ServiceImpl<UserChannelEntityM
     @Override
     public void deleteProductChannle(String product, List<String> channels) {
         baseMapper.deleteProductChannle(product,channels);
+    }
+
+    @Override
+    public List<String> getRelationProducts(String agentName) {
+        return baseMapper.getRelationProducts(agentName);
+    }
+
+    @Override
+    public List<UserChannelEntity> getChannelByLoginNameAndProduceCode(String loginName, String productCode) {
+        return baseMapper.getChannelByLoginNameAndProduceCode(loginName,productCode);
+    }
+
+    @Override
+    public void updateRate(String name, String channel, String productCode, BigDecimal lower, BigDecimal upper) {
+        baseMapper.updateRate( name,  channel,  productCode,  lower,  upper);
+    }
+
+    @Override
+    public List<UserChannelEntity> getChannleByUserNameAndChannelAndProduct(String name, String channel,
+        String product) {
+        return baseMapper.getChannleByUserNameAndChannelAndProduct( name,  channel,product) ;
     }
 }
