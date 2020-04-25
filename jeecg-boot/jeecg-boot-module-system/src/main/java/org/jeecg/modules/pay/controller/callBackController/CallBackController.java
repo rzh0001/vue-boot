@@ -1,7 +1,10 @@
 package org.jeecg.modules.pay.controller.callBackController;
 
 import lombok.extern.slf4j.Slf4j;
+import org.jeecg.modules.pay.service.AbstractCallBack;
+import org.jeecg.modules.pay.service.factory.CallBackServiceFactory;
 import org.jeecg.modules.pay.service.impl.CallBackServiceImpl;
+import org.jeecg.modules.util.BaseConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -57,12 +60,8 @@ public class CallBackController {
 
     @RequestMapping(value = "/gtpaiAlipayCallback", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     @ResponseBody
-    public String gtpaiAlipay(){
-        try{
-            return  callBackService.callBackGtpaiAlipay();
-        }catch (Exception e){
-            log.info("==>GT派支付，回调异常：{}",e);
-        }
-        return "fail";
+    public String gtpaiAlipay() throws Exception {
+       return (String)CallBackServiceFactory.getCallBackRequest(BaseConstant.REQUEST_GTPAI_ALIPAY)
+           .callBack("out_trade_no",BaseConstant.REQUEST_GTPAI_ALIPAY);
     }
 }

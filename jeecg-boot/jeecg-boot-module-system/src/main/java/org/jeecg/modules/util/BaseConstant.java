@@ -62,6 +62,8 @@ public class BaseConstant {
     public static final String QUERY_ORDER_STATUS_URL = "queryOrderStatusUrl";
     public static final String NOTIFY_ORDER_FINISH_URL = "notifyOrderFinishUrl";
     public static final String DOMAIN = "domain";
+    //回调ip白名单
+    public static final String CALLBACK_IP_WHITE="callBackIpWhite";
     //支付通道
     //云闪付
     public static final String REQUEST_YSF = "ysf";

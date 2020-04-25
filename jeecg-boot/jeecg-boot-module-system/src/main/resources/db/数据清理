@@ -1,0 +1,12 @@
+delete from pay_order_info;
+delete from sys_channel_businesss;
+delete from sys_user WHERE username!='admin';
+DELETE FROM sys_user_amount_detail;
+DELETE FROM sys_user_business;
+DELETE FROM sys_user_channel;
+DELETE FROM sys_user_rate;
+DELETE from business_income_log;
+DELETE from pay_cash_out_apply;
+DELETE FROM pay_member_bank_card;
+DELETE from sys_rate_log;
+DELETE from sys_user_amount_report;

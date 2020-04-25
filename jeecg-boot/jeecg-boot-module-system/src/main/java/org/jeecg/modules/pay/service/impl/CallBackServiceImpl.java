@@ -5,7 +5,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.jeecg.common.system.vo.DictModel;
 import org.jeecg.common.util.DateUtils;
+import org.jeecg.common.util.IPUtils;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import org.jeecg.modules.pay.entity.UserBusinessEntity;
 import org.jeecg.modules.pay.externalUtils.antUtil.AntUtil;
@@ -14,6 +16,7 @@ import org.jeecg.modules.pay.service.ICallBackService;
 import org.jeecg.modules.pay.service.IOrderInfoEntityService;
 import org.jeecg.modules.pay.service.IUserBusinessEntityService;
 import org.jeecg.modules.system.entity.SysUser;
+import org.jeecg.modules.system.service.ISysDictService;
 import org.jeecg.modules.system.service.ISysUserService;
 import org.jeecg.modules.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +44,6 @@ public class CallBackServiceImpl implements ICallBackService {
 	private ISysUserService userService;
 	@Autowired
 	private IUserBusinessEntityService businessService;
-
 	@Override
 	public String callBack4niuNanAlipay() throws Exception {
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
@@ -83,7 +85,8 @@ public class CallBackServiceImpl implements ICallBackService {
 		}
 		return this.notify(orderNo, BaseConstant.REQUEST_NIUNAN_ALIPAY);
 	}
-	private String getApikey(String orderNo,String type){
+	@Override
+	public String getApikey(String orderNo,String type)throws Exception{
 		OrderInfoEntity order = orderInfoEntityService.queryOrderInfoByOrderId(orderNo);
 		List<UserBusinessEntity> useBusinesses =
 			businessService.queryBusinessCodeByUserName(order.getAgentUsername(), type);
@@ -142,10 +145,10 @@ public class CallBackServiceImpl implements ICallBackService {
 
 	@Override
 	public String callBackAntAlipay() throws Exception {
-		Map<String, String> map = getParam();
+		Map<String, Object> map = getParam();
 		log.info("==>蚁支付，回调参数为：{}",map);
-		String sign = map.get("sign");
-		String orderNo = map.get("out_trade_no");
+		String sign = (String)map.get("sign");
+		String orderNo =(String) map.get("out_trade_no");
 		String apiKey = this.getApikey(orderNo,BaseConstant.REQUEST_ANT_ALIPAY);
 		map.remove("sign");
 		map.remove("code");
@@ -162,9 +165,9 @@ public class CallBackServiceImpl implements ICallBackService {
 
 	@Override
 	public String callBackGtpaiAlipay() throws Exception {
-		Map<String, String> map = getParam();
+		Map<String, Object> map = getParam();
 		log.info("==>GT派支付，回调参数为：{}",map);
-		String json = map.get("reqData");
+		String json = (String)map.get("reqData");
 		Map<String,Object> param = JSON.parseObject(json);
 		String sign = (String)param.get("sign");
 		String orderNo =(String) param.get("out_trade_no");
@@ -183,8 +186,8 @@ public class CallBackServiceImpl implements ICallBackService {
 		queryMap.put("mch_id", (String)param.get("mch_id"));
 		queryMap.put("out_trade_no", orderNo);
 		queryMap.put("store_id", (String)param.get("store_id"));
-		String dateStr = DateUtils.date2Str(DateUtils.yyyyMMdd);
-		queryMap.put("trans_date", dateStr);
+		//String dateStr = DateUtils.date2Str(DateUtils.yyyyMMdd);
+		//queryMap.put("trans_date", dateStr);
 
 		String querySign = GtpaiUtil.generateSignature(queryMap,apiKey);
 
@@ -204,19 +207,12 @@ public class CallBackServiceImpl implements ICallBackService {
 
 		return this.notify(orderNo, BaseConstant.REQUEST_GTPAI_ALIPAY);
 	}
-
-	private Map<String, String> getParam(){
+	@Override
+	public Map<String, Object> getParam(){
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 		Object param = RequestHandleUtil.getReqParam(request);
-		Map<String, String> map = (Map<String, String>) param;
+		Map<String, Object> map = (Map<String, Object>) param;
 		return map;
-	}
-	public static void main(String[] args) {
-		Map<String, String> map = new HashMap<>();
-		map.put("a", "a");
-		map.put("b", "b");
-		map.remove("a");
-		System.out.println(map);
 	}
 
 	@Async
@@ -229,9 +225,11 @@ public class CallBackServiceImpl implements ICallBackService {
 		log.info("异步通知notify1结束");
 	}
 
-	private String notify(String orderNo, String payType) throws Exception {
+	@Override
+	public String notify(String orderNo, String payType) throws Exception {
 		OrderInfoEntity order = orderInfoEntityService.queryOrderInfoByOrderId(orderNo);
 		if (order == null || order.getStatus() == 2) {
+			log.info("==>无订单信息，订单号为：{}",orderNo);
 			return "非法访问";
 		}
 		order.setStatus(BaseConstant.ORDER_STATUS_SUCCESS_NOT_RETURN);

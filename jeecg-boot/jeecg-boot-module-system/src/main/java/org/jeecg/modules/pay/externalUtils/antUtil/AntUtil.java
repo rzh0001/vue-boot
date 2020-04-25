@@ -15,7 +15,7 @@ import java.util.*;
 @Slf4j
 @Service
 public class AntUtil {
-    public static String generateSignature(final Map<String, String> params, final String key) throws Exception {
+    public static String generateSignature(final Map<String, Object> params, final String key) throws Exception {
         String paramUrl = formatUrlMap(params, true, false, false) + "&key=" + key;
         return MD5(paramUrl).toUpperCase();
     }
@@ -28,22 +28,22 @@ public class AntUtil {
         }
         return sb.toString().toUpperCase();
     }
-    public static String formatUrlMap(Map<String, String> paraMap, boolean removeEmptyValue, boolean urlEncode, boolean keyToLower) {
+    public static String formatUrlMap(Map<String, Object> paraMap, boolean removeEmptyValue, boolean urlEncode, boolean keyToLower) {
         String buff = "";
-        Map<String, String> tmpMap = paraMap;
+        Map<String, Object> tmpMap = paraMap;
         //开启空值筛选，则移除数据
         try {
-            List<Map.Entry<String, String>> infoIds = new ArrayList<Map.Entry<String, String>>(tmpMap.entrySet());
+            List<Map.Entry<String, Object>> infoIds = new ArrayList<Map.Entry<String, Object>>(tmpMap.entrySet());
             // 对所有传入参数按照字段名的 ASCII 码从小到大排序（字典序）
-            Collections.sort(infoIds, new Comparator<Map.Entry<String, String>>() {
+            Collections.sort(infoIds, new Comparator<Map.Entry<String, Object>>() {
                 @Override
-                public int compare(Map.Entry<String, String> o1, Map.Entry<String, String> o2) {
-                    return (o1.getKey()).toString().compareTo(o2.getKey());
+                public int compare(Map.Entry<String, Object> o1, Map.Entry<String, Object> o2) {
+                    return (o1.getKey()).toString().compareTo(o2.getKey().toString());
                 }
             });
             // 构造URL 键值对的格式
             StringBuilder buf = new StringBuilder();
-            for (Map.Entry<String, String> item : infoIds) {
+            for (Map.Entry<String, Object> item : infoIds) {
                 if (StringUtils.isNotBlank(item.getKey())) {
                     String key = item.getKey();
                     Object val = item.getValue();
