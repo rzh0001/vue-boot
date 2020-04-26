@@ -23,6 +23,7 @@ public class ApiRequestBody {
 	private String data;
 	@NotNull(message = "timestamp不能为空")
 	private Long timestamp;
+	private String remark;
 	@NotBlank(message = "sign不能为空")
 	private String sign;
 
@@ -42,9 +43,19 @@ public class ApiRequestBody {
 		return StrUtil.equals(localSign, sign);
 	}
 
+	/**
+	 * 签名拼接规则
+	 *
+	 * @param apiKey
+	 * @return
+	 */
 	public String sign(String apiKey) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(username).append(timestamp).append(data).append(apiKey);
+		sb.append("username=").append(username);
+		sb.append("&timestamp=").append(timestamp);
+		sb.append("&data=").append(data);
+		sb.append("&data=").append(data);
+		sb.append("&apiKey=").append(apiKey);
 		log.info("===>系统拼接的sign串为：{}", sb.toString());
 		return DigestUtils.md5Hex(sb.toString());
 	}

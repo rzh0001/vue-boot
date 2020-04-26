@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.validator.constraints.Length;
+import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import org.jeecg.modules.system.entity.SysUser;
 
 import javax.validation.constraints.NotBlank;
@@ -21,72 +22,44 @@ public class PayOrderData extends ApiData {
 	@Length(max = 45, message = "productCode 最大长度为45")
 	private String productCode;
 
-	@NotBlank(message = "bizOrderNo 不能为空")
-	@Length(max = 32, message = "bizOrderNo 最大长度为32")
-	private String bizOrderNo;
+	@NotBlank(message = "outerOrderId 不能为空")
+	@Length(max = 32, message = "outerOrderId 最大长度为32")
+	private String outerOrderId;
 
 	@NotNull(message = "amount 不能为空")
 	private BigDecimal amount;
 
-	@NotBlank(message = "accountType 不能为空")
-	@Length(max = 1, message = "accountType 最大长度为1")
-	private String accountType;
-
-	@NotBlank(message = "accountName 不能为空")
-	@Length(max = 45, message = "accountName 最大长度为45")
-	private String accountName;
-
-	@NotBlank(message = "accountNo 不能为空")
-	@Length(max = 255, message = "accountNo 最大长度为255")
-	private String accountNo;
-
-	@NotBlank(message = "bankName 不能为空")
-	@Length(max = 100, message = "bankName 最大长度为100")
-	private String bankName;
-
-	@Length(max = 255, message = "branchName 最大长度为255")
-	private String branchName;
-
-	@Length(max = 32, message = "bankCode 最大长度为32")
-	private String bankCode;
-
-	@Length(max = 32, message = "ip 最大长度为32")
-	private String ip;
-
-	@Length(max = 300, message = "callbackUrl 最大长度为300")
+	@NotNull(message = "callbackUrl 不能为空")
+	@Length(max = 360, message = "callbackUrl 最大长度为360")
 	private String callbackUrl;
 
-	@Length(max = 255, message = "remark 最大长度为255")
-	private String remark;
+	@NotBlank(message = "clientId 不能为空")
+	@Length(max = 45, message = "clientId 最大长度为45")
+	private String clientId;
+
+	@Length(max = 32, message = "clientIp 最大长度为32")
+	private String clientIp;
 
 
-//	public PayOrder toPayOrder(SysUser u) {
-//		check();
-//
-//		PayOrder o = new PayOrder();
-//		BeanUtil.copyProperties(this, o);
-//		o.setChannel(productCode);
-//		o.setOuterOrderId(bizOrderNo);
-////		o.setAmount(amount);
-////		o.setAccountType(accountType);
-////		o.setAccountName(accountName);
-//		o.setCardNumber(accountNo);
-////		o.setBankCode(bankCode);
-////		o.setBankName(bankName);
-////		o.setBranchName(branchName);
-////		o.setIp(ip);
-////		o.setCallbackUrl(callbackUrl);
-////		o.setRemark(remark);
-//
-//		o.setUserId(u.getId());
-//		o.setUserName(u.getUsername());
-//		o.setUserRealname(u.getRealname());
-//		o.setAgentId(u.getAgentId());
-//		o.setAgentUsername(u.getAgentUsername());
-//		o.setAgentRealname(u.getAgentRealname());
-//		o.setSalesmanId(u.getSalesmanId());
-//		o.setSalesmanUsername(u.getSalesmanUsername());
-//		o.setSalesmanRealname(u.getSalesmanRealname());
-//		return o;
-//	}
+	public OrderInfoEntity toPayOrder(SysUser u) {
+
+		OrderInfoEntity o = new OrderInfoEntity();
+		BeanUtil.copyProperties(this, o);
+		o.setSubmitAmount(amount);
+		o.setSuccessCallbackUrl(callbackUrl);
+		o.setIp(clientIp);
+
+		o.setUserId(u.getId());
+		o.setUserName(u.getUsername());
+		o.setUserRealname(u.getRealname());
+		o.setAgentId(u.getAgentId());
+		o.setAgentUsername(u.getAgentUsername());
+		o.setAgentRealname(u.getAgentRealname());
+		o.setSalesmanId(u.getSalesmanId());
+		o.setSalesmanUsername(u.getSalesmanUsername());
+		o.setSalesmanRealname(u.getSalesmanRealname());
+
+		o.setParentUser(u.getAgentUsername());
+		return o;
+	}
 }

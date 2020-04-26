@@ -15,74 +15,80 @@ import java.util.List;
 /**
  * @Description: 用户关联通道
  * @Author: jeecg-boot
- * @Date:   2019-07-26
+ * @Date: 2019-07-26
  * @Version: V1.0
  */
 @Service
 public class UserChannelEntityServiceImpl extends ServiceImpl<UserChannelEntityMapper, UserChannelEntity> implements IUserChannelEntityService {
-    @Override
-    public List<UserChannelEntity> queryChannelAndUserName(String channelCode, String userName) {
-        return baseMapper.queryChannelAndUser(channelCode,userName);
-    }
+	@Override
+	public List<UserChannelEntity> queryChannelAndUserName(String channelCode, String userName) {
+		return baseMapper.queryChannelAndUser(channelCode, userName);
+	}
 
-    @Override
-    public List<UserChannelEntity> queryChannelByUserName(String username) {
-        return baseMapper.queryChannelByUserName(username);
-    }
+	@Override
+	public List<UserChannelEntity> queryChannelByUserName(String username) {
+		return baseMapper.queryChannelByUserName(username);
+	}
 
-    @Override
-    public void deleteUserChannel(String userName, String channelCode) {
-        baseMapper.deleteUserChannel(userName,channelCode);
-    }
+	@Override
+	public void deleteUserChannel(String userName, String channelCode) {
+		baseMapper.deleteUserChannel(userName, channelCode);
+	}
 
-    @Override
-    public List<String> queryUserChannel(List<String> channelCodes, String userName) {
-        return this.baseMapper.queryUserChannel(channelCodes,userName);
-    }
+	@Override
+	public List<String> queryUserChannel(List<String> channelCodes, String userName) {
+		return this.baseMapper.queryUserChannel(channelCodes, userName);
+	}
 
-    @Override
-    public void updateUseTime(String channelCode, String userName) {
-        this.baseMapper.updateUseTime(channelCode,userName);
-    }
+	@Override
+	public void updateUseTime(String channelCode, String userName) {
+		this.baseMapper.updateUseTime(channelCode, userName);
+	}
 
-    @Override
-    public List<String> getChannelCodeByUserName(String userName) {
-        return baseMapper.getChannelCodeByUserName(userName);
-    }
+	@Override
+	public List<String> getChannelCodeByUserName(String userName) {
+		return baseMapper.getChannelCodeByUserName(userName);
+	}
 
-    @Override
-    public void deleteChannel(String userName,List<String> codes,String productCode) {
-        baseMapper.deleteChannel(userName,codes,productCode);
-    }
+	@Override
+	public void deleteChannel(String userName, List<String> codes, String productCode) {
+		baseMapper.deleteChannel(userName, codes, productCode);
+	}
 
-    @Override
-    public void save(ChannelEntity channel, SysUser sysUser) {
-        baseMapper.save(channel,sysUser);
-    }
+	@Override
+	public void save(ChannelEntity channel, SysUser sysUser) {
+		baseMapper.save(channel, sysUser);
+	}
 
-    @Override
-    public void deleteProductChannle(String product, List<String> channels) {
-        baseMapper.deleteProductChannle(product,channels);
-    }
+	@Override
+	public void deleteProductChannle(String product, List<String> channels) {
+		baseMapper.deleteProductChannle(product, channels);
+	}
 
-    @Override
-    public List<String> getRelationProducts(String agentName) {
-        return baseMapper.getRelationProducts(agentName);
-    }
+	@Override
+	public List<String> getRelationProducts(String agentName) {
+		return baseMapper.getRelationProducts(agentName);
+	}
 
-    @Override
-    public List<UserChannelEntity> getChannelByLoginNameAndProduceCode(String loginName, String productCode) {
-        return baseMapper.getChannelByLoginNameAndProduceCode(loginName,productCode);
-    }
+	@Override
+	public List<UserChannelEntity> getChannelByLoginNameAndProduceCode(String loginName, String productCode) {
+		return baseMapper.getChannelByLoginNameAndProduceCode(loginName, productCode);
+	}
 
-    @Override
-    public void updateRate(String name, String channel, String productCode, BigDecimal lower, BigDecimal upper) {
-        baseMapper.updateRate( name,  channel,  productCode,  lower,  upper);
-    }
+	@Override
+	public void updateRate(String name, String channel, String productCode, BigDecimal lower, BigDecimal upper) {
+		baseMapper.updateRate(name, channel, productCode, lower, upper);
+	}
 
-    @Override
-    public List<UserChannelEntity> getChannleByUserNameAndChannelAndProduct(String name, String channel,
-        String product) {
-        return baseMapper.getChannleByUserNameAndChannelAndProduct( name,  channel,product) ;
-    }
+	@Override
+	public List<UserChannelEntity> getChannleByUserNameAndChannelAndProduct(String name, String channel,
+																			String product) {
+		return baseMapper.getChannleByUserNameAndChannelAndProduct(name, channel, product);
+	}
+
+	@Override
+	public List<UserChannelEntity> getUserChannel(List<String> channelCodes, String userName) {
+		return this.baseMapper.getUserChannel(channelCodes, userName);
+
+	}
 }

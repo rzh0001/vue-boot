@@ -23,32 +23,35 @@ import java.util.Map;
  */
 public interface OrderInfoEntityMapper extends BaseMapper<OrderInfoEntity> {
 
-    @Select("select order_id from pay_order_info where status in(-1,0) and create_time<#{time}")
-    List<String> getOrderByTime(@Param("time") String time);
+	@Select("select order_id from pay_order_info where status in(-1,0) and create_time<#{time}")
+	List<String> getOrderByTime(@Param("time") String time);
 
-    @Update("update sys_user_business set income_amount=income_amount+#{amount} where user_name=#{userName} and " +
-            "business_code=#{businessCode} and channel_code=#{channelCode}")
-    void updateCustomerIncomeAmount(@Param("userName") String userName, @Param("businessCode") String businessCode,
-                                    @Param("channelCode") String channelCode, @Param("amount") BigDecimal amount);
+	@Update("update sys_user_business set income_amount=income_amount+#{amount} where user_name=#{userName} and " +
+			"business_code=#{businessCode} and channel_code=#{channelCode}")
+	void updateCustomerIncomeAmount(@Param("userName") String userName, @Param("businessCode") String businessCode,
+									@Param("channelCode") String channelCode, @Param("amount") BigDecimal amount);
 
-    @Select("SELECT outer_order_id as outOrderId FROM pay_order_info WHERE outer_order_id = #{outerOrderId}")
-    String queryOrderByOuterOrderId(@Param("outerOrderId") String outerOrderId);
+	@Select("SELECT outer_order_id as outOrderId FROM pay_order_info WHERE outer_order_id = #{outerOrderId}")
+	String queryOrderByOuterOrderId(@Param("outerOrderId") String outerOrderId);
 
-    OrderInfoEntity queryOrderByOrderId(@Param("orderId") String orderId);
+	@Select("SELECT count(*) FROM pay_order_info WHERE outer_order_id = #{outerOrderId} and user_name = #{username}")
+	Integer checkOuterOrderId(@Param("outerOrderId") String outerOrderId, @Param("username") String username);
 
-    void updateOrderStatusSuccessByOrderId(@Param("orderId") String orderId);
+	OrderInfoEntity queryOrderByOrderId(@Param("orderId") String orderId);
 
-    void updateOrderStatusNoBackByOrderId(@Param("orderId") String orderId);
+	void updateOrderStatusSuccessByOrderId(@Param("orderId") String orderId);
 
-    int updateOrderStatusBatch(@Param("orderIds") List<String> orderIds);
+	void updateOrderStatusNoBackByOrderId(@Param("orderId") String orderId);
 
-    Map<String, Object> summary(@Param(Constants.WRAPPER) Wrapper wrapper);
+	int updateOrderStatusBatch(@Param("orderIds") List<String> orderIds);
 
-    @Select("select count(1) as paidCount,sum(submit_amount) as paidAmount, " +
-            "sum(poundage) as payFee " +
-            "from pay_order_info " +
-            "where status = '2' and user_id = #{userId} " +
-            "and to_days(success_time) = to_days(#{date})")
-    @ResultType(HashMap.class)
-    Map<String, Object> summaryUserTodayOrderAmount(@Param("userId") String userId, @Param("date") Date date);
+	Map<String, Object> summary(@Param(Constants.WRAPPER) Wrapper wrapper);
+
+	@Select("select count(1) as paidCount,sum(submit_amount) as paidAmount, " +
+			"sum(poundage) as payFee " +
+			"from pay_order_info " +
+			"where status = '2' and user_id = #{userId} " +
+			"and to_days(success_time) = to_days(#{date})")
+	@ResultType(HashMap.class)
+	Map<String, Object> summaryUserTodayOrderAmount(@Param("userId") String userId, @Param("date") Date date);
 }

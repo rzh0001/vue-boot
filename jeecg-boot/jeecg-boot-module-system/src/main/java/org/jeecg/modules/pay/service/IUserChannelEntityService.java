@@ -11,30 +11,43 @@ import java.util.List;
 /**
  * @Description: 用户关联通道
  * @Author: jeecg-boot
- * @Date:   2019-07-26
+ * @Date: 2019-07-26
  * @Version: V1.0
  */
 public interface IUserChannelEntityService extends IService<UserChannelEntity> {
-    List<UserChannelEntity> queryChannelAndUserName(String channelCode, String userName);
-    List<UserChannelEntity> queryChannelByUserName(String username);
-    void deleteUserChannel(String userName,String channelCode);
-    List<String> queryUserChannel(List<String> channelCodes,String userName);
-    void updateUseTime(String channelCode,String userName);
-    List<String> getChannelCodeByUserName(String userName);
-    void deleteChannel(String userName,List<String> codes,String productCode);
-    void save(ChannelEntity channels, SysUser sysUser);
-    void deleteProductChannle(String product,List<String> channels);
+	List<UserChannelEntity> queryChannelAndUserName(String channelCode, String userName);
 
-    /**
-     * 获取代理已经关联过的产品
-     * @param agentName
-     * @return
-     */
-    List<String> getRelationProducts(String agentName);
+	List<UserChannelEntity> queryChannelByUserName(String username);
 
-    List<UserChannelEntity> getChannelByLoginNameAndProduceCode(String loginName,String productCode);
+	void deleteUserChannel(String userName, String channelCode);
 
-    void updateRate(String name,String channel,String productCode, BigDecimal lower,BigDecimal upper);
+	List<String> queryUserChannel(List<String> channelCodes, String userName);
 
-    List<UserChannelEntity> getChannleByUserNameAndChannelAndProduct(String name,String channel,String product);
+	void updateUseTime(String channelCode, String userName);
+
+	List<String> getChannelCodeByUserName(String userName);
+
+	void deleteChannel(String userName, List<String> codes, String productCode);
+
+	void save(ChannelEntity channels, SysUser sysUser);
+
+	void deleteProductChannle(String product, List<String> channels);
+
+	/**
+	 * 获取代理已经关联过的产品
+	 *
+	 * @param agentName
+	 * @return
+	 */
+	List<String> getRelationProducts(String agentName);
+
+	List<UserChannelEntity> getChannelByLoginNameAndProduceCode(String loginName, String productCode);
+
+	void updateRate(String name, String channel, String productCode, BigDecimal lower, BigDecimal upper);
+
+	List<UserChannelEntity> getChannleByUserNameAndChannelAndProduct(String name, String channel, String product);
+
+
+	List<UserChannelEntity> getUserChannel(List<String> channelCodes, String userName);
+
 }
