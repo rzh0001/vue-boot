@@ -49,19 +49,19 @@ public class SignatureUtils {
      * @param parameters 参数
      * @return 参数签名
      */
-    public static String signature(String secret, Map<String, String> parameters) {
+    public static String signature(String secret, Map<String, Object> parameters) {
         if (StringUtils.isEmpty(secret)) {
             throw new IllegalArgumentException("secret参数不能为空");
         }
         parameters = parameters == null ? new HashMap<>(0) : parameters;
-        TreeMap<String, String> sortedParameters = new TreeMap<>(parameters);
+        TreeMap<String, Object> sortedParameters = new TreeMap<>(parameters);
         StringBuilder paramStrBuilder = new StringBuilder();
-        for (Map.Entry<String, String> item : sortedParameters.entrySet()) {
+        for (Map.Entry<String, Object> item : sortedParameters.entrySet()) {
             if (item.getValue() == null) {
                 paramStrBuilder.append(item.getKey()).append("=").append("&");
                 continue;
             }
-            List<String> valueList = Arrays.asList(item.getValue());
+            List<Object> valueList = Arrays.asList(item.getValue());
             Collections.sort(valueList, (a, b) -> {
                 if (a == b) {
                     return 0;
@@ -75,9 +75,9 @@ public class SignatureUtils {
                 if (a.equals(b)) {
                     return 0;
                 }
-                return a.compareTo(b);
+                return a.toString().compareTo(b.toString());
             });
-            for (String value : valueList) {
+            for (Object value : valueList) {
                 paramStrBuilder.append(item.getKey())
                         .append("=")
                         .append(value == null ? "" : value)
@@ -97,7 +97,7 @@ public class SignatureUtils {
      * @param signature 签名
      * @return 签名是否匹配
      */
-    public static boolean verify(String secret, Map<String, String> parameters, String signature) {
+    public static boolean verify(String secret, Map<String, Object> parameters, String signature) {
         String correctOne = signature(secret, parameters);
         return correctOne.equals(signature);
     }

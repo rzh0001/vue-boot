@@ -58,7 +58,7 @@ public abstract class AbstractCallBack implements CallBackService{
             log.info("==>订单状态查询失败");
             return "fail";
         }
-        //通知客户
+        //异步通知客户
         asyncNotify.asyncNotify(orderNo,payType);
         //回复三方
         return reply(callBackParam,apiKey);

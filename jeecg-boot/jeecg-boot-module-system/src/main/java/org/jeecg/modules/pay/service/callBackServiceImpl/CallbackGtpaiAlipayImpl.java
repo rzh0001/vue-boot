@@ -2,6 +2,7 @@ package org.jeecg.modules.pay.service.callBackServiceImpl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import org.jeecg.modules.api.constant.PayTypeEnum;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import org.jeecg.modules.pay.externalUtils.antUtil.GtpaiUtil;
 import org.jeecg.modules.pay.service.AbstractCallBack;
@@ -23,7 +24,7 @@ import java.util.TreeMap;
  * @Date: 2020/4/24 21:58
  */
 @Service
-public class CallBackGtpaiAlipayImpl extends AbstractCallBack implements InitializingBean {
+public class CallbackGtpaiAlipayImpl extends AbstractCallBack implements InitializingBean {
 
     @Override
     public Object reply(Map<String, Object> map,String apiKey) throws Exception {
@@ -31,7 +32,6 @@ public class CallBackGtpaiAlipayImpl extends AbstractCallBack implements Initial
         String json = (String)map.get("reqData");
         Map<String,Object> param = JSON.parseObject(json);
         String sign = (String)param.get("sign");
-        String orderNo =(String) param.get("out_trade_no");
         param.remove("sign");
         Map<String, Object> sortedMap = new TreeMap<String, Object>(param);
         String localSign = GtpaiUtil.generateSignature(sortedMap,apiKey);
@@ -76,6 +76,6 @@ public class CallBackGtpaiAlipayImpl extends AbstractCallBack implements Initial
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        CallBackServiceFactory.register(BaseConstant.REQUEST_GTPAI_ALIPAY,this);
+        CallBackServiceFactory.register(PayTypeEnum.GTPAI_ALIPAY.getValue(),this);
     }
 }
