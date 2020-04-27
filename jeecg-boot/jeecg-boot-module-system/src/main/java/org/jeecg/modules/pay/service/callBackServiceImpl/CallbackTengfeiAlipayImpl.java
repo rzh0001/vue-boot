@@ -18,16 +18,14 @@ public class CallbackTengfeiAlipayImpl extends AbstractCallBack implements Initi
     @Override
     public Object reply(Map<String, Object> map, String apiKey) throws Exception {
         log.info("==>腾飞支付 回调，回调参数为：{}", map);
-        String openid = (String) map.get("openid");
-        String orderNo = (String) map.get("orderNo");
-        String tradeNo = (String) map.get("tradeNo");
-        String orderPrice = (String) map.get("orderPrice");
-        String sign = (String) map.get("sign");
+        String openid = (String)map.get("openid");
+        String orderNo = (String)map.get("orderNo");
+        String tradeNo = (String)map.get("tradeNo");
+        String orderPrice = (String)map.get("orderPrice");
+        String sign = (String)map.get("sign");
         StringBuilder md5buffer = new StringBuilder();
-        md5buffer.append("openid=").append(openid)
-            .append("&orderNo=").append(orderNo)
-            .append("&orderPrice=").append(orderPrice)
-            .append("&tradeNo=").append(tradeNo).append("&key=").append(apiKey);
+        md5buffer.append("openid=").append(openid).append("&orderNo=").append(orderNo).append("&orderPrice=")
+            .append(orderPrice).append("&tradeNo=").append(tradeNo).append("&key=").append(apiKey);
         log.info("==>腾飞支付 签名：{}", md5buffer.toString());
         String localSign = SecureUtil.md5(md5buffer.toString()).toUpperCase();
         if (!sign.equals(localSign)) {
@@ -49,6 +47,6 @@ public class CallbackTengfeiAlipayImpl extends AbstractCallBack implements Initi
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        CallBackServiceFactory.register(PayTypeEnum.TENGFEI_ALIPAY.getValue(),this);
+        CallBackServiceFactory.register(PayTypeEnum.TENGFEI_ALIPAY.getValue(), this);
     }
 }

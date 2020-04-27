@@ -27,16 +27,16 @@ import java.util.TreeMap;
 public class CallbackGtpaiAlipayImpl extends AbstractCallBack implements InitializingBean {
 
     @Override
-    public Object reply(Map<String, Object> map,String apiKey) throws Exception {
-        log.info("==>GT派支付，回调参数为：{}",map);
+    public Object reply(Map<String, Object> map, String apiKey) throws Exception {
+        log.info("==>GT派支付，回调参数为：{}", map);
         String json = (String)map.get("reqData");
-        Map<String,Object> param = JSON.parseObject(json);
+        Map<String, Object> param = JSON.parseObject(json);
         String sign = (String)param.get("sign");
         param.remove("sign");
         Map<String, Object> sortedMap = new TreeMap<String, Object>(param);
-        String localSign = GtpaiUtil.generateSignature(sortedMap,apiKey);
-        if(!localSign.equals(sign)){
-            log.info("==>GT派支付，回调签名为：{}，本地签名为：{}",sign,localSign);
+        String localSign = GtpaiUtil.generateSignature(sortedMap, apiKey);
+        if (!localSign.equals(sign)) {
+            log.info("==>GT派支付，回调签名为：{}，本地签名为：{}", sign, localSign);
             return "签名验证不通过";
         }
         return "success";
@@ -45,29 +45,29 @@ public class CallbackGtpaiAlipayImpl extends AbstractCallBack implements Initial
     @Override
     public Map<String, Object> getCallBackParam(Map<String, Object> map) {
         String json = (String)map.get("reqData");
-        Map<String,Object> param = JSON.parseObject(json);
+        Map<String, Object> param = JSON.parseObject(json);
         return param;
     }
 
     @Override
-    public boolean checkOrderStatusIsOK(Map<String, Object> param,String apiKey) throws Exception {
-        //查询订单状态
-        TreeMap<String, Object> queryMap =  new TreeMap<String,Object>();
+    public boolean checkOrderStatusIsOK(Map<String, Object> param, String apiKey) throws Exception {
+        // 查询订单状态
+        TreeMap<String, Object> queryMap = new TreeMap<String, Object>();
         queryMap.put("mch_id", (String)param.get("mch_id"));
-        String orderNo =(String) param.get("out_trade_no");
+        String orderNo = (String)param.get("out_trade_no");
         queryMap.put("out_trade_no", orderNo);
         queryMap.put("store_id", (String)param.get("store_id"));
-        String querySign = GtpaiUtil.generateSignature(queryMap,apiKey);
+        String querySign = GtpaiUtil.generateSignature(queryMap, apiKey);
         queryMap.put("sign", querySign);
         String paramString = JSON.toJSONString(queryMap);
-        TreeMap<String, Object> tmpMap =  new TreeMap<String,Object>();
+        TreeMap<String, Object> tmpMap = new TreeMap<String, Object>();
         tmpMap.put("reqData", paramString);
-        log.info("==>GT派支付支付宝，查询签名为：{} 查询参数为：{}",querySign, tmpMap);
+        log.info("==>GT派支付支付宝，查询签名为：{} 查询参数为：{}", querySign, tmpMap);
         HttpResult result = HttpUtils.doPost("http://gttffp.com:8089/zhifpops/shOrderQuery", tmpMap);
         String body = result.getBody();
-        log.info("==>GT派支付支付宝，查询返回结果为：{}",body);
+        log.info("==>GT派支付支付宝，查询返回结果为：{}", body);
         JSONObject queryRet = JSON.parseObject(body);
-        if(!queryRet.getString("ret_code").equals("00")){
+        if (!queryRet.getString("ret_code").equals("00")) {
             log.info("==>GT派支付，查询订单状态失败");
             return false;
         }
@@ -76,6 +76,6 @@ public class CallbackGtpaiAlipayImpl extends AbstractCallBack implements Initial
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        CallBackServiceFactory.register(PayTypeEnum.GTPAI_ALIPAY.getValue(),this);
+        CallBackServiceFactory.register(PayTypeEnum.GTPAI_ALIPAY.getValue(), this);
     }
 }

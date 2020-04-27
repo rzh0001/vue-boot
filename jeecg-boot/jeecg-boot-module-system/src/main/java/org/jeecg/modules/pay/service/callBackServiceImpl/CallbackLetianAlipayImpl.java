@@ -17,7 +17,7 @@ import java.util.Map;
 public class CallbackLetianAlipayImpl extends AbstractCallBack implements InitializingBean {
     @Override
     public Object reply(Map<String, Object> map, String apiKey) throws Exception {
-        log.info("==>乐天支付回调，入参为：{}",map);
+        log.info("==>乐天支付回调，入参为：{}", map);
         String sign = (String)map.get("Signature");
         map.remove("Signature");
         String localSign = SignatureUtils.signature(apiKey, map);
@@ -40,6 +40,6 @@ public class CallbackLetianAlipayImpl extends AbstractCallBack implements Initia
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        CallBackServiceFactory.register(PayTypeEnum.LETIAN_ALIPAY.getValue(),this);
+        CallBackServiceFactory.register(PayTypeEnum.LETIAN_ALIPAY.getValue(), this);
     }
 }
