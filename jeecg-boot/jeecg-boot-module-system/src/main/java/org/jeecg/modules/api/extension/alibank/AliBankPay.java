@@ -4,6 +4,7 @@ import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSONObject;
 import org.jeecg.common.system.vo.DictModel;
 import org.jeecg.common.util.encryption.AES128Util;
+import org.jeecg.modules.api.constant.PayTypeEnum;
 import org.jeecg.modules.api.extension.PayChannelStrategy;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import org.jeecg.modules.system.service.ISysDictService;
@@ -20,7 +21,6 @@ public class AliBankPay implements PayChannelStrategy {
 	@Autowired
 	public ISysDictService dictService;
 
-	private String payType = "ali_bank";
 	/**
 	 * 请求挂码平台的秘钥
 	 */
@@ -43,7 +43,7 @@ public class AliBankPay implements PayChannelStrategy {
 		innerUrlModel.ifPresent(dictModel -> innerCallBackUrl = dictModel.getValue());
 
 		List<DictModel> payUrl = dictService.queryDictItemsByCode(BaseConstant.REQUEST_URL);
-		Optional<DictModel> urlModel = payUrl.stream().filter(model -> payType.equals(model.getText())).findFirst();
+		Optional<DictModel> urlModel = payUrl.stream().filter(model -> PayTypeEnum.ALI_BANK.getValue().equals(model.getText())).findFirst();
 		urlModel.ifPresent(dictModel -> serverUrl = dictModel.getValue());
 	}
 
