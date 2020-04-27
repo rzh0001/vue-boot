@@ -19,6 +19,7 @@ import org.jeecg.modules.util.BaseConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @RestController
@@ -89,4 +90,13 @@ public class SfApiController {
 
 		return null;
 	}
+
+	@RequestMapping(value = "/order/callback/{payType}", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+	@ResponseBody
+	public String callback(@PathVariable String payType, HttpServletRequest req) {
+		log.info("payType={}", payType);
+		return "ok";
+	}
+
+
 }
