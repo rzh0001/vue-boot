@@ -46,6 +46,7 @@ public class AliPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
     public RequestUrlUtils utils;
 
     @Override
+    @Deprecated
     public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key, String callbackUrl,
                            UserBusinessEntity userBusinessEntity) throws Exception {
         String type = null;

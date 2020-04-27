@@ -222,7 +222,6 @@ public class CallBackServiceImpl implements ICallBackService {
 			.callBack(orderNoField,payType);
 	}
 
-	@Async
 	void notify1(String orderNo) throws Exception {
 		log.info("异步通知notify1开始");
 		OrderInfoEntity order = orderInfoEntityService.queryOrderInfoByOrderId(orderNo);

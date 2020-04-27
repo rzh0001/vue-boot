@@ -2,6 +2,7 @@ package org.jeecg.modules.pay.service;
 
 import org.jeecg.common.system.vo.DictModel;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
+import org.jeecg.modules.pay.service.impl.AsyncNotifyServiceImpl;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.service.ISysDictService;
 import org.jeecg.modules.system.service.ISysUserService;
@@ -33,7 +34,7 @@ public abstract class AbstractCallBack implements CallBackService{
     @Autowired
     private IOrderInfoEntityService orderInfoEntityService;
     @Autowired
-    private AsyncNotifyService asyncNotify;
+    private AsyncNotifyServiceImpl asyncNotify;
     @Override
     public Object callBack(String orderNoField,String payType) throws Exception{
         return executeCallBack(orderNoField,payType);

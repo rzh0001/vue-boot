@@ -2,7 +2,6 @@ package org.jeecg.modules.pay.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
-import org.jeecg.modules.pay.service.AsyncNotifyService;
 import org.jeecg.modules.pay.service.IOrderInfoEntityService;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.service.ISysUserService;
@@ -17,12 +16,12 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @Slf4j
-public class AsyncNotifyServiceImpl implements AsyncNotifyService {
+public class AsyncNotifyServiceImpl {
     @Autowired
     private IOrderInfoEntityService orderInfoEntityService;
     @Autowired
     private ISysUserService userService;
-    @Override
+    @Async("taskExecutor")
     public void asyncNotify(String orderNo, String payType) throws Exception {
         log.info("==>异步通知商户信息，订单号：{}，通道类型：{}",orderNo,payType);
         OrderInfoEntity order = orderInfoEntityService.queryOrderInfoByOrderId(orderNo);
