@@ -24,8 +24,6 @@ import java.util.TreeMap;
  */
 @Service
 public class CallBackGtpaiAlipayImpl extends AbstractCallBack implements InitializingBean {
-    @Autowired
-    private IOrderInfoEntityService orderInfoEntityService;
 
     @Override
     public Object reply(Map<String, Object> map,String apiKey) throws Exception {

@@ -33,7 +33,7 @@ public abstract class AbstractCallBack implements CallBackService{
     @Autowired
     private IOrderInfoEntityService orderInfoEntityService;
     @Autowired
-    private ISysUserService userService;
+    private AsyncNotifyService asyncNotify;
     @Override
     public Object callBack(String orderNoField,String payType) throws Exception{
         return executeCallBack(orderNoField,payType);
@@ -58,7 +58,7 @@ public abstract class AbstractCallBack implements CallBackService{
             return "fail";
         }
         //通知客户
-        this.notify(orderNo,payType);
+        asyncNotify.asyncNotify(orderNo,payType);
         //回复三方
         return reply(callBackParam,apiKey);
     }
@@ -72,19 +72,6 @@ public abstract class AbstractCallBack implements CallBackService{
         Object param = RequestHandleUtil.getReqParam(request);
         Map<String, Object> map = (Map<String, Object>) param;
         return map;
-    }
-    @Async
-    public void notify(String orderNo, String payType) throws Exception {
-        log.info("==>异步通知商户信息，订单号：{}，通道类型：{}",orderNo,payType);
-        OrderInfoEntity order = orderInfoEntityService.queryOrderInfoByOrderId(orderNo);
-        if (order == null || order.getStatus() == 2) {
-            log.info("==>异步通知商户信息,无订单信息，订单号为：{}",orderNo);
-            return;
-        }
-        order.setStatus(BaseConstant.ORDER_STATUS_SUCCESS_NOT_RETURN);
-        SysUser user = userService.getUserByName(order.getUserName());
-        orderInfoEntityService.notifyCustomer(order, user, payType);
-        log.info("==>异步通知商户信息成功");
     }
     /**
      * 回复三方

@@ -17,8 +17,7 @@ import java.util.Map;
 @Service
 public class CallbackAntAlipayImpl extends AbstractCallBack implements InitializingBean {
     @Override
-    public Object reply(Map<String, Object> param, String apiKey) throws Exception {
-        Map<String, Object> map = getParam();
+    public Object reply(Map<String, Object> map, String apiKey) throws Exception {
         log.info("==>蚁支付，回调参数为：{}",map);
         String sign = (String)map.get("sign");
         String orderNo =(String) map.get("out_trade_no");
