@@ -64,4 +64,11 @@ public class CallBackController {
        return (String)CallBackServiceFactory.getCallBackRequest(BaseConstant.REQUEST_GTPAI_ALIPAY)
            .callBack("out_trade_no",BaseConstant.REQUEST_GTPAI_ALIPAY);
     }
+
+    @RequestMapping(value = "/yitongAlipayCallback", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+    @ResponseBody
+    public String yitongAlipay() throws Exception {
+        return (String)CallBackServiceFactory.getCallBackRequest(BaseConstant.REQUEST_YITONG_ALIPAY)
+                .callBack("out_trade_no",BaseConstant.REQUEST_YITONG_ALIPAY);
+    }
 }
