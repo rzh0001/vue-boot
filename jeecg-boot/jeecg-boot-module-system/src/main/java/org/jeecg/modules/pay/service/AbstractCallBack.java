@@ -49,6 +49,10 @@ public abstract class AbstractCallBack implements CallBackService{
         String orderNo = (String)callBackParam.get(orderNoField);
         this.notify(orderNo,payType);
         String apiKey = callBackService.getApikey(orderNo,payType);
+        if(!this.checkOrderStatusIsOK(callBackParam,apiKey)){
+            log.info("==>订单状态查询失败");
+            return "fail";
+        }
         return reply(callBackParam,apiKey);
     }
 
@@ -89,6 +93,13 @@ public abstract class AbstractCallBack implements CallBackService{
      * @return
      */
     public abstract Map<String,Object> getCallBackParam(Map<String,Object> map);
+
+    /**
+     * 查询三方订单状态是否成功
+     * @param map 三方请求入参
+     * @return
+     */
+    public abstract boolean checkOrderStatusIsOK(Map<String,Object> map,String apiKey) throws Exception;
     /**
      * 校验回调IP
      * @param payType

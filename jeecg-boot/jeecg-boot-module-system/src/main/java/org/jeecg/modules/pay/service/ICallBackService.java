@@ -15,4 +15,6 @@ public interface ICallBackService {
     String getApikey(String orderNo,String type)throws Exception;
     String notify(String orderNo, String payType) throws Exception;
     Map<String, Object> getParam()throws Exception;
+
+    Object callBack(String orderNoField,String payType) throws Exception;
 }

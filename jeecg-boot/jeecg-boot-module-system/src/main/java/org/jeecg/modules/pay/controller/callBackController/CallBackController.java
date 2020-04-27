@@ -61,7 +61,6 @@ public class CallBackController {
     @RequestMapping(value = "/gtpaiAlipayCallback", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     @ResponseBody
     public String gtpaiAlipay() throws Exception {
-       return (String)CallBackServiceFactory.getCallBackRequest(BaseConstant.REQUEST_GTPAI_ALIPAY)
-           .callBack("out_trade_no",BaseConstant.REQUEST_GTPAI_ALIPAY);
+        return (String)callBackService.callBack("out_trade_no",BaseConstant.REQUEST_GTPAI_ALIPAY);
     }
 }

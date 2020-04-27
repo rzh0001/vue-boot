@@ -15,6 +15,7 @@ import org.jeecg.modules.pay.externalUtils.antUtil.GtpaiUtil;
 import org.jeecg.modules.pay.service.ICallBackService;
 import org.jeecg.modules.pay.service.IOrderInfoEntityService;
 import org.jeecg.modules.pay.service.IUserBusinessEntityService;
+import org.jeecg.modules.pay.service.factory.CallBackServiceFactory;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.service.ISysDictService;
 import org.jeecg.modules.system.service.ISysUserService;
@@ -213,6 +214,12 @@ public class CallBackServiceImpl implements ICallBackService {
 		Object param = RequestHandleUtil.getReqParam(request);
 		Map<String, Object> map = (Map<String, Object>) param;
 		return map;
+	}
+
+	@Override
+	public Object callBack(String orderNoField, String payType) throws Exception {
+		return (String)CallBackServiceFactory.getCallBackRequest(payType)
+			.callBack(orderNoField,payType);
 	}
 
 	@Async

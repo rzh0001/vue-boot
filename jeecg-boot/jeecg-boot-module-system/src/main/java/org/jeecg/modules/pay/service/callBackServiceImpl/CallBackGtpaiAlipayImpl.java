@@ -44,9 +44,28 @@ public class CallBackGtpaiAlipayImpl extends AbstractCallBack implements Initial
             return "签名验证不通过";
         }
 
+
+        OrderInfoEntity order = orderInfoEntityService.queryOrderInfoByOrderId(orderNo);
+        if (order == null || order.getStatus() == 2) {
+            log.info("==>无订单信息，订单号为：{}",orderNo);
+            return "非法访问";
+        }
+        return "success";
+    }
+
+    @Override
+    public Map<String, Object> getCallBackParam(Map<String, Object> map) {
+        String json = (String)map.get("reqData");
+        Map<String,Object> param = JSON.parseObject(json);
+        return param;
+    }
+
+    @Override
+    public boolean checkOrderStatusIsOK(Map<String, Object> param,String apiKey) throws Exception {
         //查询订单状态
         TreeMap<String, Object> queryMap =  new TreeMap<String,Object>();
         queryMap.put("mch_id", (String)param.get("mch_id"));
+        String orderNo =(String) param.get("out_trade_no");
         queryMap.put("out_trade_no", orderNo);
         queryMap.put("store_id", (String)param.get("store_id"));
         String querySign = GtpaiUtil.generateSignature(queryMap,apiKey);
@@ -61,21 +80,9 @@ public class CallBackGtpaiAlipayImpl extends AbstractCallBack implements Initial
         JSONObject queryRet = JSON.parseObject(body);
         if(!queryRet.getString("ret_code").equals("00")){
             log.info("==>GT派支付，查询订单状态失败");
-            return "查询订单状态失败";
+            return false;
         }
-        OrderInfoEntity order = orderInfoEntityService.queryOrderInfoByOrderId(orderNo);
-        if (order == null || order.getStatus() == 2) {
-            log.info("==>无订单信息，订单号为：{}",orderNo);
-            return "非法访问";
-        }
-        return "success";
-    }
-
-    @Override
-    public Map<String, Object> getCallBackParam(Map<String, Object> map) {
-        String json = (String)map.get("reqData");
-        Map<String,Object> param = JSON.parseObject(json);
-        return param;
+        return true;
     }
 
     @Override
