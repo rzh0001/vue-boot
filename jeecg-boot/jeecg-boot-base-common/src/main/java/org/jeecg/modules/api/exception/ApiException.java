@@ -1,5 +1,7 @@
 package org.jeecg.modules.api.exception;
 
+import org.jeecg.common.util.SUtil;
+
 /**
  * API异常基类
  *
@@ -15,6 +17,14 @@ public class ApiException extends RuntimeException {
 	public ApiException(String msg) {
 		super(msg);
 		this.msg = msg;
+	}
+
+	public static ApiException Fuck(String msg) {
+		return new ApiException(msg);
+	}
+
+	public static ApiException Fuck(String format, Object... args) {
+		return new ApiException(SUtil.concat(format, args));
 	}
 
 	public ApiException(String msg, Throwable e) {

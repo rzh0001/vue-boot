@@ -79,4 +79,6 @@ public interface IOrderInfoEntityService extends IService<OrderInfoEntity> {
      * @param orderId
      */
     void updateCustomerIncomeAmount(String orderId, BigDecimal amount) throws Exception;
+
+
 }

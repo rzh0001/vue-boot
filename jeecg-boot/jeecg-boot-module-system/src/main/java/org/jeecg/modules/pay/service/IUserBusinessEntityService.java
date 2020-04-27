@@ -1,12 +1,9 @@
 package org.jeecg.modules.pay.service;
 
-import org.apache.ibatis.annotations.Param;
+import com.baomidou.mybatisplus.extension.service.IService;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import org.jeecg.modules.pay.entity.UserBusinessEntity;
-import com.baomidou.mybatisplus.extension.service.IService;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -49,4 +46,6 @@ public interface IUserBusinessEntityService extends IService<UserBusinessEntity>
 	void updateBusinessTodayAmount();
 
 	UserBusinessEntity getUserBusiness(String userId, String businessCode, String channelCode);
+
+	UserBusinessEntity getUserChannelConfig(String userId, String channelCode);
 }

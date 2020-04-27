@@ -1,15 +1,15 @@
 package org.jeecg.modules.pay.mapper;
 
-import java.math.BigDecimal;
-import java.util.List;
-
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import org.jeecg.modules.pay.entity.UserBusinessEntity;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @Description: 用户关联商户
@@ -74,4 +74,6 @@ public interface UserBusinessEntityMapper extends BaseMapper<UserBusinessEntity>
 	@Update("update sys_user_business set today_amount=0.000")
 	void updateBusinessTodayAmount();
 
+	@Select("select * from sys_user_business where user_id=#{userId}  and channel_code=#{channelCode} limit 1 ")
+	UserBusinessEntity getUserChannelConfig(String userId, String channelCode);
 }

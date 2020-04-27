@@ -26,6 +26,7 @@ import org.jeecg.modules.system.service.ISysUserService;
 import org.jeecg.modules.system.util.IPUtils;
 import org.jeecg.modules.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -1051,45 +1052,6 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         return callbackjson;
     }
 
-    public static void main(String[] args) {
-//        String a = DigestUtils.md5Hex("zy001" + "1566805086620" + "q39k6ykfJVUo/qDaabvhvNkKdBjrDrbUjqGgw/S" +
-//                "/PjR4uspksIZJafy+Ne706Th0UevmQ4qChja6OCqhXZCzvLwe8xuP6P5YqqgsycHfzi8KuQ1UNqr/Zcm0lPevv4K5R" +
-//                "/bhHjj0qEyH+VgDNO0C5jS3sAIXuaIyoShraI2eIXwYW8o+Mj9RyLLb/e1OyhxAXX8HPV19xarwMX06v
-// /9aBBwLyOPM1dHfTFmyw" +
-//                "/fasVc=" + "ec27798b41934764");
-
-        String b = AES128Util.decryptBase64("ewEEEv1xmS+NYpg8DyqzwetQP3gaCCdtqHaA43HR6TpdUoT3J7iT92Umc3ijkzea3YaZLx" +
-                "+XF2gU2QgLg1Zr3hSh45K4Y1w0wdr7Fxh932WBzp9ogXx/zyxCF+EOBesI", "a01d43d25c6c41f5");
-//        OrderInfoEntity order = new OrderInfoEntity();
-//        order.setOrderId("111");
-//        order.setOuterOrderId("222");
-//        order.setSubmitAmount(new BigDecimal(0.5));
-//        order.setStatus(2);
-//        JSONObject callobj = new JSONObject();
-//        Long timestamp = System.currentTimeMillis();
-//        callobj.put(BaseConstant.ORDER_ID, order.getOrderId());
-//        callobj.put(BaseConstant.OUTER_ORDER_ID, order.getOuterOrderId());
-//        callobj.put(BaseConstant.SUBMIT_AMOUNT, order.getSubmitAmount());
-//        callobj.put(BaseConstant.STATUS, order.getStatus());
-//
-//        log.info("====回调商户加密前数据====" + callobj.toJSONString());
-//        //加密数据
-//        String data = AES128Util.encryptBase64(callobj.toJSONString(), "aaaa");
-//        JSONObject callbackjson = new JSONObject();
-//        StringBuilder sign = new StringBuilder();
-//        //sign = orderID+outOrderId+submitAmount+timestamp
-//        sign.append(order.getOrderId()).append(order.getOuterOrderId()).append(order.getSubmitAmount()).append
-// (timestamp);
-//        callbackjson.put(BaseConstant.SIGN, DigestUtils.md5Hex(sign.toString()));
-//        callbackjson.put(BaseConstant.DATA, data);
-//        callbackjson.put(BaseConstant.TIMESTAMP, timestamp);
-//        log.info("====回调商户加密后数据====" + callbackjson);
-//        Double b = 22985.020;
-//        Double c = 22202.050;
-//        BigDecimal remain = new BigDecimal(b).subtract(new BigDecimal(c)).setScale(2, BigDecimal.ROUND_HALF_UP);
-
-        System.out.println(b);
-    }
 
     @Override
     public OrderInfoEntity queryOrderInfoByOrderId(String orderId) {
