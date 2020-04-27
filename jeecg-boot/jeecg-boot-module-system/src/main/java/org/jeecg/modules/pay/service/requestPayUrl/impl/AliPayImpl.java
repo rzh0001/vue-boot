@@ -35,6 +35,7 @@ import java.util.Map;
  */
 @Service
 @Slf4j
+@Deprecated
 public class AliPayImpl implements RequestPayUrl<OrderInfoEntity, String, String, String, String, UserBusinessEntity,
         Object>, InitializingBean, ApplicationContextAware {
 
@@ -46,7 +47,6 @@ public class AliPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
     public RequestUrlUtils utils;
 
     @Override
-    @Deprecated
     public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key, String callbackUrl,
                            UserBusinessEntity userBusinessEntity) throws Exception {
         String type = null;
