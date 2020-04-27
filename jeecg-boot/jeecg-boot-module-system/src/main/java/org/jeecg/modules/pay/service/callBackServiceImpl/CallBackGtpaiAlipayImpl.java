@@ -25,8 +25,6 @@ import java.util.TreeMap;
 @Service
 public class CallBackGtpaiAlipayImpl extends AbstractCallBack implements InitializingBean {
     @Autowired
-    ICallBackService callBackService;
-    @Autowired
     private IOrderInfoEntityService orderInfoEntityService;
 
     @Override
@@ -42,13 +40,6 @@ public class CallBackGtpaiAlipayImpl extends AbstractCallBack implements Initial
         if(!localSign.equals(sign)){
             log.info("==>GT派支付，回调签名为：{}，本地签名为：{}",sign,localSign);
             return "签名验证不通过";
-        }
-
-
-        OrderInfoEntity order = orderInfoEntityService.queryOrderInfoByOrderId(orderNo);
-        if (order == null || order.getStatus() == 2) {
-            log.info("==>无订单信息，订单号为：{}",orderNo);
-            return "非法访问";
         }
         return "success";
     }

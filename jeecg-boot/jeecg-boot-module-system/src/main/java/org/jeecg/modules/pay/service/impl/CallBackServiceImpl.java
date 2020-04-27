@@ -158,7 +158,7 @@ public class CallBackServiceImpl implements ICallBackService {
 		map.remove("sub_msg");
 		String localSign = AntUtil.generateSignature(map,apiKey);
 		if(!localSign.equals(sign)){
-			log.info("==>蚁支付，回调签名为：{}，本地签名为：{}",sign,localSign);
+			log.info("==>蚁支付验证签名异常，回调签名为：{}，本地签名为：{}",sign,localSign);
 			return "签名验证不通过";
 		}
 		return this.notify(orderNo, BaseConstant.REQUEST_ANT_ALIPAY);
@@ -236,7 +236,7 @@ public class CallBackServiceImpl implements ICallBackService {
 	public String notify(String orderNo, String payType) throws Exception {
 		OrderInfoEntity order = orderInfoEntityService.queryOrderInfoByOrderId(orderNo);
 		if (order == null || order.getStatus() == 2) {
-			log.info("==>无订单信息，订单号为：{}",orderNo);
+			log.info("==>ant无订单信息，订单号为：{}",orderNo);
 			return "非法访问";
 		}
 		order.setStatus(BaseConstant.ORDER_STATUS_SUCCESS_NOT_RETURN);

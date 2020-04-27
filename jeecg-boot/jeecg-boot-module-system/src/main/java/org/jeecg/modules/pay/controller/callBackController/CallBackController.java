@@ -49,13 +49,8 @@ public class CallBackController {
     }
     @RequestMapping(value = "/antAlipayCallback", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     @ResponseBody
-    public String antAlipay(){
-        try{
-            return  callBackService.callBackAntAlipay();
-        }catch (Exception e){
-            log.info("==>蚁支付，回调异常：{}",e);
-        }
-        return "fail";
+    public String antAlipay() throws Exception {
+        return (String)callBackService.callBack("out_trade_no",BaseConstant.REQUEST_ANT_ALIPAY);
     }
 
     @RequestMapping(value = "/gtpaiAlipayCallback", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
