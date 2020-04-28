@@ -17,6 +17,7 @@ public class ApiV2Test {
 	private String ip = "http://127.0.0.1:8080";
 	private String createUrl = ip + "/pay/api/v2/order/create";
 	private String queryUrl = ip + "/dfxt/api/order/query";
+	private String callbackUrl = ip + "/pay/api/v2/order/callback";
 
 	private String orderId = "df202001246546rw827"; // 您系统的订单号，测试时可以更换
 
@@ -43,4 +44,8 @@ public class ApiV2Test {
 		System.out.println("返回信息：" + result);
 	}
 
+	@Test
+	public void callback() {
+		String result = HttpUtil.post(callbackUrl + "/ali_bank", "{'asdf': 'asdf'}");
+	}
 }
