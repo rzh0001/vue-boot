@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -79,7 +80,7 @@ public class ISfApiServiceImpl implements ISfApiService {
 	}
 
 	@Override
-	public boolean callback(String orderId) {
-		return false;
+	public String callback(String payType, HttpServletRequest req) {
+		return payChannel.callback(payType, req);
 	}
 }

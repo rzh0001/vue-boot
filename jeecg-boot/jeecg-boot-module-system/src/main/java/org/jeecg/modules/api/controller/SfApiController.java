@@ -95,6 +95,7 @@ public class SfApiController {
 	@ResponseBody
 	public String callback(@PathVariable String payType, HttpServletRequest req) {
 		log.info("payType={}", payType);
+		apiService.callback(payType, req);
 		return "ok";
 	}
 
