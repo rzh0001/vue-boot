@@ -43,7 +43,7 @@ public class AntAlipayImpy implements
     private RequestUrlUtils utils;
     @Autowired
     public ISysDictService dictService;
-    private static final String CALLBACK_URL="/callBack/antAlipayCallback";
+    private static final String CALLBACK_URL="/callBack/order/antAlipay/out_trade_no";
     @Override
     public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key, String callbackUrl,
         UserBusinessEntity userBusiness) throws Exception {

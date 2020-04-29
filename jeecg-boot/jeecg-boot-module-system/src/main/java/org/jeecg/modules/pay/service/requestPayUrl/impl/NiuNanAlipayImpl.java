@@ -27,7 +27,7 @@ import java.util.Map;
 public class NiuNanAlipayImpl implements
     RequestPayUrl<OrderInfoEntity, String, String, String, String, UserBusinessEntity, Object>, InitializingBean {
 
-    private static final String CALLBACK_URL = "/callBack/niuNanAlipay";
+    private static final String CALLBACK_URL = "/callBack/order/niuNanAlipay/orderNo";
     @Autowired
     public ISysDictService dictService;
     @Autowired

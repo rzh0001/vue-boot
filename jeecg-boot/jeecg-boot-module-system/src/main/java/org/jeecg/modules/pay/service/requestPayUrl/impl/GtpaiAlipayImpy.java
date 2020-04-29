@@ -44,7 +44,7 @@ public class GtpaiAlipayImpy implements
     private RequestUrlUtils utils;
     @Autowired
     public ISysDictService dictService;
-    private static final String CALLBACK_URL="/callBack/gtpaiAlipayCallback";
+    private static final String CALLBACK_URL="/callBack/order/gtpaiAlipay/out_trade_no";
     private static final String store_id = "9999kkf";
     private static final String pay_type = "53";
 

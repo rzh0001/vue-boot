@@ -27,10 +27,8 @@ import java.util.TreeMap;
 public class CallbackGtpaiAlipayImpl extends AbstractCallBack implements InitializingBean {
 
     @Override
-    public Object reply(Map<String, Object> map, String apiKey) throws Exception {
-        log.info("==>GT派支付，回调参数为：{}", map);
-        String json = (String)map.get("reqData");
-        Map<String, Object> param = JSON.parseObject(json);
+    public Object reply(Map<String, Object> param, String apiKey) throws Exception {
+        log.info("==>GT派支付，回调参数为：{}", param);
         String sign = (String)param.get("sign");
         param.remove("sign");
         Map<String, Object> sortedMap = new TreeMap<String, Object>(param);
