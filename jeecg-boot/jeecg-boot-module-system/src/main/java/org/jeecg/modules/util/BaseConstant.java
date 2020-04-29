@@ -96,6 +96,8 @@ public class BaseConstant {
     public static final String REQUEST_LETIAN_ALIPAY="leTianAlipay";
     //牛腩支付-支付宝
     public static final String REQUEST_NIUNAN_ALIPAY="niuNanAlipay";
+    //牛腩支付-网银
+    public static final String REQUEST_NIUNAN_ONLINE_BANK ="niuNanOnlineBank";
     //腾飞支付-支付宝
     public static final String REQUEST_TENGFEI_ALIPAY = "XTFF";
     public static final String REQUEST_ANT_ALIPAY = "antAlipay";

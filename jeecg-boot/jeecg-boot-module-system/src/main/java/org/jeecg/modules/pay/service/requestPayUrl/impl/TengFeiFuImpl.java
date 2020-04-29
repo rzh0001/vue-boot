@@ -49,7 +49,7 @@ public class TengFeiFuImpl implements RequestPayUrl<OrderInfoEntity, String, Str
 	private RequestUrlUtils utils;
 	@Autowired
 	public ISysDictService dictService;
-	private static final String CALLBACK_URL="/callBack/tengfeiAlipay";
+	private static final String CALLBACK_URL="/callBack/order/XTFF/orderNo";
 
 	@Override
 	public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key, String callbackUrl,

@@ -13,8 +13,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component("ali_bank")
 public class AliBankPay implements PayChannelStrategy {
@@ -57,6 +63,15 @@ public class AliBankPay implements PayChannelStrategy {
 		return response;
 	}
 
+	@Override
+	public String callback(HttpServletRequest req) {
+		// 1.从HttpServletRequest获取数据
+		Map<String, String[]> parameterMap = req.getParameterMap(); //获取以form提交的数据
+		JSONObject json = getJson(req); // 获取以json提交的数据
+
+		return null;
+	}
+
 	private AliBankRequestBody generate(OrderInfoEntity orderInfo) {
 		AliBankRequestBody body = new AliBankRequestBody();
 		body.setAccount_id(orderInfo.getBusinessCode());
@@ -84,5 +99,17 @@ public class AliBankPay implements PayChannelStrategy {
 		body.setUserName(orderInfo.getUserName());
 		body.setSign(body.sign(orderInfo, apiKey));
 		return body;
+	}
+
+	public JSONObject getJson(HttpServletRequest req) {
+		String s = null;
+		try {
+			BufferedReader reader = req.getReader();
+			Stream<String> lines = reader.lines();
+			s = lines.collect(Collectors.joining());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return JSONObject.parseObject(s);
 	}
 }

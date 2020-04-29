@@ -4,6 +4,7 @@ import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -18,6 +19,10 @@ public class PayChannelContext {
 
 	public String request(OrderInfoEntity orderInfo) {
 		return strategyMap.get(orderInfo.getPayType()).pay(orderInfo);
+	}
+
+	public String callback(String payType, HttpServletRequest req) {
+		return strategyMap.get(payType).callback(req);
 	}
 
 }

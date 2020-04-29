@@ -64,7 +64,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class LeTianPayImpl implements RequestPayUrl<OrderInfoEntity, String, String, String, String, UserBusinessEntity,
     Object>, InitializingBean, ApplicationContextAware {
-    private static final String CALLBACK_URL = "/callBack/leTianAlipay";
+    private static final String CALLBACK_URL = "/callBack/order/leTianAlipay/outTradeNo";
     @Autowired
     public ISysDictService dictService;
     @Autowired
@@ -74,7 +74,7 @@ public class LeTianPayImpl implements RequestPayUrl<OrderInfoEntity, String, Str
     @Override
     public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key, String callbackUrl,
         UserBusinessEntity userBusiness) throws Exception {
-        Map<String, String> paraMap = new HashMap();
+        Map<String, Object> paraMap = new HashMap();
         paraMap.put("outTradeNo",order.getOrderId() );
         paraMap.put("totalAmount", order.getSubmitAmount().toString());
         //登录后台  推广商管理  推广商   推广商ID
@@ -110,7 +110,7 @@ public class LeTianPayImpl implements RequestPayUrl<OrderInfoEntity, String, Str
     @Override
     public boolean orderInfoOk(OrderInfoEntity order, String url, UserBusinessEntity userBusiness)
         throws Exception {
-        Map<String, String> paraMap = new HashMap();
+        Map<String, Object> paraMap = new HashMap();
         paraMap.put("outTradeNo", order.getOrderId());
         paraMap.put("promoterId", userBusiness.getBusinessCode());
         String secret = userBusiness.getApiKey();
@@ -182,7 +182,7 @@ public class LeTianPayImpl implements RequestPayUrl<OrderInfoEntity, String, Str
      * @throws IOException
      * @throws ClientProtocolException
      */
-    public String send(String url, Map<String,String> paraMap,String encoding, Map<String,String> headerMap) throws KeyManagementException, NoSuchAlgorithmException, ClientProtocolException, IOException {
+    public String send(String url, Map<String,Object> paraMap,String encoding, Map<String,String> headerMap) throws KeyManagementException, NoSuchAlgorithmException, ClientProtocolException, IOException {
         String body = "";
 
         SSLContext sslcontext = createIgnoreVerifySSL();
@@ -203,8 +203,8 @@ public class LeTianPayImpl implements RequestPayUrl<OrderInfoEntity, String, Str
         //装填参数
         List<NameValuePair> nvps = new ArrayList<NameValuePair>();
         if(paraMap!=null){
-            for (Entry<String, String> entry : paraMap.entrySet()) {
-                nvps.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
+            for (Entry<String, Object> entry : paraMap.entrySet()) {
+                nvps.add(new BasicNameValuePair(entry.getKey(), (String)entry.getValue()));
             }
         }
         //设置参数到请求对象中
