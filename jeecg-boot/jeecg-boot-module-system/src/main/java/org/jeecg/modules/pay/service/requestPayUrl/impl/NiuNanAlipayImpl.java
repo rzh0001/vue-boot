@@ -42,7 +42,12 @@ public class NiuNanAlipayImpl implements
         String amount = order.getSubmitAmount().multiply(new BigDecimal("100")).toString();
         param.setOrderAmount(amount);
         param.setCallbackUrl(this.getDomain()+CALLBACK_URL);
-        param.setPayType("2");
+        if(order.getPayType().equals(BaseConstant.REQUEST_NIUNAN_ONLINE_BANK)){
+            //网银
+            param.setPayType("10");
+        }else {
+            param.setPayType("2");
+        }
         param.setProductDesc("alipay");
         StringBuilder buffer = new StringBuilder();
         buffer.append("callbackUrl=").append(param.getCallbackUrl())
@@ -121,5 +126,7 @@ public class NiuNanAlipayImpl implements
     public void afterPropertiesSet() throws Exception {
         PayServiceFactory.register(BaseConstant.REQUEST_NIUNAN_ALIPAY, this);
         PayServiceFactory.registerUrl(BaseConstant.REQUEST_NIUNAN_ALIPAY, utils.getRequestUrl(BaseConstant.REQUEST_NIUNAN_ALIPAY));
+        PayServiceFactory.register(BaseConstant.REQUEST_NIUNAN_ONLINE_BANK, this);
+        PayServiceFactory.registerUrl(BaseConstant.REQUEST_NIUNAN_ONLINE_BANK, utils.getRequestUrl(BaseConstant.REQUEST_NIUNAN_ALIPAY));
     }
 }
