@@ -1,10 +1,14 @@
 package org.jeecg.modules.pay.externalUtils.antUtil;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
+import java.math.BigInteger;
+import java.net.URLEncoder;
 import java.security.MessageDigest;
-import java.util.Map;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
 
 /**
  * @Author: heihei
@@ -14,31 +18,60 @@ import java.util.Map;
 @Service
 public class YitongUtil {
     public static String generateSignature(final Map<String, Object> params, final String key) throws Exception {
-        String paramSrc = getParamSrc(params);
-        String paramSrcTemp = paramSrc + "&key=" + key;
-        log.info("==>签名串为：{}", paramSrcTemp);
-        return MD5(paramSrcTemp).toLowerCase();
+        String paramUrl = formatUrlMap(params, false, false, true) + "&key=" + key;
+        return MD5(paramUrl).toLowerCase();
     }
-
-    public static String getParamSrc(Map<String, Object> paramsMap) {
-        StringBuffer paramstr = new StringBuffer();
-        for (String pkey : paramsMap.keySet()) {
-            String pvalue = (String) paramsMap.get(pkey);
-            paramstr.append(pkey + "=" + pvalue + "&"); // 签名原串，不url编码
-        }
-        // 去掉最后一个&
-        String result = paramstr.substring(0, paramstr.length() - 1);
-        return result;
-    }
-
-
     public static String MD5(String data) throws Exception {
-        MessageDigest md = MessageDigest.getInstance("MD5");
-        byte[] array = md.digest(data.getBytes("UTF-8"));
-        StringBuilder sb = new StringBuilder();
-        for (byte item : array) {
-            sb.append(Integer.toHexString((item & 0xFF) | 0x100).substring(1, 3));
+        MessageDigest digest;
+        try {
+            digest = MessageDigest.getInstance("MD5");
+            digest.update(data.getBytes());
+            return new BigInteger(1, digest.digest()).toString(16);
+        } catch (NoSuchAlgorithmException e) {
+            log.info("==>请求跑分挂马平台,生成签名异常。异常信息为：{}", e);
         }
-        return sb.toString().toUpperCase();
+        return null;
+    }
+    public static String formatUrlMap(Map<String, Object> paraMap, boolean removeEmptyValue, boolean urlEncode, boolean keyToLower) {
+        String buff = "";
+        Map<String, Object> tmpMap = paraMap;
+        //开启空值筛选，则移除数据
+        try {
+            List<Map.Entry<String, Object>> infoIds = new ArrayList<Map.Entry<String, Object>>(tmpMap.entrySet());
+            // 对所有传入参数按照字段名的 ASCII 码从小到大排序（字典序）
+            Collections.sort(infoIds, new Comparator<Map.Entry<String, Object>>() {
+                @Override
+                public int compare(Map.Entry<String, Object> o1, Map.Entry<String, Object> o2) {
+                    return (o1.getKey()).toString().compareTo(o2.getKey().toString());
+                }
+            });
+            // 构造URL 键值对的格式
+            StringBuilder buf = new StringBuilder();
+            for (Map.Entry<String, Object> item : infoIds) {
+                if (StringUtils.isNotBlank(item.getKey())) {
+                    String key = item.getKey();
+                    Object val = item.getValue();
+                    if (removeEmptyValue && val == null) {
+                        continue;
+                    }
+                    if (urlEncode) {
+                        val = URLEncoder.encode(val.toString(), "utf-8");
+                    }
+                    if (keyToLower) {
+                        key = key.toLowerCase();
+                    }
+                    buf.append(key + "=" + val).append("&");
+                }
+            }
+            buff = buf.toString();
+            if (buff.isEmpty() == false) {
+                buff = buff.substring(0, buff.length() - 1);
+            }
+        } catch (Exception e) {
+            log.info("==>蚁支付，拼接MD5字符串异常，异常信息为：{}",e);
+            return "";
+        }
+        log.info("==>蚁支付，拼接MD5字符串 buffer=:{}",buff);
+        return buff;
     }
 }

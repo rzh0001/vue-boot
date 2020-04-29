@@ -2,6 +2,7 @@ package org.jeecg.modules.pay.service.callBackServiceImpl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import org.jeecg.modules.api.constant.PayTypeEnum;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import org.jeecg.modules.pay.externalUtils.antUtil.GtpaiUtil;
 import org.jeecg.modules.pay.externalUtils.antUtil.YitongUtil;
@@ -42,31 +43,6 @@ public class CallBackYitongAlipayImpl extends AbstractCallBack implements Initia
             return "签名验证不通过";
         }
 
-        //查询订单状态
-        TreeMap<String, Object> queryMap =  new TreeMap<String,Object>();
-        queryMap.put("mch_id", (String)map.get("mch_id"));
-        queryMap.put("out_order_sn", orderNo);
-        queryMap.put("time", (String)map.get("time"));
-        String querySign = GtpaiUtil.generateSignature(queryMap,apiKey);
-        queryMap.put("sign", querySign);
-
-        log.info("==>易通支付支付宝，查询签名为：{} 查询参数为：{}",querySign, queryMap);
-        HttpResult result = HttpUtils.doPost("http://pay.ccloudpay.com/?c=Pay&a=query", queryMap);
-        String body = result.getBody();
-        log.info("==>易通支付支付宝，查询返回结果为：{}",body);
-        JSONObject queryRet = JSON.parseObject(body);
-        String strData = queryRet.getString("data");
-        String strCode = queryRet.getString("code");
-        if (strCode.equals("1")){
-            log.info("==>易通下单返回失败，返回码：{}",strCode);
-            return "易通支付订单查询失败";
-        }
-        JSONObject bodyData = JSON.parseObject(strData);
-        String strStatus = bodyData.getString("status");
-        if(!strStatus.equals("9")){
-            log.info("==>易通支付，查询订单状态失败");
-            return "查询订单状态失败";
-        }
         OrderInfoEntity order = orderInfoEntityService.queryOrderInfoByOrderId(orderNo);
         if (order == null || order.getStatus() == 2) {
             log.info("==>无订单信息，订单号为：{}",orderNo);
@@ -84,6 +60,36 @@ public class CallBackYitongAlipayImpl extends AbstractCallBack implements Initia
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        CallBackServiceFactory.register(BaseConstant.REQUEST_YITONG_ALIPAY,this);
+        CallBackServiceFactory.register(PayTypeEnum.YITONG_ALIPAY.getValue(),this);
+    }
+
+    @Override
+    public boolean checkOrderStatusIsOK(Map<String, Object> map, String apiKey) throws Exception {
+        //查询订单状态
+        TreeMap<String, Object> queryMap =  new TreeMap<String,Object>();
+        queryMap.put("mch_id", (String)map.get("mch_id"));
+        queryMap.put("out_order_sn", (String) map.get("sh_order"));
+        queryMap.put("time", (String)map.get("time"));
+        String querySign = GtpaiUtil.generateSignature(queryMap,apiKey);
+        queryMap.put("sign", querySign);
+
+        log.info("==>易通支付支付宝，查询签名为：{} 查询参数为：{}",querySign, queryMap);
+        HttpResult result = HttpUtils.doPost("http://pay.ccloudpay.com/?c=Pay&a=query", queryMap);
+        String body = result.getBody();
+        log.info("==>易通支付支付宝，查询返回结果为：{}",body);
+        JSONObject queryRet = JSON.parseObject(body);
+        String strData = queryRet.getString("data");
+        String strCode = queryRet.getString("code");
+        if (strCode.equals("1")){
+            log.info("==>易通下单返回失败，返回码：{}",strCode);
+            return false;
+        }
+        JSONObject bodyData = JSON.parseObject(strData);
+        String strStatus = bodyData.getString("status");
+        if(!strStatus.equals("9")){
+            log.info("==>易通支付，查询订单状态失败");
+            return false;
+        }
+        return true;
     }
 }

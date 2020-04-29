@@ -51,7 +51,6 @@ public class CallBackController {
     @RequestMapping(value = "/yitongAlipayCallback", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     @ResponseBody
     public String yitongAlipay() throws Exception {
-        return (String)CallBackServiceFactory.getCallBackRequest(BaseConstant.REQUEST_YITONG_ALIPAY)
-                .callBack("out_trade_no",BaseConstant.REQUEST_YITONG_ALIPAY);
+        return (String)callBackService.callBack("sh_order", PayTypeEnum.YITONG_ALIPAY.getValue());
     }
 }

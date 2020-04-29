@@ -20,6 +20,8 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.security.MessageDigest;
 import java.util.*;
 
@@ -47,20 +49,21 @@ public class YitongAlipayImpy implements
         param.setPtype("1");
         param.setFormat("json");
         String strTime = getUTCTimeStr();
+        BigDecimal strMoney = new BigDecimal(order.getSubmitAmount().toString()).setScale(2, RoundingMode.HALF_UP);
         param.setTime(strTime);
-        param.setMoney(order.getSubmitAmount().toString());
+        param.setMoney(strMoney.toString());
         param.setOrder_sn(order.getOrderId());
         param.setNotify_url(getDomain()+CALLBACK_URL);
         String paramStr = JSON.toJSONString(param);
         log.info("==>易通支付支付宝，请求入参为：{}",paramStr);
         TreeMap<String, Object> map =  new TreeMap<String,Object>();
-        map.put("client_ip", "");
+        map.put("client_ip", "127.0.0.1");
         map.put("extend_one", "");
         map.put("extend_two", "");
         map.put("format", "json");
-        map.put("goods_desc", "");
+        map.put("goods_desc", "goods");
         map.put("mch_id", userBusiness.getBusinessCode());
-        map.put("money", order.getSubmitAmount().toString());
+        map.put("money", strMoney.toString());
         map.put("notify_url", getDomain()+CALLBACK_URL);
         map.put("order_sn", order.getOrderId());
         map.put("ptype", "1");
@@ -72,9 +75,9 @@ public class YitongAlipayImpy implements
         param.setSign(sign);
         String paramString = JSON.toJSONString(param);
         Map jsonObject = JSON.parseObject(paramString);
-        HttpResult result = HttpUtils.doPost(url, jsonObject);
-        String body = result.getBody();
-        log.info("==>易通支付支付宝，请求结果为：{}",body);
+        Map<String, String> data = (Map<String,String>)jsonObject;
+        String body = HttpUtils.doGet(url, data);
+        log.info("==>易通支付支付宝，请求的url为：{} 请求结果为：{}",url, body);
         JSONObject bodyResult = JSON.parseObject(body);
         String strData = bodyResult.getString("data");
         String strCode = bodyResult.getString("code");
@@ -128,7 +131,9 @@ public class YitongAlipayImpy implements
         Calendar cal = Calendar.getInstance();
         TimeZone tz = TimeZone.getTimeZone("GMT");
         cal.setTimeZone(tz);
-        return String.valueOf(cal.getTimeInMillis());// 返回的UTC时间戳
+        long lMillTime = cal.getTimeInMillis();
+        long lSecondTime = lMillTime/1000;
+        return String.valueOf(lSecondTime);// 返回的UTC时间戳
     }
 
 }
