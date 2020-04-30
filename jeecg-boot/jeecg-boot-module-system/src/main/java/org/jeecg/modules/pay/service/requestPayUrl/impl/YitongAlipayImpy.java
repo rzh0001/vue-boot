@@ -39,7 +39,7 @@ public class YitongAlipayImpy implements
     private RequestUrlUtils utils;
     @Autowired
     public ISysDictService dictService;
-    private static final String CALLBACK_URL="/callBack/yitongAlipayCallback";
+    private static final String CALLBACK_URL="/callBack/order/yitongAlipay/sh_order";
 
     @Override
     public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key, String callbackUrl,
@@ -49,28 +49,27 @@ public class YitongAlipayImpy implements
         param.setPtype("1");
         param.setFormat("json");
         String strTime = getUTCTimeStr();
-        BigDecimal strMoney = new BigDecimal(order.getSubmitAmount().toString()).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal strMoney = order.getSubmitAmount().setScale(2, RoundingMode.HALF_UP);
         param.setTime(strTime);
+        param.setClient_ip("127.0.0.1");
+        param.setGoods_desc("goods");
         param.setMoney(strMoney.toString());
         param.setOrder_sn(order.getOrderId());
         param.setNotify_url(getDomain()+CALLBACK_URL);
         String paramStr = JSON.toJSONString(param);
         log.info("==>易通支付支付宝，请求入参为：{}",paramStr);
         TreeMap<String, Object> map =  new TreeMap<String,Object>();
-        map.put("client_ip", "127.0.0.1");
-        map.put("extend_one", "");
-        map.put("extend_two", "");
-        map.put("format", "json");
-        map.put("goods_desc", "goods");
-        map.put("mch_id", userBusiness.getBusinessCode());
-        map.put("money", strMoney.toString());
-        map.put("notify_url", getDomain()+CALLBACK_URL);
-        map.put("order_sn", order.getOrderId());
-        map.put("ptype", "1");
-        map.put("time", strTime);
+        map.put("mch_id", param.getMch_id());
+        map.put("ptype", param.getPtype());
+        map.put("order_sn",param.getOrder_sn());
+        map.put("money", param.getMoney());
+        map.put("goods_desc",param.getGoods_desc());
+        map.put("client_ip", param.getClient_ip());
+        map.put("format", param.getFormat());
+        map.put("notify_url", param.getNotify_url());
+        map.put("time", param.getTime());
 
         String sign = YitongUtil.generateSignature(map,userBusiness.getApiKey());
-
         log.info("==>易通支付支付宝，请求签名为：{}",sign);
         param.setSign(sign);
         String paramString = JSON.toJSONString(param);

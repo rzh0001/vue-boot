@@ -28,34 +28,23 @@ import java.util.TreeMap;
 public class CallBackYitongAlipayImpl extends AbstractCallBack implements InitializingBean {
     @Autowired
     ICallBackService callBackService;
-    @Autowired
-    private IOrderInfoEntityService orderInfoEntityService;
 
     @Override
     public Object reply(Map<String, Object> map,String apiKey) throws Exception {
         log.info("==>易通支付，回调参数为：{}",map);
         String sign = (String)map.get("sign");
-        String orderNo =(String) map.get("sh_order");
         map.remove("sign");
         String localSign = YitongUtil.generateSignature(map,apiKey);
         if(!localSign.equals(sign)){
             log.info("==>易通支付，回调签名为：{}，本地签名为：{}",sign,localSign);
             return "签名验证不通过";
         }
-
-        OrderInfoEntity order = orderInfoEntityService.queryOrderInfoByOrderId(orderNo);
-        if (order == null || order.getStatus() == 2) {
-            log.info("==>无订单信息，订单号为：{}",orderNo);
-            return "非法访问";
-        }
         return "success";
     }
 
     @Override
     public Map<String, Object> getCallBackParam(Map<String, Object> map) {
-        String json = (String)map.get("reqData");
-        Map<String,Object> param = JSON.parseObject(json);
-        return param;
+        return map;
     }
 
     @Override

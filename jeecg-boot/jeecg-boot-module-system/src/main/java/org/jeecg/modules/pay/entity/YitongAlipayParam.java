@@ -31,6 +31,8 @@ public class YitongAlipayParam implements Serializable {
      */
     private String money;
     private String order_sn;
+    private String goods_desc;
+    private String client_ip;
     private String format;//json或page（默认）
     private String notify_url;
     private String time;//系统当前时间戳 UTC 秒
