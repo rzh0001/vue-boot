@@ -22,7 +22,7 @@ public class RequestHandleUtil {
     public static final String METHOD_GET = "GET";
     public static final String CONTENT_TYPE_JSON = "application/json";
     public static final String CONTENT_TYPE_FORM = "application/x-www-form-urlencoded";
-
+    public static final String CONTENT_TYPE_FORM_DATA = "multipart/form-data";
     /**
      * 获取请求参数
      *
@@ -53,7 +53,7 @@ public class RequestHandleUtil {
         log.info("====>post请求的contentType为：{}", contentType);
         StringBuilder sb = new StringBuilder();
         try {
-            if (contentType.contains(CONTENT_TYPE_JSON)){
+            if (contentType.contains(CONTENT_TYPE_JSON) ){
                 BufferedReader br = new BufferedReader(new InputStreamReader(req.getInputStream(), "UTF-8"));
                 String line = null;
                 while ((line = br.readLine()) != null) {
@@ -61,7 +61,7 @@ public class RequestHandleUtil {
                 }
                 log.info("====>回调的入参为：{}", sb.toString());
                 return (JSONObject) paramsToMap(sb.toString(), METHOD_POST);
-            }else if(contentType.contains(CONTENT_TYPE_FORM)){
+            }else if(contentType.contains(CONTENT_TYPE_FORM)|| contentType.contains(CONTENT_TYPE_FORM_DATA)){
                 Map<String, String[]> map = req.getParameterMap();
                 return valueOf(map);
             }else{
