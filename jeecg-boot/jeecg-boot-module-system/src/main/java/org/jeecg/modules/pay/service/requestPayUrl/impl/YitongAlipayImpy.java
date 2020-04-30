@@ -77,13 +77,11 @@ public class YitongAlipayImpy implements
         Map<String, String> data = (Map<String,String>)jsonObject;
         String body = HttpUtils.doGet(url, data);
         log.info("==>易通支付支付宝，请求的url为：{} 请求结果为：{}",url, body);
+        //{"code":"1","msg":"下单成功",
+        // "data":
+        // {"order_sn":"MS2020043011244261339","ptype":"1","ptype_name":"支付宝扫码","realname":"施芳菊","account":"y1lijianming@163.com","money":"500.00","bank":"","qrcode":"http:\/\/pay.ccloudpay.com\/uploads\/qr\/20200430\/d88ce6e53be66c17.jpg"}}
         JSONObject bodyResult = JSON.parseObject(body);
         String strData = bodyResult.getString("data");
-        String strCode = bodyResult.getString("code");
-        if (strCode.equals("1")){
-            log.info("==>易通下单返回失败，返回码：{}",strCode);
-            return R.ok().put("url", "");
-        }
         JSONObject bodyData = JSON.parseObject(strData);
         String strOrderSn = bodyData.getString("order_sn");
         String payurl = url + "&a=info&osn=" + strOrderSn;

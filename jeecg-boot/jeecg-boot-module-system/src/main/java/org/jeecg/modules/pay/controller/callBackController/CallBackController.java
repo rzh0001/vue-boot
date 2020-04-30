@@ -20,10 +20,4 @@ public class CallBackController {
         log.info("==>三方回调类型:{},单号标识：{}",payType,orderNoField);
         return (String)callBackService.callBack(orderNoField, payType);
     }
-
-    @RequestMapping(value = "/yitongAlipayCallback", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-    @ResponseBody
-    public String yitongAlipay() throws Exception {
-        return (String)callBackService.callBack("sh_order", PayTypeEnum.YITONG_ALIPAY.getValue());
-    }
 }
