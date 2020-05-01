@@ -214,7 +214,6 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         String orderId = (String) checkParam.get(BaseConstant.ORDER_ID);
         String payType = (String) checkParam.get(BaseConstant.PAY_TYPE);
         String userName = (String) checkParam.get(BaseConstant.USER_NAME);
-        RequestPayUrl requestPayUrl = (RequestPayUrl) checkParam.get(BaseConstant.REQUEST);
         OrderInfoEntity order = queryOrderInfoByOrderId(orderId);
         if (order == null) {
             log.info("订单查询异常，无此订单信息:{}", orderId);
@@ -271,33 +270,20 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         redisUtil.del("callBack"+order.getOrderId());
         String body = result.getBody();
         log.info("===>请求商户返回状态码为：{},消息体为：{}",result.getCode(), body);
-        if (result.getCode() == BaseConstant.SUCCESS) {
-            log.info("==>通知商户成功");
-            JSONObject callBackResult = JSON.parseObject(result.getBody());
-            if ("200".equals(callBackResult.get("code").toString())) {
-                updateOrderStatusSuccessByOrderId(order.getOrderId());
-                updateBusinessIncomeAmount(order);
-                log.info("商户返回成功,orderID:{}", order.getOrderId());
-                msg.append("通知商户成功");
-                countAmount(order.getOrderId(), user.getUsername(), order.getSubmitAmount().toString(), payType);
-                return R.ok(msg.toString());
-            } else {
-                log.info("通知商户失败,orderID:{}", order.getOrderId());
-                updateOrderStatusNoBackByOrderId(order.getOrderId());
-                msg.append("通知商户失败，原因：").append(callBackResult.get("msg"));
-                return R.error(msg.toString());
-            }
+        JSONObject callBackResult = JSON.parseObject(result.getBody());
+        if ("200".equals(callBackResult.get("code").toString())) {
+            updateOrderStatusSuccessByOrderId(order.getOrderId());
+            updateBusinessIncomeAmount(order);
+            log.info("商户返回成功,orderID:{}", order.getOrderId());
+            msg.append("通知商户成功");
+            countAmount(order.getOrderId(), user.getUsername(), order.getSubmitAmount().toString(), payType);
+            return R.ok(msg.toString());
         } else {
             log.info("通知商户失败,orderID:{}", order.getOrderId());
             updateOrderStatusNoBackByOrderId(order.getOrderId());
-            msg.append("通知商户失败，返回状态码为：").append(result.getCode());
+            msg.append("通知商户失败，原因：").append(callBackResult.get("msg"));
             return R.error(msg.toString());
         }
-    }
-
-    public static void main(String[] args) {
-        JSONObject callBackResult = JSON.parseObject("{\"code\":200,\"msg\":\"success\"}");
-        System.out.println("200".equals(callBackResult.get("code").toString()));
     }
     private Lock lock = new ReentrantLock();
 

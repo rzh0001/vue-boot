@@ -1,6 +1,7 @@
 package org.jeecg.modules.pay.controller;
 
 import cn.hutool.core.collection.CollUtil;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -337,9 +338,6 @@ public class OrderInfoEntityController {
 		if (order == null) {
 			return R.error("订单不存在");
 		}
-//        if (order.getStatus() != BaseConstant.ORDER_STATUS_SUCCESS_NOT_RETURN) {
-//            return R.error("订单状态不是‘成功未返回’，不能补单");
-//        }
 		if (order.getStatus() == BaseConstant.ORDER_STATUS_SUCCESS) {
 			return R.error("订单状态已成功，不能补单");
 		}
@@ -409,24 +407,17 @@ public class OrderInfoEntityController {
 			JSONObject callobj = orderInfoEntityService.encryptAESData(order, orderUser.getApiKey());
 			log.info("===手动补单回调商户，url:{},param:{}", order.getSuccessCallbackUrl(), callobj.toJSONString());
 			HttpResult result = HttpUtils.doPostJson(order.getSuccessCallbackUrl(), callobj.toJSONString());
-			log.info("===手动补单商户返回信息=={}", result.getBody());
-			if (result.getCode() == BaseConstant.SUCCESS) {
-				CallBackResult callBackResult = JSONObject.parseObject(result.getBody(), CallBackResult.class);
-				if (callBackResult.getCode() == BaseConstant.SUCCESS) {
-					msg.append("通知商户成功，并且商户返回成功");
-					orderInfoEntityService.updateOrderStatusSuccessByOrderId(id);
-					log.info("通知商户成功，并且商户返回成功,orderID:{}", id);
-					flag = true;
-					return R.ok(msg.toString());
-				} else {
-					msg.append("通知商户失败,原因：").append(callBackResult.getMsg());
-					log.info("通通知商户失败,orderID:{}", id);
-					orderInfoEntityService.updateOrderStatusNoBackByOrderId(id);
-					return R.error(msg.toString());
-				}
+			log.info("===手动补单,返回状态码为：{}，商户返回信息：{}",result.getCode(), result.getBody());
+			JSONObject callBackResult = JSON.parseObject(result.getBody());
+			if ("200".equals(callBackResult.get("code").toString())) {
+				msg.append("通知商户成功");
+				orderInfoEntityService.updateOrderStatusSuccessByOrderId(id);
+				log.info("通知商户成功，并且商户返回成功,orderID:{}", id);
+				flag = true;
+				return R.ok(msg.toString());
 			} else {
-				msg.append("通知商户失败,返回信息：").append(result.getBody());
-				log.info("通通知商户失败,orderID:{}", id);
+				msg.append("通知商户失败,原因：").append(callBackResult.get("msg"));
+				log.info("通知商户失败,orderID:{}", id);
 				orderInfoEntityService.updateOrderStatusNoBackByOrderId(id);
 				return R.error(msg.toString());
 			}
