@@ -59,7 +59,7 @@ public class CallBackYitongAlipayImpl extends AbstractCallBack implements Initia
         queryMap.put("mch_id", (String)map.get("mch_id"));
         queryMap.put("out_order_sn", (String) map.get("sh_order"));
         queryMap.put("time", (String)map.get("time"));
-        String querySign = GtpaiUtil.generateSignature(queryMap,apiKey);
+        String querySign = YitongUtil.generateSignature(queryMap,apiKey);
         queryMap.put("sign", querySign);
 
         log.info("==>易通支付支付宝，查询签名为：{} 查询参数为：{}",querySign, queryMap);
