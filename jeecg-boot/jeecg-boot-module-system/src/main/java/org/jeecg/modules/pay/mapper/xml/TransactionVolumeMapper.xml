@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.jeecg.modules.pay.mapper.TransactionVolumeMapper">
+
+    <select id="selectPageVo" resultType="org.jeecg.modules.pay.entity.TransactionVolumeVO">
+        SELECT agent_id, agent_username, sum(submit_amount) as amount
+        from pay_order_info ${ew.customSqlSegment}
+    </select>
+</mapper>
