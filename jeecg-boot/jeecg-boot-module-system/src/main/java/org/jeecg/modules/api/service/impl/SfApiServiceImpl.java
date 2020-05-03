@@ -71,7 +71,7 @@ public class SfApiServiceImpl implements ISfApiService {
 		orderService.save(orderInfo);
 		// 请求外部平台,生成支付链接
 		String payUrl = payChannel.request(orderInfo);
-		return null;
+		return PayOrderResponse.success(payUrl);
 	}
 
 	@Override

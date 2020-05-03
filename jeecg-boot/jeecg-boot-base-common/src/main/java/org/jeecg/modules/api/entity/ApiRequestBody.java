@@ -54,7 +54,6 @@ public class ApiRequestBody {
 		sb.append("username=").append(username);
 		sb.append("&timestamp=").append(timestamp);
 		sb.append("&data=").append(data);
-		sb.append("&data=").append(data);
 		sb.append("&apiKey=").append(apiKey);
 		log.info("===>系统拼接的sign串为：{}", sb.toString());
 		return DigestUtils.md5Hex(sb.toString());

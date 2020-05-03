@@ -5,24 +5,28 @@
     <!-- 操作按钮区域 -->
     <div class="table-operator">
       <a-button @click="handleAdd" type="primary" icon="plus">测试</a-button>
+      <a-button @click="handleAdd2" type="primary" icon="plus">测试V2</a-button>
     </div>
 
     <!-- table区域-end -->
 
     <!-- 表单区域 -->
-    <channelEntity-modal ref="modalForm" @ok="modalFormOk"></channelEntity-modal>
+    <payTest-modal ref="modalForm" @ok="modalFormOk"></payTest-modal>
+    <payTestV2-modal ref="modalForm2" @ok="modalFormOk"></payTestV2-modal>
   </a-card>
 </template>
 
 <script>
-  import ChannelEntityModal from './modules/PayTestModal'
+  import PayTestModal from './modules/PayTestModal'
+  import PayTestV2Modal from './modules/PayTestV2Modal'
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
 
   export default {
     name: "ChannelEntityList",
     mixins:[JeecgListMixin],
     components: {
-      ChannelEntityModal
+      PayTestModal,
+      PayTestV2Modal,
     },
     data () {
       return {
@@ -42,7 +46,11 @@
       }
     },
     methods: {
-
+      handleAdd2: function () {
+        this.$refs.modalForm2.add();
+        this.$refs.modalForm2.title = "新增";
+        this.$refs.modalForm2.disableSubmit = false;
+      },
     }
   }
 </script>
