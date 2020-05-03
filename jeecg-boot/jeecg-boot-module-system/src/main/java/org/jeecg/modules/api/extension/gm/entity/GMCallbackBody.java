@@ -1,4 +1,4 @@
-package org.jeecg.modules.api.extension.gm;
+package org.jeecg.modules.api.extension.gm.entity;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;

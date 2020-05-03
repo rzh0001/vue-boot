@@ -1,4 +1,4 @@
-package org.jeecg.modules.api.extension.alibank;
+package org.jeecg.modules.api.extension.gm;
 
 import org.jeecg.modules.api.extension.gm.GMPay;
 import org.jeecg.modules.util.BaseConstant;

@@ -10,6 +10,7 @@ import org.jeecg.modules.api.constant.PayTypeEnum;
 import org.jeecg.modules.api.exception.AccountAbnormalException;
 import org.jeecg.modules.api.exception.BusinessException;
 import org.jeecg.modules.api.extension.PayChannelStrategy;
+import org.jeecg.modules.api.extension.gm.entity.*;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import org.jeecg.modules.pay.entity.UserBusinessEntity;
 import org.jeecg.modules.pay.service.IOrderInfoEntityService;
