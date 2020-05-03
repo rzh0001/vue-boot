@@ -6,12 +6,12 @@ import javax.servlet.http.HttpServletRequest;
 
 public interface PayChannelStrategy {
 	/**
-	 * 请求外部支付通道
+	 * 请求外部支付通道，生成支付链接
 	 *
 	 * @param orderInfo
 	 * @return
 	 */
 	String pay(OrderInfoEntity orderInfo);
 
-	String callback(HttpServletRequest req);
+	String callback(String orderId, HttpServletRequest req);
 }

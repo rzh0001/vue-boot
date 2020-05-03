@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.jeecg.common.system.vo.DictModel;
 import org.jeecg.common.util.DateUtils;
 import org.jeecg.common.util.RedisUtil;
 import org.jeecg.modules.api.exception.AccountAbnormalException;
@@ -15,13 +16,17 @@ import org.jeecg.modules.pay.mapper.OrderInfoEntityMapper;
 import org.jeecg.modules.pay.service.IOrderToolsService;
 import org.jeecg.modules.pay.service.IUserBusinessEntityService;
 import org.jeecg.modules.pay.service.IUserRateEntityService;
+import org.jeecg.modules.system.service.ISysDictService;
+import org.jeecg.modules.util.BaseConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -37,6 +42,22 @@ public class OrderToolsServiceImpl implements IOrderToolsService {
 
 	@Autowired
 	IUserBusinessEntityService businessService;
+
+	@Autowired
+	private ISysDictService dictService;
+
+	/**
+	 * 本机域名
+	 */
+	private String serverDomain = null;
+
+	@PostConstruct
+	public void init() {
+		List<DictModel> domain = dictService.queryDictItemsByCode(BaseConstant.DOMAIN);
+		Optional<DictModel> urlModel = domain.stream().filter(model -> BaseConstant.DOMAIN.equals(model.getText())).findFirst();
+		urlModel.ifPresent(dictModel -> serverDomain = dictModel.getValue());
+	}
+
 
 	@Override
 	public void checkOuterOrderId(String username, String outerOrderId) {
@@ -64,6 +85,16 @@ public class OrderToolsServiceImpl implements IOrderToolsService {
 		String dateStr = DateUtils.date2Str(DateUtils.yyyymmddhhmmss);
 		String randomStr = RandomStringUtils.randomAlphabetic(5);
 		return sb.append(dateStr).append(randomStr).toString();
+	}
+
+	@Override
+	public String generateCallbackUrl(OrderInfoEntity orderInfo) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(serverDomain).append("/");
+		sb.append("api/v2/order/callback/");
+		sb.append(orderInfo.getPayType()).append("/");
+		sb.append(orderInfo.getOrderId());
+		return sb.toString();
 	}
 
 	@Override

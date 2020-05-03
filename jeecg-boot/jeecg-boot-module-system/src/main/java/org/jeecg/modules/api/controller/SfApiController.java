@@ -6,8 +6,8 @@ import cn.hutool.json.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.constant.CommonConstant;
 import org.jeecg.modules.api.entity.ApiRequestBody;
-import org.jeecg.modules.api.entity.ApiResponseBody;
 import org.jeecg.modules.api.entity.PayOrderData;
+import org.jeecg.modules.api.entity.PayOrderResponse;
 import org.jeecg.modules.api.exception.AccountAbnormalException;
 import org.jeecg.modules.api.exception.SignatureException;
 import org.jeecg.modules.api.service.ISfApiService;
@@ -41,7 +41,7 @@ public class SfApiController {
 	 */
 	@RequestMapping(value = "/order/create", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	@ResponseBody
-	public ApiResponseBody createPayOrder(@Valid @RequestBody ApiRequestBody reqBody) {
+	public PayOrderResponse createPayOrder(@Valid @RequestBody ApiRequestBody reqBody) {
 		log.info("=======>商户[{}]创建订单", reqBody.getUsername());
 
 		// 检查账户状态
@@ -85,17 +85,16 @@ public class SfApiController {
 		OrderInfoEntity orderInfoEntity = payOrderData.toPayOrder(user);
 		orderInfoEntity.setRemark(reqBody.getRemark());
 		// 创建订单
-		apiService.createOrder(orderInfoEntity);
+		PayOrderResponse response = apiService.createOrder(orderInfoEntity);
 
-
-		return null;
+		return response;
 	}
 
-	@RequestMapping(value = "/order/callback/{payType}", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+	@RequestMapping(value = "/order/callback/{payType}/{orderId}", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	@ResponseBody
-	public String callback(@PathVariable String payType, HttpServletRequest req) {
+	public String callback(@PathVariable String payType, @PathVariable String orderId, HttpServletRequest req) {
 		log.info("payType={}", payType);
-		apiService.callback(payType, req);
+		apiService.callback(payType, orderId, req);
 		return "ok";
 	}
 

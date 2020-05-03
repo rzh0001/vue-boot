@@ -3,6 +3,7 @@ package org.jeecg.modules.api.service.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.modules.api.entity.ApiRequestBody;
 import org.jeecg.modules.api.entity.ApiResponseBody;
+import org.jeecg.modules.api.entity.PayOrderResponse;
 import org.jeecg.modules.api.exception.BusinessException;
 import org.jeecg.modules.api.extension.PayChannelContext;
 import org.jeecg.modules.api.service.ISfApiService;
@@ -24,7 +25,7 @@ import java.util.Date;
 
 @Slf4j
 @Service
-public class ISfApiServiceImpl implements ISfApiService {
+public class SfApiServiceImpl implements ISfApiService {
 
 	@Autowired
 	IOrderInfoEntityService orderService;
@@ -40,7 +41,7 @@ public class ISfApiServiceImpl implements ISfApiService {
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public ApiResponseBody createOrder(OrderInfoEntity orderInfo) {
+	public PayOrderResponse createOrder(OrderInfoEntity orderInfo) {
 
 		// 检查产品、通道配置
 		UserChannelEntity channel = productService.getChannelByProduct(orderInfo.getUserName(), orderInfo.getProductCode());
@@ -68,10 +69,9 @@ public class ISfApiServiceImpl implements ISfApiService {
 		orderInfo.setActualAmount(orderInfo.getSubmitAmount().subtract(commission));
 
 		orderService.save(orderInfo);
-		// 请求外部平台
-		String response = payChannel.request(orderInfo);
-		throw BusinessException.Fuck(response);
-//		return null;
+		// 请求外部平台,生成支付链接
+		String payUrl = payChannel.request(orderInfo);
+		return null;
 	}
 
 	@Override
@@ -80,7 +80,10 @@ public class ISfApiServiceImpl implements ISfApiService {
 	}
 
 	@Override
-	public String callback(String payType, HttpServletRequest req) {
-		return payChannel.callback(payType, req);
+	public String callback(String payType, String orderId, HttpServletRequest req) {
+		// 检验回调IP TODO 通道服务器域名、IP统一配置到通道表里，修改后在这里校验对调IP地址
+
+
+		return payChannel.callback(payType, orderId, req);
 	}
 }

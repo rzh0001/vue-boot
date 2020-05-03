@@ -47,5 +47,5 @@ public interface IUserBusinessEntityService extends IService<UserBusinessEntity>
 
 	UserBusinessEntity getUserBusiness(String userId, String businessCode, String channelCode);
 
-	UserBusinessEntity getUserChannelConfig(String userId, String channelCode);
+	UserBusinessEntity getUserChannelConfig(String username, String channelCode);
 }

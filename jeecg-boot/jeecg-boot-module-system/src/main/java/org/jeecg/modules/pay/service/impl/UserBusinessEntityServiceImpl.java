@@ -135,7 +135,7 @@ public class UserBusinessEntityServiceImpl extends ServiceImpl<UserBusinessEntit
 	}
 
 	@Override
-	public UserBusinessEntity getUserChannelConfig(String userId, String channelCode) {
-		return baseMapper.getUserChannelConfig(userId, channelCode);
+	public UserBusinessEntity getUserChannelConfig(String username, String channelCode) {
+		return baseMapper.getUserChannelConfig(username, channelCode);
 	}
 }

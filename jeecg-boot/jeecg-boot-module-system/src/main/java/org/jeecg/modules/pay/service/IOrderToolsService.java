@@ -27,6 +27,13 @@ public interface IOrderToolsService {
 	String generateOrderId();
 
 	/**
+	 * 生成回调地址
+	 *
+	 * @return
+	 */
+	String generateCallbackUrl(OrderInfoEntity orderInfo);
+
+	/**
 	 * 获取用户通道费率设置
 	 *
 	 * @param username

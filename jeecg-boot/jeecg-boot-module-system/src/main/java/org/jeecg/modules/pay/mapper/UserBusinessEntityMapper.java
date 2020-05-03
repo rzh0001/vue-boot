@@ -74,6 +74,6 @@ public interface UserBusinessEntityMapper extends BaseMapper<UserBusinessEntity>
 	@Update("update sys_user_business set today_amount=0.000")
 	void updateBusinessTodayAmount();
 
-	@Select("select * from sys_user_business where user_id=#{userId}  and channel_code=#{channelCode} limit 1 ")
-	UserBusinessEntity getUserChannelConfig(String userId, String channelCode);
+	@Select("select * from sys_user_business where user_name=#{username}  and channel_code=#{channelCode} limit 1 ")
+	UserBusinessEntity getUserChannelConfig(String username, String channelCode);
 }
