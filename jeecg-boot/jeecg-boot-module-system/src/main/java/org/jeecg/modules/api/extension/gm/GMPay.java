@@ -35,8 +35,6 @@ import java.util.stream.Stream;
  */
 @Slf4j
 public class GMPay implements PayChannelStrategy {
-	@Autowired
-	private ISysDictService dictService;
 
 	@Autowired
 	private IUserBusinessEntityService businessService;
@@ -49,21 +47,15 @@ public class GMPay implements PayChannelStrategy {
 	@Autowired
 	private AsyncNotifyServiceImpl asyncNotify;
 
-	private String gmUrl = null;
-
 	private String payType;
-	/**
-	 * 挂码平台回调四方的地址
-	 */
-	private static String innerCallBackUrl = null;
+
+	@Autowired
+	private ISysDictService dictService;
+
+	private String gmUrl = null;
 
 	@PostConstruct
 	public void init() {
-
-		List<DictModel> innerUrlML = dictService.queryDictItemsByCode(BaseConstant.INNER_CALL_BACK_URL);
-		Optional<DictModel> innerUrlModel = innerUrlML.stream().filter(model -> BaseConstant.INNER_CALL_BACK_URL.equals(model.getText())).findFirst();
-		innerUrlModel.ifPresent(dictModel -> innerCallBackUrl = dictModel.getValue());
-
 		List<DictModel> payUrl = dictService.queryDictItemsByCode(BaseConstant.REQUEST_URL);
 		Optional<DictModel> urlModel = payUrl.stream().filter(model -> PayTypeEnum.ALI_BANK.getValue().equals(model.getText())).findFirst();
 		urlModel.ifPresent(dictModel -> gmUrl = dictModel.getValue());
