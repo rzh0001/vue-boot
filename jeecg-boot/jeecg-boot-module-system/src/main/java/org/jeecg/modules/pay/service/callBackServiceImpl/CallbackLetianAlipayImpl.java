@@ -15,17 +15,23 @@ import java.util.Map;
  */
 @Service
 public class CallbackLetianAlipayImpl extends AbstractCallBack implements InitializingBean {
+
     @Override
-    public Object reply(Map<String, Object> map, String apiKey) throws Exception {
+    public Object reply() throws Exception {
+        return "success";
+    }
+
+    @Override
+    public boolean checkSign(Map<String, Object> map, String apiKey) throws Exception {
         log.info("==>乐天支付回调，入参为：{}", map);
         String sign = (String)map.get("Signature");
         map.remove("Signature");
         String localSign = SignatureUtils.signature(apiKey, map);
         if (!localSign.equals(sign)) {
             log.info("=>乐天支付，签名校验失败,入参签名：{}，本地签名：{}", sign, localSign);
-            return "fail";
+            return false;
         }
-        return "success";
+        return true;
     }
 
     @Override

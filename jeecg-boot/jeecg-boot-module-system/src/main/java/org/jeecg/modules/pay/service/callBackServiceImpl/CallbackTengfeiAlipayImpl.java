@@ -15,8 +15,14 @@ import java.util.Map;
  */
 @Service
 public class CallbackTengfeiAlipayImpl extends AbstractCallBack implements InitializingBean {
+
     @Override
-    public Object reply(Map<String, Object> map, String apiKey) throws Exception {
+    public Object reply() throws Exception {
+        return  "success";
+    }
+
+    @Override
+    public boolean checkSign(Map<String, Object> map, String apiKey) throws Exception {
         log.info("==>腾飞支付 回调，回调参数为：{}", map);
         String openid = (String)map.get("openid");
         String orderNo = (String)map.get("orderNo");
@@ -30,9 +36,9 @@ public class CallbackTengfeiAlipayImpl extends AbstractCallBack implements Initi
         String localSign = SecureUtil.md5(md5buffer.toString()).toUpperCase();
         if (!sign.equals(localSign)) {
             log.info("==>签名不匹配，localSign：{}；sign：{}", localSign, sign);
-            return "fail";
+            return false;
         }
-        return "success";
+        return true;
     }
 
     @Override

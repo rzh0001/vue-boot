@@ -58,10 +58,14 @@ public abstract class AbstractCallBack implements CallBackService{
             log.info("==>订单状态查询失败");
             return "fail";
         }
+        if(!this.checkSign(callBackParam,apiKey)){
+            log.info("==>签名校验失败");
+            return "fail";
+        }
         //异步通知客户
         asyncNotify.asyncNotify(orderNo,payType);
         //回复三方
-        return reply(callBackParam,apiKey);
+        return reply();
     }
 
     /**
@@ -76,12 +80,18 @@ public abstract class AbstractCallBack implements CallBackService{
     }
     /**
      * 回复三方
+     * @return
+     */
+    public abstract Object reply() throws Exception;
+
+    /**
+     * 校验签名
      * @param param 三方请求入参
      * @param apiKey 三方秘钥
      * @return
+     * @throws Exception
      */
-    public abstract Object reply(Map<String, Object> param,String apiKey) throws Exception;
-
+    public abstract boolean checkSign(Map<String, Object> param,String apiKey) throws Exception;
     /**
      * 如果不需要对参数进行转换，直接返回入参的map
      * @param map

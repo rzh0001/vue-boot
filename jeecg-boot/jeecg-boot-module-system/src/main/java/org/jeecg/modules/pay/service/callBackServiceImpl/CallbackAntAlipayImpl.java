@@ -15,8 +15,14 @@ import java.util.Map;
  */
 @Service
 public class CallbackAntAlipayImpl extends AbstractCallBack implements InitializingBean {
+
     @Override
-    public Object reply(Map<String, Object> map, String apiKey) throws Exception {
+    public Object reply() throws Exception {
+        return  "success";
+    }
+
+    @Override
+    public boolean checkSign(Map<String, Object> map, String apiKey) throws Exception {
         log.info("==>蚁支付，回调参数为：{}", map);
         String sign = (String)map.get("sign");
         map.remove("sign");
@@ -27,9 +33,9 @@ public class CallbackAntAlipayImpl extends AbstractCallBack implements Initializ
         String localSign = AntUtil.generateSignature(map, apiKey);
         if (!localSign.equals(sign)) {
             log.info("==>蚁支付验证签名异常，回调签名为：{}，本地签名为：{}", sign, localSign);
-            return "签名验证不通过";
+            return false;
         }
-        return "success";
+        return true;
     }
 
     @Override

@@ -26,8 +26,14 @@ import java.util.TreeMap;
 @Service
 public class CallbackGtpaiAlipayImpl extends AbstractCallBack implements InitializingBean {
 
+
     @Override
-    public Object reply(Map<String, Object> param, String apiKey) throws Exception {
+    public Object reply() throws Exception {
+        return "success";
+    }
+
+    @Override
+    public boolean checkSign(Map<String, Object> param, String apiKey) throws Exception {
         log.info("==>GT派支付，回调参数为：{}", param);
         String sign = (String)param.get("sign");
         param.remove("sign");
@@ -35,9 +41,9 @@ public class CallbackGtpaiAlipayImpl extends AbstractCallBack implements Initial
         String localSign = GtpaiUtil.generateSignature(sortedMap, apiKey);
         if (!localSign.equals(sign)) {
             log.info("==>GT派支付，回调签名为：{}，本地签名为：{}", sign, localSign);
-            return "签名验证不通过";
+            return false;
         }
-        return "success";
+        return true;
     }
 
     @Override

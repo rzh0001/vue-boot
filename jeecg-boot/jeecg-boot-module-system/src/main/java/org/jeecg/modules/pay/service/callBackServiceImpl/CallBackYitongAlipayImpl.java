@@ -35,17 +35,24 @@ public class CallBackYitongAlipayImpl extends AbstractCallBack implements Initia
     private IOrderInfoEntityService orderInfoEntityService;
     @Autowired
     private IUserBusinessEntityService businessService;
+
+
     @Override
-    public Object reply(Map<String, Object> map,String apiKey) throws Exception {
-        log.info("==>易通支付，回调参数为：{}",map);
+    public Object reply() throws Exception {
+        return "success";
+    }
+
+    @Override
+    public boolean checkSign(Map<String, Object> map, String apiKey) throws Exception {
+        log.info("==>易通支付，回调参数为：{}", map);
         String sign = (String)map.get("sign");
         map.remove("sign");
-        String localSign = YitongUtil.generateSignature(map,apiKey);
-        if(!localSign.equals(sign)){
-            log.info("==>易通支付，回调签名为：{}，本地签名为：{}",sign,localSign);
-            return "签名验证不通过";
+        String localSign = YitongUtil.generateSignature(map, apiKey);
+        if (!localSign.equals(sign)) {
+            log.info("==>易通支付，回调签名为：{}，本地签名为：{}", sign, localSign);
+            return false;
         }
-        return "success";
+        return true;
     }
 
     @Override
@@ -55,29 +62,29 @@ public class CallBackYitongAlipayImpl extends AbstractCallBack implements Initia
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        CallBackServiceFactory.register(PayTypeEnum.YITONG_ALIPAY.getValue(),this);
+        CallBackServiceFactory.register(PayTypeEnum.YITONG_ALIPAY.getValue(), this);
     }
 
     @Override
     public boolean checkOrderStatusIsOK(Map<String, Object> map, String apiKey) throws Exception {
         OrderInfoEntity order = orderInfoEntityService.queryOrderInfoByOrderId((String)map.get("sh_order"));
-        //查询订单状态
-        TreeMap<String, Object> queryMap =  new TreeMap<String,Object>();
+        // 查询订单状态
+        TreeMap<String, Object> queryMap = new TreeMap<String, Object>();
         queryMap.put("mch_id", order.getBusinessCode());
-        queryMap.put("out_order_sn",  map.get("sh_order"));
+        queryMap.put("out_order_sn", map.get("sh_order"));
         queryMap.put("time", map.get("time"));
-        String querySign = YitongUtil.generateSignature(queryMap,apiKey);
+        String querySign = YitongUtil.generateSignature(queryMap, apiKey);
         queryMap.put("sign", querySign);
 
-        log.info("==>易通支付支付宝，查询签名为：{} 查询参数为：{}",querySign, queryMap);
+        log.info("==>易通支付支付宝，查询签名为：{} 查询参数为：{}", querySign, queryMap);
         HttpResult result = HttpUtils.doPost("http://pay.ccloudpay.com/?c=Pay&a=query", queryMap);
         String body = result.getBody();
-        log.info("==>易通支付支付宝，查询返回结果为：{}",body);
+        log.info("==>易通支付支付宝，查询返回结果为：{}", body);
         JSONObject queryRet = JSON.parseObject(body);
         String strData = queryRet.getString("data");
         JSONObject bodyData = JSON.parseObject(strData);
         String strStatus = bodyData.getString("status");
-        if(!strStatus.equals("9")){
+        if (!strStatus.equals("9")) {
             log.info("==>易通支付，查询订单状态失败");
             return false;
         }

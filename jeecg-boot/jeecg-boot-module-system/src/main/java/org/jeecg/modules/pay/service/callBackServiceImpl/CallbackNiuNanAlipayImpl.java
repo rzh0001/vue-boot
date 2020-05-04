@@ -18,8 +18,14 @@ import java.util.Map;
  */
 @Service
 public class CallbackNiuNanAlipayImpl extends AbstractCallBack implements InitializingBean {
+
     @Override
-    public Object reply(Map<String, Object> map, String apiKey) throws Exception {
+    public Object reply() throws Exception {
+        return "success";
+    }
+
+    @Override
+    public boolean checkSign(Map<String, Object> map, String apiKey) throws Exception {
         log.info("==>牛腩支付 回调，回调参数为：{}", map);
         String merCode = (String)map.get("merCode");
         String orderNo = (String)map.get("orderNo");
@@ -46,9 +52,9 @@ public class CallbackNiuNanAlipayImpl extends AbstractCallBack implements Initia
         log.info("==>牛腩支付 回调，MD5 :{}", localSign);
         if (!localSign.equals(sign)) {
             log.error("==>牛腩支付 签名验证不通过，入参sign:{},本地：{}", sign, localSign);
-            return "fail";
+            return false;
         }
-        return "success";
+        return true;
     }
 
     @Override
