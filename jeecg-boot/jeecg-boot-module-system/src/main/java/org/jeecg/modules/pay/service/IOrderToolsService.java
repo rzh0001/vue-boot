@@ -48,7 +48,12 @@ public interface IOrderToolsService {
 
 	OrderInfoEntity queryOrderByOrderIdAndPayType(String orderId, String payType);
 
-	void notifyClient(OrderInfoEntity orderInfo);
+	/**
+	 * 订单已支付，完成后续处理
+	 *
+	 * @param orderInfo
+	 */
+	void orderPaid(OrderInfoEntity orderInfo);
 
 //	UserBusinessEntity getUserChannelConfig(String userId, String channelCode);
 

@@ -145,7 +145,13 @@ public class OrderToolsServiceImpl implements IOrderToolsService {
 	}
 
 	@Override
-	public void notifyClient(OrderInfoEntity orderInfo) {
+	public void orderPaid(OrderInfoEntity orderInfo) {
+		// 更新订单状态
+
+		// 处理资金流水
+
+		// 通知商户
+
 		try {
 			asyncNotify.asyncNotify(orderInfo.getOrderId(), orderInfo.getPayType());
 		} catch (Exception e) {

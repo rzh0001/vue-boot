@@ -37,7 +37,7 @@ public class AntPay implements PayChannelStrategy {
 		body.setNonce_str(UUIDGenerator.generate());
 		body.setTotal_amount(orderInfo.getSubmitAmount().multiply(new BigDecimal("100")).stripTrailingZeros().toPlainString());
 		body.setOut_trade_no(orderInfo.getOrderId());
-		body.setNotify_url(orderInfo.getSuccessCallbackUrl());
+		body.setNotify_url(orderTools.generateCallbackUrl(orderInfo));
 		body.setSign(body.sign(userChannelConfig.getApiKey()));
 
 		String serverGateway = orderTools.getChannelGateway(orderInfo.getPayType());
@@ -60,7 +60,7 @@ public class AntPay implements PayChannelStrategy {
 		if ("0000".equals(callback.getCode()) & "0000".equals(callback.getSub_code()) & callback.getTrade_status() == 1) {
 			log.info("订单[{}]回调处理成功", orderInfo.getOrderId());
 			//异步通知客户
-			orderTools.notifyClient(orderInfo);
+			orderTools.orderPaid(orderInfo);
 			return "success";
 		}
 		return "fail";

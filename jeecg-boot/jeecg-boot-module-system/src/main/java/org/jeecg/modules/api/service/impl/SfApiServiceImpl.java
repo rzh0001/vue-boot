@@ -70,8 +70,6 @@ public class SfApiServiceImpl implements ISfApiService {
 				orderInfo.getSubmitAmount().multiply(new BigDecimal(rate)).setScale(2, BigDecimal.ROUND_HALF_UP);
 		orderInfo.setPoundage(commission);
 		orderInfo.setActualAmount(orderInfo.getSubmitAmount().subtract(commission));
-		// 生成回调地址
-		orderInfo.setSuccessCallbackUrl(orderTools.generateCallbackUrl(orderInfo));
 
 		orderService.save(orderInfo);
 		// 请求外部平台,生成支付链接

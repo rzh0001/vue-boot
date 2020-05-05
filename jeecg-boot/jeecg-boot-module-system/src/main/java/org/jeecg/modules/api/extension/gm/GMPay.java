@@ -56,7 +56,7 @@ public class GMPay implements PayChannelStrategy {
 		data.setApplyamount(String.valueOf(orderInfo.getSubmitAmount()));
 		data.setOrderchannel(6);
 		data.setWeb_username(orderInfo.getUserName());
-		data.setCallbackurl(orderInfo.getSuccessCallbackUrl());
+		data.setCallbackurl(orderTools.generateCallbackUrl(orderInfo));
 
 		GMRequestBody body = new GMRequestBody();
 		body.setAgentcode(orderInfo.getBusinessCode());
@@ -106,7 +106,7 @@ public class GMPay implements PayChannelStrategy {
 		}
 
 		//异步通知客户
-		orderTools.notifyClient(orderInfo);
+		orderTools.orderPaid(orderInfo);
 
 		JSONObject json = new JSONObject();
 		json.put("code", "200");
