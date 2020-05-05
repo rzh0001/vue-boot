@@ -17,7 +17,7 @@ import java.math.BigDecimal;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class PayOrderData extends ApiData {
+public class PayOrderRequestData extends ApiBase {
 	@NotBlank(message = "productCode 不能为空")
 	@Length(max = 45, message = "productCode 最大长度为45")
 	private String productCode;

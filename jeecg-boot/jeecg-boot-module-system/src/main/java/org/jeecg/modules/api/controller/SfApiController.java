@@ -6,9 +6,10 @@ import cn.hutool.json.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.constant.CommonConstant;
 import org.jeecg.modules.api.entity.ApiRequestBody;
-import org.jeecg.modules.api.entity.PayOrderData;
-import org.jeecg.modules.api.entity.PayOrderResponse;
+import org.jeecg.modules.api.entity.PayOrderRequestData;
+import org.jeecg.modules.api.entity.PayOrderUrlResponse;
 import org.jeecg.modules.api.exception.AccountAbnormalException;
+import org.jeecg.modules.api.exception.BusinessException;
 import org.jeecg.modules.api.exception.SignatureException;
 import org.jeecg.modules.api.service.ISfApiService;
 import org.jeecg.modules.exception.RRException;
@@ -41,7 +42,7 @@ public class SfApiController {
 	 */
 	@RequestMapping(value = "/order/create", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	@ResponseBody
-	public PayOrderResponse createPayOrder(@Valid @RequestBody ApiRequestBody reqBody) {
+	public PayOrderUrlResponse createPayOrder(@Valid @RequestBody ApiRequestBody reqBody) {
 		log.info("=======>商户[{}]创建订单", reqBody.getUsername());
 
 		// 检查账户状态
@@ -74,7 +75,7 @@ public class SfApiController {
 		// 解析数据，验证数据合法性
 		String data = reqBody.decodeData(user.getApiKey());
 		JSONObject jsonObject = JSONUtil.parseObj(data);
-		PayOrderData payOrderData = jsonObject.toBean(PayOrderData.class);
+		PayOrderRequestData payOrderData = jsonObject.toBean(PayOrderRequestData.class);
 		log.info("=======>商户[{}]创建订单[{}]：解密成功", reqBody.getUsername(), payOrderData.getOuterOrderId());
 		log.info("=======>订单[{}]：{}", payOrderData.getOuterOrderId(), payOrderData.toJsonString());
 		//
@@ -85,7 +86,7 @@ public class SfApiController {
 		OrderInfoEntity orderInfoEntity = payOrderData.toPayOrder(user);
 		orderInfoEntity.setRemark(reqBody.getRemark());
 		// 创建订单
-		PayOrderResponse response = apiService.createOrder(orderInfoEntity);
+		PayOrderUrlResponse response = apiService.createOrder(orderInfoEntity);
 
 		return response;
 	}
@@ -93,9 +94,21 @@ public class SfApiController {
 	@RequestMapping(value = "/order/callback/{payType}/{orderId}", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 	@ResponseBody
 	public String callback(@PathVariable String payType, @PathVariable String orderId, HttpServletRequest req) {
-		log.info("payType={}", payType);
-		apiService.callback(payType, orderId, req);
-		return "ok";
+		return apiService.callback(payType, orderId, req);
+	}
+
+
+	@RequestMapping(value = "/order/query/{outerOrderId}", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+	@ResponseBody
+	public String callback(@PathVariable String outerOrderId, @Valid @RequestBody ApiRequestBody reqBody) {
+		SysUser user = userService.getUserByName(reqBody.getUsername());
+		String data = reqBody.decodeData(user.getApiKey());
+		JSONObject jsonObject = JSONUtil.parseObj(data);
+		if (outerOrderId.compareTo(jsonObject.get("outerOrderId").toString()) != 0) {
+			throw BusinessException.Fuck("外部订单号[{}]异常", outerOrderId);
+		}
+
+		return apiService.queryOrder(outerOrderId, reqBody.getUsername()).toJsonString();
 	}
 
 

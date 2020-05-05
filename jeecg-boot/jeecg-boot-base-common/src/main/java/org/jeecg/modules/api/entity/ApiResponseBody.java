@@ -13,13 +13,19 @@ public class ApiResponseBody<T> {
 	private String msg;
 	private T data;
 
-	public ApiResponseBody() {
+	private ApiResponseBody() {
 		code = 0;
 		msg = "success";
 	}
 
 	public static ApiResponseBody ok() {
 		return new ApiResponseBody();
+	}
+
+	public ApiResponseBody(T dataObject) {
+		code = 0;
+		msg = "success";
+		data = dataObject;
 	}
 
 	public static ApiResponseBody error(int code, String msg) {

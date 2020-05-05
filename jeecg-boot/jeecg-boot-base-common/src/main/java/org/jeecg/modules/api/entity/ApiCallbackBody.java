@@ -10,7 +10,7 @@ import org.apache.commons.codec.digest.DigestUtils;
  */
 @Data
 @Slf4j
-public class CallbackBody extends ApiData {
+public class ApiCallbackBody extends ApiBase {
 	private String username;
 	private String data;
 	private Long timestamp = System.currentTimeMillis();
@@ -23,10 +23,12 @@ public class CallbackBody extends ApiData {
 	 * @param apiKey
 	 * @return
 	 */
-	public CallbackBody sign(String apiKey) {
+	public ApiCallbackBody sign(String apiKey) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(username).append(timestamp).append(data).append(apiKey);
-		log.info("===>系统拼接的sign串为：{}", sb.toString());
+		sb.append("username=").append(username);
+		sb.append("&timestamp=").append(timestamp);
+		sb.append("&data=").append(data);
+		sb.append("&apiKey=").append(apiKey);
 		sign = DigestUtils.md5Hex(sb.toString());
 		return this;
 	}

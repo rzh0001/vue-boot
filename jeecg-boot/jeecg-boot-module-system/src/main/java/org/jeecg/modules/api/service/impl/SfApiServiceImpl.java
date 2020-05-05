@@ -1,10 +1,11 @@
 package org.jeecg.modules.api.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
-import org.jeecg.modules.api.entity.ApiRequestBody;
 import org.jeecg.modules.api.entity.ApiResponseBody;
-import org.jeecg.modules.api.entity.PayOrderResponse;
+import org.jeecg.modules.api.entity.PayOrderResponseData;
+import org.jeecg.modules.api.entity.PayOrderUrlResponse;
 import org.jeecg.modules.api.exception.BusinessException;
 import org.jeecg.modules.api.extension.PayChannelContext;
 import org.jeecg.modules.api.service.ISfApiService;
@@ -43,7 +44,7 @@ public class SfApiServiceImpl implements ISfApiService {
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public PayOrderResponse createOrder(OrderInfoEntity orderInfo) {
+	public PayOrderUrlResponse createOrder(OrderInfoEntity orderInfo) {
 		// 检查产品、通道配置
 		UserChannelEntity channel =
 				productService.getChannelByProduct(orderInfo.getUserName(), orderInfo.getProductCode());
@@ -75,7 +76,18 @@ public class SfApiServiceImpl implements ISfApiService {
 		orderService.save(orderInfo);
 		// 请求外部平台,生成支付链接
 		String payUrl = payChannel.request(orderInfo);
-		return PayOrderResponse.success(payUrl);
+		return PayOrderUrlResponse.success(payUrl);
+	}
+
+	@Override
+	public ApiResponseBody queryOrder(String outerOrderId, String username) {
+		QueryWrapper<OrderInfoEntity> qw = new QueryWrapper<>();
+		qw.lambda().eq(OrderInfoEntity::getOuterOrderId, outerOrderId)
+				.eq(OrderInfoEntity::getUserName, username);
+		OrderInfoEntity orderInfo = orderService.getOne(qw);
+		PayOrderResponseData data = PayOrderResponseData.fromPayOrder(orderInfo);
+
+		return new ApiResponseBody(data);
 	}
 
 
@@ -111,11 +123,6 @@ public class SfApiServiceImpl implements ISfApiService {
 			return channel.getRate();
 		}
 		return userRate.getUserRate();
-	}
-
-	@Override
-	public ApiResponseBody queryOrder(ApiRequestBody req) {
-		return null;
 	}
 
 	@Override

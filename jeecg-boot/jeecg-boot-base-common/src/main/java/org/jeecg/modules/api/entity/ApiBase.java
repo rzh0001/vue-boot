@@ -17,7 +17,7 @@ import java.util.Set;
  */
 @Data
 @Slf4j
-public class ApiData {
+public class ApiBase {
 
 	/**
 	 * 根据实体注解校验参数合法性
@@ -26,7 +26,7 @@ public class ApiData {
 	public void checkData() {
 		ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
 		Validator validator = validatorFactory.getValidator();
-		Set<ConstraintViolation<ApiData>> validate = validator.validate(this);
+		Set<ConstraintViolation<ApiBase>> validate = validator.validate(this);
 		if (!validate.isEmpty()) {
 			StringBuilder builder = new StringBuilder();
 			validate.forEach(item -> {
