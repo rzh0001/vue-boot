@@ -14,7 +14,7 @@ public class NiuNanPay implements PayChannelStrategy {
 	}
 
 	@Override
-	public String callback(String orderId, HttpServletRequest req) {
+	public String callback(OrderInfoEntity orderId, HttpServletRequest req) {
 		return null;
 	}
 }

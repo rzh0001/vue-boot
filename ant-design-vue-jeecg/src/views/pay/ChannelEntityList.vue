@@ -48,7 +48,6 @@
         :dataSource="dataSource"
         :pagination="ipagination"
         :loading="loading"
-        :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
         @change="handleTableChange">
 
         <span slot="action" slot-scope="text, record">
@@ -92,30 +91,30 @@
         // 表头
         columns: [
           {
-            title: '#',
-            dataIndex: '',
-            key:'rowIndex',
-            width:60,
+            title: '通道代码',
             align:"center",
-            customRender:function (t,r,index) {
-              return parseInt(index)+1;
-            }
-           },
-		   {
+            dataIndex: 'channelCode'
+          },
+          {
             title: '通道名称',
             align:"center",
             dataIndex: 'channelName'
            },
-		   {
-            title: '通道代码',
-            align:"center",
-            dataIndex: 'channelCode'
-           },
           {
-            title: '通道利率',
+            title: '通道默认费率',
             align:"center",
             dataIndex: 'rate'
           },
+          {
+            title: '通道网关',
+            align:"center",
+            dataIndex: 'channelGateway'
+           },
+          {
+            title: '通道服务器IP',
+            align:"center",
+            dataIndex: 'channelIp'
+           },
           {
             title: '操作',
             dataIndex: 'action',

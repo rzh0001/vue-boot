@@ -2,8 +2,10 @@ package org.jeecg.modules.pay.service.impl;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.jeecg.common.constant.PayConstant;
 import org.jeecg.common.system.vo.DictModel;
 import org.jeecg.common.util.DateUtils;
 import org.jeecg.common.util.RedisUtil;
@@ -46,6 +48,9 @@ public class OrderToolsServiceImpl implements IOrderToolsService {
 	@Autowired
 	private ISysDictService dictService;
 
+	@Autowired
+	private AsyncNotifyServiceImpl asyncNotify;
+
 	/**
 	 * 本机域名
 	 */
@@ -57,7 +62,6 @@ public class OrderToolsServiceImpl implements IOrderToolsService {
 		Optional<DictModel> urlModel = domain.stream().filter(model -> BaseConstant.DOMAIN.equals(model.getText())).findFirst();
 		urlModel.ifPresent(dictModel -> serverDomain = dictModel.getValue());
 	}
-
 
 	@Override
 	public void checkOuterOrderId(String username, String outerOrderId) {
@@ -98,6 +102,11 @@ public class OrderToolsServiceImpl implements IOrderToolsService {
 	}
 
 	@Override
+	public String getChannelGateway(String payType) {
+		return (String) redisUtil.hget(PayConstant.REDIS_CHANNEL_CONFIG, payType);
+	}
+
+	@Override
 	public UserRateEntity getUserRate(String username, String channelCode) {
 		return rateService.getUserRate(username, channelCode);
 	}
@@ -124,6 +133,25 @@ public class OrderToolsServiceImpl implements IOrderToolsService {
 		}
 		throw AccountAbnormalException.Fuck("通道[{}]余额不足，请联系管理员", orderInfo.getPayType());
 
+	}
+
+	@Override
+	public OrderInfoEntity queryOrderByOrderIdAndPayType(String orderId, String payType) {
+		QueryWrapper<OrderInfoEntity> qw = new QueryWrapper();
+		qw.lambda().eq(OrderInfoEntity::getOrderId, orderId)
+				.eq(OrderInfoEntity::getPayType, payType);
+		orderMapper.selectOne(qw);
+		return orderMapper.selectOne(qw);
+	}
+
+	@Override
+	public void notifyClient(OrderInfoEntity orderInfo) {
+		try {
+			asyncNotify.asyncNotify(orderInfo.getOrderId(), orderInfo.getPayType());
+		} catch (Exception e) {
+			log.error("订单[{}]异步通知客户失败", orderInfo.getOrderId());
+			e.printStackTrace();
+		}
 	}
 
 }

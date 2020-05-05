@@ -21,64 +21,71 @@ import java.util.Map;
  * @Version: V1.0
  */
 public interface IOrderInfoEntityService extends IService<OrderInfoEntity> {
-    R createOrder(JSONObject reqobj, HttpServletRequest req) throws Exception;
+	R createOrder(JSONObject reqobj, HttpServletRequest req) throws Exception;
 
-    /**
-     * 查询订单信息
-     *
-     * @param reqobj
-     */
-    R queryOrderInfo(JSONObject reqobj);
+	/**
+	 * 查询订单信息
+	 *
+	 * @param reqobj
+	 */
+	R queryOrderInfo(JSONObject reqobj);
 
-    /**
-     * 回调
-     *
-     * @param reqobj
-     * @return
-     */
-    R callback(JSONObject reqobj, HttpServletRequest req) throws Exception;
-    public R notifyCustomer(OrderInfoEntity order, SysUser user, String payType) throws Exception;
-    Object innerSysCallBack(String payTpye,Object param) throws Exception;
-    Map<String, Object> isInternalSystem(Map<String, Object> param);
-    OrderInfoEntity queryOrderInfoByOrderId(String orderId);
+	/**
+	 * 回调
+	 *
+	 * @param reqobj
+	 * @return
+	 */
+	R callback(JSONObject reqobj, HttpServletRequest req) throws Exception;
 
-    /**
-     * 更新订单状态为支付已返回
-     *
-     * @param orderId
-     */
-    void updateOrderStatusSuccessByOrderId(@Param("orderId") String orderId);
+	public R notifyCustomer(OrderInfoEntity order, SysUser user, String payType) throws Exception;
 
-    /**
-     * 更新订单状态为支付未返回
-     *
-     * @param orderId
-     */
-    void updateOrderStatusNoBackByOrderId(@Param("orderId") String orderId);
+	Object innerSysCallBack(String payTpye, Object param) throws Exception;
 
-    JSONObject encryptAESData(OrderInfoEntity order, String aseKey) throws Exception;
+	Map<String, Object> isInternalSystem(Map<String, Object> param);
 
-    void countAmount(String orderId, String userName, String submitAmount, String payType) throws Exception;
+	OrderInfoEntity queryOrderInfoByOrderId(String orderId);
 
-    int updateOrderStatusBatch(List<String> orderIds);
-    
-    Map<String, Object> summary(Wrapper wrapper);
-    
-    Map<String, Object> summaryUserTodayOrderAmount(String userId, Date date);
+	/**
+	 * 更新订单状态为支付已返回
+	 *
+	 * @param orderId
+	 */
+	void updateOrderStatusSuccessByOrderId(@Param("orderId") String orderId);
 
-    /**
-     * 通知挂马扣除手续费
-     * @param orderId
-     * @param payType
-     */
-    boolean notifyOrderFinish(String orderId,String payType) throws Exception;
-    List<String> getOrderByTime(String time);
+	/**
+	 * 更新订单状态为支付未返回
+	 *
+	 * @param orderId
+	 */
+	void updateOrderStatusNoBackByOrderId(@Param("orderId") String orderId);
 
-    /**
-     * 手动调整金额商户，根据订单号，更新马商的收入金额
-     * @param orderId
-     */
-    void updateCustomerIncomeAmount(String orderId, BigDecimal amount) throws Exception;
+	JSONObject encryptAESData(OrderInfoEntity order, String aseKey) throws Exception;
+
+	void countAmount(String orderId, String userName, String submitAmount, String payType) throws Exception;
+
+	int updateOrderStatusBatch(List<String> orderIds);
+
+	Map<String, Object> summary(Wrapper wrapper);
+
+	Map<String, Object> summaryUserTodayOrderAmount(String userId, Date date);
+
+	/**
+	 * 通知挂马扣除手续费
+	 *
+	 * @param orderId
+	 * @param payType
+	 */
+	boolean notifyOrderFinish(String orderId, String payType) throws Exception;
+
+	List<String> getOrderByTime(String time);
+
+	/**
+	 * 手动调整金额商户，根据订单号，更新马商的收入金额
+	 *
+	 * @param orderId
+	 */
+	void updateCustomerIncomeAmount(String orderId, BigDecimal amount) throws Exception;
 
 
 }

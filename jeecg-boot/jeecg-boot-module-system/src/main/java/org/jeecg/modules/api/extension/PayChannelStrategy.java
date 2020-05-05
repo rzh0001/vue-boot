@@ -13,5 +13,5 @@ public interface PayChannelStrategy {
 	 */
 	String pay(OrderInfoEntity orderInfo);
 
-	String callback(String orderId, HttpServletRequest req);
+	String callback(OrderInfoEntity orderInfo, HttpServletRequest req);
 }

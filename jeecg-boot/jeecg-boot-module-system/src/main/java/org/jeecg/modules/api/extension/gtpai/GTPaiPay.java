@@ -52,7 +52,7 @@ public class GTPaiPay implements PayChannelStrategy {
 		body.setMch_id(orderInfo.getBusinessCode());
 		body.setTrans_amt(orderInfo.getSubmitAmount().toString());
 		body.setOut_trade_no(orderInfo.getOrderId());
-		body.setNotify_url(orderTools.generateCallbackUrl(orderInfo));
+		body.setNotify_url(orderInfo.getSuccessCallbackUrl());
 		body.setSign(body.sign(userChannelConfig.getApiKey()));
 
 		String resp = HttpUtil.post(serverUrl, body.toJsonString());
@@ -62,7 +62,7 @@ public class GTPaiPay implements PayChannelStrategy {
 	}
 
 	@Override
-	public String callback(String orderId, HttpServletRequest req) {
+	public String callback(OrderInfoEntity orderId, HttpServletRequest req) {
 		return null;
 	}
 }

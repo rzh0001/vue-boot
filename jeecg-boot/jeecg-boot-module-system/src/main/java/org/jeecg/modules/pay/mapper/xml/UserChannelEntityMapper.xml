@@ -6,7 +6,7 @@
         from sys_user_channel
         where user_name = #{userName}
           and channel_code = #{channelCode}
-          and del_flag is null
+          and (del_flag is null or del_flag = 0)
     </select>
     <select id="queryUserChannel" resultType="java.lang.String" parameterType="java.lang.String">
         select channel_code from sys_user_channel where user_name=#{userName} and channel_code in

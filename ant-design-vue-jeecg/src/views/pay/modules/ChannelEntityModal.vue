@@ -10,13 +10,7 @@
     
     <a-spin :spinning="confirmLoading">
       <a-form :form="form">
-      
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="通道名称">
-          <a-input placeholder="请输入通道名称" v-decorator="['channelName', validatorRules.channelName]" />
-        </a-form-item>
+
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
@@ -26,13 +20,22 @@
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
-          label="通过利率">
-          <a-input placeholder="请输入通道利率,如：0.003代表千分三" v-decorator="['rate', validatorRules.rate]" />
+          label="通道名称">
+          <a-input placeholder="请输入通道名称" v-decorator="['channelName', validatorRules.channelName]" />
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
-          label="状态">
+          label="通道默认费率">
+          <a-input placeholder="请输入通道利率,如：0.003代表千分三" v-decorator="['rate', validatorRules.rate]" />
+        </a-form-item>
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="通道网关">
+          <a-input placeholder="" v-decorator="['channelGateway', validatorRules.channelGateway]" />
+        </a-form-item>
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="通道服务器IP">
+          <a-input placeholder="" v-decorator="['channelIp', validatorRules.channelIp]" />
+        </a-form-item>
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="状态">
           <select v-decorator="[ 'status', validatorRules.status]">
             <option value="0">关闭</option>
             <option value="1">开启</option>
@@ -69,7 +72,9 @@
         validatorRules:{
           channelName:{rules: [{ required: true, message: '请输入通道名称!' }]},
           channelCode:{rules: [{ required: true, message: '请输入通道代码' }]},
-          rate:{rules: [{ required: true, message: '请输入通道利率' }]},
+          channelGateway:{rules: [{ required: true, message: '请输入通道网关' }]},
+          channelIp:{rules: [{ required: true, message: '请输入通道服务器IP' }]},
+          rate:{rules: [{ required: true, message: '请输入通道费率' }]},
           status:{rules: [{ required: true, message: '请选择状态!' }]},
         },
         url: {
@@ -89,7 +94,7 @@
         this.model = Object.assign({}, record);
         this.visible = true;
         this.$nextTick(() => {
-          this.form.setFieldsValue(pick(this.model,'channelName','channelCode','rate','status','delFlag','createUser','updateUser'))
+          this.form.setFieldsValue(pick(this.model,'channelName','channelCode','channelGateway','channelIp','rate','status','delFlag','createUser','updateUser'))
 		  //时间格式化
         });
 
@@ -121,24 +126,19 @@
               if(res.success){
                 that.$message.success(res.message);
                 that.$emit('ok');
+                that.close();
               }else{
                 that.$message.warning(res.message);
               }
             }).finally(() => {
               that.confirmLoading = false;
-              that.close();
             })
-
-
-
           }
         })
       },
       handleCancel () {
         this.close()
       },
-
-
     }
   }
 </script>

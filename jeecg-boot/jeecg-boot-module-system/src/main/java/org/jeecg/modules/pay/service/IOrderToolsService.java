@@ -33,6 +33,8 @@ public interface IOrderToolsService {
 	 */
 	String generateCallbackUrl(OrderInfoEntity orderInfo);
 
+	String getChannelGateway(String payType);
+
 	/**
 	 * 获取用户通道费率设置
 	 *
@@ -43,6 +45,10 @@ public interface IOrderToolsService {
 	UserRateEntity getUserRate(String username, String channelCode);
 
 	UserBusinessEntity getUserChannelConfig(OrderInfoEntity orderInfo);
+
+	OrderInfoEntity queryOrderByOrderIdAndPayType(String orderId, String payType);
+
+	void notifyClient(OrderInfoEntity orderInfo);
 
 //	UserBusinessEntity getUserChannelConfig(String userId, String channelCode);
 
