@@ -45,7 +45,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
 		//根据product获取通道
 		List<String> channels = productChannelService.getChannelByProductCode(product);
 		if (CollectionUtils.isEmpty(channels)) {
-			throw new BusinessException("未配置支付通道，请联系管理员");
+			throw new BusinessException("未配置:["+product+"]支付产品渠道，请联系管理员");
 		}
 		//根据 通道列表和用户，查看用户具备哪些通道
 		List<UserChannelEntity> channelCodes = channelUserDao.getUserChannel(channels, userName);

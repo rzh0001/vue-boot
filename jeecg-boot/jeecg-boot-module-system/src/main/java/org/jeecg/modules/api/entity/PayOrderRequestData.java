@@ -41,7 +41,7 @@ public class PayOrderRequestData extends ApiBase {
 	private String clientIp;
 
 
-	public OrderInfoEntity toPayOrder(SysUser u) {
+	public OrderInfoEntity toPayOrder(SysUser u,String  remark) {
 
 		OrderInfoEntity o = new OrderInfoEntity();
 		BeanUtil.copyProperties(this, o);
@@ -58,8 +58,8 @@ public class PayOrderRequestData extends ApiBase {
 		o.setSalesmanId(u.getSalesmanId());
 		o.setSalesmanUsername(u.getSalesmanUsername());
 		o.setSalesmanRealname(u.getSalesmanRealname());
-
 		o.setParentUser(u.getAgentUsername());
+		o.setRemark(remark);
 		return o;
 	}
 }

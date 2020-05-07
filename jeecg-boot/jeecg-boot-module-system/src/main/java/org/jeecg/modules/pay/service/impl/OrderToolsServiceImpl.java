@@ -111,10 +111,6 @@ public class OrderToolsServiceImpl implements IOrderToolsService {
 		return rateService.getUserRate(username, channelCode);
 	}
 
-//	@Override
-////	public UserBusinessEntity getUserChannelConfig(String userId, String channelCode) {
-////		return businessService.getUserChannelConfig(userId, channelCode);
-////	}
 
 	@Override
 	public UserBusinessEntity getUserChannelConfig(OrderInfoEntity orderInfo) {
