@@ -55,10 +55,10 @@ public class SfApiController {
 		return response;
 	}
 
-	@RequestMapping(value = "/order/callback/{payType}/{orderId}", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+	@RequestMapping(value = "/order/callback/{payType}/{orderId}")
 	@ResponseBody
-	public String callback(@PathVariable String payType, @PathVariable String orderId, HttpServletRequest req) {
-		return apiService.callback(payType, orderId, req);
+	public Object callback(@PathVariable String payType, @PathVariable String orderId) throws Exception {
+		return apiService.callback(payType, orderId);
 	}
 
 

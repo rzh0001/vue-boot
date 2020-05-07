@@ -18,99 +18,77 @@ import org.jeecg.modules.pay.service.IUserBusinessEntityService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 /**
  * GM支付接口
  */
 @Slf4j
-public class GMPay implements PayChannelStrategy {
+public class GMPay extends PayChannelStrategy {
 
-	@Autowired
-	private IUserBusinessEntityService businessService;
+    @Autowired
+    private IOrderToolsService orderTools;
 
-	@Autowired
-	private IOrderToolsService orderTools;
+    @Override
+    public String pay(OrderInfoEntity orderInfo) {
+        UserBusinessEntity userChannelConfig = orderTools.getUserChannelConfig(orderInfo);
+        String gmApiKey = userChannelConfig.getApiKey();
+        if (StringUtils.isBlank(gmApiKey)) {
+            log.error("通道未配置apikey");
+            throw new AccountAbnormalException("通道未配置apikey");
+        }
+        String[] keys = gmApiKey.split("=");
+        if (keys.length != 2) {
+            log.error("通道未配置apikey");
+            throw new AccountAbnormalException("通道未配置apikey");
+        }
+        String md5Key = keys[0];
+        String aesKey = keys[1];
 
-	@Autowired
-	private IOrderInfoEntityService orderService;
+        GMRequestData data = new GMRequestData();
+        data.setAgentorderid(orderInfo.getOrderId());
+        data.setApplyamount(String.valueOf(orderInfo.getSubmitAmount()));
+        data.setOrderchannel(6);
+        data.setWeb_username(orderInfo.getUserName());
+        data.setCallbackurl(orderTools.generateCallbackUrl(orderInfo));
 
+        GMRequestBody body = new GMRequestBody();
+        body.setAgentcode(orderInfo.getBusinessCode());
+        body.setData(data.encrypt(aesKey));
+        body.setSign(body.sign(md5Key));
 
-	@Override
-	public String pay(OrderInfoEntity orderInfo) {
-		UserBusinessEntity userChannelConfig = orderTools.getUserChannelConfig(orderInfo);
-		String gmApiKey = userChannelConfig.getApiKey();
-		if (StringUtils.isBlank(gmApiKey)) {
-			log.error("通道未配置apikey");
-			throw new AccountAbnormalException("通道未配置apikey");
-		}
-		String[] keys = gmApiKey.split("=");
-		if (keys.length != 2) {
-			log.error("通道未配置apikey");
-			throw new AccountAbnormalException("通道未配置apikey");
-		}
-		String md5Key = keys[0];
-		String aesKey = keys[1];
+        String serverGateway = orderTools.getChannelGateway(orderInfo.getPayType());
+        log.info("订单[{}]向[{}]发送请求[{}]", orderInfo.getOrderId(), serverGateway, body.toJsonString());
+        String response = HttpUtil.post(serverGateway, body.toJsonString());
+        log.info("订单[{}]接受响应[{}]", orderInfo.getOrderId(), response);
 
-		GMRequestData data = new GMRequestData();
-		data.setAgentorderid(orderInfo.getOrderId());
-		data.setApplyamount(String.valueOf(orderInfo.getSubmitAmount()));
-		data.setOrderchannel(6);
-		data.setWeb_username(orderInfo.getUserName());
-		data.setCallbackurl(orderTools.generateCallbackUrl(orderInfo));
+        // 处理响应
+        GMResponse gmResponse = JSONObject.parseObject(response, GMResponse.class);
+        if (gmResponse.getCode() != 0) {
+            throw BusinessException.Fuck("支付连接生成失败，请联系管理员。失败原因：{}", gmResponse.getMsg());
+        }
+        return gmResponse.getPayurl();
+    }
 
-		GMRequestBody body = new GMRequestBody();
-		body.setAgentcode(orderInfo.getBusinessCode());
-		body.setData(data.encrypt(aesKey));
-		body.setSign(body.sign(md5Key));
-
-		String serverGateway = orderTools.getChannelGateway(orderInfo.getPayType());
-		log.info("订单[{}]向[{}]发送请求[{}]", orderInfo.getOrderId(), serverGateway, body.toJsonString());
-		String response = HttpUtil.post(serverGateway, body.toJsonString());
-		log.info("订单[{}]接受响应[{}]", orderInfo.getOrderId(), response);
-
-		// 处理响应
-		GMResponse gmResponse = JSONObject.parseObject(response, GMResponse.class);
-		if (gmResponse.getCode() != 0) {
-			throw BusinessException.Fuck("支付连接生成失败，请联系管理员。失败原因：{}", gmResponse.getMsg());
-		}
-		return gmResponse.getPayurl();
-	}
-
-	@Override
-	public String callback(OrderInfoEntity orderInfo, HttpServletRequest req) {
-		// 1.从HttpServletRequest获取数据
-//		Map<String, String[]> parameterMap = req.getParameterMap(); //获取以form提交的数据
-		String jsonStr = HttpRequestUtil.getJsonString(req); // 获取以json提交的数据
-		GMCallbackBody body = JSONObject.parseObject(jsonStr, GMCallbackBody.class);
-		// 验签
-		UserBusinessEntity userChannelConfig = orderTools.getUserChannelConfig(orderInfo);
-		String gmApiKey = userChannelConfig.getApiKey();
-		if (StringUtils.isBlank(gmApiKey)) {
-			log.error("通道未配置apikey");
-			throw new AccountAbnormalException("通道未配置apikey");
-		}
-		String[] keys = gmApiKey.split("=");
-		if (keys.length != 2) {
-			log.error("通道未配置apikey");
-			throw new AccountAbnormalException("通道未配置apikey");
-		}
-		String md5Key = keys[0];
-		String aesKey = keys[1];
-
-		body.checkSign(md5Key);
-
-		String s = AES128Util.decryptBase64(body.getData(), aesKey);
-		GMCallbackData data = JSONObject.parseObject(s, GMCallbackData.class);
-		if (data == null) {
-			throw BusinessException.Fuck("data数据解密失败");
-		}
-
-		//异步通知客户
-		orderTools.orderPaid(orderInfo);
-
+    @Override
+    public Object reply() throws Exception {
 		JSONObject json = new JSONObject();
 		json.put("code", "200");
-
 		return json.toJSONString();
-	}
+    }
+
+    @Override
+    public boolean checkSign(Map<String, Object> param, String apiKey) throws Exception {
+        return false;
+    }
+
+    @Override
+    public Map<String, Object> getCallBackParam(Map<String, Object> map) {
+        return map;
+    }
+
+    @Override
+    public boolean checkOrderStatusIsOK(Map<String, Object> map, String apiKey) throws Exception {
+        return true;
+    }
 }

@@ -128,19 +128,9 @@ public class SfApiServiceImpl implements ISfApiService {
     }
 
     @Override
-    public String callback(String payType, String orderId, HttpServletRequest req) {
-        // 检验回调IP TODO 通道服务器域名、IP统一配置到通道表里，修改后在这里校验对调IP地址
-
-        // 查询订单
-        OrderInfoEntity orderInfo = orderTools.queryOrderByOrderIdAndPayType(orderId, payType);
-        if (BeanUtil.isEmpty(orderInfo)) {
-            throw BusinessException.Fuck("订单[{}]不存在", orderId);
-        }
-        if (orderInfo.getStatus() == 2) {
-            throw BusinessException.Fuck("订单[{}]已成功完结", orderId);
-        }
-
-        return payChannel.callback(orderInfo, req);
+    public Object callback(String payType, String orderId) throws Exception {
+        log.info("==>回调，回调通道为：{}，订单号为：{}",payType,orderId);
+        return payChannel.callback(payType, orderId);
     }
 
     @Override

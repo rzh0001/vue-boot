@@ -21,8 +21,8 @@ public class PayChannelContext {
 		return strategyMap.get(orderInfo.getPayType()).pay(orderInfo);
 	}
 
-	public String callback(OrderInfoEntity orderInfo, HttpServletRequest req) {
-		return strategyMap.get(orderInfo.getPayType()).callback(orderInfo, req);
+	public Object callback(String payType, String orderId) throws Exception {
+		return strategyMap.get(payType).callBack(orderId, payType);
 	}
 
 }

@@ -16,7 +16,14 @@ public interface ISfApiService {
 
 	ApiResponseBody queryOrder(String outerOrderId, String username);
 
-	String callback(String payType, String orderId, HttpServletRequest req);
+	/**
+	 * 回调
+	 * @param payType 通道代码
+	 * @param orderId 平台订单号
+	 * @return
+	 * @throws Exception
+	 */
+	Object callback(String payType, String orderId) throws Exception;
 
 	/**
 	 * 校验用户信息
@@ -35,5 +42,11 @@ public interface ISfApiService {
 	 */
 	PayOrderRequestData decodeData(ApiRequestBody reqBody, SysUser user) throws Exception;
 
+	/**
+	 * 校验通道信息
+	 * @param orderInfo
+	 * @return
+	 * @throws Exception
+	 */
 	String verifyUserChannel(OrderInfoEntity orderInfo)throws Exception;
 }
