@@ -4,27 +4,22 @@ import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.jeecg.common.util.encryption.AES128Util;
 import org.jeecg.modules.api.exception.AccountAbnormalException;
 import org.jeecg.modules.api.exception.BusinessException;
-import org.jeecg.modules.api.extension.PayChannelStrategy;
+import org.jeecg.modules.api.extension.APayChannelStrategy;
 import org.jeecg.modules.api.extension.gm.entity.*;
-import org.jeecg.modules.api.util.HttpRequestUtil;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import org.jeecg.modules.pay.entity.UserBusinessEntity;
-import org.jeecg.modules.pay.service.IOrderInfoEntityService;
 import org.jeecg.modules.pay.service.IOrderToolsService;
-import org.jeecg.modules.pay.service.IUserBusinessEntityService;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 /**
  * GM支付接口
  */
 @Slf4j
-public class GMPay extends PayChannelStrategy {
+public class GMAPay extends APayChannelStrategy {
 
     @Autowired
     private IOrderToolsService orderTools;

@@ -4,7 +4,7 @@ import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.jeecg.common.system.vo.DictModel;
-import org.jeecg.modules.api.extension.PayChannelStrategy;
+import org.jeecg.modules.api.extension.APayChannelStrategy;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import org.jeecg.modules.pay.entity.UserBusinessEntity;
 import org.jeecg.modules.pay.externalUtils.antUtil.GtpaiUtil;
@@ -20,14 +20,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 
 @Component("gtpaiAlipay")
-public class GTPaiPay extends PayChannelStrategy {
+public class GTPaiAPay extends APayChannelStrategy {
 	@Autowired
 	private IUserBusinessEntityService businessService;
 

@@ -4,12 +4,8 @@ import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
-import org.jeecg.common.util.MD5Util;
 import org.jeecg.common.util.UUIDGenerator;
-import org.jeecg.modules.api.exception.SignatureException;
-import org.jeecg.modules.api.extension.PayChannelStrategy;
-import org.jeecg.modules.api.util.HttpRequestUtil;
+import org.jeecg.modules.api.extension.APayChannelStrategy;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import org.jeecg.modules.pay.entity.UserBusinessEntity;
 import org.jeecg.modules.pay.externalUtils.antUtil.AntUtil;
@@ -17,14 +13,12 @@ import org.jeecg.modules.pay.service.IOrderToolsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
-import java.net.URLEncoder;
 import java.util.*;
 
 @Slf4j
 @Component("antAlipay")
-public class AntPay extends PayChannelStrategy {
+public class AntAPay extends APayChannelStrategy {
 
 	@Autowired
 	private IOrderToolsService orderTools;

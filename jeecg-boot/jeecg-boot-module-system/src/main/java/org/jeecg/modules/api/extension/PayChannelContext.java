@@ -4,16 +4,15 @@ import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class PayChannelContext {
 	@Autowired
-	private final Map<String, PayChannelStrategy> strategyMap = new ConcurrentHashMap<>();
+	private final Map<String, APayChannelStrategy> strategyMap = new ConcurrentHashMap<>();
 
-	public PayChannelContext(Map<String, PayChannelStrategy> strategyMap) {
+	public PayChannelContext(Map<String, APayChannelStrategy> strategyMap) {
 		strategyMap.forEach(this.strategyMap::put);
 	}
 
