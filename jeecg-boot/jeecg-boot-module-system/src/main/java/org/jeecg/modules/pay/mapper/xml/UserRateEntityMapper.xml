@@ -7,7 +7,7 @@
         FROM
             sys_user_rate
         WHERE
-            user_name = #{userName} AND agent_id = #{agentUsername} and channel_code = #{payType} and del_flag IS NULL
+            user_name = #{userName} AND agent_id = #{agentUsername} and channel_code = #{payType} and del_flag !=1
     </select>
     <select id="getBeIntroducerRate" parameterType="String" resultType="String">
         SELECT
@@ -15,6 +15,6 @@
         FROM
             sys_user_rate
         WHERE
-            user_name = #{userName} AND agent_id = #{agentUsername}  AND introducer_name = #{introducerName} and channel_code = #{payType} AND del_flag IS NULL
+            user_name = #{userName} AND agent_id = #{agentUsername}  AND introducer_name = #{introducerName} and channel_code = #{payType} AND del_flag !=1
     </select>
 </mapper>
