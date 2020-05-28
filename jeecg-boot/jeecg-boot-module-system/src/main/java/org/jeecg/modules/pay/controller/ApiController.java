@@ -6,12 +6,17 @@ import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import org.jeecg.modules.pay.service.IOrderInfoEntityService;
 import org.jeecg.modules.util.R;
 import org.jeecg.modules.util.RequestHandleUtil;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Map;
 
 /**
@@ -107,5 +112,16 @@ public class ApiController {
     @ResponseBody
     public void test(){
         RequestHandleUtil.doPost(((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest());
+    }
+    @PostMapping("/html")
+    @ResponseBody
+    public void html() throws IOException {
+        String body = "<!DOCTYPE html><html><head></head><body>ceshi</body></html>";
+        Document doc = Jsoup.parse(body);
+        HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
+        log.info("返回页面内容：{}",doc.outerHtml());
+        response.setContentType("text/html;charset=utf-8");
+        PrintWriter out = response.getWriter();
+        out.println(doc.outerHtml());
     }
 }

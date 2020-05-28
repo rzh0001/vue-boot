@@ -28,7 +28,7 @@ public class JaveDemo {
         data.put(BaseConstant.OUTER_ORDER_ID,"1565776105000abc");
         data.put(BaseConstant.USER_NAME,"www");
         data.put(BaseConstant.SUBMIT_AMOUNT,"111");
-        data.put(BaseConstant.PAY_TYPE,"ysf");
+        data.put(BaseConstant.PRODUCT_NAME,"ysf");
         data.put(BaseConstant.CALLBACK_URL,"http://localhost/api/callback");
         //加密数据
         String dataEn = AES128Util.encryptBase64(data.toJSONString(), "1234123412ABCDEF");
