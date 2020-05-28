@@ -10,25 +10,6 @@
     
     <a-spin :spinning="confirmLoading">
       <a-form :form="form">
-      
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="通道代码">
-          <a-input placeholder="请输入通道代码" v-decorator="['channelCode', validatorRules.channelCode ]" />
-        </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="通道网关">
-          <a-input placeholder="请输入通道网关" v-decorator="['channelGateway', {}]" />
-        </a-form-item>
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="通道IP白名单，使用,分割">
-          <a-input placeholder="请输入通道IP白名单，使用,分割" v-decorator="['channelIp', {}]" />
-        </a-form-item>
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
@@ -38,20 +19,33 @@
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
-          label="通道默认费率">
-          <a-input placeholder="请输入通道默认费率" v-decorator="['channelRate', validatorRules.channelRate ]" />
+          label="通道代码">
+          <a-input placeholder="请输入通道代码" v-decorator="['channelCode', validatorRules.channelCode ]" />
+        </a-form-item>
+
+        <a-form-item label="通道默认费率" :span="12"  :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <j-dict-select-tag  :triggerChange="true" placeholder="请选择通道默认费率" dictCode="rates" v-decorator="['channelRate', validatorRules.channelRate ]"/>
+        </a-form-item>
+
+
+        <a-form-item
+          :labelCol="labelCol"
+          :wrapperCol="wrapperCol"
+          label="通道网关">
+          <a-input placeholder="请输入通道网关" v-decorator="['channelGateway', {}]" />
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
-          label="删除状态，0:未删除，1删除状态">
-          <a-input-number v-decorator="[ 'delFlag', {}]" />
+          label="通道IP白名单">
+          <a-input placeholder="请输入通道IP白名单，使用,分割" v-decorator="['channelIp', {}]" />
         </a-form-item>
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
-          label="状态 0：关闭；1：开启">
-          <a-input-number v-decorator="[ 'status', {}]" />
+          label="状态">
+          <j-dict-select-tag  v-decorator="['status', validatorRules.status]" :triggerChange="true" placeholder="请选择状态"
+                              dictCode="SysStatus"/>
         </a-form-item>
 		
       </a-form>
@@ -62,14 +56,19 @@
 <script>
   import { httpAction } from '@/api/manage'
   import pick from 'lodash.pick'
+  import JDictSelectTag from '@/components/dict/JDictSelectTag.vue'
   import moment from "moment"
 
   export default {
     name: "PayChannelModal",
-    data () {
+    components:{
+      JDictSelectTag,
+    },
+      data () {
       return {
         title:"操作",
         visible: false,
+        rates:null,
         model: {},
         labelCol: {
           xs: { span: 24 },
@@ -85,7 +84,8 @@
         validatorRules:{
         channelCode:{rules: [{ required: true, message: '请输入通道代码!' }]},
         channelName:{rules: [{ required: true, message: '请输入通道名称!' }]},
-        channelRate:{rules: [{ required: true, message: '请输入通道默认费率!' }]},
+        channelRate:{rules: [{ required: true, message: '请选择通道默认费率!' }]},
+          status:{rules: [{ required: true, message: '请选择状态' }]}
         },
         url: {
           add: "/v2/payChannel/add",
