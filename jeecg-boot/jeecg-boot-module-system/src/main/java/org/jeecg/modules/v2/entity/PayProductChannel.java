@@ -33,9 +33,6 @@ public class PayProductChannel {
     @ApiModelProperty(value = "通道代码")
 	private java.lang.String channelCode;
 	/**通道名称*/
-	@Excel(name = "通道名称", width = 15)
-    @ApiModelProperty(value = "通道名称")
-	private java.lang.String channelName;
 	/**创建人*/
 	@Excel(name = "创建人", width = 15)
     @ApiModelProperty(value = "创建人")
@@ -54,10 +51,6 @@ public class PayProductChannel {
 	@Excel(name = "产品代码", width = 15)
     @ApiModelProperty(value = "产品代码")
 	private java.lang.String productCode;
-	/**产品名称*/
-	@Excel(name = "产品名称", width = 15)
-    @ApiModelProperty(value = "产品名称")
-	private java.lang.String productName;
 	/**状态 0：关闭；1：开启*/
 	@Excel(name = "状态 0：关闭；1：开启", width = 15)
     @ApiModelProperty(value = "状态 0：关闭；1：开启")
