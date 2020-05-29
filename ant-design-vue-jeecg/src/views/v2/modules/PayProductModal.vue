@@ -10,13 +10,7 @@
     
     <a-spin :spinning="confirmLoading">
       <a-form :form="form">
-      
-        <a-form-item
-          :labelCol="labelCol"
-          :wrapperCol="wrapperCol"
-          label="删除状态，0:未删除，1删除状态">
-          <a-input-number v-decorator="[ 'delFlag', {}]" />
-        </a-form-item>
+
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
@@ -32,8 +26,9 @@
         <a-form-item
           :labelCol="labelCol"
           :wrapperCol="wrapperCol"
-          label="状态 0：关闭；1：开启">
-          <a-input-number v-decorator="[ 'status', {}]" />
+          label="状态">
+          <j-dict-select-tag  v-decorator="['status', validatorRules.status]" :triggerChange="true" placeholder="请选择状态"
+                              dictCode="SysStatus"/>
         </a-form-item>
 		
       </a-form>
@@ -44,10 +39,14 @@
 <script>
   import { httpAction } from '@/api/manage'
   import pick from 'lodash.pick'
+  import JDictSelectTag from '@/components/dict/JDictSelectTag.vue'
   import moment from "moment"
 
   export default {
     name: "PayProductModal",
+    components:{
+      JDictSelectTag,
+    },
     data () {
       return {
         title:"操作",
@@ -67,6 +66,7 @@
         validatorRules:{
         productCode:{rules: [{ required: true, message: '请输入产品代码!' }]},
         productName:{rules: [{ required: true, message: '请输入产品名称!' }]},
+        status:{rules: [{ required: true, message: '请选择状态' }]}
         },
         url: {
           add: "/v2/payProduct/add",

@@ -5,37 +5,20 @@
     <div class="table-page-search-wrapper">
       <a-form layout="inline">
         <a-row :gutter="24">
-
-          <a-col :md="6" :sm="8">
-            <a-form-item label="删除状态，0:未删除，1删除状态">
-              <a-input placeholder="请输入删除状态，0:未删除，1删除状态" v-model="queryParam.delFlag"></a-input>
-            </a-form-item>
-          </a-col>
           <a-col :md="6" :sm="8">
             <a-form-item label="产品代码">
               <a-input placeholder="请输入产品代码" v-model="queryParam.productCode"></a-input>
             </a-form-item>
           </a-col>
-        <template v-if="toggleSearchStatus">
         <a-col :md="6" :sm="8">
             <a-form-item label="产品名称">
               <a-input placeholder="请输入产品名称" v-model="queryParam.productName"></a-input>
             </a-form-item>
           </a-col>
-          <a-col :md="6" :sm="8">
-            <a-form-item label="状态 0：关闭；1：开启">
-              <a-input placeholder="请输入状态 0：关闭；1：开启" v-model="queryParam.status"></a-input>
-            </a-form-item>
-          </a-col>
-          </template>
           <a-col :md="6" :sm="8" >
             <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
               <a-button type="primary" @click="searchQuery" icon="search">查询</a-button>
               <a-button type="primary" @click="searchReset" icon="reload" style="margin-left: 8px">重置</a-button>
-              <a @click="handleToggleSearch" style="margin-left: 8px">
-                {{ toggleSearchStatus ? '收起' : '展开' }}
-                <a-icon :type="toggleSearchStatus ? 'up' : 'down'"/>
-              </a>
             </span>
           </a-col>
 
@@ -46,24 +29,10 @@
     <!-- 操作按钮区域 -->
     <div class="table-operator">
       <a-button @click="handleAdd" type="primary" icon="plus">新增</a-button>
-      <a-button type="primary" icon="download" @click="handleExportXls('产品')">导出</a-button>
-      <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl" @change="handleImportExcel">
-        <a-button type="primary" icon="import">导入</a-button>
-      </a-upload>
-      <a-dropdown v-if="selectedRowKeys.length > 0">
-        <a-menu slot="overlay">
-          <a-menu-item key="1" @click="batchDel"><a-icon type="delete"/>删除</a-menu-item>
-        </a-menu>
-        <a-button style="margin-left: 8px"> 批量操作 <a-icon type="down" /></a-button>
-      </a-dropdown>
     </div>
 
     <!-- table区域-begin -->
     <div>
-      <div class="ant-alert ant-alert-info" style="margin-bottom: 16px;">
-        <i class="anticon anticon-info-circle ant-alert-icon"></i> 已选择 <a style="font-weight: 600">{{ selectedRowKeys.length }}</a>项
-        <a style="margin-left: 24px" @click="onClearSelected">清空</a>
-      </div>
 
       <a-table
         ref="table"
@@ -89,6 +58,10 @@
                   <a>删除</a>
                 </a-popconfirm>
               </a-menu-item>
+
+            <a-menu-item>
+                <a @click="relatedChannels(record)">关联通道信息</a>
+              </a-menu-item>
             </a-menu>
           </a-dropdown>
         </span>
@@ -99,18 +72,22 @@
 
     <!-- 表单区域 -->
     <payProduct-modal ref="modalForm" @ok="modalFormOk"></payProduct-modal>
+    <related-channels-modal ref="relatedChannelsModal"></related-channels-modal>
   </a-card>
+
 </template>
 
 <script>
   import PayProductModal from './modules/PayProductModal'
+  import RelatedChannelsModal from './modules/RelatedChannelsModal'
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
 
   export default {
     name: "PayProductList",
     mixins:[JeecgListMixin],
     components: {
-      PayProductModal
+      PayProductModal,
+      RelatedChannelsModal
     },
     data () {
       return {
@@ -128,11 +105,6 @@
             }
            },
 		   {
-            title: '删除状态，0:未删除，1删除状态',
-            align:"center",
-            dataIndex: 'delFlag'
-           },
-		   {
             title: '产品代码',
             align:"center",
             dataIndex: 'productCode'
@@ -143,9 +115,18 @@
             dataIndex: 'productName'
            },
 		   {
-            title: '状态 0：关闭；1：开启',
+            title: '状态',
             align:"center",
-            dataIndex: 'status'
+            dataIndex: 'status',
+         customRender: function(text) {
+           if (text == 0) {
+             return <a-tag color="red">关闭</a-tag>
+           } else if (text == 1) {
+             return <a-tag color="cyan">开启</a-tag>
+           } else {
+             return text
+           }
+         }
            },
           {
             title: '操作',
@@ -157,9 +138,6 @@
 		url: {
           list: "/v2/payProduct/list",
           delete: "/v2/payProduct/delete",
-          deleteBatch: "/v2/payProduct/deleteBatch",
-          exportXlsUrl: "v2/payProduct/exportXls",
-          importExcelUrl: "v2/payProduct/importExcel",
        },
     }
   },
@@ -169,7 +147,9 @@
     }
   },
     methods: {
-     
+      relatedChannels: function(record) {
+        this.$refs.relatedChannelsModal.relatedProductChannels(record)
+      },
     }
   }
 </script>
