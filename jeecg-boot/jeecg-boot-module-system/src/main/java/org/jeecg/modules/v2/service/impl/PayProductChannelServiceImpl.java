@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
+import java.util.List;
+
 /**
  * @Description: 产品通道
  * @Author: jeecg-boot
@@ -35,5 +37,17 @@ public class PayProductChannelServiceImpl extends ServiceImpl<PayProductChannelM
 
     public void delete(String productCode,String channelCode){
         getBaseMapper().delete(productCode,channelCode);
+    }
+
+    public void cleanRelated(String productCode){
+        getBaseMapper().cleanRelated(productCode);
+    }
+
+    public void saveProductChannelCodes(String productCode, List<String> channelCodes){
+        getBaseMapper().saveProductChannelCodes(productCode,channelCodes);
+    }
+
+    public List<String> getProductRelateChannels(String productCode){
+        return getBaseMapper().getProductRelateChannels(productCode);
     }
 }

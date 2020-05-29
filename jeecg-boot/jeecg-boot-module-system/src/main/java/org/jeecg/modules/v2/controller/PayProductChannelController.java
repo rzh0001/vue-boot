@@ -8,6 +8,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import cn.hutool.core.collection.CollUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.aspect.annotation.AutoLog;
@@ -50,6 +53,27 @@ public class PayProductChannelController {
     @Autowired
     private PayProductChannelServiceImpl payProductChannelService;
 
+    @GetMapping("/saveProductChannels")
+    public Result saveProductChannels(String productCode,String channelCodes){
+        Result result = new Result();
+        //清空关联关系
+        payProductChannelService.cleanRelated(productCode);
+        if(StringUtils.isNoneBlank(channelCodes)){
+            List<String> codes = Arrays.asList(channelCodes.split(","));
+            payProductChannelService.saveProductChannelCodes(productCode,codes);
+        }
+        result.success("添加成功！");
+        return result;
+    }
+
+    @GetMapping("getProductRelateChannels")
+    public Result<String> getProductRelateChannels(String productCode){
+        Result result = new Result();
+        List<String> list = payProductChannelService.getProductRelateChannels(productCode);
+        String codes = CollUtil.join(list,",");
+        result.setResult(codes);
+        return result;
+    }
     /**
      * 分页列表查询
      * 

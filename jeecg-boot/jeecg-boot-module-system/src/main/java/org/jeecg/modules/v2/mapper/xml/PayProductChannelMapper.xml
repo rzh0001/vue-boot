@@ -2,4 +2,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.jeecg.modules.v2.mapper.PayProductChannelMapper">
 
+    <insert id="saveProductChannelCodes">
+        <foreach item="channelCode" collection="channelCodes" separator=";" index="">
+          insert into pay_v2_product_channel (product_code,channel_code,status) values (#{productCode},#{channelCode},1)
+        </foreach>
+    </insert>
 </mapper>

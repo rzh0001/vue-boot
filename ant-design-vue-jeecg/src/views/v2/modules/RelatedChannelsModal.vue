@@ -11,13 +11,15 @@
 
       <a-spin :spinning="confirmLoading">
         <a-form :form="form">
+          <a-form-item label="产品" style="width: 300px">
+            <a-input placeholder="产品"  v-model="productName" readonly="readonly"/>
+          </a-form-item>
           <a-form-item label="请选择要关联的通道" style="width: 300px">
             <j-multi-select-tag
               v-model="channelCodes"
               dictCode="pay_v2_channel,channel_name,channel_code"
               placeholder="请选择要关联的通道">
             </j-multi-select-tag>
-            {{ channelCodes }}
           </a-form-item>
         </a-form>
       </a-spin>
@@ -40,36 +42,45 @@
         title:"关联通道信息",
         visible: false,
         channelCodes:"",
-        channels: [],
-        model: {},
-        data:[],
+        productCode:"",
+        productName:"",
         confirmLoading: false,
         form: this.$form.createForm(this),
         url: {
+          saveProductChannels:"/v2/payProductChannel/saveProductChannels",
+          getProductRelateChannels:"/v2/payProductChannel/getProductRelateChannels"
         },
       }
     },
     mounted:function () {
+
     },
     methods: {
-      //激活账号
+      getProductRelateChannels(){
+        let formData = [];
+        formData.productCode = this.productCode;
+        getAction(this.url.getProductRelateChannels,formData).then((res)=>{
+          if(res.success){
+          this.channelCodes=res.result;
+          this.$emit('ok');
+        }else{
+          this.$message.warning(res.message);
+        }
+      })
+      },
       relatedProductChannels:function(record){
         this.title= "产品关联通道信息";
         this.visible=true;
-        this.userName = record.username;
+        this.productCode = record.productCode;
+        this.productName=record.productName;
+        this.getProductRelateChannels();
       },
       handleOk () {
         let formData = [];
-        formData.userName = this.userName;
-        formData.channelCode = this.selected;
-        formData.businesses = this.businesses.values;
-        console.log(formData);
-        getAction(this.url.activeBusiness,formData).then((res)=>{
+        formData.productCode = this.productCode;
+        formData.channelCodes = this.channelCodes;
+        getAction(this.url.saveProductChannels,formData).then((res)=>{
           if(res.success){
-          this.visible4Add=false;
-          this.selected = "";
-          this.businesses.values="";
-          this.businesses.options=[];
           this.$message.success(res.message);
           this.$emit('ok');
         }else{
@@ -80,6 +91,7 @@
       close() {
         this.$emit('close');
         this.visible = false;
+        this.channelCodes="";
       },
       handleCancel() {
         this.close()
