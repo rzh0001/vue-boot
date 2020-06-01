@@ -65,7 +65,11 @@ public class PayProductChannelController {
         result.success("添加成功！");
         return result;
     }
-
+    @GetMapping("getNotRelatedChannelCodeByProductCode")
+    public Result getNotRelatedChannelCodeByProductCode(String productCode){
+        Result result = new Result();
+        return result;
+    }
     @GetMapping("getProductRelateChannels")
     public Result<String> getProductRelateChannels(String productCode){
         Result result = new Result();

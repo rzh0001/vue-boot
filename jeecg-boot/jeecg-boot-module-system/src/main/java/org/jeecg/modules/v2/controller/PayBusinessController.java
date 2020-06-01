@@ -19,6 +19,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 
+import org.jeecg.modules.v2.service.impl.PayBusinessServiceImpl;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -46,7 +47,7 @@ import io.swagger.annotations.ApiOperation;
 @RequestMapping("/v2/payBusiness")
 public class PayBusinessController {
 	@Autowired
-	private IPayBusinessService payBusinessService;
+	private PayBusinessServiceImpl payBusinessService;
 	
 	/**
 	 * 分页列表查询

@@ -72,11 +72,6 @@
       <a-button @click="handleAddAgent" v-has="'user:addAgent'" type="primary" icon="plus">添加代理</a-button>
       <a-button @click="handleAddSalesman" v-has="'user:addSalesman'" type="primary" icon="plus">添加介绍人</a-button>
       <a-button @click="handleAddMember" v-has="'user:addMember'" type="primary" icon="plus">添加商户</a-button>
-      <a-button type="primary" icon="download" @click="handleExportXls('用户信息')">导出</a-button>
-      <!--      <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl"-->
-      <!--                @change="handleImportExcel">-->
-      <!--        <a-button type="primary" icon="import">导入</a-button>-->
-      <!--      </a-upload>-->
       <a-dropdown v-if="selectedRowKeys.length > 0">
         <a-menu slot="overlay" @click="handleMenuClick">
           <a-menu-item key="1">
@@ -101,12 +96,6 @@
 
     <!-- table区域-begin -->
     <div>
-      <!--      <div class="ant-alert ant-alert-info" style="margin-bottom: 16px;">-->
-      <!--        <i class="anticon anticon-info-circle ant-alert-icon"></i>已选择&nbsp;<a style="font-weight: 600">{{-->
-      <!--        selectedRowKeys.length }}</a>项&nbsp;&nbsp;-->
-      <!--        <a style="margin-left: 24px" @click="onClearSelected">清空</a>-->
-      <!--      </div>-->
-
       <a-table
         ref="table"
         bordered
@@ -121,20 +110,11 @@
 
         <span slot="action" slot-scope="text, record">
 
-<!--          <a @click="handleDetail(record)">详情</a>-->
-          <!--          <a-divider type="vertical"/>-->
-          <!--          <a @click="handleEdit(record)">编辑</a>-->
-          <!--          <a-divider type="vertical"/>-->
-
           <a-dropdown>
-<!--            <a class="ant-dropdown-link">-->
-            <!--              更多 <a-icon type="down"/>-->
-            <!--            </a>-->
             <a-button>
-             帐号管理 <!-- <a-icon type="down"/>-->
+             帐号管理
             </a-button>
             <a-menu slot="overlay">
-
               <a-menu-item>
                 <a @click="handleDetail(record)">详情</a>
               </a-menu-item>
@@ -171,81 +151,37 @@
               </a-menu-item>
             </a-menu>
           </a-dropdown>
-         <!-- <a-dropdown>
-            <a-button>
-              挂马账号配置
-            </a-button>
-            <a-menu slot="overlay">
-              <a-menu-item>
-                <a @click="addChannel(record)">添加挂马账号</a>
-              </a-menu-item>
-            </a-menu>
-          </a-dropdown>-->
-         <a-dropdown>
-            <a-button>
-              关联子账号
-            </a-button>
-            <a-menu slot="overlay">
-               <a-menu-item>
-                <a @click="addChannel(record)">添加子账号</a>
-              </a-menu-item>
-              <a-menu-item>
-                <a @click="activeBusiness(record)">激活子账号</a>
-              </a-menu-item>
-               <a-menu-item>
-                <a @click="rechargeAmount(record)">子账号充值</a>
-              </a-menu-item>
-            </a-menu>
-          </a-dropdown>
+
+
           <a-dropdown>
             <a-button>
-              产品配置
+              入金渠道设置
             </a-button>
             <a-menu slot="overlay">
-              <a-menu-item>
-                <a @click="relationProduct(record)">关联产品</a>
-              </a-menu-item>
-              <a-menu-item>
-                <a @click="relationProductRate(record)">通道限额</a>
+               <a-menu-item>
+                <a @click="addChannel(record)">入金渠道设置</a>
               </a-menu-item>
             </a-menu>
           </a-dropdown>
-            <a-dropdown>
-            <a-button>
-              费率设置
-            </a-button>
-            <a-menu slot="overlay">
-              <a-menu-item>
-                <a @click="rateDeatil(record)">已设置费率</a>
-              </a-menu-item>
-              <a-menu-item>
-                <a @click="addRate(record)">添加费率</a>
-              </a-menu-item>
-            </a-menu>
-          </a-dropdown>
+
+
+
+
+
         </span>
 
 
       </a-table>
     </div>
     <!-- table区域-end -->
-
     <user-modal ref="modalForm" @ok="modalFormOk"></user-modal>
-
     <user-agent-modal ref="agentModalForm" @ok="modalFormOk"></user-agent-modal>
     <user-salesman-modal ref="salesmanModalForm" @ok="modalFormOk"></user-salesman-modal>
     <user-member-modal ref="memberModalForm" @ok="modalFormOk"></user-member-modal>
-
     <password-modal ref="passwordmodal" @ok="passwordModalOk"></password-modal>
     <user-amount-modal ref="userAmountModal" @ok="modalFormOk"></user-amount-modal>
-
     <sys-user-agent-modal ref="sysUserAgentModal"></sys-user-agent-modal>
-    <user-channel-modal ref="userChannelModal"></user-channel-modal>
-    <user-business-modal ref="userBusinessModal"></user-business-modal>
-    <user-rate-modal ref="userRateModal"></user-rate-modal>
-    <active-business-modal ref="activeBusinessModal"></active-business-modal>
-    <user-product-modal ref="userProductModal"></user-product-modal>
-    <user-product-rate-modal ref="userProductRateModal"></user-product-rate-modal>
+    <related-product-channels-modal ref="relatedProductChannelsModal"></related-product-channels-modal>
   </a-card>
 </template>
 
@@ -260,31 +196,21 @@
   import { frozenBatch } from '@/api/api'
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
   import SysUserAgentModal from './modules/SysUserAgentModal'
-  import UserChannelModal from './modules/UserChannelModal'
-  import UserBusinessModal from './modules/UserBusinessModal'
-  import UserRateModal from './modules/UserRateModal'
-  import ActiveBusinessModal from './modules/ActiveBusinessModal'
-  import UserProductModal from './modules/UserProductModal'
-  import UserProductRateModal from './modules/UserProductRateModal'
   import { getAction, httpAction } from '@/api/manage'
+  import RelatedProductChannelsModal from './modules/RelatedProductChannelsModal'
 
   export default {
     name: 'UserList',
     mixins: [JeecgListMixin],
     components: {
-      UserProductModal,
       SysUserAgentModal,
       UserModal,
       UserAgentModal,
       UserSalesmanModal,
       UserMemberModal,
       PasswordModal,
-      UserChannelModal,
-      UserBusinessModal,
-      UserRateModal,
       UserAmountModal,
-      ActiveBusinessModal,
-      UserProductRateModal
+      RelatedProductChannelsModal
     },
     data() {
       return {
@@ -377,9 +303,8 @@
       }
     },
     methods: {
-      rateDeatil: function(record) {
-        this.$refs.userRateModal.title = '已添加费率详情'
-        this.$refs.userRateModal.detail(record)
+      addChannel: function(record) {
+        this.$refs.relatedProductChannelsModal.relatedProductChannels(record)
       },
       addRate: function(record) {
         this.$refs.userRateModal.title = '添加费率'
@@ -403,9 +328,6 @@
       },
       channelDetail: function(record) {
         this.$refs.userChannelModal.detail(record)
-      },
-      addChannel: function(record) {
-        this.$refs.userChannelModal.addChannel(record)
       },
       //关联产品信息
       relationProduct: function(record){
