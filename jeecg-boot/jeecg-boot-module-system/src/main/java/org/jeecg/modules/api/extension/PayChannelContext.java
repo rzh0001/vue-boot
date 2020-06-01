@@ -10,9 +10,9 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class PayChannelContext {
 	@Autowired
-	private final Map<String, APayChannelStrategy> strategyMap = new ConcurrentHashMap<>();
+	private final Map<String, AbstractPayChannelStrategy> strategyMap = new ConcurrentHashMap<>();
 
-	public PayChannelContext(Map<String, APayChannelStrategy> strategyMap) {
+	public PayChannelContext(Map<String, AbstractPayChannelStrategy> strategyMap) {
 		strategyMap.forEach(this.strategyMap::put);
 	}
 

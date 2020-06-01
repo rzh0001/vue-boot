@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jeecg.modules.api.exception.AccountAbnormalException;
 import org.jeecg.modules.api.exception.BusinessException;
-import org.jeecg.modules.api.extension.APayChannelStrategy;
+import org.jeecg.modules.api.extension.AbstractPayChannelStrategy;
 import org.jeecg.modules.api.extension.gm.entity.*;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import org.jeecg.modules.pay.entity.UserBusinessEntity;
@@ -19,7 +19,7 @@ import java.util.Map;
  * GM支付接口
  */
 @Slf4j
-public class GMAPay extends APayChannelStrategy {
+public class GMAPay extends AbstractPayChannelStrategy {
 
     @Autowired
     private IOrderToolsService orderTools;

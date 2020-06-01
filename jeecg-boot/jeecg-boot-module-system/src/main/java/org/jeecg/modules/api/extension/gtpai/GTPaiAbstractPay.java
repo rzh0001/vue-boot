@@ -4,7 +4,7 @@ import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.jeecg.common.system.vo.DictModel;
-import org.jeecg.modules.api.extension.APayChannelStrategy;
+import org.jeecg.modules.api.extension.AbstractPayChannelStrategy;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import org.jeecg.modules.pay.entity.UserBusinessEntity;
 import org.jeecg.modules.pay.externalUtils.antUtil.GtpaiUtil;
@@ -26,7 +26,7 @@ import java.util.Optional;
 import java.util.TreeMap;
 
 @Component("gtpaiAlipay")
-public class GTPaiAPay extends APayChannelStrategy {
+public class GTPaiAbstractPay extends AbstractPayChannelStrategy {
 	@Autowired
 	private IUserBusinessEntityService businessService;
 

@@ -1,7 +1,7 @@
 package org.jeecg.modules.api.extension.niunan;
 
 import org.apache.commons.lang.StringUtils;
-import org.jeecg.modules.api.extension.APayChannelStrategy;
+import org.jeecg.modules.api.extension.AbstractPayChannelStrategy;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import org.jeecg.modules.pay.externalUtils.niunan.NiunanUtils;
 import org.springframework.stereotype.Component;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 
 @Component("")
-public class NiuNanAPay extends APayChannelStrategy {
+public class NiuNanAbstractPay extends AbstractPayChannelStrategy {
 	@Override
 	public String pay(OrderInfoEntity orderInfo) {
 		return null;

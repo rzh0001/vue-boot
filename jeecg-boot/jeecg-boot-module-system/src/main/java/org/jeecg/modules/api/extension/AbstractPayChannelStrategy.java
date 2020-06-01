@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public abstract class APayChannelStrategy implements ICallbackService{
+public abstract class AbstractPayChannelStrategy implements ICallbackService{
 	protected Logger log = LoggerFactory.getLogger(getClass());
 	@Autowired
 	public ISysDictService dictService;

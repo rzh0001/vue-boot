@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.util.UUIDGenerator;
-import org.jeecg.modules.api.extension.APayChannelStrategy;
+import org.jeecg.modules.api.extension.AbstractPayChannelStrategy;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
 import org.jeecg.modules.pay.entity.UserBusinessEntity;
 import org.jeecg.modules.pay.externalUtils.antUtil.AntUtil;
@@ -18,7 +18,7 @@ import java.util.*;
 
 @Slf4j
 @Component("antAlipay")
-public class AntAPay extends APayChannelStrategy {
+public class AntAbstractPay extends AbstractPayChannelStrategy {
 
 	@Autowired
 	private IOrderToolsService orderTools;
