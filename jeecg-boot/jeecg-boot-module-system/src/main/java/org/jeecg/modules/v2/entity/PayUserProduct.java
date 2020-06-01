@@ -54,6 +54,8 @@ public class PayUserProduct {
 	@Excel(name = "状态 0：关闭；1：开启", width = 15)
     @ApiModelProperty(value = "状态 0：关闭；1：开启")
 	private java.lang.Integer status;
+
+	private Integer delFlag;
 	/**更新人*/
 	@Excel(name = "更新人", width = 15)
     @ApiModelProperty(value = "更新人")

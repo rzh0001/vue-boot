@@ -46,7 +46,8 @@ public class SfApiController {
 	public PayOrderUrlResponse createPayOrder(@Valid @RequestBody ApiRequestBody reqBody) throws Exception {
 		log.info("=======>商户[{}]创建订单", reqBody.getUsername());
 		log.info("=======>入参为：{}",reqBody);
-		SysUser user = apiService.verifyUser(reqBody);
+		SysUser user = apiService.verifyAccountInfo(reqBody);
+		apiService.verifySignature(reqBody,user.getApiKey());
 		PayOrderRequestData payOrderData = apiService.decodeData(reqBody,user);
 		// 转换订单实体
 		OrderInfoEntity orderInfoEntity = payOrderData.toPayOrder(user,reqBody.getRemark());
