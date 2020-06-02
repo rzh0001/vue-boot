@@ -9,6 +9,7 @@ import org.jeecg.modules.v2.mapper.PayBusinessMapper;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -33,5 +34,17 @@ public class PayBusinessServiceImpl extends ServiceImpl<PayBusinessMapper, PayBu
    public void updateUsedTime(PayBusiness business){
         business.setLastUsedTime(new Date());
         getBaseMapper().updateById(business);
+    }
+
+
+    public boolean existBusiness(String userName,String productCode,String channelCode,String businessCode){
+        QueryWrapper<PayBusiness> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_name",userName).eq("channel_code",channelCode).eq("product_code",productCode).eq("business_code",businessCode)
+                .eq("del_flag", DeleteFlagEnum.NOT_DELETE.getValue()).eq("business_active_status", BusinessActivStatusEnum.ACTIVE.getValue());
+        List<PayBusiness> businesses = getBaseMapper().selectList(queryWrapper);
+        if(CollectionUtils.isEmpty(businesses)){
+            return false;
+        }
+        return true;
     }
 }

@@ -70,17 +70,18 @@ public class PayUserChannelController {
     private PayProductChannelServiceImpl productChannelService;
     @Autowired
     private PayChannelServiceImpl channelService;
-	@Autowired
+    @Autowired
     private PayBusinessServiceImpl businessService;
 
-	/**
-	 * 获取产品关联的通道信息
-	 * @param productCode
-	 * @return
-	 */
-	@GetMapping("findChannelsByRelatedProductCode")
+    /**
+     * 获取产品关联的通道信息
+     *
+     * @param productCode
+     * @return
+     */
+    @GetMapping("findChannelsByRelatedProductCode")
     public Result<List<PayChannel>> findChannelsByRelatedProductCode(String productCode) {
-        LoginUser loginUser = (LoginUser)SecurityUtils.getSubject().getPrincipal();
+        LoginUser loginUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
         SysUser sysUser = userService.getUserByName(loginUser.getUsername());
         Result result = new Result();
         List<String> channelCodes = null;
@@ -90,59 +91,68 @@ public class PayUserChannelController {
             channelCodes = payUserChannelService.getChannelsByUserAndProduct(sysUser.getUsername(), productCode);
         }
         List<PayChannel> payChannels = null;
-        if(!CollectionUtils.isEmpty(channelCodes)){
+        if (!CollectionUtils.isEmpty(channelCodes)) {
             payChannels = channelService.getChannlesByChannelCodes(channelCodes);
         }
         result.setResult(payChannels);
         return result;
     }
 
-	/**
-	 * 获取用户已关联的通道
-	 * @param userName
-	 * @param productCode
-	 * @return
-	 */
-	@GetMapping("/getUserAlreadyRelatedChannels")
-	public Result<List<String>> getUserAlreadyRelatedChannels(String userName,String productCode){
-		Result result = new Result();
-		List<String> channels = payUserChannelService.getChannelsByUserAndProduct(userName,productCode);
-		result.setResult(channels);
-		return result;
-	}
+    /**
+     * 获取用户已关联的通道
+     *
+     * @param userName
+     * @param productCode
+     * @return
+     */
+    @GetMapping("/getUserAlreadyRelatedChannels")
+    public Result<List<String>> getUserAlreadyRelatedChannels(String userName, String productCode) {
+        Result result = new Result();
+        List<String> channels = payUserChannelService.getChannelsByUserAndProduct(userName, productCode);
+        result.setResult(channels);
+        return result;
+    }
 
-	/**
-	 *
-	 * @param param
-	 * @return
-	 */
+    /**
+     * @param param
+     * @return
+     */
     @PostMapping("/saveUserChannel")
-    public Result saveUserChannel(@RequestBody @Valid UserChannelParam param){
-		Result result = new Result();
-		String msg = payUserChannelService.checkParam(param);
-		if(!StringUtils.isEmpty(msg)){
-		    result.error500(msg);
-		    return result;
+    public Result saveUserChannel(@RequestBody @Valid UserChannelParam param) {
+        Result result = new Result();
+        String msg = payUserChannelService.checkParam(param);
+        if (!StringUtils.isEmpty(msg)) {
+            result.error500(msg);
+            return result;
         }
-		PayUserChannel userChannel = new PayUserChannel();
-		BeanUtils.copyProperties(param,userChannel);
-		//代理，保存通道信息和子账号信息
-		if(UserTypeEnum.AGENT.getValue().equals(param.getMemberType())){
-			PayBusiness business = new PayBusiness();
-			BeanUtils.copyProperties(param,business);
-			businessService.save(business);
-		}else{
-			//商户和介绍人只需要保存通道信息
-			SysUser operater = userService.getUserByName(param.getUserName());
-			userChannel.setAgentName(operater.getAgentUsername());
-			userChannel.setIntroducerName(operater.getSalesmanUsername());
-		}
-		payUserChannelService.save(userChannel);
-		return result;
-	}
+        PayUserChannel userChannel = new PayUserChannel();
+        BeanUtils.copyProperties(param, userChannel);
+        boolean channelExist = payUserChannelService.channelExist(param.getUserName(), param.getProductCode(), param.getChannelCode());
+        //代理，保存通道信息和子账号信息
+        if (UserTypeEnum.AGENT.getValue().equals(param.getMemberType())) {
+            PayBusiness business = new PayBusiness();
+            BeanUtils.copyProperties(param, business);
+            boolean existBusiness = businessService.existBusiness(business.getUserName(), business.getProductCode(), business.getChannelCode(), business.getBusinessCode());
+            if (existBusiness) {
+                result.error500("该子账号已存在,子账号：" + business.getBusinessCode());
+                return result;
+            }
+            businessService.save(business);
+        } else {
+            //商户和介绍人只需要保存通道信息
+            SysUser operater = userService.getUserByName(param.getUserName());
+            userChannel.setAgentName(operater.getAgentUsername());
+            userChannel.setIntroducerName(operater.getSalesmanUsername());
+        }
+        if (!channelExist) {
+            payUserChannelService.save(userChannel);
+        }
+        return result;
+    }
+
     /**
      * 分页列表查询
-     * 
+     *
      * @param payUserChannel
      * @param pageNo
      * @param pageSize
@@ -153,11 +163,11 @@ public class PayUserChannelController {
     @ApiOperation(value = "用户关联通道-分页列表查询", notes = "用户关联通道-分页列表查询")
     @GetMapping(value = "/list")
     public Result<IPage<PayUserChannel>> queryPageList(PayUserChannel payUserChannel,
-        @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
-        @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize, HttpServletRequest req) {
+                                                       @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
+                                                       @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize, HttpServletRequest req) {
         Result<IPage<PayUserChannel>> result = new Result<IPage<PayUserChannel>>();
         QueryWrapper<PayUserChannel> queryWrapper =
-            QueryGenerator.initQueryWrapper(payUserChannel, req.getParameterMap());
+                QueryGenerator.initQueryWrapper(payUserChannel, req.getParameterMap());
         Page<PayUserChannel> page = new Page<PayUserChannel>(pageNo, pageSize);
         IPage<PayUserChannel> pageList = payUserChannelService.page(page, queryWrapper);
         result.setSuccess(true);
@@ -167,7 +177,7 @@ public class PayUserChannelController {
 
     /**
      * 添加
-     * 
+     *
      * @param payUserChannel
      * @return
      */
@@ -188,7 +198,7 @@ public class PayUserChannelController {
 
     /**
      * 编辑
-     * 
+     *
      * @param payUserChannel
      * @return
      */
@@ -213,7 +223,7 @@ public class PayUserChannelController {
 
     /**
      * 通过id删除
-     * 
+     *
      * @param id
      * @return
      */
@@ -232,7 +242,7 @@ public class PayUserChannelController {
 
     /**
      * 批量删除
-     * 
+     *
      * @param ids
      * @return
      */
@@ -252,7 +262,7 @@ public class PayUserChannelController {
 
     /**
      * 通过id查询
-     * 
+     *
      * @param id
      * @return
      */
@@ -312,7 +322,7 @@ public class PayUserChannelController {
      */
     @RequestMapping(value = "/importExcel", method = RequestMethod.POST)
     public Result<?> importExcel(HttpServletRequest request, HttpServletResponse response) {
-        MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest)request;
+        MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
         Map<String, MultipartFile> fileMap = multipartRequest.getFileMap();
         for (Map.Entry<String, MultipartFile> entity : fileMap.entrySet()) {
             MultipartFile file = entity.getValue();// 获取上传文件对象
@@ -322,7 +332,7 @@ public class PayUserChannelController {
             params.setNeedSave(true);
             try {
                 List<PayUserChannel> listPayUserChannels =
-                    ExcelImportUtil.importExcel(file.getInputStream(), PayUserChannel.class, params);
+                        ExcelImportUtil.importExcel(file.getInputStream(), PayUserChannel.class, params);
                 payUserChannelService.saveBatch(listPayUserChannels);
                 return Result.ok("文件导入成功！数据行数:" + listPayUserChannels.size());
             } catch (Exception e) {

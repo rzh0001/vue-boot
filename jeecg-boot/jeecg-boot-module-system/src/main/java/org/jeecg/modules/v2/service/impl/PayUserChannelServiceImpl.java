@@ -69,6 +69,16 @@ public class PayUserChannelServiceImpl extends ServiceImpl<PayUserChannelMapper,
             }
         }
         return msg.toString();
+    }
 
+    public boolean channelExist(String userName,String productCode,String channelCode){
+        QueryWrapper<PayUserChannel> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_name",userName).eq("product_code",productCode).eq("channel_code",channelCode).eq("del_flag",
+                DeleteFlagEnum.NOT_DELETE.getValue());
+        List<PayUserChannel> userChannels = getBaseMapper().selectList(queryWrapper);
+        if(CollectionUtils.isEmpty(userChannels)){
+            return false;
+        }
+        return true;
     }
 }
