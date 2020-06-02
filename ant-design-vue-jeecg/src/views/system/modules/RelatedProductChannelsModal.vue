@@ -12,7 +12,10 @@
       <a-spin :spinning="confirmLoading">
         <a-form :form="form">
           <a-form-item label="产品" style="width: 300px">
-            <j-dict-select-tag  @change="changeFunction()" :triggerChange="true" placeholder="请选择产品类型" dictCode="pay_v2_product,product_name,product_code" v-decorator="['productCode', validatorRules.productCode ]"/>
+            <a-select v-model="productCode">
+              <a-select-option v-for="product of products"
+                               :value="product.productCode" :key="product.productCode">{{product.productName}}</a-select-option>
+            </a-select>
           </a-form-item>
           <a-form-item label="请选择要关联的通道" style="width: 300px">
             <j-multi-select-tag
@@ -43,6 +46,7 @@
         visible: false,
         channelCodes:"",
         productCode:"",
+        products:[],
         productName:"",
         confirmLoading: false,
         form: this.$form.createForm(this),
@@ -51,15 +55,26 @@
           channelName:{rules: [{ required: true, message: '请输入通道名称!' }]}
         },
         url: {
+          findCurrentLoginAccountRelatedProduct:"/v2/payUserProduct/findCurrentLoginAccountRelatedProduct",
           getChannelsByProductCode:"/v2/payProductChannel/saveProductChannels",
           getNotRelatedChannelCodeByProductCode:"/v2/payProductChannel/getNotRelatedChannelCodeByProductCode"
         },
       }
     },
     mounted:function () {
-
+      this.findCurrentLoginAccountRelatedProduct();
     },
     methods: {
+      findCurrentLoginAccountRelatedProduct:function(){
+        getAction(this.url.findCurrentLoginAccountRelatedProduct,null).then((res)=>{
+          if(res.success){
+            this.products=res.result;
+            this.$emit('ok');
+          }else{
+            this.$message.warning(res.message);
+          }
+        })
+      },
       changeFunction:function(){
         let formData = [];
         formData.productCode = this.productCode;
@@ -75,6 +90,7 @@
       relatedProductChannels:function(record){
         this.title= "产品关联通道信息";
         this.visible=true;
+        this.findCurrentLoginAccountRelatedProduct();
       },
       handleOk () {
         let formData = [];

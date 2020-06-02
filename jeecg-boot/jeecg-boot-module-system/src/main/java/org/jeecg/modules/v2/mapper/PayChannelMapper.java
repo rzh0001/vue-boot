@@ -16,4 +16,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 public interface PayChannelMapper extends BaseMapper<PayChannel> {
     @Update("update pay_v2_channel set del_flag=1 where id=#{id}")
     void deleteById(@Param("id") String id);
+
+    List<PayChannel> getChannlesByChannelCodes(@Param("channelCodes") List<String> channelCodes);
 }

@@ -23,6 +23,6 @@ public interface PayProductChannelMapper extends BaseMapper<PayProductChannel> {
 
     void saveProductChannelCodes(@Param("productCode") String productCode, @Param("channelCodes") List<String> channelCodes);
 
-    @Select("select channel_code from pay_v2_product_channel where product_code=#{productCode}")
+    @Select("select channel_code from pay_v2_product_channel where product_code=#{productCode} and del_flag=0 and status=1")
     List<String> getProductRelateChannels(@Param("productCode") String productCode);
 }

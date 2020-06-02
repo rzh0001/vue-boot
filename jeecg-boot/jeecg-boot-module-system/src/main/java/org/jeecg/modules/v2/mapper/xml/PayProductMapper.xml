@@ -2,4 +2,11 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.jeecg.modules.v2.mapper.PayProductMapper">
 
+    <select id="getProductsByProductCodes" parameterType="java.lang.String" resultType="org.jeecg.modules.v2.entity.PayProduct">
+        select product_code,product_name from pay_v2_product where product_code in
+        <foreach item="item" collection="productCodes" separator="," open="(" close=")" index="">
+            #{item}
+        </foreach>
+        and status=1 and del_flag=0
+    </select>
 </mapper>

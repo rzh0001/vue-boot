@@ -30,4 +30,8 @@ public class PayProductServiceImpl extends ServiceImpl<PayProductMapper, PayProd
     public void deleteById(String id){
         getBaseMapper().deleteById(id);
     }
+
+    public List<PayProduct> getProductsByProductCodes(List<String> productCodes){
+        return getBaseMapper().getProductsByProductCodes(productCodes);
+    }
 }

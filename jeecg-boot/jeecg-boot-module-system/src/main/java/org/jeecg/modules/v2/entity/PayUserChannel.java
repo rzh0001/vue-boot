@@ -85,6 +85,9 @@ public class PayUserChannel {
 	@Excel(name = "用户名", width = 15)
     @ApiModelProperty(value = "用户名")
 	private java.lang.String userName;
+
+	private String agentName;
+	private String introducerName;
 	/**费率*/
 	@Excel(name = "费率", width = 15)
     @ApiModelProperty(value = "费率")

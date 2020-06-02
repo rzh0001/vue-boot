@@ -20,4 +20,6 @@ public interface PayProductMapper extends BaseMapper<PayProduct> {
 
     @Select("update pay_v2_product set del_flag=1 where id=#{id}")
     void deleteById(@Param("id") String id);
+
+    List<PayProduct> getProductsByProductCodes(@Param("productCodes") List<String> productCodes);
 }

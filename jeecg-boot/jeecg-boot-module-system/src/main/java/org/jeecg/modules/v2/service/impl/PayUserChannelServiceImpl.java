@@ -9,8 +9,10 @@ import org.jeecg.modules.v2.mapper.PayUserChannelMapper;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @Description: 用户关联通道
@@ -35,5 +37,16 @@ public class PayUserChannelServiceImpl extends ServiceImpl<PayUserChannelMapper,
 
     public void updateChannelLastUsedTime(PayUserChannel channel){
         getBaseMapper().updateChannelLastUsedTime(channel);
+    }
+
+    public List<String> getChannelsByUserAndProduct(String userName,String productCode){
+        QueryWrapper<PayUserChannel> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_name",userName).eq("product_code",productCode).eq("del_flag",
+            DeleteFlagEnum.NOT_DELETE.getValue());
+        List<PayUserChannel> userChannels = getBaseMapper().selectList(queryWrapper);
+        if(!CollectionUtils.isEmpty(userChannels)){
+            return userChannels.stream().map(userChannel -> userChannel.getChannelCode()).collect(Collectors.toList());
+        }
+        return null;
     }
 }

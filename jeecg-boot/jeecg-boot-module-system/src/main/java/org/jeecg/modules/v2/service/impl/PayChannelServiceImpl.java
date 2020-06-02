@@ -35,4 +35,8 @@ public class PayChannelServiceImpl extends ServiceImpl<PayChannelMapper, PayChan
     public void deleteById(String id){
         getBaseMapper().deleteById(id);
     }
+
+    public List<PayChannel> getChannlesByChannelCodes(List<String> channelCodes){
+        return getBaseMapper().getChannlesByChannelCodes(channelCodes);
+    }
 }
