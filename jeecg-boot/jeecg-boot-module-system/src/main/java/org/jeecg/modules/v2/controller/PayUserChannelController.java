@@ -8,6 +8,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
 import org.apache.shiro.SecurityUtils;
 import org.jeecg.common.api.vo.Result;
@@ -41,6 +42,7 @@ import org.jeecgframework.poi.excel.view.JeecgEntityExcelView;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -115,8 +117,13 @@ public class PayUserChannelController {
 	 * @return
 	 */
     @PostMapping("/saveUserChannel")
-    public Result saveUserChannel(@RequestBody UserChannelParam param){
+    public Result saveUserChannel(@RequestBody @Valid UserChannelParam param){
 		Result result = new Result();
+		String msg = payUserChannelService.checkParam(param);
+		if(!StringUtils.isEmpty(msg)){
+		    result.error500(msg);
+		    return result;
+        }
 		PayUserChannel userChannel = new PayUserChannel();
 		BeanUtils.copyProperties(param,userChannel);
 		//代理，保存通道信息和子账号信息

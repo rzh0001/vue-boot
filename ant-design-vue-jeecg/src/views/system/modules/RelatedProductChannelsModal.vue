@@ -15,20 +15,20 @@
             <a-input placeholder="商户" style="width:200px;" readOnly=true v-model="userName"/>
           </a-form-item>
           <a-form-item label="产品" style="width: 300px">
-            <a-select v-model="productCode" @change="findChannelsByRelatedProductCode"  v-decorator="['productCode', validatorRules.productCode]">
+            <a-select v-model="productCode" @change="findChannelsByRelatedProductCode"  >
               <a-select-option v-for="product of products"
                                :value="product.productCode" :key="product.productCode">{{product.productName}}</a-select-option>
             </a-select>
           </a-form-item>
           <a-form-item label="请选择要关联的通道" style="width: 300px">
-            <a-select v-model="channelCode" v-decorator="['channelCode', validatorRules.channelCode]">
+            <a-select v-model="channelCode" >
               <a-select-option v-for="channel of channels"
                                :value="channel.channelCode" :key="channel.channelCode">{{channel.channelName}}</a-select-option>
             </a-select>
           </a-form-item>
 
           <a-form-item label="通道默认费率"  style="width: 300px" v-if="isMem">
-            <j-dict-select-tag  v-model="channelRate" :triggerChange="true" placeholder="请选择通道默认费率" dictCode="rates" v-decorator="['channelRate', validatorRules.channelRate ]"/>
+            <j-dict-select-tag  v-model="channelRate" :triggerChange="true" placeholder="请选择通道默认费率" dictCode="rates" />
           </a-form-item>
 
           <a-form-item label="单笔金额限制" v-if="isMem">
@@ -45,10 +45,10 @@
           </a-form-item>
 
             <a-form-item label="子账号" style="width: 300px" v-if="isAgent">
-            <a-input placeholder="子账号" style="width:200px;" v-model="businessCode" v-decorator="['businessCode', validatorRules.businessCode]"/>
+            <a-input placeholder="子账号" style="width:200px;" v-model="businessCode" />
           </a-form-item>
           <a-form-item label="秘钥" style="width: 300px" v-if="isAgent">
-            <a-input placeholder="秘钥" style="width:200px;"v-model="businessApiKey" v-decorator="['businessApiKey', validatorRules.businessApiKey]"/>
+            <a-input placeholder="秘钥" style="width:200px;"v-model="businessApiKey" />
           </a-form-item>
         </a-form>
       </a-spin>
@@ -96,8 +96,7 @@
         url: {
           findCurrentLoginAccountRelatedProduct:"/v2/payUserProduct/findCurrentLoginAccountRelatedProduct",
           findChannelsByRelatedProductCode:"/v2/payUserChannel/findChannelsByRelatedProductCode",
-          getChannelsByProductCode:"/v2/payProductChannel/saveProductChannels",
-          getNotRelatedChannelCodeByProductCode:"/v2/payProductChannel/getNotRelatedChannelCodeByProductCode"
+          saveUserChannel:"/v2/payUserChannel/saveUserChannel"
         },
       }
     },
@@ -142,39 +141,27 @@
 
       },
       handleOk () {
-        const that = this;
+        let formData ={};
+          formData.lowerLimit=this.lowerLimit;
+          formData.upperLimit=this.upperLimit;
+          formData.userName=this.userName;
+          formData.memberType=this.memberType;
+          formData.businessCode=this.businessCode;
+          formData.businessApiKey=this.businessApiKey;
+          formData.channelCode=this.channelCode;
+          formData.productCode=this.productCode;
+          formData.channelRate=this.channelRate;
         // 触发表单验证
-        this.form.validateFields((err, values) => {
-          if (!err) {
-            that.confirmLoading = true;
-            let httpurl = '';
-            let method = '';
-            if(!this.model.id){
-              httpurl+=this.url.add;
-              method = 'post';
-            }else{
-              httpurl+=this.url.edit;
-              method = 'put';
-            }
-            let formData = Object.assign(this.model, values);
-            //时间格式化
-
-            console.log(formData)
-            httpAction(httpurl,formData,method).then((res)=>{
-              if(res.success){
-                that.$message.success(res.message);
-                that.$emit('ok');
-              }else{
-                that.$message.warning(res.message);
-              }
-            }).finally(() => {
-              that.confirmLoading = false;
-              that.close();
-            })
-
-
-
+        httpAction(this.url.saveUserChannel,formData,"post").then((res)=>{
+          if(res.success){
+            this.$message.success(res.message);
+            this.$emit('ok');
+          }else{
+            this.$message.warning(res.message);
           }
+        }).finally(() => {
+          that.confirmLoading = false;
+          that.close();
         })
       },
       close() {
