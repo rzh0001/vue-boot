@@ -40,6 +40,7 @@ import org.jeecgframework.poi.excel.view.JeecgEntityExcelView;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -86,7 +87,10 @@ public class PayUserChannelController {
         } else {
             channelCodes = payUserChannelService.getChannelsByUserAndProduct(sysUser.getUsername(), productCode);
         }
-        List<PayChannel> payChannels = channelService.getChannlesByChannelCodes(channelCodes);
+        List<PayChannel> payChannels = null;
+        if(!CollectionUtils.isEmpty(channelCodes)){
+            payChannels = channelService.getChannlesByChannelCodes(channelCodes);
+        }
         result.setResult(payChannels);
         return result;
     }

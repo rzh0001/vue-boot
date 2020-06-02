@@ -23,7 +23,7 @@
           <a-input placeholder="请输入通道代码" v-decorator="['channelCode', validatorRules.channelCode ]" />
         </a-form-item>
 
-        <a-form-item label="通道默认费率" :span="12"  :labelCol="labelCol" :wrapperCol="wrapperCol">
+        <a-form-item label="通道默认费率"  :labelCol="labelCol" :wrapperCol="wrapperCol">
           <j-dict-select-tag  :triggerChange="true" placeholder="请选择通道默认费率" dictCode="rates" v-decorator="['channelRate', validatorRules.channelRate ]"/>
         </a-form-item>
 
