@@ -27,8 +27,8 @@
             </a-select>
           </a-form-item>
 
-          <a-form-item label="通道默认费率"  style="width: 300px" v-if="isMem">
-            <j-dict-select-tag  v-model="channelRate" :triggerChange="true" placeholder="请选择通道默认费率" dictCode="rates" />
+          <a-form-item label="通道费率"  style="width: 300px" v-if="isMem">
+            <j-dict-select-tag v-model="userRate"  placeholder="请选择通道费率" dictCode="rates" />
           </a-form-item>
 
           <a-form-item label="单笔金额限制" v-if="isMem">
@@ -47,9 +47,16 @@
             <a-form-item label="子账号" style="width: 300px" v-if="isAgent">
             <a-input placeholder="子账号" style="width:200px;" v-model="businessCode" />
           </a-form-item>
+          <a-form-item label="子账号初始充值金额" style="width: 300px" v-if="isAgent">
+            <a-input placeholder="子账号初始充值金额" style="width:200px;"v-model="businessRechargeAmount" />
+          </a-form-item>
+          <a-form-item label="子账号状态" style="width: 300px"   v-if="isAgent">
+            <j-dict-select-tag   placeholder="子账号状态" dictCode="businessActiveStatus" v-model="businessActiveStatus"/>
+          </a-form-item>
           <a-form-item label="秘钥" style="width: 300px" v-if="isAgent">
             <a-input placeholder="秘钥" style="width:200px;"v-model="businessApiKey" />
           </a-form-item>
+
         </a-form>
       </a-spin>
     </a-modal>
@@ -80,9 +87,11 @@
         memberType:"",
         businessCode:"",
         businessApiKey:"",
+        businessRechargeAmount:"",
+        businessActiveStatus:"1",
         channelCode:"",
         productCode:"",
-        channelRate:"",
+        userRate:"",
         products:[],
         channels:[],
         confirmLoading: false,
@@ -150,7 +159,9 @@
           formData.businessApiKey=this.businessApiKey;
           formData.channelCode=this.channelCode;
           formData.productCode=this.productCode;
-          formData.channelRate=this.channelRate;
+          formData.userRate=this.userRate;
+          formData.businessActiveStatus=this.businessActiveStatus;
+          formData.businessRechargeAmount=this.businessRechargeAmount;
         // 触发表单验证
         httpAction(this.url.saveUserChannel,formData,"post").then((res)=>{
           if(res.success){
@@ -174,6 +185,8 @@
         this.memberType="",
         this.businessCode="",
         this.businessApiKey="",
+        this.businessRechargeAmount="",
+        this.businessActiveStatus="1",
         this.channelCode="",
         this.productCode="",
         this.channelRate="",

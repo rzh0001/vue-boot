@@ -1,5 +1,6 @@
 package org.jeecg.modules.v2.controller;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -29,10 +30,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 
-import org.jeecg.modules.v2.service.impl.PayBusinessServiceImpl;
-import org.jeecg.modules.v2.service.impl.PayChannelServiceImpl;
-import org.jeecg.modules.v2.service.impl.PayProductChannelServiceImpl;
-import org.jeecg.modules.v2.service.impl.PayUserChannelServiceImpl;
+import org.jeecg.modules.v2.entity.PayUserProduct;
+import org.jeecg.modules.v2.service.impl.*;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -72,7 +71,27 @@ public class PayUserChannelController {
     private PayChannelServiceImpl channelService;
     @Autowired
     private PayBusinessServiceImpl businessService;
+    @Autowired
+    private PayUserProductServiceImpl userProductService;
 
+    @PostMapping("/updateUserChannel")
+    public Result updateUserChannel(@RequestBody PayUserChannel userChannel){
+        Result result = new Result();
+
+        return result;
+    }
+    @GetMapping("/getUserChannels")
+    public Result getUserChannels(String userName){
+        List<PayUserChannel> channels= payUserChannelService.getUserChannels(userName);
+        if(!CollectionUtils.isEmpty(channels)){
+            for(int i=0;i<channels.size();i++){
+                channels.get(i).setKey(i+1);
+            }
+        }
+        Result result = new Result();
+        result.setResult(channels);
+        return result;
+    }
     /**
      * 获取产品关联的通道信息
      *
@@ -125,6 +144,13 @@ public class PayUserChannelController {
             result.error500(msg);
             return result;
         }
+        //保存产品信息
+        PayUserProduct userProduct = new PayUserProduct();
+        BeanUtils.copyProperties(param,userProduct);
+        boolean existUserProduct = userProductService.existProductByUserName(param.getUserName(),param.getProductCode());
+        if(!existUserProduct){
+            userProductService.save(userProduct);
+        }
         PayUserChannel userChannel = new PayUserChannel();
         BeanUtils.copyProperties(param, userChannel);
         boolean channelExist = payUserChannelService.channelExist(param.getUserName(), param.getProductCode(), param.getChannelCode());
@@ -132,6 +158,9 @@ public class PayUserChannelController {
         if (UserTypeEnum.AGENT.getValue().equals(param.getMemberType())) {
             PayBusiness business = new PayBusiness();
             BeanUtils.copyProperties(param, business);
+            if(!StringUtils.isEmpty(param.getBusinessRechargeAmount())){
+                business.setBusinessRechargeAmount(new BigDecimal(param.getBusinessRechargeAmount()));
+            }
             boolean existBusiness = businessService.existBusiness(business.getUserName(), business.getProductCode(), business.getChannelCode(), business.getBusinessCode());
             if (existBusiness) {
                 result.error500("该子账号已存在,子账号：" + business.getBusinessCode());

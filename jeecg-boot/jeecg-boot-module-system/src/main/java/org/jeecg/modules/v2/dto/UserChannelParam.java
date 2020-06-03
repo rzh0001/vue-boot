@@ -28,4 +28,5 @@ public class UserChannelParam implements Serializable {
     private String businessCode;
     private String businessApiKey;
     private String businessActiveStatus;
+    private String businessRechargeAmount;
 }

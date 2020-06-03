@@ -19,66 +19,73 @@ import java.util.stream.Collectors;
 /**
  * @Description: 用户关联通道
  * @Author: jeecg-boot
- * @Date:   2020-05-28
+ * @Date: 2020-05-28
  * @Version: V1.0
  */
 @Service
-public class PayUserChannelServiceImpl extends ServiceImpl<PayUserChannelMapper, PayUserChannel> implements
-    IService<PayUserChannel> {
+public class PayUserChannelServiceImpl extends ServiceImpl<PayUserChannelMapper, PayUserChannel>
+    implements IService<PayUserChannel> {
 
-    public void delete(String productCode,String channelCode){
-        getBaseMapper().delete(productCode,channelCode);
+    public void delete(String productCode, String channelCode) {
+        getBaseMapper().delete(productCode, channelCode);
     }
 
-    public List<PayUserChannel> getUserChannels(String userName,String productCode){
+    public List<PayUserChannel> getUserChannels(String userName, String productCode) {
         QueryWrapper<PayUserChannel> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_name",userName).eq("product_code",productCode).eq("member_type", UserTypeEnum.MERCHANT.getValue()).eq("del_flag",
-            DeleteFlagEnum.NOT_DELETE.getValue()).orderByDesc("last_used_time");
+        queryWrapper.eq("user_name", userName).eq("product_code", productCode)
+            .eq("member_type", UserTypeEnum.MERCHANT.getValue()).eq("del_flag", DeleteFlagEnum.NOT_DELETE.getValue())
+            .orderByDesc("last_used_time");
         return getBaseMapper().selectList(queryWrapper);
     }
 
-    public void updateChannelLastUsedTime(PayUserChannel channel){
+    public void updateChannelLastUsedTime(PayUserChannel channel) {
         getBaseMapper().updateChannelLastUsedTime(channel);
     }
 
-    public List<String> getChannelsByUserAndProduct(String userName,String productCode){
+    public List<String> getChannelsByUserAndProduct(String userName, String productCode) {
         QueryWrapper<PayUserChannel> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_name",userName).eq("product_code",productCode).eq("del_flag",
+        queryWrapper.eq("user_name", userName).eq("product_code", productCode).eq("del_flag",
             DeleteFlagEnum.NOT_DELETE.getValue());
         List<PayUserChannel> userChannels = getBaseMapper().selectList(queryWrapper);
-        if(!CollectionUtils.isEmpty(userChannels)){
+        if (!CollectionUtils.isEmpty(userChannels)) {
             return userChannels.stream().map(userChannel -> userChannel.getChannelCode()).collect(Collectors.toList());
         }
         return null;
     }
 
-    public String checkParam(UserChannelParam param){
+    public String checkParam(UserChannelParam param) {
         StringBuilder msg = new StringBuilder();
-        if(StringUtils.isEmpty(param.getProductCode())){
+        if (StringUtils.isEmpty(param.getProductCode())) {
             msg.append("产品类型不能为空");
         }
-        if(StringUtils.isEmpty(param.getChannelCode())){
+        if (StringUtils.isEmpty(param.getChannelCode())) {
             msg.append("通道不能为空");
         }
-        if(param.getMemberType().equals(UserTypeEnum.AGENT.getValue())){
-            if(StringUtils.isEmpty(param.getBusinessCode())){
+        if (param.getMemberType().equals(UserTypeEnum.AGENT.getValue())) {
+            if (StringUtils.isEmpty(param.getBusinessCode())) {
                 msg.append("子账号不能为空");
             }
-            if(StringUtils.isEmpty(param.getBusinessApiKey())){
+            if (StringUtils.isEmpty(param.getBusinessApiKey())) {
                 msg.append("秘钥不能为空");
             }
         }
         return msg.toString();
     }
 
-    public boolean channelExist(String userName,String productCode,String channelCode){
+    public boolean channelExist(String userName, String productCode, String channelCode) {
         QueryWrapper<PayUserChannel> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_name",userName).eq("product_code",productCode).eq("channel_code",channelCode).eq("del_flag",
-                DeleteFlagEnum.NOT_DELETE.getValue());
+        queryWrapper.eq("user_name", userName).eq("product_code", productCode).eq("channel_code", channelCode)
+            .eq("del_flag", DeleteFlagEnum.NOT_DELETE.getValue());
         List<PayUserChannel> userChannels = getBaseMapper().selectList(queryWrapper);
-        if(CollectionUtils.isEmpty(userChannels)){
+        if (CollectionUtils.isEmpty(userChannels)) {
             return false;
         }
         return true;
+    }
+
+    public List<PayUserChannel> getUserChannels(String userName) {
+        QueryWrapper<PayUserChannel> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_name", userName).eq("del_flag", DeleteFlagEnum.NOT_DELETE.getValue());
+        return getBaseMapper().selectList(queryWrapper);
     }
 }

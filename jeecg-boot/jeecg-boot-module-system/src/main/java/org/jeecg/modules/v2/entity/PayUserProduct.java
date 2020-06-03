@@ -69,5 +69,5 @@ public class PayUserProduct {
 	/**用户账号*/
 	@Excel(name = "用户账号", width = 15)
     @ApiModelProperty(value = "用户账号")
-	private java.lang.String username;
+	private java.lang.String userName;
 }

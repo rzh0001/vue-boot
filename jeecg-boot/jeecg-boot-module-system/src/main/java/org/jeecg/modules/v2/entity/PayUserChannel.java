@@ -27,6 +27,10 @@ import org.jeecgframework.poi.excel.annotation.Excel;
 @Accessors(chain = true)
 @ApiModel(value="pay_v2_user_channel对象", description="用户关联通道")
 public class PayUserChannel {
+	@TableField(exist = false)
+	private Integer key;
+	@TableField(exist = false)
+	private boolean editable = false;
 	/**通道code*/
 	@Excel(name = "通道code", width = 15)
     @ApiModelProperty(value = "通道code")

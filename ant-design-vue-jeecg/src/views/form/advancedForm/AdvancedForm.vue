@@ -84,6 +84,7 @@
             title: '成员姓名',
             dataIndex: 'name',
             key: 'name',
+            readonly:true,
             width: '20%',
             scopedSlots: { customRender: 'name' }
           },

@@ -32,7 +32,7 @@ public class PayUserProductServiceImpl extends ServiceImpl<PayUserProductMapper,
      */
     public PayUserProduct getUserProducts(String userName,String productCode){
         QueryWrapper<PayUserProduct> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("username",userName).eq("product_code",productCode).eq("member_type", UserTypeEnum.MERCHANT.getValue()).eq("status",
+        queryWrapper.eq("user_name",userName).eq("product_code",productCode).eq("member_type", UserTypeEnum.MERCHANT.getValue()).eq("status",
             StatusEnum.OPEN.getValue()).eq("del_flag", DeleteFlagEnum.NOT_DELETE.getValue());
         return getBaseMapper().selectOne(queryWrapper);
     }
@@ -40,12 +40,23 @@ public class PayUserProductServiceImpl extends ServiceImpl<PayUserProductMapper,
 
     public List<String> findProductCodesByUserName(String userName){
         QueryWrapper<PayUserProduct> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("username",userName).eq("status", StatusEnum.OPEN.getValue()).eq("del_flag", DeleteFlagEnum.NOT_DELETE.getValue());
+        queryWrapper.eq("user_name",userName).eq("status", StatusEnum.OPEN.getValue()).eq("del_flag", DeleteFlagEnum.NOT_DELETE.getValue());
         List<PayUserProduct> userProducts = getBaseMapper().selectList(queryWrapper);
         if(!CollectionUtils.isEmpty(userProducts)){
             return userProducts.stream().map(userProduct->userProduct.getProductCode()).collect(Collectors.toList());
         }
         return null;
+    }
+
+    public boolean existProductByUserName(String userName,String productCode){
+        QueryWrapper<PayUserProduct> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_name",userName).eq("product_code",productCode).eq("status",
+            StatusEnum.OPEN.getValue()).eq("del_flag", DeleteFlagEnum.NOT_DELETE.getValue());
+        List<PayUserProduct> products = getBaseMapper().selectList(queryWrapper);
+        if(CollectionUtils.isEmpty(products)){
+            return false;
+        }
+        return true;
     }
 
 }

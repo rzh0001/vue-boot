@@ -161,6 +161,9 @@
                <a-menu-item>
                 <a @click="addChannel(record)">入金渠道设置</a>
               </a-menu-item>
+               <a-menu-item>
+                <a @click="manageChannel(record)">管理入金渠道</a>
+              </a-menu-item>
             </a-menu>
           </a-dropdown>
 
@@ -182,6 +185,7 @@
     <user-amount-modal ref="userAmountModal" @ok="modalFormOk"></user-amount-modal>
     <sys-user-agent-modal ref="sysUserAgentModal"></sys-user-agent-modal>
     <related-product-channels-modal ref="relatedProductChannelsModal"></related-product-channels-modal>
+    <manage-product-channels-modal ref="manageProductChannelsModal"></manage-product-channels-modal>
   </a-card>
 </template>
 
@@ -198,7 +202,7 @@
   import SysUserAgentModal from './modules/SysUserAgentModal'
   import { getAction, httpAction } from '@/api/manage'
   import RelatedProductChannelsModal from './modules/RelatedProductChannelsModal'
-
+  import ManageProductChannelsModal from './modules/ManageProductChannelsModal'
   export default {
     name: 'UserList',
     mixins: [JeecgListMixin],
@@ -210,7 +214,8 @@
       UserMemberModal,
       PasswordModal,
       UserAmountModal,
-      RelatedProductChannelsModal
+      RelatedProductChannelsModal,
+      ManageProductChannelsModal
     },
     data() {
       return {
@@ -305,6 +310,9 @@
     methods: {
       addChannel: function(record) {
         this.$refs.relatedProductChannelsModal.relatedProductChannels(record)
+      },
+      manageChannel:function(record){
+        this.$refs.manageProductChannelsModal.manageChannel(record);
       },
       addRate: function(record) {
         this.$refs.userRateModal.title = '添加费率'
