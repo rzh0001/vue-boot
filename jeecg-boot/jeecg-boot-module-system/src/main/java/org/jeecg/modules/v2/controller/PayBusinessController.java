@@ -1,5 +1,6 @@
 package org.jeecg.modules.v2.controller;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,7 @@ import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.aspect.annotation.AutoLog;
 import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.v2.constant.BusinessActivStatusEnum;
+import org.jeecg.modules.v2.dto.ChargeBusinessParam;
 import org.jeecg.modules.v2.entity.PayBusiness;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -20,6 +22,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 
+import org.jeecg.modules.v2.entity.PayChannel;
+import org.jeecg.modules.v2.entity.PayProduct;
 import org.jeecg.modules.v2.service.impl.PayBusinessServiceImpl;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
@@ -29,6 +33,7 @@ import org.jeecgframework.poi.excel.view.JeecgEntityExcelView;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -52,28 +57,30 @@ public class PayBusinessController {
     private PayBusinessServiceImpl payBusinessService;
 
     @PostMapping("/deleteBusiness")
-    public Result deleteBusiness(@RequestBody  PayBusiness business){
-		payBusinessService.deleteBusiness(business);
-		Result result = new Result();
-		result.setResult("删除成功");
-		return result;
-	}
+    public Result deleteBusiness(@RequestBody PayBusiness business) {
+        payBusinessService.deleteBusiness(business);
+        Result result = new Result();
+        result.setResult("删除成功");
+        return result;
+    }
 
     @PostMapping("/activeBusinessStatus")
-    public Result activeBusinessStatus(@RequestBody PayBusiness business){
-		business.setBusinessActiveStatus(BusinessActivStatusEnum.ACTIVE.getValue());
-		payBusinessService.updateById(business);
-		Result result = new Result();
-		result.setResult("激活成功");
-		return result;
-	}
+    public Result activeBusinessStatus(@RequestBody PayBusiness business) {
+        business.setBusinessActiveStatus(BusinessActivStatusEnum.ACTIVE.getValue());
+        payBusinessService.updateById(business);
+        Result result = new Result();
+        result.setResult("激活成功");
+        return result;
+    }
+
     @PostMapping("/updateBusiness")
-    public Result updateBusiness(@RequestBody PayBusiness business){
-		payBusinessService.updateById(business);
-		Result result = new Result();
-		result.setResult("修改成功");
-		return result;
-	}
+    public Result updateBusiness(@RequestBody PayBusiness business) {
+        payBusinessService.updateById(business);
+        Result result = new Result();
+        result.setResult("修改成功");
+        return result;
+    }
+
     @GetMapping("/getBusinessByAgentName")
     public Result getBusinessByAgentName(String userName) {
         List<PayBusiness> businesses = payBusinessService.getBusinessByName(userName);
@@ -87,6 +94,42 @@ public class PayBusinessController {
         return result;
     }
 
+    @GetMapping("/getBusiness")
+    public Result getBusiness(String userName, String productCode, String channelCode) {
+        List<PayBusiness> businesses = payBusinessService.getBusiness(userName, channelCode, productCode);
+        Result result = new Result();
+        result.setResult(businesses);
+        return result;
+    }
+
+    @GetMapping("/getBusinessRelatedProduct")
+    public Result getBusinessRelatedProduct(String userName) {
+        List<PayProduct> products = payBusinessService.getBusinessRelatedProduct(userName);
+        Result result = new Result();
+        result.setResult(products);
+        return result;
+    }
+
+	@GetMapping("/getBusinessRelatedChannel")
+    public Result getBusinessRelatedChannel(String userName,String productCode){
+		List<PayChannel> channels = payBusinessService.getBusinessRelatedChannel(userName,productCode);
+		Result result = new Result();
+		result.setResult(channels);
+		return result;
+	}
+
+	@PostMapping("/chargeAmount")
+	public Result chargeAmount(@RequestBody ChargeBusinessParam param){
+		Result result = new Result();
+    	if(StringUtils.isEmpty(param.getAmount())){
+			result.error500("金额不能为空");
+			return result;
+		}
+		param.setChargeAmount(new BigDecimal(param.getAmount()));
+		payBusinessService.updateBusinessAmount(param);
+		result.success("充值成功,充值金额为："+param.getAmount());
+		return result;
+	}
     /**
      * 分页列表查询
      * 

@@ -4,8 +4,12 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.jeecg.modules.v2.constant.BusinessActivStatusEnum;
 import org.jeecg.modules.v2.constant.DeleteFlagEnum;
+import org.jeecg.modules.v2.dto.ChargeBusinessParam;
 import org.jeecg.modules.v2.entity.PayBusiness;
+import org.jeecg.modules.v2.entity.PayChannel;
+import org.jeecg.modules.v2.entity.PayProduct;
 import org.jeecg.modules.v2.mapper.PayBusinessMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -13,6 +17,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @Description: 子账号信息
@@ -23,7 +28,10 @@ import java.util.List;
 @Service
 public class PayBusinessServiceImpl extends ServiceImpl<PayBusinessMapper, PayBusiness>
     implements IService<PayBusiness> {
-
+    @Autowired
+    private PayProductServiceImpl productService;
+    @Autowired
+    private PayChannelServiceImpl channelService;
     public List<PayBusiness> getBusiness(String userName, String channelCode, String productCode) {
         QueryWrapper<PayBusiness> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("user_name", userName).eq("channel_code", channelCode).eq("product_code", productCode)
@@ -51,12 +59,41 @@ public class PayBusinessServiceImpl extends ServiceImpl<PayBusinessMapper, PayBu
 
     public List<PayBusiness> getBusinessByName(String userName) {
         QueryWrapper<PayBusiness> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_name", userName).eq("del_flag", DeleteFlagEnum.NOT_DELETE.getValue());
+        queryWrapper.eq("user_name", userName).eq("del_flag", DeleteFlagEnum.NOT_DELETE.getValue())
+            .eq("business_active_status", BusinessActivStatusEnum.ACTIVE.getValue());
         return getBaseMapper().selectList(queryWrapper);
     }
 
-    public void deleteBusiness(PayBusiness business){
+    public void deleteBusiness(PayBusiness business) {
         business.setDelFlag(DeleteFlagEnum.DELETE.getValue());
         getBaseMapper().updateById(business);
+    }
+
+    public List<PayProduct> getBusinessRelatedProduct(String userName) {
+        List<PayBusiness> businesses = this.getBusinessByName(userName);
+        if (!CollectionUtils.isEmpty(businesses)) {
+            List<String> productCodes =
+                businesses.stream().map(business -> business.getProductCode()).collect(Collectors.toList());
+            return productService.getProductsByProductCodes(productCodes);
+        }
+        return null;
+    }
+
+
+    public List<PayChannel> getBusinessRelatedChannel(String userName, String productCode) {
+        QueryWrapper<PayBusiness> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_name", userName).eq("product_code", productCode).eq("del_flag",
+            DeleteFlagEnum.NOT_DELETE.getValue()).eq("business_active_status", BusinessActivStatusEnum.ACTIVE.getValue());
+        List<PayBusiness> businesses =getBaseMapper().selectList(queryWrapper);
+        if (!CollectionUtils.isEmpty(businesses)) {
+            List<String> channels =
+                businesses.stream().map(business -> business.getChannelCode()).collect(Collectors.toList());
+            return channelService.getChannlesByChannelCodes(channels);
+        }
+        return null;
+    }
+
+    public void updateBusinessAmount(ChargeBusinessParam param){
+        getBaseMapper().updateBusinessAmount(param);
     }
 }

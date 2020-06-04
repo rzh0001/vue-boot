@@ -175,6 +175,9 @@
                <a-menu-item>
                 <a @click="manageBusiness(record)">子账号管理</a>
               </a-menu-item>
+               <a-menu-item>
+                <a @click="chargeBusiness(record)">子账号充值</a>
+              </a-menu-item>
             </a-menu>
           </a-dropdown>
 
@@ -196,6 +199,7 @@
     <related-product-channels-modal ref="relatedProductChannelsModal"></related-product-channels-modal>
     <manage-product-channels-modal ref="manageProductChannelsModal"></manage-product-channels-modal>
     <manage-business-modal ref="manageBusinessModal"></manage-business-modal>
+    <charge-business-modal ref="chargeBusinessModal"></charge-business-modal>
   </a-card>
 </template>
 
@@ -214,6 +218,7 @@
   import RelatedProductChannelsModal from './modules/RelatedProductChannelsModal'
   import ManageProductChannelsModal from './modules/ManageProductChannelsModal'
   import ManageBusinessModal from './modules/ManageBusinessModal'
+  import ChargeBusinessModal from './modules/ChargeBusinessModal'
   export default {
     name: 'UserList',
     mixins: [JeecgListMixin],
@@ -227,7 +232,8 @@
       UserAmountModal,
       RelatedProductChannelsModal,
       ManageProductChannelsModal,
-      ManageBusinessModal
+      ManageBusinessModal,
+      ChargeBusinessModal
     },
     data() {
       return {
@@ -328,6 +334,9 @@
       },
       manageBusiness:function(record){
         this.$refs.manageBusinessModal.manageBusiness(record);
+      },
+      chargeBusiness:function(record){
+        this.$refs.chargeBusinessModal.chargeBusiness(record);
       },
       addRate: function(record) {
         this.$refs.userRateModal.title = '添加费率'
