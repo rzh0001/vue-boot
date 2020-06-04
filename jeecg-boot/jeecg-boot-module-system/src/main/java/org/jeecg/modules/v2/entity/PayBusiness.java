@@ -27,6 +27,10 @@ import org.jeecgframework.poi.excel.annotation.Excel;
 @Accessors(chain = true)
 @ApiModel(value="pay_v2_business对象", description="子账号信息")
 public class PayBusiness {
+	@TableField(exist = false)
+	private Integer key;
+	@TableField(exist = false)
+	private boolean editable = false;
 	/**最近一次使用时间*/
 	@Excel(name = "最近一次使用时间", width = 20, format = "yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")

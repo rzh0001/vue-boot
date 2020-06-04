@@ -167,7 +167,16 @@
             </a-menu>
           </a-dropdown>
 
-
+          <a-dropdown>
+            <a-button>
+              子账号管理
+            </a-button>
+            <a-menu slot="overlay">
+               <a-menu-item>
+                <a @click="manageBusiness(record)">子账号管理</a>
+              </a-menu-item>
+            </a-menu>
+          </a-dropdown>
 
 
 
@@ -186,6 +195,7 @@
     <sys-user-agent-modal ref="sysUserAgentModal"></sys-user-agent-modal>
     <related-product-channels-modal ref="relatedProductChannelsModal"></related-product-channels-modal>
     <manage-product-channels-modal ref="manageProductChannelsModal"></manage-product-channels-modal>
+    <manage-business-modal ref="manageBusinessModal"></manage-business-modal>
   </a-card>
 </template>
 
@@ -203,6 +213,7 @@
   import { getAction, httpAction } from '@/api/manage'
   import RelatedProductChannelsModal from './modules/RelatedProductChannelsModal'
   import ManageProductChannelsModal from './modules/ManageProductChannelsModal'
+  import ManageBusinessModal from './modules/ManageBusinessModal'
   export default {
     name: 'UserList',
     mixins: [JeecgListMixin],
@@ -215,7 +226,8 @@
       PasswordModal,
       UserAmountModal,
       RelatedProductChannelsModal,
-      ManageProductChannelsModal
+      ManageProductChannelsModal,
+      ManageBusinessModal
     },
     data() {
       return {
@@ -314,6 +326,9 @@
       manageChannel:function(record){
         this.$refs.manageProductChannelsModal.manageChannel(record);
       },
+      manageBusiness:function(record){
+        this.$refs.manageBusinessModal.manageBusiness(record);
+      },
       addRate: function(record) {
         this.$refs.userRateModal.title = '添加费率'
         this.$refs.userRateModal.addRate(record)
@@ -321,7 +336,7 @@
       businessDeatil: function(record) {
         if (record.memberType != '1') {
           alert('会员类型不是代理，无挂马信息')
-          return
+          return;
         }
         this.$refs.userBusinessModal.title = '已添加挂马详情'
         this.$refs.userBusinessModal.detail(record)

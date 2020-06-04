@@ -14,7 +14,7 @@
         :dataSource="data"
         :pagination="false"
       >
-        <template v-for="(col, i) in [ 'userRate','lowerLimit','upperLimit']" :slot="col" slot-scope="text, record, index">
+        <template v-for="(col, i) in [ 'businessCode','businessApiKey','businessActiveStatus']" :slot="col" slot-scope="text, record, index">
           <a-input
             :key="col"
             v-if="record.editable"
@@ -46,6 +46,10 @@
               <a-popconfirm title="是否要删除此行？" @confirm="remove(record.key)">
                 <a>删除</a>
               </a-popconfirm>
+            <a-divider type="vertical" />
+              <a-popconfirm title="确认激活码？" @confirm="active(record.key)">
+                <a>激活</a>
+              </a-popconfirm>
             </span>
         </template>
       </a-table>
@@ -61,7 +65,7 @@
   import JMultiSelectTag from '@/components/dict/JMultiSelectTag'
   import STable from '@/components/table/'
   export default {
-    name: "ManageProductChannelsModal",
+    name: "ManageBusinessModal",
     components: {
       JCheckbox,
       JMultiSelectTag,
@@ -81,7 +85,8 @@
             dataIndex: 'userName',
             key: 'userName',
             width: '10%',
-            scopedSlots: { customRender: 'userName' }
+            scopedSlots: { customRender: 'userName' },
+
           },
           {
             title: '产品名称',
@@ -98,25 +103,33 @@
             scopedSlots: { customRender: 'channelCode' }
           },
           {
-            title: '费率',
-            dataIndex: 'userRate',
-            key: 'userRate',
+            title: '子账号名称',
+            dataIndex: 'businessCode',
+            key: 'businessCode',
             width: '10%',
-            scopedSlots: { customRender: 'userRate' }
+            scopedSlots: { customRender: 'businessCode' }
           },
           {
-            title: '最低支付金额',
-            dataIndex: 'lowerLimit',
-            key: 'lowerLimit',
+            title: '秘钥',
+            dataIndex: 'businessApiKey',
+            key: 'businessApiKey',
             width: '20%',
-            scopedSlots: { customRender: 'lowerLimit' }
+            scopedSlots: { customRender: 'businessApiKey' }
           },
           {
-            title: '最高支付金额',
-            dataIndex: 'upperLimit',
-            key: 'upperLimit',
-            width: '20%',
-            scopedSlots: { customRender: 'upperLimit' }
+            title: '状态',
+            dataIndex: 'businessActiveStatus',
+            key: 'businessActiveStatus',
+            width: '10%',
+            customRender: function(text) {
+              if (text == '0') {
+                return <a-tag color="red">未激活</a-tag>
+              } else if (text == '1') {
+                return  <a-tag color="cyan">已激活</a-tag>
+              } else{
+                return text
+              }
+            }
           },
           {
             title: '操作',
@@ -126,18 +139,20 @@
         ],
         data: [],
         url:{
-          getUserChannels:"/v2/payUserChannel/getUserChannels",
-          updateUserChannel:"/v2/payUserChannel/updateUserChannel",
+          getBusinessByAgentName:"/v2/payBusiness/getBusinessByAgentName",
+          updateBusiness:"/v2/payBusiness/updateBusiness",
+          activeBusinessStatus:"/v2/payBusiness/activeBusinessStatus",
+          deleteBusiness:"/v2/payBusiness/deleteBusiness",
         }
       }
     },
     mounted:function () {
     },
     methods: {
-      getUserChannels(){
+      getBusinessByAgentName(){
         let formData = [];
         formData.userName = this.userName;
-        getAction(this.url.getUserChannels,formData).then((res)=>{
+        getAction(this.url.getBusinessByAgentName,formData).then((res)=>{
           if(res.success){
             this.data=res.result;
             this.$emit('ok');
@@ -149,18 +164,24 @@
       close() {
         this.$emit('close');
         this.manage = false;
+        this.userName = '';
       },
       handleOk(){
         this.$emit('close');
         this.manage = false;
+        this.userName = '';
       },
       handleCancel() {
         this.close()
       },
-      manageChannel(record){
+      manageBusiness(record){
+        if(record.memberType != '1'){
+          alert("无权限")
+          return;
+        }
         this.manage=true;
         this.userName=record.username;
-        this.getUserChannels();
+        this.getBusinessByAgentName();
       },
       handleSubmit (e) {
         e.preventDefault()
@@ -176,14 +197,8 @@
         })
       },
       remove (key) {
-        const newData = this.data.filter(item => item.key !== key)
-        this.data = newData
-      },
-      saveRow (key) {
         let target = this.data.filter(item => item.key === key)[0]
-        console.log("update");
-        console.log(target)
-        httpAction(this.url.updateUserChannel,target,"post").then((res)=>{
+        httpAction(this.url.deleteBusiness,target,"post").then((res)=>{
           if(res.success){
             this.$message.success(res.message);
             this.$emit('ok');
@@ -194,8 +209,34 @@
           that.confirmLoading = false;
           that.close();
         })
-        //target.editable = false
-        //target.isNew = false
+      },
+      active (key){
+        let target = this.data.filter(item => item.key === key)[0]
+        httpAction(this.url.activeBusinessStatus,target,"post").then((res)=>{
+          if(res.success){
+            this.$message.success(res.message);
+            this.$emit('ok');
+          }else{
+            this.$message.warning(res.message);
+          }
+        }).finally(() => {
+          that.confirmLoading = false;
+          that.close();
+        })
+      },
+      saveRow (key) {
+        let target = this.data.filter(item => item.key === key)[0]
+        httpAction(this.url.updateBusiness,target,"post").then((res)=>{
+          if(res.success){
+            this.$message.success(res.message);
+            this.$emit('ok');
+          }else{
+            this.$message.warning(res.message);
+          }
+        }).finally(() => {
+          that.confirmLoading = false;
+          that.close();
+        })
       },
       toggle (key) {
         let target = this.data.filter(item => item.key === key)[0]
