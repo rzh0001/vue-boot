@@ -1,0 +1,12 @@
+momey 充值金额
+
+
+businessActiveStatus 子账号激活状态
+0：未激活
+1：激活
+
+rates 费率
+
+SysStatus 状态
+1：开启
+0：关闭
