@@ -9,12 +9,12 @@ import org.jeecg.common.util.RedisUtil;
 import org.jeecg.common.util.encryption.AES128Util;
 import org.jeecg.modules.exception.RRException;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
-import org.jeecg.modules.pay.entity.UserBusinessEntity;
 import org.jeecg.modules.pay.entity.YsfQueryOrderResult;
 import org.jeecg.modules.pay.service.IOrderInfoEntityService;
 import org.jeecg.modules.pay.service.factory.PayServiceFactory;
 import org.jeecg.modules.pay.service.requestPayUrl.RequestPayUrl;
 import org.jeecg.modules.util.*;
+import org.jeecg.modules.v2.entity.PayBusiness;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,7 @@ import java.math.BigDecimal;
 
 @Service
 @Slf4j
-public class YsfPayImpl implements RequestPayUrl<OrderInfoEntity, String, String, String, String, UserBusinessEntity, Object>, InitializingBean {
+public class YsfPayImpl implements RequestPayUrl<OrderInfoEntity, String, String, String, String, PayBusiness, Object>, InitializingBean {
     @Autowired
     private IOrderInfoEntityService orderInfoEntityService;
     @Autowired
@@ -32,8 +32,8 @@ public class YsfPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
     private RequestUrlUtils utils;
 
     @Override
-    public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key, String callbackUrl, UserBusinessEntity userBusinessEntity) throws Exception {
-        String ysfKey = userBusinessEntity.getApiKey();
+    public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key, String callbackUrl, PayBusiness PayBusiness) throws Exception {
+        String ysfKey = PayBusiness.getBusinessApiKey();
         if (StringUtils.isBlank(ysfKey)) {
             log.info("云闪付通道未配置apikey");
             throw new RRException("云闪付通道未配置apikey");
@@ -45,7 +45,7 @@ public class YsfPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
         }
         String md5Key = keys[0];
         String aesKey = keys[1];
-        String param = structuralYsfParam(order, md5Key, aesKey, order.getBusinessCode(), userName, callbackUrl, userBusinessEntity.getChannelCode());
+        String param = structuralYsfParam(order, md5Key, aesKey, order.getBusinessCode(), userName, callbackUrl, PayBusiness.getChannelCode());
         String payUrl = ysfCallBack(param, url);
         if (StringUtils.isEmpty(payUrl)) {
             throw new RRException("设备产码失败，请联系商户，查看设置状态");
@@ -55,8 +55,8 @@ public class YsfPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
     }
 
     @Override
-    public boolean orderInfoOk(OrderInfoEntity order, String url, UserBusinessEntity userBusinessEntity) throws Exception {
-        String apiKey = userBusinessEntity.getApiKey();
+    public boolean orderInfoOk(OrderInfoEntity order, String url, PayBusiness PayBusiness) throws Exception {
+        String apiKey = PayBusiness.getBusinessApiKey();
         if (StringUtils.isBlank(apiKey)) {
             log.info("云闪付通道未配置apikey");
             throw new RRException("云闪付通道未配置apikey");
@@ -69,11 +69,11 @@ public class YsfPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
         String md5Key = keys[0];
         String aesKey = keys[1];
         JSONObject param = new JSONObject();
-        param.put("agentcode", userBusinessEntity.getBusinessCode());
+        param.put("agentcode", PayBusiness.getBusinessCode());
         long time = System.currentTimeMillis();
         param.put("timestamp", time);
         //agentcode+timestamp+agententity.getMd5key()
-        String sign = DigestUtils.md5Hex(userBusinessEntity.getBusinessCode() + time + md5Key);
+        String sign = DigestUtils.md5Hex(PayBusiness.getBusinessCode() + time + md5Key);
         param.put("sign", sign);
         JSONObject data = new JSONObject();
         data.put("orderids", order.getOrderId());
@@ -101,11 +101,11 @@ public class YsfPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
     }
 
     @Override
-    public boolean notifyOrderFinish(OrderInfoEntity order, String key, UserBusinessEntity userBusiness, String url) throws Exception {
+    public boolean notifyOrderFinish(OrderInfoEntity order, String key, PayBusiness userBusiness, String url) throws Exception {
         JSONObject param = new JSONObject();
         param.put("orderId", order.getOrderId());
         log.info("==>手动补单，回调挂马平台url：{}，param:{}", url, param.toJSONString());
-        String apiKey = userBusiness.getApiKey();
+        String apiKey = userBusiness.getBusinessApiKey();
         String[] keys = apiKey.split("=");
         if (keys.length != 2) {
             log.info("云闪付通道配置apikey规则不对");

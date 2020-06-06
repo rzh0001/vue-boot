@@ -7,7 +7,6 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.jeecg.common.util.RedisUtil;
 import org.jeecg.modules.exception.RRException;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
-import org.jeecg.modules.pay.entity.UserBusinessEntity;
 import org.jeecg.modules.pay.entity.XinPayParam;
 import org.jeecg.modules.pay.service.IOrderInfoEntityService;
 import org.jeecg.modules.pay.service.factory.PayServiceFactory;
@@ -18,6 +17,7 @@ import org.jeecg.modules.util.BaseConstant;
 import org.jeecg.modules.util.HttpResult;
 import org.jeecg.modules.util.HttpUtils;
 import org.jeecg.modules.util.R;
+import org.jeecg.modules.v2.entity.PayBusiness;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,7 +27,7 @@ import java.util.Map;
 
 @Service
 @Slf4j
-public class XinPayImpl implements RequestPayUrl<OrderInfoEntity, String, String, String,String, UserBusinessEntity,Object>, InitializingBean {
+public class XinPayImpl implements RequestPayUrl<OrderInfoEntity, String, String, String,String, PayBusiness,Object>, InitializingBean {
     private static final String MD5_KEY = "93a6c71e361c04b8ca275e32fbd52018";
     @Autowired
     private RedisUtil redisUtil;
@@ -36,7 +36,7 @@ public class XinPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
     @Autowired
     private ISysUserService userService;
     @Override
-    public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key, String callbackUrl, UserBusinessEntity userBusiness) throws Exception {
+    public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key, String callbackUrl, PayBusiness userBusiness) throws Exception {
         XinPayParam payParam = new XinPayParam();
         payParam.setMerchantNum(userBusiness.getBusinessCode());
         payParam.setOrderNo(order.getOrderId());
@@ -80,12 +80,12 @@ public class XinPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
     }
 
     @Override
-    public boolean orderInfoOk(OrderInfoEntity order, String url, UserBusinessEntity userBusiness) throws Exception {
+    public boolean orderInfoOk(OrderInfoEntity order, String url, PayBusiness userBusiness) throws Exception {
         return false;
     }
 
     @Override
-    public boolean notifyOrderFinish(OrderInfoEntity order, String key, UserBusinessEntity userBusiness, String url) throws Exception {
+    public boolean notifyOrderFinish(OrderInfoEntity order, String key, PayBusiness userBusiness, String url) throws Exception {
         return false;
     }
 

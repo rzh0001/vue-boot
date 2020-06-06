@@ -8,7 +8,6 @@ import org.jeecg.common.util.RedisUtil;
 import org.jeecg.modules.pay.entity.ChiChengAlipayParam;
 import org.jeecg.modules.pay.entity.ChiChengAlipayQueryResult;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
-import org.jeecg.modules.pay.entity.UserBusinessEntity;
 import org.jeecg.modules.pay.service.IOrderInfoEntityService;
 import org.jeecg.modules.pay.service.factory.PayServiceFactory;
 import org.jeecg.modules.pay.service.requestPayUrl.RequestPayUrl;
@@ -18,15 +17,13 @@ import org.jeecg.modules.util.BaseConstant;
 import org.jeecg.modules.util.HttpResult;
 import org.jeecg.modules.util.HttpUtils;
 import org.jeecg.modules.util.R;
+import org.jeecg.modules.v2.entity.PayBusiness;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,7 +33,7 @@ import java.util.Map;
  */
 @Service
 @Slf4j
-public class ChiChengAlipayImpl implements RequestPayUrl<OrderInfoEntity, String, String, String, String, UserBusinessEntity,
+public class ChiChengAlipayImpl implements RequestPayUrl<OrderInfoEntity, String, String, String, String, PayBusiness,
     Object>, InitializingBean{
     @Autowired
     private IOrderInfoEntityService orderInfoEntityService;
@@ -48,7 +45,7 @@ public class ChiChengAlipayImpl implements RequestPayUrl<OrderInfoEntity, String
     private RequestUrlUtils utils;
     @Override
     public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key, String callbackUrl,
-        UserBusinessEntity userBusiness) throws Exception {
+        PayBusiness userBusiness) throws Exception {
         ChiChengAlipayParam param = new ChiChengAlipayParam();
         param.setPay_memberid(userBusiness.getBusinessCode());
         param.setPay_orderid(order.getOrderId());
@@ -69,7 +66,7 @@ public class ChiChengAlipayImpl implements RequestPayUrl<OrderInfoEntity, String
             .append("&pay_notifyurl=").append(param.getPay_notifyurl())
             .append("&pay_orderid=").append(param.getPay_orderid())
             .append("&pay_type=get")
-            .append("&key=").append(userBusiness.getApiKey()).append("");
+            .append("&key=").append(userBusiness.getBusinessApiKey()).append("");
         log.info("==>赤诚支付 MD5为加密值为：{}",md5buffer.toString());
         String md5 = this.md5(md5buffer.toString()).toUpperCase();
         log.info("==>赤诚支付 MD5加密值为：{} ",md5);
@@ -114,15 +111,15 @@ public class ChiChengAlipayImpl implements RequestPayUrl<OrderInfoEntity, String
         }
     }
     @Override
-    public boolean orderInfoOk(OrderInfoEntity order, String url, UserBusinessEntity userBusiness)
+    public boolean orderInfoOk(OrderInfoEntity order, String url, PayBusiness userBusiness)
         throws Exception {
         Map<String,Object> param = new HashMap<>();
         StringBuilder md5buffer = new StringBuilder();
         md5buffer.append("pay_memberid=").append(userBusiness.getBusinessCode())
             .append("&pay_orderid=").append(order.getOrderId())
-            .append("&key=").append(userBusiness.getApiKey());
+            .append("&key=").append(userBusiness.getBusinessApiKey());
         String md5 = md5(md5buffer.toString()).toUpperCase();
-        param.put("pay_memberid",userBusiness.getApiKey());
+        param.put("pay_memberid",userBusiness.getBusinessApiKey());
         param.put("pay_orderid",order.getOrderId());
         param.put("pay_md5sign",md5);
         HttpResult result = HttpUtils.doPost(url, param);
@@ -135,7 +132,7 @@ public class ChiChengAlipayImpl implements RequestPayUrl<OrderInfoEntity, String
     }
 
     @Override
-    public boolean notifyOrderFinish(OrderInfoEntity order, String key, UserBusinessEntity userBusiness, String url)
+    public boolean notifyOrderFinish(OrderInfoEntity order, String key, PayBusiness userBusiness, String url)
         throws Exception {
         return false;
     }

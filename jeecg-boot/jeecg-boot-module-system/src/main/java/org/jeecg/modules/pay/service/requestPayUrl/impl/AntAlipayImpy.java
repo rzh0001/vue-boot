@@ -19,6 +19,7 @@ import org.jeecg.modules.util.BaseConstant;
 import org.jeecg.modules.util.HttpResult;
 import org.jeecg.modules.util.HttpUtils;
 import org.jeecg.modules.util.R;
+import org.jeecg.modules.v2.entity.PayBusiness;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,7 +37,7 @@ import java.util.*;
 @Service
 @Slf4j
 public class AntAlipayImpy implements
-    RequestPayUrl<OrderInfoEntity, String, String, String, String, UserBusinessEntity, Object>, InitializingBean {
+    RequestPayUrl<OrderInfoEntity, String, String, String, String, PayBusiness, Object>, InitializingBean {
     @Autowired
     private RedisUtil redisUtil;
     @Autowired
@@ -46,7 +47,7 @@ public class AntAlipayImpy implements
     private static final String CALLBACK_URL="/callBack/order/antAlipay/out_trade_no";
     @Override
     public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key, String callbackUrl,
-        UserBusinessEntity userBusiness) throws Exception {
+                           PayBusiness userBusiness) throws Exception {
         AntAlipayParam param = new AntAlipayParam();
         param.setApp_id(userBusiness.getBusinessCode());
         param.setNonce_str(UUIDGenerator.generate());
@@ -60,7 +61,7 @@ public class AntAlipayImpy implements
         String paramStr = JSON.toJSONString(param);
         log.info("==>蚁支付支付宝，请求入参为：{}",paramStr);
         Map jsonObject = JSON.parseObject(paramStr);
-        String sign = this.generateSignature(jsonObject,userBusiness.getApiKey());
+        String sign = this.generateSignature(jsonObject,userBusiness.getBusinessApiKey());
         log.info("==>蚁支付支付宝，请求签名为：{}",sign);
         param.setSign(sign);
         HttpResult result = HttpUtils.doPostJson(url, JSON.toJSONString(param));
@@ -159,13 +160,13 @@ public class AntAlipayImpy implements
         return buff;
     }
     @Override
-    public boolean orderInfoOk(OrderInfoEntity order, String url, UserBusinessEntity userBusiness)
+    public boolean orderInfoOk(OrderInfoEntity order, String url, PayBusiness userBusiness)
         throws Exception {
         return false;
     }
 
     @Override
-    public boolean notifyOrderFinish(OrderInfoEntity order, String key, UserBusinessEntity userBusiness, String url)
+    public boolean notifyOrderFinish(OrderInfoEntity order, String key, PayBusiness userBusiness, String url)
         throws Exception {
         return false;
     }

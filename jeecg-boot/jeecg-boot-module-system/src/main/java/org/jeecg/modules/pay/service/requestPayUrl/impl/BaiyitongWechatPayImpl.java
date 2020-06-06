@@ -3,27 +3,25 @@ package org.jeecg.modules.pay.service.requestPayUrl.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
-import org.jeecg.common.system.vo.DictModel;
 import org.jeecg.common.util.RedisUtil;
+import org.jeecg.modules.api.service.ICommonApiService;
+import org.jeecg.modules.api.service.impl.SfApiServiceImpl;
 import org.jeecg.modules.exception.RRException;
 import org.jeecg.modules.pay.entity.BaiyitongParam;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
-import org.jeecg.modules.pay.entity.UserBusinessEntity;
 import org.jeecg.modules.pay.service.IOrderInfoEntityService;
-import org.jeecg.modules.pay.service.IUserBusinessEntityService;
 import org.jeecg.modules.pay.service.factory.PayServiceFactory;
 import org.jeecg.modules.pay.service.requestPayUrl.RequestPayUrl;
 import org.jeecg.modules.system.entity.SysUser;
-import org.jeecg.modules.system.service.ISysDictService;
 import org.jeecg.modules.system.service.ISysUserService;
 import org.jeecg.modules.util.BaseConstant;
 import org.jeecg.modules.util.HttpResult;
 import org.jeecg.modules.util.HttpUtils;
 import org.jeecg.modules.util.R;
+import org.jeecg.modules.v2.entity.PayBusiness;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
@@ -42,7 +40,7 @@ import java.util.*;
 @Service
 @Slf4j
 public class BaiyitongWechatPayImpl implements
-    RequestPayUrl<OrderInfoEntity, String, String, String, String, UserBusinessEntity, Object>, InitializingBean {
+        RequestPayUrl<OrderInfoEntity, String, String, String, String, PayBusiness, Object>, InitializingBean {
     @Autowired
     private RedisUtil redisUtil;
     @Autowired
@@ -54,8 +52,8 @@ public class BaiyitongWechatPayImpl implements
 
     @Override
     public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key, String callbackUrl,
-        UserBusinessEntity userBusiness) throws Exception {
-        BaiyitongParam param = valueOf(order, userBusiness.getBusinessCode(), callbackUrl, userBusiness.getApiKey());
+                           PayBusiness userBusiness) throws Exception {
+        BaiyitongParam param = valueOf(order, userBusiness.getBusinessCode(), callbackUrl, userBusiness.getBusinessApiKey());
         String json = JSON.toJSONString(param);
         Map<String, Object> mapTypes = JSON.parseObject(json);
         log.info("===>请求百易通，获取支付链接，请求入参为：{}", json);
@@ -67,7 +65,7 @@ public class BaiyitongWechatPayImpl implements
             JSONObject result = JSONObject.parseObject(body);
             if ("200".equals(result.get("code").toString())) {
                 // JSONObject data = (JSONObject) result.get("data");
-                payUrl = (String)result.get("url").toString();
+                payUrl = (String) result.get("url").toString();
                 log.info("===>百易通，支付链接地址为：{}", payUrl);
             } else {
                 log.info("===>订单为：{}，请求百易通平台，获取支付链接，返回的code为：{}", order.getOrderId(), result.get("code").toString());
@@ -85,23 +83,23 @@ public class BaiyitongWechatPayImpl implements
     }
 
     @Override
-    public boolean orderInfoOk(OrderInfoEntity order, String url, UserBusinessEntity userBusiness) throws Exception {
+    public boolean orderInfoOk(OrderInfoEntity order, String url, PayBusiness userBusiness) throws Exception {
         return false;
     }
 
     @Override
-    public boolean notifyOrderFinish(OrderInfoEntity order, String key, UserBusinessEntity userBusiness, String url)
-        throws Exception {
+    public boolean notifyOrderFinish(OrderInfoEntity order, String key, PayBusiness userBusiness, String url)
+            throws Exception {
         return false;
     }
 
     @Autowired
-    private IUserBusinessEntityService businessEntityService;
+    private ICommonApiService apiService;
 
     @Override
     public Object callBack(Object object) throws Exception {
-        Map<String, Object> map = (Map<String, Object>)object;
-        String orderId = (String)map.get("out_trade_no");
+        Map<String, Object> map = (Map<String, Object>) object;
+        String orderId = (String) map.get("out_trade_no");
         log.info("===>百易通回调四方，回调单号为：{}", orderId);
         SortedMap<Object, Object> params1 = new TreeMap<Object, Object>();
         params1.put("callbacks", map.get("callbacks"));
@@ -120,21 +118,21 @@ public class BaiyitongWechatPayImpl implements
         }
         SysUser user = userService.getUserByName(order.getUserName());
         log.info("===>百易通回调，订单号：{},服务端sign串为：{}", orderId, params1);
-        String payType = (String)map.get("out_uid");
-        List<UserBusinessEntity> useBusinesses =
-            businessEntityService.queryBusinessCodeByUserName(user.getAgentUsername(), payType);
-        if (CollectionUtils.isEmpty(useBusinesses)) {
+        String payType = (String) map.get("out_uid");
+        PayBusiness useBusinesses =
+                apiService.findBusiness(order.getAgentUsername(), order.getPayType(), order.getProductCode());
+        if (useBusinesses == null) {
             log.info("===>百易通回调，根据订单号：{}，查询不到代理信息", orderId);
             return "代理不存在";
         }
-        String sign = signForInspiry(params1, useBusinesses.get(0).getApiKey());
+        String sign = signForInspiry(params1, useBusinesses.getBusinessApiKey());
         log.info("===>百易通回调，订单号：{},服务端sign为：{}", orderId, sign);
         if (!sign.equals(map.get("sign"))) {
             log.info("===>百易通回调,签名验证不通过，入参的签名为：{},本地签名为：{}", map.get("sign").toString(), sign);
             return "签名验证失败";
         }
         // 假如当前同一个单号有多个请求进来，则，只针对一个线程进行处理，其余的不处理
-        String exist = (String)redisUtil.get("callBack" + orderId);
+        String exist = (String) redisUtil.get("callBack" + orderId);
         if (!StringUtils.isEmpty(exist)) {
             return "不能重复回调";
         }
@@ -160,7 +158,7 @@ public class BaiyitongWechatPayImpl implements
         if (order.getPayType().equals(BaseConstant.REQUEST_BAIYITONG_ALIPAY)) {
             param.setPay_type("alipay");
             param.setOut_uid(BaseConstant.REQUEST_BAIYITONG_ALIPAY);
-        }else{
+        } else {
             param.setPay_type("wechat");
             param.setOut_uid(BaseConstant.REQUEST_BAIYITONG_WECHAT);
         }
@@ -196,8 +194,8 @@ public class BaiyitongWechatPayImpl implements
         Iterator it = es.iterator();
 
         while (it.hasNext()) {
-            Map.Entry entry = (Map.Entry)it.next();
-            String k = (String)entry.getKey();
+            Map.Entry entry = (Map.Entry) it.next();
+            String k = (String) entry.getKey();
             Object v = entry.getValue();
             // 空值不传递，不参与签名组串
             if (null != v && !"".equals(v)) {
@@ -215,8 +213,7 @@ public class BaiyitongWechatPayImpl implements
     /**
      * 对字符串进行MD5加密
      *
-     * @param str
-     *            需要加密的字符串
+     * @param str 需要加密的字符串
      * @return 小写MD5字符串 32位
      */
     private String MD5(String str) {
@@ -236,8 +233,8 @@ public class BaiyitongWechatPayImpl implements
         PayServiceFactory.register(BaseConstant.REQUEST_BAIYITONG_WECHAT, this);
         PayServiceFactory.register(BaseConstant.REQUEST_BAIYITONG_ALIPAY, this);
         PayServiceFactory.registerUrl(BaseConstant.REQUEST_BAIYITONG_ALIPAY,
-            utils.getRequestUrl(BaseConstant.REQUEST_BAIYITONG_ALIPAY));
+                utils.getRequestUrl(BaseConstant.REQUEST_BAIYITONG_ALIPAY));
         PayServiceFactory.registerUrl(BaseConstant.REQUEST_BAIYITONG_WECHAT,
-            utils.getRequestUrl(BaseConstant.REQUEST_BAIYITONG_WECHAT));
+                utils.getRequestUrl(BaseConstant.REQUEST_BAIYITONG_WECHAT));
     }
 }

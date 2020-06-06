@@ -9,7 +9,6 @@ import org.jeecg.common.util.RedisUtil;
 import org.jeecg.common.util.UUIDGenerator;
 import org.jeecg.modules.pay.entity.GtpaiAlipayParam;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
-import org.jeecg.modules.pay.entity.UserBusinessEntity;
 import org.jeecg.modules.pay.externalUtils.antUtil.GtpaiUtil;
 import org.jeecg.modules.pay.service.factory.PayServiceFactory;
 import org.jeecg.modules.pay.service.requestPayUrl.RequestPayUrl;
@@ -18,6 +17,7 @@ import org.jeecg.modules.util.BaseConstant;
 import org.jeecg.modules.util.HttpResult;
 import org.jeecg.modules.util.HttpUtils;
 import org.jeecg.modules.util.R;
+import org.jeecg.modules.v2.entity.PayBusiness;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,7 +37,7 @@ import java.util.*;
 @Service
 @Slf4j
 public class GtpaiAlipayImpy implements
-    RequestPayUrl<OrderInfoEntity, String, String, String, String, UserBusinessEntity, Object>, InitializingBean {
+    RequestPayUrl<OrderInfoEntity, String, String, String, String, PayBusiness, Object>, InitializingBean {
     @Autowired
     private RedisUtil redisUtil;
     @Autowired
@@ -50,7 +50,7 @@ public class GtpaiAlipayImpy implements
 
     @Override
     public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key, String callbackUrl,
-        UserBusinessEntity userBusiness) throws Exception {
+        PayBusiness userBusiness) throws Exception {
         GtpaiAlipayParam param = new GtpaiAlipayParam();
         param.setMch_id(userBusiness.getBusinessCode());
         param.setStore_id(store_id);
@@ -70,7 +70,7 @@ public class GtpaiAlipayImpy implements
         map.put("store_id", store_id);
         map.put("trans_amt", order.getSubmitAmount().toString());
 
-        String sign = GtpaiUtil.generateSignature(map,userBusiness.getApiKey());
+        String sign = GtpaiUtil.generateSignature(map,userBusiness.getBusinessApiKey());
 
         log.info("==>GT派支付支付宝，请求签名为：{}",sign);
         param.setSign(sign);
@@ -101,13 +101,13 @@ public class GtpaiAlipayImpy implements
     }
 
     @Override
-    public boolean orderInfoOk(OrderInfoEntity order, String url, UserBusinessEntity userBusiness)
+    public boolean orderInfoOk(OrderInfoEntity order, String url, PayBusiness userBusiness)
         throws Exception {
         return false;
     }
 
     @Override
-    public boolean notifyOrderFinish(OrderInfoEntity order, String key, UserBusinessEntity userBusiness, String url)
+    public boolean notifyOrderFinish(OrderInfoEntity order, String key, PayBusiness userBusiness, String url)
         throws Exception {
         return false;
     }

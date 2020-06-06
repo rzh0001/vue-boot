@@ -4,12 +4,12 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.util.RedisUtil;
+import org.jeecg.modules.api.service.ICommonApiService;
+import org.jeecg.modules.api.service.impl.SfApiServiceImpl;
 import org.jeecg.modules.exception.RRException;
 import org.jeecg.modules.pay.entity.PaofenParam;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
-import org.jeecg.modules.pay.entity.UserBusinessEntity;
 import org.jeecg.modules.pay.service.IOrderInfoEntityService;
-import org.jeecg.modules.pay.service.IUserBusinessEntityService;
 import org.jeecg.modules.pay.service.factory.PayServiceFactory;
 import org.jeecg.modules.pay.service.requestPayUrl.RequestPayUrl;
 import org.jeecg.modules.system.entity.SysUser;
@@ -18,6 +18,7 @@ import org.jeecg.modules.util.BaseConstant;
 import org.jeecg.modules.util.HttpResult;
 import org.jeecg.modules.util.HttpUtils;
 import org.jeecg.modules.util.R;
+import org.jeecg.modules.v2.entity.PayBusiness;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,7 +41,7 @@ import java.util.*;
 @Service
 @Slf4j
 public class PaoFenPayImpl implements
-    RequestPayUrl<OrderInfoEntity, String, String, String, String, UserBusinessEntity, Object>, InitializingBean {
+    RequestPayUrl<OrderInfoEntity, String, String, String, String, PayBusiness, Object>, InitializingBean {
     @Autowired
     private RedisUtil redisUtil;
     @Autowired
@@ -52,8 +53,8 @@ public class PaoFenPayImpl implements
 
     @Override
     public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key, String callbackUrl,
-        UserBusinessEntity userBusiness) throws Exception {
-        PaofenParam param = valueOf(order, userBusiness.getBusinessCode(), callbackUrl, userBusiness.getApiKey());
+        PayBusiness userBusiness) throws Exception {
+        PaofenParam param = valueOf(order, userBusiness.getBusinessCode(), callbackUrl, userBusiness.getBusinessApiKey());
         String json = JSON.toJSONString(param);
         Map<String, Object> mapTypes = JSON.parseObject(json);
         log.info("===>请求跑分，获取支付链接，请求入参为：{}", json);
@@ -83,18 +84,18 @@ public class PaoFenPayImpl implements
     }
 
     @Override
-    public boolean orderInfoOk(OrderInfoEntity order, String url, UserBusinessEntity userBusiness) throws Exception {
+    public boolean orderInfoOk(OrderInfoEntity order, String url, PayBusiness userBusiness) throws Exception {
         return false;
     }
 
     @Override
-    public boolean notifyOrderFinish(OrderInfoEntity order, String key, UserBusinessEntity userBusiness, String url)
+    public boolean notifyOrderFinish(OrderInfoEntity order, String key, PayBusiness userBusiness, String url)
         throws Exception {
         return false;
     }
 
     @Autowired
-    private IUserBusinessEntityService businessEntityService;
+    private ICommonApiService apiService;
 
     @Override
     public Object callBack(Object object) throws Exception {
@@ -121,13 +122,13 @@ public class PaoFenPayImpl implements
         }else{
             payType = "yl";
         }
-        List<UserBusinessEntity> useBusinesses =
-            businessEntityService.queryBusinessCodeByUserName(user.getAgentUsername(), payType);
-        if (CollectionUtils.isEmpty(useBusinesses)) {
+        PayBusiness useBusinesses =
+                apiService.findBusiness(order.getAgentUsername(), order.getPayType(), order.getProductCode());
+        if (useBusinesses==null) {
             log.info("===>跑分回调，根据订单号：{}，查询不到代理信息", orderId);
             return "代理不存在";
         }
-        String sign = signForInspiry(params1, useBusinesses.get(0).getApiKey());
+        String sign = signForInspiry(params1, useBusinesses.getBusinessApiKey());
         log.info("===>跑分回调，订单号：{},服务端sign为：{}", orderId, sign);
         if (!sign.equals(map.get("shkey"))) {
             log.info("===>跑分回调,签名验证不通过，入参的签名为：{},本地签名为：{}", map.get("sign").toString(), sign);

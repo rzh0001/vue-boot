@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.system.vo.DictModel;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
-import org.jeecg.modules.pay.entity.UserBusinessEntity;
 import org.jeecg.modules.pay.entity.NiuNanAlipayParam;
 import org.jeecg.modules.pay.service.factory.PayServiceFactory;
 import org.jeecg.modules.pay.service.requestPayUrl.RequestPayUrl;
@@ -13,6 +12,7 @@ import org.jeecg.modules.util.BaseConstant;
 import org.jeecg.modules.util.HttpResult;
 import org.jeecg.modules.util.HttpUtils;
 import org.jeecg.modules.util.R;
+import org.jeecg.modules.v2.entity.PayBusiness;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,12 +20,11 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.security.MessageDigest;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Service
 public class NiuNanAlipayImpl implements
-    RequestPayUrl<OrderInfoEntity, String, String, String, String, UserBusinessEntity, Object>, InitializingBean {
+    RequestPayUrl<OrderInfoEntity, String, String, String, String, PayBusiness, Object>, InitializingBean {
 
     private static final String CALLBACK_URL = "/callBack/order/niuNanAlipay/orderNo";
     @Autowired
@@ -34,7 +33,7 @@ public class NiuNanAlipayImpl implements
     private RequestUrlUtils utils;
     @Override
     public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key, String callbackUrl,
-        UserBusinessEntity userBusiness) throws Exception {
+        PayBusiness userBusiness) throws Exception {
         NiuNanAlipayParam param = new NiuNanAlipayParam();
         param.setMerCode(userBusiness.getBusinessCode());
         param.setOrderNo(order.getOrderId());
@@ -56,7 +55,7 @@ public class NiuNanAlipayImpl implements
             .append("&orderNo=").append(param.getOrderNo())
             .append("&payType=").append(param.getPayType())
             .append("&productDesc=").append(param.getProductDesc())
-            .append(userBusiness.getApiKey());
+            .append(userBusiness.getBusinessApiKey());
         log.info("==>牛腩支付，签名为：{}",buffer.toString());
         String sign = md5Hash(buffer.toString());
         log.info("==>牛腩支付,MD5为：{}",sign);
@@ -106,13 +105,13 @@ public class NiuNanAlipayImpl implements
     }
 
     @Override
-    public boolean orderInfoOk(OrderInfoEntity order, String url, UserBusinessEntity userBusiness)
+    public boolean orderInfoOk(OrderInfoEntity order, String url, PayBusiness userBusiness)
         throws Exception {
         return false;
     }
 
     @Override
-    public boolean notifyOrderFinish(OrderInfoEntity order, String key, UserBusinessEntity userBusiness, String url)
+    public boolean notifyOrderFinish(OrderInfoEntity order, String key, PayBusiness userBusiness, String url)
         throws Exception {
         return false;
     }

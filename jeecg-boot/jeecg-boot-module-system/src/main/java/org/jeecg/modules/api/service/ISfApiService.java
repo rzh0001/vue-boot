@@ -60,22 +60,7 @@ public interface ISfApiService {
     PayOrderRequestData decodeData(ApiRequestBody reqBody, SysUser user) throws Exception;
 
 
-	/**
-	 * 校验通道信息
-	 * @param userName
-	 * @param productCode
-	 */
-    void checkProduct(String userName, String productCode);
 
-	/**
-	 * 获取通道信息
-	 * @param userName
-	 * @param productCode
-	 * @return
-	 */
-    PayUserChannel findChannel(String userName, String productCode);
 
-    PayBusiness findBusiness(String agentName, String channelCode, String productCode);
 
-    void checkSubmitAmountLegal(BigDecimal submitAmount, PayUserChannel channel) throws Exception;
 }

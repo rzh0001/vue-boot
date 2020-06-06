@@ -12,6 +12,7 @@ import org.jeecg.modules.api.exception.AccountAbnormalException;
 import org.jeecg.modules.api.exception.BusinessException;
 import org.jeecg.modules.api.exception.SignatureException;
 import org.jeecg.modules.api.extension.PayChannelContext;
+import org.jeecg.modules.api.service.ICommonApiService;
 import org.jeecg.modules.api.service.ISfApiService;
 import org.jeecg.modules.exception.RRException;
 import org.jeecg.modules.pay.entity.*;
@@ -49,24 +50,18 @@ public class SfApiServiceImpl implements ISfApiService {
     @Autowired
     private ISysUserService userService;
     @Autowired
-    private PayChannelServiceImpl channelService;
-    @Autowired
-    private PayUserProductServiceImpl userProductService;
-    @Autowired
-    private PayUserChannelServiceImpl userChannelService;
-    @Autowired
-    private PayBusinessServiceImpl businessService;
+    private ICommonApiService apiService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public PayOrderUrlResponse createOrder(OrderInfoEntity orderInfo) throws Exception {
         // 重复订单校验
         orderTools.checkOuterOrderId(orderInfo.getUserName(), orderInfo.getOuterOrderId());
-        this.checkProduct(orderInfo.getUserName(), orderInfo.getProductCode());
-        PayUserChannel channel = this.findChannel(orderInfo.getUserName(), orderInfo.getProductCode());
-        this.checkSubmitAmountLegal(orderInfo.getSubmitAmount(), channel);
+        apiService.checkProduct(orderInfo.getUserName(), orderInfo.getProductCode());
+        PayUserChannel channel = apiService.findChannel(orderInfo.getUserName(), orderInfo.getProductCode());
+        apiService.checkSubmitAmountLegal(orderInfo.getSubmitAmount(), channel);
         PayBusiness business =
-            this.findBusiness(orderInfo.getAgentUsername(), channel.getChannelCode(), orderInfo.getProductCode());
+                apiService.findBusiness(orderInfo.getAgentUsername(), channel.getChannelCode(), orderInfo.getProductCode());
         this.saveOrder(orderInfo, channel, business);
         // 请求外部平台,生成支付链接
         String payUrl = payChannel.request(orderInfo);
@@ -75,7 +70,7 @@ public class SfApiServiceImpl implements ISfApiService {
 
     private void saveOrder(OrderInfoEntity orderInfo, PayUserChannel channel, PayBusiness business) throws Exception {
         // 计算手续费
-        String rate = this.getRate(channel);
+        String rate = apiService.getRate(channel);
         BigDecimal commission =
             orderInfo.getSubmitAmount().multiply(new BigDecimal(rate)).setScale(2, BigDecimal.ROUND_HALF_UP);
         // 创建本平台订单
@@ -100,14 +95,7 @@ public class SfApiServiceImpl implements ISfApiService {
         return new ApiResponseBody(data);
     }
 
-    private String getRate(PayUserChannel userChannel) {
-        if (userChannel.getUserRate() == null) {
-            // 如果用户未配置费率，则使用通道费率
-            PayChannel channel = channelService.getChannelByChannelCode(userChannel.getChannelCode());
-            return channel.getChannelRate();
-        }
-        return userChannel.getUserRate();
-    }
+
 
     @Override
     public Object callback(String payType, String orderId) throws Exception {
@@ -163,44 +151,7 @@ public class SfApiServiceImpl implements ISfApiService {
         return payOrderData;
     }
 
-    @Override
-    public void checkProduct(String userName, String productCode) {
-        PayUserProduct userProduct = userProductService.getUserProducts(userName, productCode);
-        if (userProduct == null) {
-            throw new BusinessException("未配置产品权限，产品代码为：" + productCode);
-        }
-    }
 
-    @Override
-    public PayUserChannel findChannel(String userName, String productCode) {
-        List<PayUserChannel> channels = userChannelService.getUserChannels(userName, productCode);
-        if (CollectionUtils.isEmpty(channels)) {
-            throw new BusinessException("无通道权限，产品代码为：" + productCode);
-        }
-        PayUserChannel channel = channels.get(0);
-        userChannelService.updateChannelLastUsedTime(channel);
-        return channel;
-    }
 
-    @Override
-    public PayBusiness findBusiness(String agentName, String channelCode, String productCode) {
-        List<PayBusiness> businesses = businessService.getBusiness(agentName, channelCode, productCode);
-        if (CollectionUtils.isEmpty(businesses)) {
-            throw new BusinessException("代理[" + agentName + "]无可用子账号信息");
-        }
-        PayBusiness business = businesses.get(0);
-        businessService.updateUsedTime(business);
-        return business;
-    }
-
-    @Override
-    public void checkSubmitAmountLegal(BigDecimal submitAmount, PayUserChannel channel) throws Exception {
-        if (channel.getLowerLimit() != null && submitAmount.compareTo(channel.getLowerLimit()) < 0) {
-            throw new BusinessException("申请金额低于最低金额，最低金额为：" + channel.getLowerLimit());
-        }
-        if (channel.getUpperLimit() != null && submitAmount.compareTo(channel.getUpperLimit()) > 0) {
-            throw new BusinessException("申请金额高于最高金额，最高金额为：" + channel.getUpperLimit());
-        }
-    }
 
 }

@@ -135,3 +135,34 @@ SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '更新人',
  PRIMARY KEY (`id`)
 ) ENGINE = INNODB DEFAULT CHARSET = utf8 COMMENT = '子账号信息';
 
+
+-- channel --
+INSERT INTO pay_v2_channel (id,channel_name,channel_code,channel_gateway,channel_ip,channel_rate)
+select REPLACE(UUID(), '-', ''),channel_name,channel_code,channel_gateway,channel_ip,0.003 from sys_channel;
+
+
+-- product --
+INSERT INTO pay_v2_product (id,product_code,product_name)
+SELECT REPLACE(UUID(), '-', ''),product_code,product_name from pay_product;
+
+
+-- pay_v2_product_channel --
+INSERT INTO pay_v2_product_channel (product_code,channel_code)
+select product_code,channel_code from pay_product_channel;
+
+
+-- pay_v2_user_product --
+INSERT INTO pay_v2_user_product (id,user_name,agent_name,introducer_name,member_type,product_code)
+SELECT REPLACE(UUID(), '-', ''),c.user_name,u.agent_username,u.salesman_username,c.member_type,c.product_code from sys_user_channel c LEFT JOIN sys_user u ON c.user_name=u.username;
+
+
+-- pay_v2_user_channel --
+insert INTO pay_v2_user_channel (id,user_name,member_type,channel_code,product_code,last_used_time,upper_limit,lower_limit)
+SELECT REPLACE(UUID(), '-', ''),user_name,member_type,channel_code,product_code,NOW(),upper_limit,lower_limit FROM sys_user_channel WHERE product_code is NOT NULL;
+
+
+-- pay_v2_business --
+
+INSERT INTO pay_v2_business (id,user_name,channel_code,product_code,last_used_time,business_code,business_api_key,business_active_status,business_recharge_amount,business_income_amount)
+SELECT REPLACE(UUID(), '-', ''),user_name,channel_code,product_code,NOW(),business_code,api_key,active,recharge_amount,income_amount FROM sys_user_business WHERE product_code is NOT NULL;
+

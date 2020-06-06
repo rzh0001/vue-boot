@@ -6,21 +6,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.system.vo.DictModel;
 import org.jeecg.common.util.RedisUtil;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
-import org.jeecg.modules.pay.entity.UserBusinessEntity;
 import org.jeecg.modules.pay.service.factory.PayServiceFactory;
 import org.jeecg.modules.pay.service.requestPayUrl.RequestPayUrl;
 import org.jeecg.modules.system.service.ISysDictService;
 import org.jeecg.modules.util.BaseConstant;
 import org.jeecg.modules.util.R;
 import org.jeecg.modules.util.SignatureUtils;
+import org.jeecg.modules.v2.entity.PayBusiness;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.security.cert.CertificateException;
 import java.util.*;
@@ -62,7 +59,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @Slf4j
-public class LeTianPayImpl implements RequestPayUrl<OrderInfoEntity, String, String, String, String, UserBusinessEntity,
+public class LeTianPayImpl implements RequestPayUrl<OrderInfoEntity, String, String, String, String, PayBusiness,
     Object>, InitializingBean, ApplicationContextAware {
     private static final String CALLBACK_URL = "/callBack/order/leTianAlipay/outTradeNo";
     @Autowired
@@ -73,7 +70,7 @@ public class LeTianPayImpl implements RequestPayUrl<OrderInfoEntity, String, Str
     private RedisUtil redisUtil;
     @Override
     public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key, String callbackUrl,
-        UserBusinessEntity userBusiness) throws Exception {
+        PayBusiness userBusiness) throws Exception {
         Map<String, Object> paraMap = new HashMap();
         paraMap.put("outTradeNo",order.getOrderId() );
         paraMap.put("totalAmount", order.getSubmitAmount().toString());
@@ -82,7 +79,7 @@ public class LeTianPayImpl implements RequestPayUrl<OrderInfoEntity, String, Str
         paraMap.put("noticeUrl", this.getDomain()+CALLBACK_URL);
         paraMap.put("tradeType", "0");
         //文档中X-Signature值
-        String secret = userBusiness.getApiKey();
+        String secret = userBusiness.getBusinessApiKey();
         log.info("==>乐天娱乐 ，请求入参：{}",paraMap);
         String signature = SignatureUtils.signature(secret, paraMap);
         Map<String,String> headerMap = new HashMap<String, String>();
@@ -108,12 +105,12 @@ public class LeTianPayImpl implements RequestPayUrl<OrderInfoEntity, String, Str
         return domain;
     }
     @Override
-    public boolean orderInfoOk(OrderInfoEntity order, String url, UserBusinessEntity userBusiness)
+    public boolean orderInfoOk(OrderInfoEntity order, String url, PayBusiness userBusiness)
         throws Exception {
         Map<String, Object> paraMap = new HashMap();
         paraMap.put("outTradeNo", order.getOrderId());
         paraMap.put("promoterId", userBusiness.getBusinessCode());
-        String secret = userBusiness.getApiKey();
+        String secret = userBusiness.getBusinessApiKey();
         String signature = SignatureUtils.signature(secret, paraMap);
 
         Map<String,String> headerMap = new HashMap<String, String>();
@@ -124,7 +121,7 @@ public class LeTianPayImpl implements RequestPayUrl<OrderInfoEntity, String, Str
     }
 
     @Override
-    public boolean notifyOrderFinish(OrderInfoEntity order, String key, UserBusinessEntity userBusiness, String url)
+    public boolean notifyOrderFinish(OrderInfoEntity order, String key, PayBusiness userBusiness, String url)
         throws Exception {
         return false;
     }

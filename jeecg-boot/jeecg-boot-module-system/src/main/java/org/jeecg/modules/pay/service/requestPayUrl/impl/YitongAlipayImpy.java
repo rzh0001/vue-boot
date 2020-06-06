@@ -6,23 +6,21 @@ import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.system.vo.DictModel;
 import org.jeecg.common.util.RedisUtil;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
-import org.jeecg.modules.pay.entity.UserBusinessEntity;
 import org.jeecg.modules.pay.entity.YitongAlipayParam;
 import org.jeecg.modules.pay.externalUtils.antUtil.YitongUtil;
 import org.jeecg.modules.pay.service.factory.PayServiceFactory;
 import org.jeecg.modules.pay.service.requestPayUrl.RequestPayUrl;
 import org.jeecg.modules.system.service.ISysDictService;
 import org.jeecg.modules.util.BaseConstant;
-import org.jeecg.modules.util.HttpResult;
 import org.jeecg.modules.util.HttpUtils;
 import org.jeecg.modules.util.R;
+import org.jeecg.modules.v2.entity.PayBusiness;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.security.MessageDigest;
 import java.util.*;
 
 /**
@@ -32,7 +30,7 @@ import java.util.*;
 @Service
 @Slf4j
 public class YitongAlipayImpy implements
-    RequestPayUrl<OrderInfoEntity, String, String, String, String, UserBusinessEntity, Object>, InitializingBean {
+        RequestPayUrl<OrderInfoEntity, String, String, String, String, PayBusiness, Object>, InitializingBean {
     @Autowired
     private RedisUtil redisUtil;
     @Autowired
@@ -43,7 +41,7 @@ public class YitongAlipayImpy implements
 
     @Override
     public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key, String callbackUrl,
-        UserBusinessEntity userBusiness) throws Exception {
+        PayBusiness userBusiness) throws Exception {
         YitongAlipayParam param = new YitongAlipayParam();
         param.setMch_id(userBusiness.getBusinessCode());
         param.setPtype("1");
@@ -69,7 +67,7 @@ public class YitongAlipayImpy implements
         map.put("notify_url", param.getNotify_url());
         map.put("time", param.getTime());
 
-        String sign = YitongUtil.generateSignature(map,userBusiness.getApiKey());
+        String sign = YitongUtil.generateSignature(map,userBusiness.getBusinessApiKey());
         log.info("==>易通支付支付宝，请求签名为：{}",sign);
         param.setSign(sign);
         String paramString = JSON.toJSONString(param);
@@ -102,13 +100,13 @@ public class YitongAlipayImpy implements
     }
 
     @Override
-    public boolean orderInfoOk(OrderInfoEntity order, String url, UserBusinessEntity userBusiness)
+    public boolean orderInfoOk(OrderInfoEntity order, String url, PayBusiness userBusiness)
         throws Exception {
         return false;
     }
 
     @Override
-    public boolean notifyOrderFinish(OrderInfoEntity order, String key, UserBusinessEntity userBusiness, String url)
+    public boolean notifyOrderFinish(OrderInfoEntity order, String key, PayBusiness userBusiness, String url)
         throws Exception {
         return false;
     }

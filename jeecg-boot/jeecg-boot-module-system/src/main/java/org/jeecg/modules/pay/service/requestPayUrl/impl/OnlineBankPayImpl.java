@@ -6,7 +6,6 @@ import org.jeecg.common.util.DateUtils;
 import org.jeecg.common.util.RedisUtil;
 import org.jeecg.modules.pay.entity.OnlineBankPayParam;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
-import org.jeecg.modules.pay.entity.UserBusinessEntity;
 import org.jeecg.modules.pay.externalUtils.onlineBank.OnlineBankUtils;
 import org.jeecg.modules.pay.service.factory.PayServiceFactory;
 import org.jeecg.modules.pay.service.requestPayUrl.RequestPayUrl;
@@ -15,6 +14,7 @@ import org.jeecg.modules.util.BaseConstant;
 import org.jeecg.modules.util.HttpResult;
 import org.jeecg.modules.util.HttpUtils;
 import org.jeecg.modules.util.R;
+import org.jeecg.modules.v2.entity.PayBusiness;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,7 +30,7 @@ import java.util.TreeMap;
 @Service
 @Slf4j
 public class OnlineBankPayImpl implements
-    RequestPayUrl<OrderInfoEntity, String, String, String, String, UserBusinessEntity, Object>, InitializingBean {
+    RequestPayUrl<OrderInfoEntity, String, String, String, String, PayBusiness, Object>, InitializingBean {
     @Autowired
     private RedisUtil redisUtil;
     @Autowired
@@ -39,7 +39,7 @@ public class OnlineBankPayImpl implements
     public ISysDictService dictService;
     @Override
     public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key, String callbackUrl,
-        UserBusinessEntity userBusiness) throws Exception {
+        PayBusiness userBusiness) throws Exception {
         OnlineBankPayParam payParam = new OnlineBankPayParam();
         payParam.setPay_memberid(userBusiness.getBusinessCode());
         payParam.setPay_orderid(order.getOrderId());
@@ -58,7 +58,7 @@ public class OnlineBankPayImpl implements
         StringBuilder md5str = new StringBuilder();
         md5str.append("pay_amount=").append(payParam.getPay_amount()).append("&pay_applydate=").append(payParam.getPay_applydate()).append("&pay_bankcode=").append(payParam.getPay_bankcode())
             .append("&pay_callbackurl=").append(payParam.getPay_callbackurl()).append("&pay_memberid=").append(payParam.getPay_memberid()).append("&pay_notifyurl").append(payParam.getPay_notifyurl())
-            .append("&pay_orderid=").append(payParam.getPay_orderid()).append("&key=").append(userBusiness.getApiKey());
+            .append("&pay_orderid=").append(payParam.getPay_orderid()).append("&key=").append(userBusiness.getBusinessApiKey());
        String sign = OnlineBankUtils.md5(md5str.toString());
        log.info("==>网银转卡，签名串：{}，签名：{}",md5str.toString(),sign);
        payParam.setPay_md5sign(sign);
@@ -102,12 +102,12 @@ public class OnlineBankPayImpl implements
         System.out.println("返回值："+body);
     }
     @Override
-    public boolean orderInfoOk(OrderInfoEntity order, String url, UserBusinessEntity userBusiness) throws Exception {
+    public boolean orderInfoOk(OrderInfoEntity order, String url, PayBusiness userBusiness) throws Exception {
         return false;
     }
 
     @Override
-    public boolean notifyOrderFinish(OrderInfoEntity order, String key, UserBusinessEntity userBusiness, String url)
+    public boolean notifyOrderFinish(OrderInfoEntity order, String key, PayBusiness userBusiness, String url)
         throws Exception {
         return false;
     }
