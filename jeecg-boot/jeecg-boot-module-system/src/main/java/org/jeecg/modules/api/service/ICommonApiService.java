@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 
 public interface ICommonApiService {
     String getRate(PayUserChannel userChannel);
-    public String getGateWayUrl(PayUserChannel userChannel);
+    String getGateWayUrl(PayUserChannel userChannel);
     /**
      * 获取通道信息
      * @param userName

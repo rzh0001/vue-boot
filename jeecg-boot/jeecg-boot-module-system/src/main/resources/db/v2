@@ -86,6 +86,10 @@ CREATE TABLE `pay_v2_user_channel` (
 	SET utf8 COLLATE utf8_general_ci NOT NULL,
 	`user_name` VARCHAR (32) CHARACTER
 SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '用户名',
+`agent_name` VARCHAR (32) CHARACTER
+SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '代理',
+`introducer_name` VARCHAR (32) CHARACTER
+SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '介绍人',
  `member_type` VARCHAR (1) CHARACTER
 SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '会员类型(1：代理  2：介绍人 3：商户）',
  `channel_code` VARCHAR (32) CHARACTER
@@ -157,8 +161,8 @@ SELECT REPLACE(UUID(), '-', ''),c.user_name,u.agent_username,u.salesman_username
 
 
 -- pay_v2_user_channel --
-insert INTO pay_v2_user_channel (id,user_name,member_type,channel_code,product_code,last_used_time,upper_limit,lower_limit)
-SELECT REPLACE(UUID(), '-', ''),user_name,member_type,channel_code,product_code,NOW(),upper_limit,lower_limit FROM sys_user_channel WHERE product_code is NOT NULL;
+insert INTO pay_v2_user_channel (id,user_name,agent_name,introducer_name,member_type,channel_code,product_code,last_used_time,upper_limit,lower_limit)
+SELECT REPLACE(UUID(), '-', ''),c.user_name,u.agent_username,u.salesman_username,c.member_type,c.channel_code,c.product_code,NOW(),c.upper_limit,c.lower_limit FROM sys_user_channel c LEFT JOIN sys_user u ON c.user_name=u.username WHERE product_code is NOT NULL;
 
 
 -- pay_v2_business --

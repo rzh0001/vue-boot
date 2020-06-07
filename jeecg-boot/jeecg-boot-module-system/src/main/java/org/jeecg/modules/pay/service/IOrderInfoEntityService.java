@@ -62,7 +62,7 @@ public interface IOrderInfoEntityService extends IService<OrderInfoEntity> {
 
 	JSONObject encryptAESData(OrderInfoEntity order, String aseKey) throws Exception;
 
-	void countAmount(String orderId, String userName, String submitAmount, String payType) throws Exception;
+	void countAmount(String orderId, String userName, String submitAmount, String payType,String productCode) throws Exception;
 
 	int updateOrderStatusBatch(List<String> orderIds);
 

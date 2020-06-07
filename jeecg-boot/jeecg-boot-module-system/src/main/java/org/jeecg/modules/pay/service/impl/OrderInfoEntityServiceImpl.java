@@ -27,7 +27,10 @@ import org.jeecg.modules.system.service.ISysUserService;
 import org.jeecg.modules.system.util.IPUtils;
 import org.jeecg.modules.util.*;
 import org.jeecg.modules.v2.entity.PayBusiness;
+import org.jeecg.modules.v2.entity.PayChannel;
 import org.jeecg.modules.v2.entity.PayUserChannel;
+import org.jeecg.modules.v2.service.impl.PayChannelServiceImpl;
+import org.jeecg.modules.v2.service.impl.PayUserChannelServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -271,7 +274,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             updateBusinessIncomeAmount(order);
             log.info("商户返回成功,orderID:{}", order.getOrderId());
             msg.append("通知商户成功");
-            countAmount(order.getOrderId(), user.getUsername(), order.getSubmitAmount().toString(), payType);
+            countAmount(order.getOrderId(), user.getUsername(), order.getSubmitAmount().toString(), payType,order.getProductCode());
             return R.ok(msg.toString());
         } else {
             log.info("通知商户失败,orderID:{}", order.getOrderId());
@@ -330,6 +333,10 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         }
     }
 
+    @Autowired
+    private PayChannelServiceImpl channelService;
+    @Autowired
+    private PayUserChannelServiceImpl userChannelService;
     /**
      * 统计规则： 查看订单的商户是否存在介绍人： 存在介绍人： 介绍人收入=订单金额*（介绍人费率-代理费率） 代理收入 = 订单金额*代理费率 商户收入 = 订单金额 - 介绍人收入 不存在介绍人： 代理收入 = 订单金额 *
      * 商户费率 商户收入 = 订单金额 - 代理收入
@@ -341,16 +348,16 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * @throws Exception
      */
     @Override
-    public void countAmount(String orderId, String userName, String submitAmount, String payType) throws Exception {
+    public void countAmount(String orderId, String userName, String submitAmount, String payType,String productCode) throws Exception {
         SysUser user = userService.getUserByName(userName);
         BigDecimal submit = new BigDecimal(submitAmount);
-        ChannelEntity channel = chnannelDao.queryChannelByCode(payType);
+        PayChannel channel = channelService.getChannelByChannelCode(payType);
+        PayUserChannel userChannel = userChannelService.getUserChannel(userName,payType,productCode);
+        // 商户的费率
+        String rateString =userChannel.getUserRate();
         // 介绍人为空
         if (org.springframework.util.StringUtils.isEmpty(user.getSalesmanUsername())) {
-            // 商户的费率
-            String rateString =
-                    rateEntityService.getUserRateByUserNameAndAngetCode(userName, user.getAgentUsername(), payType);
-            BigDecimal rate = new BigDecimal(rateString == null ? channel.getRate() : rateString);
+            BigDecimal rate = new BigDecimal(rateString == null ? channel.getChannelRate() : rateString);
             UserAmountEntity agent = amountService.getUserAmountByUserName(user.getAgentUsername());
             // 代理获利
             BigDecimal agentAmount = submit.multiply(rate).setScale(2, BigDecimal.ROUND_HALF_UP);
@@ -361,16 +368,13 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
                     payType, null);
         } else {
             // 介绍人不为空
-            // 介绍人对商户设置的费率,如果为空，则取通道费率
-            String introducerRate = rateEntityService.getBeIntroducerRate(userName, user.getAgentUsername(),
-                    user.getSalesmanUsername(), payType);
-            // 代理对介绍人设置的费率
+            // 获取介绍人费率
             SysUser sale = userService.getUserByName(user.getSalesmanUsername());
-            String agentRate = rateEntityService.getUserRateByUserNameAndAngetCode(user.getSalesmanUsername(),
-                    sale.getAgentUsername(), payType);
-            // 介绍人对商户设置的费率 - 代理对介绍人的费率 = 介绍人的利率差
-            BigDecimal rateDifference = new BigDecimal(introducerRate == null ? channel.getRate() : introducerRate)
-                    .subtract(new BigDecimal(agentRate));
+            PayUserChannel introducer = userChannelService.getUserChannel(user.getSalesmanUsername(),payType,productCode);
+            String introducerRate = introducer.getUserRate();
+            // 代理对介绍人设置的费率
+            // 介绍人的利率差 = 介绍人对商户设置的费率 - 代理对介绍人的费率
+            BigDecimal rateDifference = new BigDecimal(rateString).subtract(new BigDecimal(introducerRate));
             // 介绍人获利 = 订单金额*（介绍人费率-代理费率）
             BigDecimal saleAmount = submit.multiply(rateDifference).setScale(2, BigDecimal.ROUND_HALF_UP);
             UserAmountEntity saleDbAmount = amountService.getUserAmountByUserName(user.getSalesmanUsername());
@@ -378,7 +382,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
                     payType, null);
 
             // 代理获利 = 订单金额*代理费率
-            BigDecimal agentAmout = submit.multiply(new BigDecimal(agentRate)).setScale(2, BigDecimal.ROUND_HALF_UP);
+            BigDecimal agentAmout = submit.multiply(new BigDecimal(introducerRate)).setScale(2, BigDecimal.ROUND_HALF_UP);
             UserAmountEntity agentDbAmount = amountService.getUserAmountByUserName(user.getAgentUsername());
             changeAmount(user.getAgentUsername(), user.getAgentId(), agentAmout, agentDbAmount, null, orderId, payType,
                     null);

@@ -115,9 +115,9 @@ public class PayTest {
         System.out.println(r.get("orderInfo").toString());
     }
     @Test
-    public void testAmount() throws Exception {
-        order.countAmount("20190913123844IiNeL","a7_putong","100","ali_bank");
-    }
+//    public void testAmount() throws Exception {
+//        order.countAmount("20190913123844IiNeL","a7_putong","100","ali_bank");
+//    }
 
     public static void main(String[] args) {
         BareBonesBrowserLaunch.openURL("http://www.baidu.com");

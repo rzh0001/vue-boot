@@ -347,7 +347,7 @@ public class OrderInfoEntityController {
 		orderInfoEntityService.updateById(order);
 		try {
 			orderInfoEntityService.countAmount(id, order.getUserName(), order.getSubmitAmount().toString(),
-					order.getPayType());
+					order.getPayType(),order.getProductCode());
 			return R.ok("线下补单成功:" + id);
 		} catch (Exception e) {
 			log.info("线下补单失败，单号为：{}，失败原因为：{}", id, e);
@@ -429,7 +429,7 @@ public class OrderInfoEntityController {
 				//5、只有在通知商户成功，才统计高级代理。商户。介绍人的收入情况
 				try {
 					orderInfoEntityService.countAmount(id, order.getUserName(), order.getSubmitAmount().toString(),
-							order.getPayType());
+							order.getPayType(),order.getProductCode());
 				} catch (Exception e) {
 					log.info("==补单，统计额度异常，异常信息为：{}", e);
 				}

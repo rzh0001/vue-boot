@@ -88,4 +88,10 @@ public class PayUserChannelServiceImpl extends ServiceImpl<PayUserChannelMapper,
         queryWrapper.eq("user_name", userName).eq("del_flag", DeleteFlagEnum.NOT_DELETE.getValue());
         return getBaseMapper().selectList(queryWrapper);
     }
+
+    public PayUserChannel getUserChannel(String userName,String channelCode,String productCode){
+        QueryWrapper<PayUserChannel> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_name",userName).eq("channel_code",channelCode).eq("product_code",productCode).eq("del_flag",DeleteFlagEnum.NOT_DELETE.getValue());
+        return getBaseMapper().selectOne(queryWrapper);
+    }
 }
