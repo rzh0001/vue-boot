@@ -100,6 +100,7 @@ SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '产品code',
 SET utf8 COLLATE utf8_general_ci DEFAULT NULL COMMENT '费率',
  `upper_limit` DECIMAL (7, 2) DEFAULT NULL COMMENT '单笔金额上限',
  `lower_limit` DECIMAL (7, 2) DEFAULT NULL COMMENT '单笔金额下限',
+ `status` INT (2) DEFAULT 1 COMMENT '状态 0：关闭；1：开启',
  `del_flag` INT (1) DEFAULT 0 COMMENT '删除状态，0：未删除，1删除状态',
  `last_used_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '最近一次使用时间',
  `create_by` VARCHAR (32) CHARACTER
@@ -156,8 +157,8 @@ select product_code,channel_code from pay_product_channel;
 
 
 -- pay_v2_user_product --
-INSERT INTO pay_v2_user_product (id,user_name,agent_name,introducer_name,member_type,product_code)
-SELECT REPLACE(UUID(), '-', ''),c.user_name,u.agent_username,u.salesman_username,c.member_type,c.product_code from sys_user_channel c LEFT JOIN sys_user u ON c.user_name=u.username;
+INSERT INTO pay_v2_user_product (id,user_name,member_type,product_code)
+SELECT REPLACE(UUID(), '-', ''),c.user_name,c.member_type,c.product_code from sys_user_channel c LEFT JOIN sys_user u ON c.user_name=u.username;
 
 
 -- pay_v2_user_channel --

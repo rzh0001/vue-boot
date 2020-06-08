@@ -19,6 +19,7 @@ import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.service.ISysUserService;
+import org.jeecg.modules.v2.constant.StatusEnum;
 import org.jeecg.modules.v2.constant.UserTypeEnum;
 import org.jeecg.modules.v2.dto.UserChannelParam;
 import org.jeecg.modules.v2.entity.PayBusiness;
@@ -74,10 +75,27 @@ public class PayUserChannelController {
     @Autowired
     private PayUserProductServiceImpl userProductService;
 
+    @PostMapping("/activeUserChannel")
+    public Result activeUserChannel(@RequestBody PayUserChannel userChannel){
+        Result result = new Result();
+        userChannel.setStatus(StatusEnum.OPEN.getValue());
+        payUserChannelService.updateById(userChannel);
+        result.success("启用成功");
+        return result;
+    }
+    @PostMapping("/unActiveUserChannel")
+    public Result unActiveUserChannel(@RequestBody PayUserChannel userChannel){
+        Result result = new Result();
+        userChannel.setStatus(StatusEnum.CLOSE.getValue());
+        payUserChannelService.updateById(userChannel);
+        result.success("关闭成功");
+        return result;
+    }
+
     @PostMapping("/updateUserChannel")
     public Result updateUserChannel(@RequestBody PayUserChannel userChannel){
         Result result = new Result();
-
+        payUserChannelService.updateById(userChannel);
         return result;
     }
     @GetMapping("/getUserChannels")

@@ -46,7 +46,16 @@
               <a-popconfirm title="是否要删除此行？" @confirm="remove(record.key)">
                 <a>删除</a>
               </a-popconfirm>
+            <a-divider type="vertical" />
+              <a-popconfirm title="确认启用吗？" @confirm="active(record.key)">
+                <a>启用</a>
+              </a-popconfirm>
             </span>
+          <a-divider type="vertical" />
+          <a-popconfirm title="确认关闭吗？" @confirm="unActive(record.key)">
+            <a>关闭</a>
+          </a-popconfirm>
+          </span>
         </template>
       </a-table>
     </form>
@@ -80,7 +89,7 @@
             title: '商户名称',
             dataIndex: 'userName',
             key: 'userName',
-            width: '10%',
+            width: '5%',
             scopedSlots: { customRender: 'userName' }
           },
           {
@@ -105,17 +114,32 @@
             scopedSlots: { customRender: 'userRate' }
           },
           {
+            title: '状态',
+            dataIndex: 'status',
+            key: 'status',
+            width: '5%',
+            customRender: function(text) {
+              if (text == '0') {
+                return <a-tag color="red">未激活</a-tag>
+              } else if (text == '1') {
+                return  <a-tag color="cyan">已激活</a-tag>
+              } else{
+                return text
+              }
+            }
+          },
+          {
             title: '最低支付金额',
             dataIndex: 'lowerLimit',
             key: 'lowerLimit',
-            width: '20%',
+            width: '10%',
             scopedSlots: { customRender: 'lowerLimit' }
           },
           {
             title: '最高支付金额',
             dataIndex: 'upperLimit',
             key: 'upperLimit',
-            width: '20%',
+            width: '10%',
             scopedSlots: { customRender: 'upperLimit' }
           },
           {
@@ -128,6 +152,8 @@
         url:{
           getUserChannels:"/v2/payUserChannel/getUserChannels",
           updateUserChannel:"/v2/payUserChannel/updateUserChannel",
+          activeUserChannel:"/v2/payUserChannel/activeUserChannel",
+          unActiveUserChannel:"/v2/payUserChannel/unActiveUserChannel"
         }
       }
     },
@@ -178,6 +204,34 @@
       remove (key) {
         const newData = this.data.filter(item => item.key !== key)
         this.data = newData
+      },
+      active(key){
+        let target = this.data.filter(item => item.key === key)[0]
+        httpAction(this.url.activeUserChannel,target,"post").then((res)=>{
+          if(res.success){
+            this.$message.success(res.message);
+            this.$emit('ok');
+          }else{
+            this.$message.warning(res.message);
+          }
+        }).finally(() => {
+          that.confirmLoading = false;
+          that.close();
+        })
+      },
+      unActive(key){
+        let target = this.data.filter(item => item.key === key)[0]
+        httpAction(this.url.unActiveUserChannel,target,"post").then((res)=>{
+          if(res.success){
+            this.$message.success(res.message);
+            this.$emit('ok');
+          }else{
+            this.$message.warning(res.message);
+          }
+        }).finally(() => {
+          that.confirmLoading = false;
+          that.close();
+        })
       },
       saveRow (key) {
         let target = this.data.filter(item => item.key === key)[0]

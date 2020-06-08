@@ -49,6 +49,8 @@ public class PayUserChannel {
 	@Excel(name = "删除状态，0：未删除，1删除状态", width = 15)
     @ApiModelProperty(value = "删除状态，0：未删除，1删除状态")
 	private java.lang.Integer delFlag;
+
+	private Integer status;
 	/**id*/
 	@TableId(type = IdType.UUID)
     @ApiModelProperty(value = "id")
