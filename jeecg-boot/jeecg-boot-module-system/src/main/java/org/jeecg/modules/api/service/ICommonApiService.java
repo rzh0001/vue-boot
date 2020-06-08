@@ -1,5 +1,6 @@
 package org.jeecg.modules.api.service;
 
+import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.v2.entity.PayBusiness;
 import org.jeecg.modules.v2.entity.PayUserChannel;
 
@@ -26,4 +27,6 @@ public interface ICommonApiService {
      * @param productCode
      */
     void checkProduct(String userName, String productCode);
+
+    void checkSalesmanRate(SysUser user,PayUserChannel userChannel);
 }

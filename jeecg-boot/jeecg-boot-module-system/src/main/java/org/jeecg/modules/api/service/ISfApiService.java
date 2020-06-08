@@ -15,7 +15,7 @@ import java.util.Map;
 
 public interface ISfApiService {
 
-    PayOrderUrlResponse createOrder(OrderInfoEntity orderInfo) throws Exception;
+    PayOrderUrlResponse createOrder(OrderInfoEntity orderInfo,SysUser user) throws Exception;
 
     ApiResponseBody queryOrder(String outerOrderId, String username);
 

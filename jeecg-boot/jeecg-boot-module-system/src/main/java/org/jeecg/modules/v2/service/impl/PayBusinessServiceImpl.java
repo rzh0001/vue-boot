@@ -34,12 +34,23 @@ public class PayBusinessServiceImpl extends ServiceImpl<PayBusinessMapper, PayBu
     private PayChannelServiceImpl channelService;
     public List<PayBusiness> getBusiness(String userName, String channelCode, String productCode) {
         QueryWrapper<PayBusiness> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_name", userName).eq("channel_code", channelCode).eq("product_code", productCode)
+        queryWrapper.eq("user_name", userName)
+            .eq("channel_code", channelCode)
+            .eq("product_code", productCode)
             .eq("del_flag", DeleteFlagEnum.NOT_DELETE.getValue())
-            .eq("business_active_status", BusinessActivStatusEnum.ACTIVE.getValue()).orderByDesc("last_used_time");
+            .eq("business_active_status", BusinessActivStatusEnum.ACTIVE.getValue())
+            .orderByDesc("last_used_time");
         return getBaseMapper().selectList(queryWrapper);
     }
-
+    public List<PayBusiness> getBusinessNotDelete(String userName, String channelCode, String productCode) {
+        QueryWrapper<PayBusiness> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_name", userName)
+            .eq("channel_code", channelCode)
+            .eq("product_code", productCode)
+            .eq("del_flag", DeleteFlagEnum.NOT_DELETE.getValue())
+            .orderByDesc("last_used_time");
+        return getBaseMapper().selectList(queryWrapper);
+    }
     public void updateUsedTime(PayBusiness business) {
         business.setLastUsedTime(new Date());
         getBaseMapper().updateById(business);
@@ -59,8 +70,9 @@ public class PayBusinessServiceImpl extends ServiceImpl<PayBusinessMapper, PayBu
 
     public List<PayBusiness> getBusinessByName(String userName) {
         QueryWrapper<PayBusiness> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_name", userName).eq("del_flag", DeleteFlagEnum.NOT_DELETE.getValue())
-            .eq("business_active_status", BusinessActivStatusEnum.ACTIVE.getValue());
+        queryWrapper.eq("user_name", userName)
+            .eq("del_flag", DeleteFlagEnum.NOT_DELETE.getValue());
+//            .eq("business_active_status", BusinessActivStatusEnum.ACTIVE.getValue());
         return getBaseMapper().selectList(queryWrapper);
     }
 

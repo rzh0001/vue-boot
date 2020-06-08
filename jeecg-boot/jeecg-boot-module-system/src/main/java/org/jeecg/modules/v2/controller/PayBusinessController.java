@@ -72,6 +72,14 @@ public class PayBusinessController {
         result.setResult("激活成功");
         return result;
     }
+    @PostMapping("/unActiveBusinessStatus")
+    public Result unActiveBusinessStatus(@RequestBody PayBusiness business) {
+        business.setBusinessActiveStatus(BusinessActivStatusEnum.NOT_ACTIVE.getValue());
+        payBusinessService.updateById(business);
+        Result result = new Result();
+        result.setResult("激活成功");
+        return result;
+    }
 
     @PostMapping("/updateBusiness")
     public Result updateBusiness(@RequestBody PayBusiness business) {
@@ -96,7 +104,7 @@ public class PayBusinessController {
 
     @GetMapping("/getBusiness")
     public Result getBusiness(String userName, String productCode, String channelCode) {
-        List<PayBusiness> businesses = payBusinessService.getBusiness(userName, channelCode, productCode);
+        List<PayBusiness> businesses = payBusinessService.getBusinessNotDelete(userName, channelCode, productCode);
         Result result = new Result();
         result.setResult(businesses);
         return result;

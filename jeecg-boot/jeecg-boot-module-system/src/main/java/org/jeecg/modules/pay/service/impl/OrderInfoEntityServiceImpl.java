@@ -583,7 +583,6 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         String callbackUrl = (String) checkParam.get(BaseConstant.CALLBACK_URL);
         String agentName = (String) checkParam.get(BaseConstant.AGENT_NAME);
         RequestPayUrl requestPayUrl = (RequestPayUrl) checkParam.get(BaseConstant.REQUEST);
-        String requestUrl = (String) checkParam.get(BaseConstant.REQUEST_URL);
         String remark = (String) checkParam.get(BaseConstant.REMARK);
         String product = (String) checkParam.get(BaseConstant.PRODUCT_NAME);
         log.info("请求创建订单，商户单号为:{};通道为：{};用户名为:{};申请金额为:{}",
@@ -592,6 +591,8 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         apiService.checkProduct(userName, product);
         //获取通道
         PayUserChannel userChannel = apiService.findChannel(userName, product);
+        SysUser user = userService.getUserByName(userName);
+        apiService.checkSalesmanRate(user,userChannel);
         //校验金额合法性
         apiService.checkSubmitAmountLegal(new BigDecimal(submitAmount), userChannel);
         //获取子账号
@@ -599,13 +600,14 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
                 apiService.findBusiness(agentName, userChannel.getChannelCode(), product);
         //获取通道费率
         String rate = apiService.getRate(userChannel);
-        SysUser user = userService.getUserByName(userName);
+
         String gateWay = apiService.getGateWayUrl(userChannel);
         // 保存订单信息
         OrderInfoEntity order = this.saveOrder(submitAmount, outerOrderId, userChannel, business, rate, user, callbackUrl, remark, ip);
         // 请求挂马平台
         return requestPayUrl.requestPayUrl(order, userName, gateWay, key, innerCallBackUrl, business);
     }
+
 
 
     /**

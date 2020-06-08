@@ -20,7 +20,7 @@
             v-if="record.editable"
             style="margin: -5px 0"
             :value="text"
-            :placeholder="columns[i+3].title"
+            :placeholder="columns[i+4].title"
             @change="e => handleChange(e.target.value, record.key, col)"
           />
           <template v-else>{{ text }}</template>
@@ -42,10 +42,10 @@
           </template>
           <span v-else>
               <a @click="toggle(record.key)">编辑</a>
-              <a-divider type="vertical" />
+              <!--<a-divider type="vertical" />
               <a-popconfirm title="是否要删除此行？" @confirm="remove(record.key)">
                 <a>删除</a>
-              </a-popconfirm>
+              </a-popconfirm>-->
             <a-divider type="vertical" />
               <a-popconfirm title="确认启用吗？" @confirm="active(record.key)">
                 <a>启用</a>
@@ -107,27 +107,28 @@
             scopedSlots: { customRender: 'channelCode' }
           },
           {
-            title: '费率',
-            dataIndex: 'userRate',
-            key: 'userRate',
-            width: '10%',
-            scopedSlots: { customRender: 'userRate' }
-          },
-          {
             title: '状态',
             dataIndex: 'status',
             key: 'status',
             width: '5%',
             customRender: function(text) {
               if (text == '0') {
-                return <a-tag color="red">未激活</a-tag>
+                return <a-tag color="red">未启用</a-tag>
               } else if (text == '1') {
-                return  <a-tag color="cyan">已激活</a-tag>
+                return  <a-tag color="cyan">已启动</a-tag>
               } else{
                 return text
               }
             }
           },
+          {
+            title: '费率',
+            dataIndex: 'userRate',
+            key: 'userRate',
+            width: '10%',
+            scopedSlots: { customRender: 'userRate' }
+          },
+
           {
             title: '最低支付金额',
             dataIndex: 'lowerLimit',

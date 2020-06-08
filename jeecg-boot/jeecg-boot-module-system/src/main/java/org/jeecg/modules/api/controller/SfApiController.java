@@ -52,7 +52,7 @@ public class SfApiController {
 		// 转换订单实体
 		OrderInfoEntity orderInfoEntity = payOrderData.toPayOrder(user,reqBody.getRemark());
 		// 创建订单
-		PayOrderUrlResponse response = apiService.createOrder(orderInfoEntity);
+		PayOrderUrlResponse response = apiService.createOrder(orderInfoEntity,user);
 		return response;
 	}
 

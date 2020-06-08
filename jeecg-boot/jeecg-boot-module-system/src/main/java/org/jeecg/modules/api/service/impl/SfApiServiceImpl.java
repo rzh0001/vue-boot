@@ -54,11 +54,12 @@ public class SfApiServiceImpl implements ISfApiService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public PayOrderUrlResponse createOrder(OrderInfoEntity orderInfo) throws Exception {
+    public PayOrderUrlResponse createOrder(OrderInfoEntity orderInfo,SysUser user) throws Exception {
         // 重复订单校验
         orderTools.checkOuterOrderId(orderInfo.getUserName(), orderInfo.getOuterOrderId());
         apiService.checkProduct(orderInfo.getUserName(), orderInfo.getProductCode());
         PayUserChannel channel = apiService.findChannel(orderInfo.getUserName(), orderInfo.getProductCode());
+        apiService.checkSalesmanRate(user,channel);
         apiService.checkSubmitAmountLegal(orderInfo.getSubmitAmount(), channel);
         PayBusiness business =
                 apiService.findBusiness(orderInfo.getAgentUsername(), channel.getChannelCode(), orderInfo.getProductCode());

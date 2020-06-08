@@ -2,8 +2,11 @@ package org.jeecg.modules.api.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.jeecg.modules.api.exception.BusinessException;
 import org.jeecg.modules.api.service.ICommonApiService;
+import org.jeecg.modules.system.entity.SysUser;
+import org.jeecg.modules.v2.constant.UserTypeEnum;
 import org.jeecg.modules.v2.entity.PayBusiness;
 import org.jeecg.modules.v2.entity.PayChannel;
 import org.jeecg.modules.v2.entity.PayUserChannel;
@@ -79,6 +82,17 @@ public class CommonApiServiceImpl implements ICommonApiService {
         PayUserProduct userProduct = userProductService.getUserProducts(userName, productCode);
         if (userProduct == null) {
             throw new BusinessException("未配置产品权限，产品代码为：" + productCode);
+        }
+    }
+
+    @Override
+    public void checkSalesmanRate(SysUser user,PayUserChannel userChannel) {
+        if(StringUtils.isNotBlank(user.getSalesmanUsername())){
+            PayUserChannel saleChannel = userChannelService.getUserChannel(user.getSalesmanUsername(),userChannel.getChannelCode(),userChannel.getProductCode());
+            if(saleChannel == null || StringUtils.isBlank(saleChannel.getUserRate())){
+                log.error("未对介绍人设置费率，介绍人：{}",user.getSalesmanUsername());
+                throw new BusinessException("未设置费率,请先在后台进行费率设置") ;
+            }
         }
     }
 }

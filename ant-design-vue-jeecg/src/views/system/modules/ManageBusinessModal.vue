@@ -42,13 +42,17 @@
           </template>
           <span v-else>
               <a @click="toggle(record.key)">编辑</a>
-              <a-divider type="vertical" />
+             <!-- <a-divider type="vertical" />
               <a-popconfirm title="是否要删除此行？" @confirm="remove(record.key)">
                 <a>删除</a>
-              </a-popconfirm>
+              </a-popconfirm>-->
             <a-divider type="vertical" />
               <a-popconfirm title="确认激活码？" @confirm="active(record.key)">
                 <a>激活</a>
+              </a-popconfirm>
+            <a-divider type="vertical" />
+              <a-popconfirm title="确认失效码？" @confirm="unActive(record.key)">
+                <a>失效</a>
               </a-popconfirm>
             </span>
         </template>
@@ -142,6 +146,7 @@
           getBusinessByAgentName:"/v2/payBusiness/getBusinessByAgentName",
           updateBusiness:"/v2/payBusiness/updateBusiness",
           activeBusinessStatus:"/v2/payBusiness/activeBusinessStatus",
+          unActiveBusinessStatus:"/v2/payBusiness/unActiveBusinessStatus",
           deleteBusiness:"/v2/payBusiness/deleteBusiness",
         }
       }
@@ -213,6 +218,20 @@
       active (key){
         let target = this.data.filter(item => item.key === key)[0]
         httpAction(this.url.activeBusinessStatus,target,"post").then((res)=>{
+          if(res.success){
+            this.$message.success(res.message);
+            this.$emit('ok');
+          }else{
+            this.$message.warning(res.message);
+          }
+        }).finally(() => {
+          that.confirmLoading = false;
+          that.close();
+        })
+      },
+      unActive(key){
+        let target = this.data.filter(item => item.key === key)[0]
+        httpAction(this.url.unActiveBusinessStatus,target,"post").then((res)=>{
           if(res.success){
             this.$message.success(res.message);
             this.$emit('ok');

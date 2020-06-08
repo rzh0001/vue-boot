@@ -2,11 +2,15 @@ package org.jeecg.modules.v2.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.jeecg.modules.system.entity.SysUser;
+import org.jeecg.modules.system.service.ISysUserService;
 import org.jeecg.modules.v2.constant.DeleteFlagEnum;
+import org.jeecg.modules.v2.constant.StatusEnum;
 import org.jeecg.modules.v2.constant.UserTypeEnum;
 import org.jeecg.modules.v2.dto.UserChannelParam;
 import org.jeecg.modules.v2.entity.PayUserChannel;
 import org.jeecg.modules.v2.mapper.PayUserChannelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -32,8 +36,11 @@ public class PayUserChannelServiceImpl extends ServiceImpl<PayUserChannelMapper,
 
     public List<PayUserChannel> getUserChannels(String userName, String productCode) {
         QueryWrapper<PayUserChannel> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_name", userName).eq("product_code", productCode)
-            .eq("member_type", UserTypeEnum.MERCHANT.getValue()).eq("del_flag", DeleteFlagEnum.NOT_DELETE.getValue())
+        queryWrapper.eq("user_name", userName)
+            .eq("product_code", productCode)
+            .eq("member_type", UserTypeEnum.MERCHANT.getValue())
+            .eq("del_flag", DeleteFlagEnum.NOT_DELETE.getValue())
+            .eq("status",StatusEnum.OPEN.getValue())
             .orderByDesc("last_used_time");
         return getBaseMapper().selectList(queryWrapper);
     }
@@ -52,7 +59,8 @@ public class PayUserChannelServiceImpl extends ServiceImpl<PayUserChannelMapper,
         }
         return null;
     }
-
+    @Autowired
+    private ISysUserService userService;
     public String checkParam(UserChannelParam param) {
         StringBuilder msg = new StringBuilder();
         if (StringUtils.isEmpty(param.getProductCode())) {
@@ -67,6 +75,19 @@ public class PayUserChannelServiceImpl extends ServiceImpl<PayUserChannelMapper,
             }
             if (StringUtils.isEmpty(param.getBusinessApiKey())) {
                 msg.append("秘钥不能为空");
+            }
+        }else if(param.getMemberType().equals(UserTypeEnum.INTRODUCER.getValue())){
+            if (StringUtils.isEmpty(param.getUserRate())) {
+                msg.append("介绍人费率不能为空");
+            }
+        }else {
+            //商户的话，则看是否有介绍人，如果有介绍人，则要先校验下，介绍人的费率是否已经设置，如果未设置，需要先进行设置
+            SysUser operater = userService.getUserByName(param.getUserName());
+            if(!StringUtils.isEmpty(operater.getSalesmanUsername())){
+                PayUserChannel saleChannel = this.getUserChannel(operater.getSalesmanUsername(),param.getChannelCode(),param.getProductCode());
+                if(saleChannel == null || StringUtils.isEmpty(saleChannel.getUserRate())){
+                    msg.append("请先对商户介绍人:[").append(operater.getSalesmanUsername()).append("]进行费率设置");
+                }
             }
         }
         return msg.toString();
