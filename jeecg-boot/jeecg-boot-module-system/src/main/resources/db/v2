@@ -171,3 +171,8 @@ SELECT REPLACE(UUID(), '-', ''),c.user_name,u.agent_username,u.salesman_username
 INSERT INTO pay_v2_business (id,user_name,channel_code,product_code,last_used_time,business_code,business_api_key,business_active_status,business_recharge_amount,business_income_amount)
 SELECT REPLACE(UUID(), '-', ''),user_name,channel_code,product_code,NOW(),business_code,api_key,active,recharge_amount,income_amount FROM sys_user_business WHERE product_code is NOT NULL;
 
+
+-- 介绍人费率设置 --
+INSERT INTO pay_v2_user_channel (id,user_name,agent_name,member_type,channel_code,product_code,user_rate)
+SELECT REPLACE(UUID(), '-', ''),r.user_name,r.agent_id,'2',r.channel_code,p.product_code,r.user_rate from sys_user_rate r LEFT JOIN pay_product_channel p on r.channel_code=p.channel_code LEFT JOIN sys_user u ON r.user_name=u.username WHERE u.member_type='2' AND p.product_code is not null;
+
