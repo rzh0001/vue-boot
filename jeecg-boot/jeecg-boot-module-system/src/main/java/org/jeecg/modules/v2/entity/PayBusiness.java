@@ -1,6 +1,7 @@
 package org.jeecg.modules.v2.entity;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -97,4 +98,8 @@ public class PayBusiness {
 	@Excel(name = "用户名", width = 15)
     @ApiModelProperty(value = "用户名")
 	private java.lang.String userName;
+
+	@TableField(exist = false)
+	private BigDecimal balance;
+
 }

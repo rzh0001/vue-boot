@@ -36,7 +36,8 @@
             </a-select>
           </a-form-item>
           <a-form-item label="充值金额" style="width: 300px">
-            <j-dict-select-tag placeholder="请选择金额" dictCode="momey" v-model="amount"/>
+            <a-input placeholder="充值金额" style="width:200px;" v-model="amount"/>
+           <!-- <j-dict-select-tag placeholder="请选择金额" dictCode="momey" v-model="amount"/>-->
           </a-form-item>
 
         </a-form>

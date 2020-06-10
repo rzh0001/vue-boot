@@ -28,7 +28,8 @@
           </a-form-item>
 
           <a-form-item label="通道费率"  style="width: 300px" v-if="isMem">
-            <j-dict-select-tag v-model="userRate"  placeholder="请选择通道费率" dictCode="rates" />
+            <a-input placeholder="请输入费率，如0.003"  v-model="userRate" />
+           <!-- <j-dict-select-tag v-model="userRate"  placeholder="请选择通道费率" dictCode="rates" />-->
           </a-form-item>
 
           <a-form-item label="单笔金额限制" v-if="isMem">

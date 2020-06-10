@@ -20,7 +20,7 @@
             v-if="record.editable"
             style="margin: -5px 0"
             :value="text"
-            :placeholder="columns[i+3].title"
+            :placeholder="columns[i+4].title"
             @change="e => handleChange(e.target.value, record.key, col)"
           />
           <template v-else>{{ text }}</template>
@@ -105,6 +105,13 @@
             key: 'channelCode',
             width: '10%',
             scopedSlots: { customRender: 'channelCode' }
+          },
+          {
+            title: '余额',
+            dataIndex: 'balance',
+            key: 'balance',
+            width: '10%',
+            scopedSlots: { customRender: 'balance' }
           },
           {
             title: '子账号名称',

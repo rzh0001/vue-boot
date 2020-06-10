@@ -7,6 +7,7 @@ import java.util.Map;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.jeecg.common.api.vo.Result;
@@ -93,6 +94,8 @@ public class PayBusinessController {
     public Result getBusinessByAgentName(String userName) {
         List<PayBusiness> businesses = payBusinessService.getBusinessByName(userName);
         if (!CollectionUtils.isEmpty(businesses)) {
+            businesses = businesses.stream().map(business -> business.setBalance(business.getBusinessRechargeAmount().subtract(business.getBusinessIncomeAmount()))).collect(
+                Collectors.toList());
             for (int i = 0; i < businesses.size(); i++) {
                 businesses.get(i).setKey(i + 1);
             }
