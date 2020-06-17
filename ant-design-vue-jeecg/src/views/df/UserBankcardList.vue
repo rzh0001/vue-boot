@@ -94,13 +94,14 @@
 
         <span slot="action" slot-scope="text, record">
           <a v-if="record.delFlag !== '1'"  @click="handleEdit(record)">编辑</a>
-
-          <a-divider type="vertical"/>
-          <a-dropdown>
-            <a class="ant-dropdown-link">更多 <a-icon type="down"/></a>
+          <a-divider v-if="record.delFlag !== '1'"  type="vertical"/>
+          <a v-if="record.delFlag !== '1'" @click="editConfig(record)"><a-icon type="setting"/> 用户配置</a>
+          <a-divider v-if="record.delFlag !== '1'"  type="vertical"/>
+          <a-dropdown  v-if="record.delFlag !== '1'">
+            <a class="ant-dropdown-link" >更多 <a-icon type="down"/></a>
             <a-menu slot="overlay">
               <a-menu-item>
-                <a-popconfirm title="确定删除吗?" @confirm="() => handleDelete(record.id)">
+                <a-popconfirm title="确定删除吗?"  @confirm="() => handleDelete(record.id)">
                   <a>删除</a>
                 </a-popconfirm>
               </a-menu-item>
@@ -114,18 +115,20 @@
 
     <!-- 表单区域 -->
     <userBankcard-modal ref="modalForm" @ok="modalFormOk"></userBankcard-modal>
+    <user-bankcard-config-list ref="configList"></user-bankcard-config-list>
   </a-card>
 </template>
 
 <script>
   import UserBankcardModal from './modules/UserBankcardModal'
+  import UserBankcardConfigList from './UserBankcardConfigList'
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
 
   export default {
     name: 'UserBankcardList',
     mixins: [JeecgListMixin],
     components: {
-      UserBankcardModal
+      UserBankcardModal,UserBankcardConfigList
     },
     data() {
       return {
@@ -147,11 +150,11 @@
           //   align: 'center',
           //   dataIndex: 'userId'
           // },
-          {
-            title: '用户',
-            align: 'center',
-            dataIndex: 'username'
-          },
+          // {
+          //   title: '用户',
+          //   align: 'center',
+          //   dataIndex: 'username'
+          // },
           {
             title: '账户类型',
             align: 'center',
@@ -264,7 +267,12 @@
         return `${window._CONFIG['domianURL']}/${this.url.importExcelUrl}`
       }
     },
-    methods: {}
+    methods: {
+      //编辑
+      editConfig(record) {
+        this.$refs.configList.edit(record);
+      },
+    }
   }
 </script>
 <style scoped>

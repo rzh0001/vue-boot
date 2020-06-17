@@ -1,15 +1,20 @@
 package org.jeecg.modules.df.service;
 
-import org.apache.ibatis.annotations.Update;
-import org.jeecg.modules.df.entity.UserBankcardConfig;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.jeecg.modules.df.entity.UserBankcardConfig;
+import org.jeecg.modules.df.entity.UserBankcardConfigVo;
+
+import java.util.Map;
 
 /**
- * @Description: 代付平台用户银行卡配置表
+ * @Description: 1
  * @Author: jeecg-boot
- * @Date: 2020-03-21
+ * @Date: 2020-06-17
  * @Version: V1.0
  */
 public interface IUserBankcardConfigService extends IService<UserBankcardConfig> {
+	IPage<UserBankcardConfigVo> selectPageVo(Page<UserBankcardConfigVo> page, Map map);
 
 }

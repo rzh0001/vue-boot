@@ -1,17 +1,21 @@
 package org.jeecg.modules.df.mapper;
 
-import java.util.List;
-
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
 import org.jeecg.modules.df.entity.UserBankcardConfig;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.jeecg.modules.df.entity.UserBankcardConfigVo;
+
+import java.util.Map;
 
 /**
- * @Description: 代付平台用户银行卡配置表
+ * @Description: 1
  * @Author: jeecg-boot
- * @Date:   2020-03-21
+ * @Date: 2020-06-17
  * @Version: V1.0
  */
 public interface UserBankcardConfigMapper extends BaseMapper<UserBankcardConfig> {
 
+	IPage<UserBankcardConfigVo> selectPageVo(Page<UserBankcardConfigVo> page, @Param("map") Map map);
 }

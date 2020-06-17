@@ -19,6 +19,6 @@
         <if test="map.user_id!=null and map.user_id!=''">
             and c.user_id = #{map.user_id}
         </if>
-        order by c.last_time, c.create_time limit 1;
+        order by c.last_time, c.create_time limit 1
     </select>
 </mapper>

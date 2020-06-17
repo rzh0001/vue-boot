@@ -2,4 +2,11 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.jeecg.modules.df.mapper.UserBankcardConfigMapper">
 
+    <select id="selectPageVo" resultType="org.jeecg.modules.df.entity.UserBankcardConfigVo" parameterType="Map">
+        select su.username, su.id as userId, case when dubc.id is null then 0 else 1 end as status, dubc.id
+        from sys_user su
+                 left join (select * from df_user_bankcard_config where card_id = #{map.cardId}) dubc on su.id = dubc.user_id
+        where su.agent_id = #{map.agentId}
+        order by status desc
+    </select>
 </mapper>
