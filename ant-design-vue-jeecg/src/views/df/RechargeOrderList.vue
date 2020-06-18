@@ -50,7 +50,7 @@
 
     <!-- 操作按钮区域 -->
     <div class="table-operator">
-      <a-button @click="handleAdd" v-has="'rechargeOrder:add'" type="primary" icon="plus">充值</a-button>
+      <a-button @click="toRecharge" v-has="'rechargeOrder:add'" type="primary" icon="plus">充值</a-button>
       <a-button type="primary" icon="download" @click="handleExportXls('代付充值订单')">导出</a-button>
 <!--      <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl"-->
 <!--                @change="handleImportExcel">-->
@@ -116,7 +116,7 @@
     <!-- table区域-end -->
 
     <!-- 表单区域 -->
-    <rechargeOrder-modal ref="modalForm" @ok="modalFormOk"></rechargeOrder-modal>
+<!--    <rechargeOrder-modal ref="modalForm" @ok="modalFormOk"></rechargeOrder-modal>-->
   </a-card>
 </template>
 
@@ -338,6 +338,10 @@
           this.loading = false;
         })
       },
+
+      toRecharge () {
+        this.$router.push('/df/rechargeOrder/StepForm')
+      }
     }
   }
 </script>
