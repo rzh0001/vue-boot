@@ -4,7 +4,7 @@
     :width="800"
     :visible="visible"
     :confirmLoading="confirmLoading"
-    @ok="handleOk"
+    @ok="handleOk" okText="已支付"
     @cancel="handleCancel"
     cancelText="关闭">
 
@@ -101,29 +101,22 @@
           cardNumber:{rules: [{ required: true, message: '请输入卡号或支付宝帐号!' }]},
         },
         url: {
-          add: "/df/payOrder/add",
-          edit: "/df/payOrder/edit",
+
         },
       }
     },
     created () {
     },
     methods: {
-      add () {
-        this.getMemberAvailableAmount();
-        this.edit({});
-      },
       edit (record) {
         this.form.resetFields();
         this.model = Object.assign({}, record);
         this.visible = true;
         this.$nextTick(() => {
           this.form.setFieldsValue(pick(this.model,'orderId','outerOrderId','userId','userName','userRealname',
-            'merchantId','amount','transactionFee','fixedFee','orderFee','channel','accountType','accountName',
+            'amount','transactionFee','fixedFee','orderFee','channel','accountType','accountName',
             'cardNumber','bankName','branchName','status','remark','agentId','agentUsername','agentRealname',
             'salesmanId','salesmanUsername','salesmanRealname','ip'))
-          //时间格式化
-          this.form.setFieldsValue({successTime:this.model.successTime?moment(this.model.successTime):null})
         });
 
       },
@@ -132,42 +125,12 @@
         this.visible = false;
       },
       handleOk () {
-        const that = this;
-        // 触发表单验证
-        this.form.validateFields((err, values) => {
-          if (!err) {
-            that.confirmLoading = true;
-            let httpurl = '';
-            let method = '';
-            if(!this.model.id){
-              httpurl+=this.url.add;
-              method = 'post';
-            }else{
-              httpurl+=this.url.edit;
-              method = 'put';
-            }
-            let formData = Object.assign(this.model, values);
-            //时间格式化
-            formData.successTime = formData.successTime?formData.successTime.format('YYYY-MM-DD HH:mm:ss'):null;
+        // this.$emit("handleApproval", {id: this.model.id, status: '2'})
 
-            console.log(formData)
-            httpAction(httpurl,formData,method).then((res)=>{
-              if(res.success){
-                that.$message.success(res.message);
-                that.$emit('ok');
-                that.close();
-              }else{
-                that.$message.error(res.message);
-              }
-            }).finally(() => {
-              that.confirmLoading = false;
-              // that.close();
-            })
-
-
-
-          }
-        })
+        console.log(this.model)
+        // this.$parent.handleApproval({id: this.model.id, status: '2'})
+        this.$emit("handleApproval", {id: this.model.id, status: '2'})
+        this.close()
       },
       handleCancel () {
         this.close()

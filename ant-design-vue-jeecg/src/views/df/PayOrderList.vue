@@ -138,7 +138,7 @@
 
     <!-- 表单区域 -->
     <payOrder-modal ref="modalForm" @ok="modalFormOk"></payOrder-modal>
-    <payOrderDetail-modal ref="detail" ></payOrderDetail-modal>
+    <payOrderDetail-modal ref="detail" @ok="modalFormOk" @handleApproval="handleApproval" ></payOrderDetail-modal>
   </a-card>
 </template>
 
@@ -401,8 +401,8 @@
         this.handleApproval({id: record.id, status: '1'});
         if (record.status === '0'){
           this.$refs.detail.edit(record);
-          this.$refs.detail.title = "详情";
-          this.$refs.detail.disableSubmit = true;
+          this.$refs.detail.title = "订单详情";
+          // this.$refs.detail.disableSubmit = true;
         }
       }
     }
