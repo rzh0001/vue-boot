@@ -117,7 +117,7 @@
         @change="handleTableChange">
 
         <span slot="action" slot-scope="text, record">
-          <a-popconfirm title="确定开始处理吗?" v-has="'payOrder:approval'" v-if="record.status==0" @confirm="() => handleApproval({id: record.id, status: '1'})">
+          <a-popconfirm title="确定开始处理吗?" v-has="'payOrder:approval'" v-if="record.status==0" @confirm="() => handleApprovalLocal(record)">
                   <a>接单</a>
           </a-popconfirm>
           <a-popconfirm title="确定已打款吗?" v-has="'payOrder:approval'" v-if="record.status==1" @confirm="() => handleApproval({id: record.id, status: '2'})">
@@ -138,11 +138,13 @@
 
     <!-- 表单区域 -->
     <payOrder-modal ref="modalForm" @ok="modalFormOk"></payOrder-modal>
+    <payOrderDetail-modal ref="detail" ></payOrderDetail-modal>
   </a-card>
 </template>
 
 <script>
   import PayOrderModal from './modules/PayOrderModal'
+  import PayOrderDetailModal from './modules/PayOrderDetailModal'
   import JDate from '@/components/jeecg/JDate'
   import { getAction, putAction } from '@/api/manage'
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
@@ -151,7 +153,7 @@
     name: 'PayOrderList',
     mixins: [JeecgListMixin],
     components: {
-      PayOrderModal,
+      PayOrderModal,PayOrderDetailModal,
       JDate
     },
     data() {
@@ -394,6 +396,14 @@
             that.$message.warning(res.message);
           }
         });
+      },
+      handleApprovalLocal(record){
+        this.handleApproval({id: record.id, status: '1'});
+        if (record.status === '0'){
+          this.$refs.detail.edit(record);
+          this.$refs.detail.title = "详情";
+          this.$refs.detail.disableSubmit = true;
+        }
       }
     }
   }
