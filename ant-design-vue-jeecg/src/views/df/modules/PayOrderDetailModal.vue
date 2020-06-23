@@ -48,20 +48,32 @@
 <!--          </a-select>-->
 <!--        </a-form-item>-->
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="账户名">
-          <a-input placeholder="" v-decorator="['accountName', validatorRules.accountName]" :readOnly="true"/>
+          <a-input-search  v-decorator="['accountName', {} ]" :readOnly="true" @search="onCopy">
+            <a-button type="primary" v-clipboard:copy="model.accountName"  slot="enterButton">复制</a-button>
+          </a-input-search>
         </a-form-item>
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="卡号">
-          <a-input placeholder="" v-decorator="['cardNumber', {}]"  :readOnly="true"/>
+          <a-input-search  v-decorator="['cardNumber', {} ]" :readOnly="true" @search="onCopy">
+            <a-button type="primary" v-clipboard:copy="model.cardNumber"  slot="enterButton">复制</a-button>
+          </a-input-search>
         </a-form-item>
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="银行名称">
-          <a-input placeholder="" v-decorator="['bankName', {}]" :readOnly="true" />
+          <a-input-search  v-decorator="['bankName', {} ]" :readOnly="true" @search="onCopy">
+            <a-button type="primary" v-clipboard:copy="model.bankName"  slot="enterButton">复制</a-button>
+          </a-input-search>
         </a-form-item>
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="开户行全称">
-          <a-input placeholder="" v-decorator="['branchName', {}]" :readOnly="true"/>
+          <a-input-search  v-decorator="['branchName', {} ]" :readOnly="true" @search="onCopy">
+            <a-button type="primary" v-clipboard:copy="model.branchName"  slot="enterButton">复制</a-button>
+          </a-input-search>
         </a-form-item>
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="备注">
-          <a-input placeholder="" v-decorator="['remark', {}]" :readOnly="true"/>
+          <a-input-search  v-decorator="['remark', {} ]" :readOnly="true" @search="onCopy">
+            <a-button type="primary" v-clipboard:copy="model.remark"  slot="enterButton">复制</a-button>
+          </a-input-search>
         </a-form-item>
+
+
 <!--        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="操作IP">-->
 <!--          <a-input placeholder="请输入操作IP" v-decorator="['ip', {}]" />-->
 <!--        </a-form-item>-->
@@ -74,7 +86,7 @@
 <script>
   import { httpAction,getAction } from '@/api/manage'
   import pick from 'lodash.pick'
-  import moment from "moment"
+  // import Clipboard from 'clipboard';
 
   export default {
     name: "PayOrderModal",
@@ -135,6 +147,9 @@
       handleCancel () {
         this.close()
       },
+      onCopy: function(e) {
+        this.$message.info('复制成功');
+      }
 
 
     }

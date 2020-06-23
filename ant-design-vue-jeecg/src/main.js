@@ -19,6 +19,9 @@ import VueApexCharts from 'vue-apexcharts'
 import preview from 'vue-photo-preview'
 import 'vue-photo-preview/dist/skin.css'
 
+import VueClipBoard from 'vue-clipboard2'
+
+
 import {
   ACCESS_TOKEN,
   DEFAULT_COLOR,
@@ -52,6 +55,7 @@ Vue.component('apexchart', VueApexCharts)
 Vue.use(preview)
 Vue.use(vueBus);
 Vue.use(JeecgComponents);
+Vue.use(VueClipBoard);
 
 new Vue({
   router,
