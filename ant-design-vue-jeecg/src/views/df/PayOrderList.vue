@@ -297,7 +297,8 @@
           {
             title: '备注',
             align: 'center',
-            dataIndex: 'remark'
+            dataIndex: 'remark',
+            width: 80
           },
           {
             title: '创建时间',

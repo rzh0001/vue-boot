@@ -14,39 +14,39 @@
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="订单号" >
           <a-input placeholder="" v-decorator="['orderId', validatorRules.orderId ]" :readOnly="true"/>
         </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="外部订单号">
-          <a-input placeholder="" v-decorator="['outerOrderId', validatorRules.outerOrderId ]" :readOnly="true"/>
-        </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="用户" >
-          <a-input placeholder="" v-decorator="['userName', {}]" :readOnly="true"/>
-        </a-form-item>
+<!--        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="外部订单号">-->
+<!--          <a-input placeholder="" v-decorator="['outerOrderId', validatorRules.outerOrderId ]" :readOnly="true"/>-->
+<!--        </a-form-item>-->
+<!--        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="用户" >-->
+<!--          <a-input placeholder="" v-decorator="['userName', {}]" :readOnly="true"/>-->
+<!--        </a-form-item>-->
 <!--        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="商户编号">-->
 <!--          <a-input placeholder="请输入商户编号" v-decorator="['merchantId', validatorRules.merchantId ]" />-->
 <!--        </a-form-item>-->
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="订单金额">
           <a-input-number v-decorator="[ 'amount', validatorRules.amount]"  disabled/>
         </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="交易手续费"  v-show="false">
-          <a-input-number v-decorator="[ 'transactionFee', {}]" />
-        </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="固定手续费" v-show="false">
-          <a-input-number v-decorator="[ 'fixedFee', {}]" />
-        </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="订单总手续费" v-show="false">
-          <a-input-number v-decorator="[ 'orderFee', {}]" />
-        </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="通道">
-          <a-select v-decorator="['channel', {}]" placeholder="" >
-            <a-select-option value="bank">银行转账</a-select-option>
-            <a-select-option value="alipay">支付宝</a-select-option>
-          </a-select>
-        </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="账户类型">
-          <a-select v-decorator="['accountType', {}]" placeholder="" >
-            <a-select-option value="1">对私</a-select-option>
-            <a-select-option value="2">对公</a-select-option>
-          </a-select>
-        </a-form-item>
+<!--        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="交易手续费"  v-show="false">-->
+<!--          <a-input-number v-decorator="[ 'transactionFee', {}]" />-->
+<!--        </a-form-item>-->
+<!--        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="固定手续费" v-show="false">-->
+<!--          <a-input-number v-decorator="[ 'fixedFee', {}]" />-->
+<!--        </a-form-item>-->
+<!--        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="订单总手续费" v-show="false">-->
+<!--          <a-input-number v-decorator="[ 'orderFee', {}]" />-->
+<!--        </a-form-item>-->
+<!--        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="通道">-->
+<!--          <a-select v-decorator="['channel', {}]" placeholder="" >-->
+<!--            <a-select-option value="bank">银行转账</a-select-option>-->
+<!--            <a-select-option value="alipay">支付宝</a-select-option>-->
+<!--          </a-select>-->
+<!--        </a-form-item>-->
+<!--        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="账户类型">-->
+<!--          <a-select v-decorator="['accountType', {}]" placeholder="" >-->
+<!--            <a-select-option value="1">对私</a-select-option>-->
+<!--            <a-select-option value="2">对公</a-select-option>-->
+<!--          </a-select>-->
+<!--        </a-form-item>-->
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="账户名">
           <a-input placeholder="" v-decorator="['accountName', validatorRules.accountName]" :readOnly="true"/>
         </a-form-item>
