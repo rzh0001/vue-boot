@@ -1,9 +1,11 @@
 <template>
   <a-modal
     :title="title"
-    :width="800"
+    :width="500"
     :visible="visible"
     :confirmLoading="confirmLoading"
+    :keyboard="false"
+    :maskClosable="false"
     @ok="handleOk" okText="已支付"
     @cancel="handleCancel"
     cancelText="关闭">
@@ -24,7 +26,9 @@
 <!--          <a-input placeholder="请输入商户编号" v-decorator="['merchantId', validatorRules.merchantId ]" />-->
 <!--        </a-form-item>-->
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="订单金额">
-          <a-input-number v-decorator="[ 'amount', validatorRules.amount]"  disabled/>
+          <a-input-search  v-decorator="['amount', {} ]" :readOnly="true" @search="onCopy">
+            <a-button type="primary" v-clipboard:copy="model.amount"  slot="enterButton">复制</a-button>
+          </a-input-search>
         </a-form-item>
 <!--        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="交易手续费"  v-show="false">-->
 <!--          <a-input-number v-decorator="[ 'transactionFee', {}]" />-->
