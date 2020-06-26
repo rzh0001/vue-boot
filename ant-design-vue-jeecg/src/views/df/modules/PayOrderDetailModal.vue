@@ -90,7 +90,6 @@
 <script>
   import { httpAction,getAction } from '@/api/manage'
   import pick from 'lodash.pick'
-  // import Clipboard from 'clipboard';
 
   export default {
     name: "PayOrderModal",

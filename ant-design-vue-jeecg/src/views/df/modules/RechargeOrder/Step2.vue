@@ -6,18 +6,35 @@
         {{order.orderId}}
       </a-form-item>
 
-      <a-form-item label="充值金额" :labelCol="{span: 5}" :wrapperCol="{span: 19}" class="stepFormText" >
-        {{order.amount}}
+      <a-form-item :labelCol="{span: 5}" :wrapperCol="{span: 19}" class="stepFormText" label="充值金额">
+        <a-input-search  v-model="order.amount" :readOnly="true" @search="onCopy">
+          <a-button type="primary" v-clipboard:copy="order.amount"  slot="enterButton">复制</a-button>
+        </a-input-search>
       </a-form-item>
+
       <a-form-item label="收款人" :labelCol="{span: 5}" :wrapperCol="{span: 19}" class="stepFormText" >
-        {{order.accountName}}
+        <a-input-search  v-model="order.accountName" :readOnly="true" @search="onCopy">
+          <a-button type="primary" v-clipboard:copy="order.accountName"  slot="enterButton">复制</a-button>
+        </a-input-search>
       </a-form-item>
+
       <a-form-item label="收款账户" :labelCol="{span: 5}" :wrapperCol="{span: 19}" class="stepFormText" >
-        {{order.cardNumber}}
+        <a-input-search  v-model="order.cardNumber" :readOnly="true" @search="onCopy">
+          <a-button type="primary" v-clipboard:copy="order.cardNumber"  slot="enterButton">复制</a-button>
+        </a-input-search>
+      </a-form-item>
+
+      <a-form-item label="收款银行" :labelCol="{span: 5}" :wrapperCol="{span: 19}" class="stepFormText" >
+        <a-input-search  v-model="order.bankName" :readOnly="true" @search="onCopy">
+          <a-button type="primary" v-clipboard:copy="order.bankName"  slot="enterButton">复制</a-button>
+        </a-input-search>
       </a-form-item>
       <a-form-item label="开户行" :labelCol="{span: 5}" :wrapperCol="{span: 19}" class="stepFormText" >
-        {{order.bankName + order.branchName}}
+        <a-input-search  v-model="order.branchName" :readOnly="true" @search="onCopy">
+          <a-button type="primary" v-clipboard:copy="order.branchName"  slot="enterButton">复制</a-button>
+        </a-input-search>
       </a-form-item>
+
       <a-form-item label="账户类型" :labelCol="{span: 5}" :wrapperCol="{span: 19}" >
         <a-select :value="order.accountType"  placeholder="" :readOnly="true" disabled>
           <a-select-option value="1">对私</a-select-option>
@@ -53,7 +70,11 @@
       },
       prevStep () {
         this.$emit('prevStep')
+      },
+      onCopy: function(e) {
+        this.$message.success('复制成功');
       }
+
     }
   }
 </script>
