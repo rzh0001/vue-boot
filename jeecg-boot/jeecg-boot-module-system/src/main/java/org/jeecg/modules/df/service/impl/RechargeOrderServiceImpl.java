@@ -46,7 +46,7 @@ public class RechargeOrderServiceImpl extends ServiceImpl<RechargeOrderMapper, R
 		order.setAgentUsername(ou.getAgentUsername());
 		order.setAgentRealname(ou.getAgentRealname());
 		order.setOrderId(IDUtil.genRechargeOrderId());
-		order.setStatus(DfConstant.STATUS_PAID);
+		order.setStatus(DfConstant.RECHARGE_STATUS_PAID);
 
 		UserBankcardConfigDO randomBankcard = cardService.getRandomBankcard(ou.getAgentId(), ou.getId());
 		order.setBankcardId(randomBankcard.getCardId());

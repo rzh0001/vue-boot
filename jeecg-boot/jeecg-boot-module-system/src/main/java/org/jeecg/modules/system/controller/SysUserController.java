@@ -948,11 +948,25 @@ public class SysUserController {
 	@RequestMapping(value = "/addSalesman", method = RequestMethod.POST)
 	@RequiresPermissions("user:addSalesman")
 	public Result<SysUser> addSalesman(@RequestBody JSONObject jsonObject) {
-		jsonObject.get("s");
 		Result<SysUser> result = new Result<SysUser>();
 		try {
 			SysUser user = JSON.parseObject(jsonObject.toJSONString(), SysUser.class);
 			sysUserService.addPayMember(user, PayConstant.MEMBER_TYPE_SALESMAN);
+			result.success("添加成功！");
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+			result.error500("操作失败");
+		}
+		return result;
+	}
+
+	@RequestMapping(value = "/addOperator", method = RequestMethod.POST)
+	@RequiresPermissions("user:addOperator")
+	public Result<SysUser> addOperator(@RequestBody JSONObject jsonObject) {
+		Result<SysUser> result = new Result<SysUser>();
+		try {
+			SysUser user = JSON.parseObject(jsonObject.toJSONString(), SysUser.class);
+			sysUserService.addPayMember(user, PayConstant.MEMBER_TYPE_OPERATOR);
 			result.success("添加成功！");
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);

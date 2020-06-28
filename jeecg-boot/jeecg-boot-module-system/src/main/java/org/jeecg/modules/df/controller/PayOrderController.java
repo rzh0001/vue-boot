@@ -77,6 +77,9 @@ public class PayOrderController {
 				case PayConstant.MEMBER_TYPE_MEMBER:
 					queryWrapper.lambda().eq(PayOrder::getUserId, opUser.getId());
 					break;
+//				case PayConstant.MEMBER_TYPE_OPERATOR:
+//					queryWrapper.lambda().eq(PayOrder::getOperatorId, opUser.getId());
+//					break;
 				default:
 			}
 		}
@@ -188,13 +191,18 @@ public class PayOrderController {
 		if (StrUtil.isEmpty(status)) {
 			return Result.error("内部错误，status 字段不能为空");
 		}
+		if (DfConstant.PAY_STATUS_TAKEN.equals(status)) {
+			LoginUser optUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+			order.setOperatorId(optUser.getId());
+			order.setOperatorUsername(optUser.getUsername());
+		}
 		order.setStatus(status);
 		order.setSuccessTime(new Date());
-		boolean ok = payOrderService.updateById(order);
+		payOrderService.updateById(order);
 
-		if (DfConstant.STATUS_CHECKED.equals(status)) {
+		if (DfConstant.PAY_STATUS_PAID.equals(status)) {
 			payOrderService.checked(order);
-		} else if (DfConstant.STATUS_REJECTED.equals(status)) {
+		} else if (DfConstant.PAY_STATUS_REJECTED.equals(status)) {
 			payOrderService.rejected(order);
 		}
 

@@ -13,9 +13,11 @@ public interface PayConstant {
 	public static final String MEMBER_TYPE_AGENT = "1";
 	public static final String MEMBER_TYPE_SALESMAN = "2";
 	public static final String MEMBER_TYPE_MEMBER = "3";
-	
-	
+	public static final String MEMBER_TYPE_OPERATOR = "4";
+
+
 	public static final String ROLE_CODE_AGENT = "pay_agent";
 	public static final String ROLE_CODE_SALESMAN = "pay_salesman";
 	public static final String ROLE_CODE_MEMBER = "pay_member";
+	public static final String ROLE_CODE_OPERATOR = "pay_operator";
 }

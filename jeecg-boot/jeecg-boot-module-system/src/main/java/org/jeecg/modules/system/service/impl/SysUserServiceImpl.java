@@ -322,6 +322,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 					user.setSalesmanRealname(salesman.getRealname());
 				}
 				break;
+			case PayConstant.MEMBER_TYPE_OPERATOR:
+				roleCode = PayConstant.ROLE_CODE_OPERATOR;
+				user.setAgentId(optUser.getId());
+				user.setAgentUsername(optUser.getUsername());
+				user.setAgentRealname(optUser.getRealname());
+				break;
 			default:
 		}
 

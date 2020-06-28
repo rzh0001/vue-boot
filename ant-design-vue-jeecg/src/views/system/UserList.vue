@@ -12,15 +12,17 @@
             </a-form-item>
           </a-col>
 
-          <!--          <a-col :md="6" :sm="8">-->
-          <!--            <a-form-item label="性别">-->
-          <!--              <a-select v-model="queryParam.sex" placeholder="请选择性别查询">-->
-          <!--                <a-select-option value="">请选择性别查询</a-select-option>-->
-          <!--                <a-select-option value="1">男性</a-select-option>-->
-          <!--                <a-select-option value="2">女性</a-select-option>-->
-          <!--              </a-select>-->
-          <!--            </a-form-item>-->
-          <!--          </a-col>-->
+          <a-col :md="6" :sm="8">
+            <a-form-item label="会员类型">
+              <a-select v-model="queryParam.memberType" placeholder="">
+                <a-select-option value="">请选择会员类型</a-select-option>
+                <a-select-option value="1">代理</a-select-option>
+                <a-select-option value="2">介绍人</a-select-option>
+                <a-select-option value="3">商户</a-select-option>
+                <a-select-option value="4">操作员</a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
 
 
           <template v-if="toggleSearchStatus">
@@ -63,11 +65,8 @@
       <a-button @click="handleAddAgent" v-has="'user:addAgent'" type="primary" icon="plus">添加代理</a-button>
       <a-button @click="handleAddSalesman" v-has="'user:addSalesman'" type="primary" icon="plus">添加介绍人</a-button>
       <a-button @click="handleAddMember" v-has="'user:addMember'" type="primary" icon="plus">添加商户</a-button>
+      <a-button @click="handleAddOperator" v-has="'user:addOperator'" type="primary" icon="plus">添加操作员</a-button>
       <a-button type="primary" icon="download" @click="handleExportXls('用户信息')">导出</a-button>
-<!--      <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl"-->
-<!--                @change="handleImportExcel">-->
-<!--        <a-button type="primary" icon="import">导入</a-button>-->
-<!--      </a-upload>-->
       <a-dropdown v-if="selectedRowKeys.length > 0">
         <a-menu slot="overlay" @click="handleMenuClick">
           <a-menu-item key="1">
@@ -98,12 +97,7 @@
 <!--        <a style="margin-left: 24px" @click="onClearSelected">清空</a>-->
 <!--      </div>-->
 
-      <a-table
-        ref="table"
-        bordered
-        size="middle"
-        rowKey="id"
-        :columns="columns"
+      <a-table ref="table" bordered size="middle" rowKey="id" :columns="columns"
         :dataSource="dataSource"
         :pagination="ipagination"
         :loading="loading"
@@ -213,6 +207,7 @@
     <user-agent-modal ref="agentModalForm" @ok="modalFormOk"></user-agent-modal>
     <user-salesman-modal ref="salesmanModalForm" @ok="modalFormOk"></user-salesman-modal>
     <user-member-modal ref="memberModalForm" @ok="modalFormOk"></user-member-modal>
+    <user-operator-modal ref="operatorModalForm" @ok="modalFormOk"></user-operator-modal>
 
     <password-modal ref="passwordmodal" @ok="passwordModalOk"></password-modal>
     <user-amount-modal ref="userAmountModal" @ok="modalFormOk"></user-amount-modal>
@@ -230,6 +225,7 @@
   import UserAgentModal from './modules/UserAgentModal'
   import UserSalesmanModal from './modules/UserSalesmanModal'
   import UserMemberModal from './modules/UserMemberModal'
+  import UserOperatorModal from './modules/UserOperatorModal'
   import PasswordModal from './modules/PasswordModal'
   import UserAmountModal from './modules/UserAmountModal'
   import { putAction } from '@/api/manage'
@@ -251,6 +247,7 @@
       UserAgentModal,
       UserSalesmanModal,
       UserMemberModal,
+      UserOperatorModal,
       PasswordModal,
       UserChannelModal,
       UserBusinessModal,
@@ -283,13 +280,14 @@
             dataIndex: 'memberType',
             key: 'memberType',
             customRender: function(text) {
-              if (text == 1) {
-
+              if (text === '1') {
                 return '代理'
-              } else if (text == 2) {
+              } else if (text === '2') {
                 return '介绍人'
-              } else if (text == 3) {
+              } else if (text === '3') {
                 return '商户'
+              } else if (text === '4') {
+                return '操作员'
               } else {
                 return text
               }
@@ -448,6 +446,11 @@
         this.$refs.memberModalForm.add()
         this.$refs.memberModalForm.title = '新增商户'
         this.$refs.memberModalForm.disableSubmit = false
+      },
+      handleAddOperator: function() {
+        this.$refs.operatorModalForm.add()
+        this.$refs.operatorModalForm.title = '新增操作员'
+        this.$refs.operatorModalForm.disableSubmit = false
       },
       handleMenuClick(e) {
         if (e.key == 1) {

@@ -17,15 +17,12 @@ import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.common.util.RedisUtil;
 import org.jeecg.modules.df.constant.DfConstant;
-import org.jeecg.modules.df.entity.PayOrder;
 import org.jeecg.modules.df.entity.RechargeOrder;
 import org.jeecg.modules.df.entity.UserBankcard;
 import org.jeecg.modules.df.service.IRechargeOrderService;
 import org.jeecg.modules.df.service.IUserBankcardService;
-import org.jeecg.modules.df.util.IDUtil;
 import org.jeecg.modules.exception.RRException;
 import org.jeecg.modules.system.entity.SysUser;
-import org.jeecg.modules.system.entity.UserAmountEntity;
 import org.jeecg.modules.system.service.ISysUserService;
 import org.jeecg.modules.system.service.IUserAmountEntityService;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
@@ -228,7 +225,7 @@ public class RechargeOrderController {
 		rechargeOrderService.updateById(order);
 
 		// 审核通过增加余额
-		if (DfConstant.STATUS_CHECKED.equals(jsonObject.getString("status"))) {
+		if (DfConstant.RECHARGE_STATUS_CHECKED.equals(jsonObject.getString("status"))) {
 			log.info("充值订单-审核通过:{} 金额:{}", order.getOrderId(), order.getAmount());
 			userAmountService.changeAmount(order.getUserId(), order.getAmount(), order.getOrderId(), order.getRemark(), "2");
 		}

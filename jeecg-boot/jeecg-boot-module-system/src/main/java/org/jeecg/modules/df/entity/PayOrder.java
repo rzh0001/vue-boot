@@ -15,83 +15,117 @@ import org.springframework.format.annotation.DateTimeFormat;
 /**
  * @Description: 1
  * @Author: jeecg-boot
- * @Date:   2019-10-27
+ * @Date: 2019-10-27
  * @Version: V1.0
  */
 @Data
 @TableName("df_pay_order")
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value="df_pay_order对象", description="1")
+@ApiModel(value = "df_pay_order对象", description = "1")
 public class PayOrder {
-    
-	/**主键id*/
+
+	/**
+	 * 主键id
+	 */
 	@TableId(type = IdType.UUID)
-    @ApiModelProperty(value = "主键id")
+	@ApiModelProperty(value = "主键id")
 	private java.lang.String id;
-	/**订单号*/
+	/**
+	 * 订单号
+	 */
 	@Excel(name = "订单号", width = 15)
-    @ApiModelProperty(value = "订单号")
+	@ApiModelProperty(value = "订单号")
 	private java.lang.String orderId;
-	/**外部订单号*/
+	/**
+	 * 外部订单号
+	 */
 	@Excel(name = "外部订单号", width = 15)
-    @ApiModelProperty(value = "外部订单号")
+	@ApiModelProperty(value = "外部订单号")
 	private java.lang.String outerOrderId;
-	/**用户id*/
+	/**
+	 * 用户id
+	 */
 	@Excel(name = "用户id", width = 15)
-    @ApiModelProperty(value = "用户id")
+	@ApiModelProperty(value = "用户id")
 	private java.lang.String userId;
-	/**用户*/
+	/**
+	 * 用户
+	 */
 	@Excel(name = "用户", width = 15)
-    @ApiModelProperty(value = "用户")
+	@ApiModelProperty(value = "用户")
 	private java.lang.String userName;
-	/**用户昵称*/
+	/**
+	 * 用户昵称
+	 */
 	@Excel(name = "用户昵称", width = 15)
-    @ApiModelProperty(value = "用户昵称")
+	@ApiModelProperty(value = "用户昵称")
 	private java.lang.String userRealname;
-	/**商户编号*/
+	/**
+	 * 商户编号
+	 */
 	@Excel(name = "商户编号", width = 15)
-    @ApiModelProperty(value = "商户编号")
+	@ApiModelProperty(value = "商户编号")
 	private java.lang.String merchantId;
-	/**订单金额*/
+	/**
+	 * 订单金额
+	 */
 	@Excel(name = "订单金额", width = 15)
-    @ApiModelProperty(value = "订单金额")
+	@ApiModelProperty(value = "订单金额")
 	private java.math.BigDecimal amount;
-	/**交易手续费*/
+	/**
+	 * 交易手续费
+	 */
 	@Excel(name = "交易手续费", width = 15)
-    @ApiModelProperty(value = "交易手续费")
+	@ApiModelProperty(value = "交易手续费")
 	private java.math.BigDecimal transactionFee;
-	/**固定手续费*/
+	/**
+	 * 固定手续费
+	 */
 	@Excel(name = "固定手续费", width = 15)
-    @ApiModelProperty(value = "固定手续费")
+	@ApiModelProperty(value = "固定手续费")
 	private java.math.BigDecimal fixedFee;
-	/**订单总手续费*/
+	/**
+	 * 订单总手续费
+	 */
 	@Excel(name = "订单总手续费", width = 15)
-    @ApiModelProperty(value = "订单总手续费")
+	@ApiModelProperty(value = "订单总手续费")
 	private java.math.BigDecimal orderFee;
-	/**通道*/
+	/**
+	 * 通道
+	 */
 	@Excel(name = "通道", width = 15)
-    @ApiModelProperty(value = "通道")
+	@ApiModelProperty(value = "通道")
 	private java.lang.String channel;
-	/**账户类型(1-对私;2-对公)*/
+	/**
+	 * 账户类型(1-对私;2-对公)
+	 */
 	@Excel(name = "账户类型(1-对私;2-对公)", width = 15)
-    @ApiModelProperty(value = "账户类型(1-对私;2-对公)")
+	@ApiModelProperty(value = "账户类型(1-对私;2-对公)")
 	private java.lang.String accountType;
-	/**账户名*/
+	/**
+	 * 账户名
+	 */
 	@Excel(name = "账户名", width = 15)
-    @ApiModelProperty(value = "账户名")
+	@ApiModelProperty(value = "账户名")
 	private java.lang.String accountName;
-	/**卡号*/
+	/**
+	 * 卡号
+	 */
 	@Excel(name = "卡号", width = 15)
-    @ApiModelProperty(value = "卡号")
+	@ApiModelProperty(value = "卡号")
 	private java.lang.String cardNumber;
-	/**银行名称*/
+	/**
+	 * 银行名称
+	 */
 	@Excel(name = "银行名称", width = 15)
-    @ApiModelProperty(value = "银行名称")
+	@ApiModelProperty(value = "银行名称")
 	private java.lang.String bankName;
-	/**开户行全称*/
+	/**
+	 * 开户行全称
+	 */
 	@Excel(name = "开户行全称", width = 15)
-    @ApiModelProperty(value = "开户行全称")
+	@ApiModelProperty(value = "开户行全称")
 	private java.lang.String branchName;
 	/**
 	 * 银行编码，对公必填;支付宝对公不 填写;
@@ -99,13 +133,17 @@ public class PayOrder {
 	@Excel(name = "银行编码，对公必填;支付宝对公不 填写;", width = 15)
 	@ApiModelProperty(value = "银行编码，对公必填;支付宝对公不 填写;")
 	private java.lang.String bankCode;
-	/**订单状态：0-待处理;1-已接单;2-已打款;3-审核拒绝*/
+	/**
+	 * 订单状态：0-待处理;1-已接单;2-已打款;3-审核拒绝
+	 */
 	@Excel(name = "订单状态：0-待处理;1-已接单;2-已打款;3-审核拒绝", width = 15)
-    @ApiModelProperty(value = "订单状态：0-待处理;1-已接单;2-已打款;3-审核拒绝")
+	@ApiModelProperty(value = "订单状态：0-待处理;1-已接单;2-已打款;3-审核拒绝")
 	private java.lang.String status;
-	/**备注*/
+	/**
+	 * 备注
+	 */
 	@Excel(name = "备注", width = 15)
-    @ApiModelProperty(value = "备注")
+	@ApiModelProperty(value = "备注")
 	private java.lang.String remark;
 	/**
 	 * 回调地址
@@ -119,58 +157,88 @@ public class PayOrder {
 	@Excel(name = "回调状态", width = 15)
 	@ApiModelProperty(value = "回调状态")
 	private java.lang.String callbackStatus;
-	/**成功时间*/
+	/**
+	 * 成功时间
+	 */
 	@Excel(name = "成功时间", width = 20, format = "yyyy-MM-dd HH:mm:ss")
-	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
-    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
-    @ApiModelProperty(value = "成功时间")
+	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@ApiModelProperty(value = "成功时间")
 	private java.util.Date successTime;
-	/**代理ID*/
+	/**
+	 * 代理ID
+	 */
 	@Excel(name = "代理ID", width = 15)
-    @ApiModelProperty(value = "代理ID")
+	@ApiModelProperty(value = "代理ID")
 	private java.lang.String agentId;
-	/**代理帐号*/
+	/**
+	 * 代理帐号
+	 */
 	@Excel(name = "代理帐号", width = 15)
-    @ApiModelProperty(value = "代理帐号")
+	@ApiModelProperty(value = "代理帐号")
 	private java.lang.String agentUsername;
-	/**代理姓名*/
+	/**
+	 * 代理姓名
+	 */
 	@Excel(name = "代理姓名", width = 15)
-    @ApiModelProperty(value = "代理姓名")
+	@ApiModelProperty(value = "代理姓名")
 	private java.lang.String agentRealname;
-	/**介绍人ID*/
+	/**
+	 * 介绍人ID
+	 */
 	@Excel(name = "介绍人ID", width = 15)
-    @ApiModelProperty(value = "介绍人ID")
+	@ApiModelProperty(value = "介绍人ID")
 	private java.lang.String salesmanId;
-	/**介绍人帐号*/
+	/**
+	 * 介绍人帐号
+	 */
 	@Excel(name = "介绍人帐号", width = 15)
-    @ApiModelProperty(value = "介绍人帐号")
+	@ApiModelProperty(value = "介绍人帐号")
 	private java.lang.String salesmanUsername;
-	/**介绍人姓名*/
+	/**
+	 * 介绍人姓名
+	 */
 	@Excel(name = "介绍人姓名", width = 15)
-    @ApiModelProperty(value = "介绍人姓名")
+	@ApiModelProperty(value = "介绍人姓名")
 	private java.lang.String salesmanRealname;
-	/**创建人*/
+	/**
+	 * 创建人
+	 */
 	@Excel(name = "创建人", width = 15)
-    @ApiModelProperty(value = "创建人")
+	@ApiModelProperty(value = "创建人")
 	private java.lang.String createBy;
-	/**创建时间*/
+	/**
+	 * 创建时间
+	 */
 	@Excel(name = "创建时间", width = 20, format = "yyyy-MM-dd HH:mm:ss")
-	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
-    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
-    @ApiModelProperty(value = "创建时间")
+	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@ApiModelProperty(value = "创建时间")
 	private java.util.Date createTime;
-	/**更新人*/
+	/**
+	 * 更新人
+	 */
 	@Excel(name = "更新人", width = 15)
-    @ApiModelProperty(value = "更新人")
+	@ApiModelProperty(value = "更新人")
 	private java.lang.String updateBy;
-	/**更新时间*/
+	/**
+	 * 更新时间
+	 */
 	@Excel(name = "更新时间", width = 20, format = "yyyy-MM-dd HH:mm:ss")
-	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
-    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
-    @ApiModelProperty(value = "更新时间")
+	@JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@ApiModelProperty(value = "更新时间")
 	private java.util.Date updateTime;
-	/**操作IP*/
+	/**
+	 * 操作IP
+	 */
 	@Excel(name = "操作IP", width = 15)
-    @ApiModelProperty(value = "操作IP")
+	@ApiModelProperty(value = "操作IP")
 	private java.lang.String ip;
+
+	/**
+	 * 操作员
+	 */
+	private String operatorId;
+	private String operatorUsername;
 }

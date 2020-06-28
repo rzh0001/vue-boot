@@ -15,34 +15,41 @@ import java.util.Map;
  */
 public interface IPayOrderService extends IService<PayOrder> {
 
-    /**
-     * 创建订单
-     *
-     * @return
-     */
-    boolean create(PayOrder order);
+	/**
+	 * 创建订单
+	 *
+	 * @return
+	 */
+	boolean create(PayOrder order);
 
-    /**
-     * 审核通过
-     *
-     * @param order
-     * @return
-     */
-    boolean checked(PayOrder order);
+	/**
+	 * 审核通过
+	 *
+	 * @param order
+	 * @return
+	 */
+	boolean checked(PayOrder order);
 
-    /**
-     * 审核拒绝
-     *
-     * @param order
-     * @return
-     */
-    boolean rejected(PayOrder order);
+	/**
+	 * 审核拒绝
+	 *
+	 * @param order
+	 * @return
+	 */
+	boolean rejected(PayOrder order);
 
-    PayOrderResult apiOrder(PayOrder order);
+	/**
+	 * 创建api订单
+	 *
+	 * @param order
+	 * @return
+	 */
 
-    int count(String userId, String outerOrderId);
+	PayOrderResult apiOrder(PayOrder order);
 
-    PayOrder getByOuterOrderId(String outerOrderId);
+	int count(String userId, String outerOrderId);
 
-    Map<String, Object> summary(QueryWrapper<PayOrder> queryWrapper);
+	PayOrder getByOuterOrderId(String outerOrderId);
+
+	Map<String, Object> summary(QueryWrapper<PayOrder> queryWrapper);
 }
