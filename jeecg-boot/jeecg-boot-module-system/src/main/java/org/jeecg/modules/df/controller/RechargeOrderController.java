@@ -210,14 +210,17 @@ public class RechargeOrderController {
 		String key = "CZ-" + jsonObject.getString("id") + "-" + jsonObject.getString("status");
 		if (redis.hasKey(key)) {
 			log.info("充值订单-审核:缓存已存在{}", key);
-			return Result.ok("修改成功!");
+			return Result.error("数据已过期，请刷新后再试");
 		} else {
 			log.info("充值订单-审核:插入缓存{}", key);
 			redis.set(key, 1, 600);
 		}
-		RechargeOrder order = rechargeOrderService.getById(jsonObject.getString("id"));
+
+		QueryWrapper<RechargeOrder> qw = new QueryWrapper<>();
+		qw.lambda().eq(RechargeOrder::getId, jsonObject.getString("id")).eq(RechargeOrder::getVersion, jsonObject.getString("version"));
+		RechargeOrder order = rechargeOrderService.getOne(qw);
 		if (order == null) {
-			return Result.error("未找到对应实体");
+			return Result.error("数据已过期，请刷新后再试");
 		}
 
 		order.setStatus(jsonObject.getString("status"));

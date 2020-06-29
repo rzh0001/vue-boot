@@ -3,6 +3,7 @@ package org.jeecg.modules.df.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.Version;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -241,4 +242,7 @@ public class PayOrder {
 	 */
 	private String operatorId;
 	private String operatorUsername;
+
+	@Version
+	private Integer version;
 }

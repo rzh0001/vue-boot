@@ -141,4 +141,4 @@ skip:
 
 logging:
   level:
-    org.jeecg.modules.system.mapper: debug
+    org.jeecg.modules.df.mapper: debug

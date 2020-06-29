@@ -99,13 +99,13 @@
         @change="handleTableChange">
 
         <span slot="action" slot-scope="text, record">
-          <a-popconfirm title="确定已打款吗?" v-has="'rechargeOrder:paid'" v-if="record.status==0" @confirm="() => handleApproval({id: record.id, status: '1'})">
+          <a-popconfirm title="确定已打款吗?" v-has="'rechargeOrder:paid'" v-if="record.status==0" @confirm="() => handleApprovalLocal(record, 1)">
                   <a>已打款</a>
           </a-popconfirm>
-          <a-popconfirm title="确定已收到款项吗?" v-has="'rechargeOrder:approval'" v-if="record.status==1" @confirm="() => handleApproval({id: record.id, status: '2'})">
+          <a-popconfirm title="确定已收到款项吗?" v-has="'rechargeOrder:approval'" v-if="record.status==1" @confirm="() => handleApprovalLocal(record, 2)">
                   <a>审核通过</a> <a-divider type="vertical"/>
           </a-popconfirm>
-          <a-popconfirm title="确定未收到款项吗?" v-has="'rechargeOrder:approval'" v-if="record.status==1" @confirm="() => handleApproval({id: record.id, status: '3'})">
+          <a-popconfirm title="确定未收到款项吗?" v-has="'rechargeOrder:approval'" v-if="record.status==1" @confirm="() => handleApprovalLocal(record, 3)">
                   <a>审核拒绝</a>
           </a-popconfirm>
 
@@ -341,6 +341,20 @@
 
       toRecharge () {
         this.$router.push('/df/rechargeOrder/StepForm')
+      },
+      handleApprovalLocal(record, status) {
+        // this.handleApproval({id: record.id, status: status, version: record.version});
+        let params = { id: record.id, status: status, version: record.version };
+        var that = this;
+        putAction(that.url.approval, params).then((res) => {
+          if (res.success) {
+            that.$message.success(res.message);
+            that.loadData();
+          } else {
+            that.$message.error(res.message,6);
+            that.loadData();
+          }
+        });
       }
     }
   }

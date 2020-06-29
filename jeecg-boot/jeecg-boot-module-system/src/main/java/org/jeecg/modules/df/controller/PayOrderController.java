@@ -77,9 +77,9 @@ public class PayOrderController {
 				case PayConstant.MEMBER_TYPE_MEMBER:
 					queryWrapper.lambda().eq(PayOrder::getUserId, opUser.getId());
 					break;
-//				case PayConstant.MEMBER_TYPE_OPERATOR:
-//					queryWrapper.lambda().eq(PayOrder::getOperatorId, opUser.getId());
-//					break;
+				case PayConstant.MEMBER_TYPE_OPERATOR:
+					queryWrapper.lambda().isNull(PayOrder::getOperatorId).eq(PayOrder::getStatus, DfConstant.STATUS_SAVE);
+					break;
 				default:
 			}
 		}
@@ -182,9 +182,11 @@ public class PayOrderController {
 	@Transactional(rollbackFor = Exception.class)
 	public Result<Object> approval(@RequestBody JSONObject jsonObject) {
 
-		PayOrder order = payOrderService.getById(jsonObject.getString("id"));
+		QueryWrapper<PayOrder> qw = new QueryWrapper<>();
+		qw.lambda().eq(PayOrder::getId, jsonObject.getString("id")).eq(PayOrder::getVersion, jsonObject.getString("version"));
+		PayOrder order = payOrderService.getOne(qw);
 		if (order == null) {
-			return Result.error("未找到对应实体");
+			return Result.error("数据已过期，请刷新后再试");
 		}
 		String status = jsonObject.getString("status");
 
