@@ -118,13 +118,13 @@
         @change="handleTableChange">
 
         <span slot="action" slot-scope="text, record">
-          <a-popconfirm title="确定开始处理吗?" v-has="'payOrder:approval'" v-if="record.status==0" @confirm="() => handleApprovalLocal(record)">
+          <a-popconfirm title="确定开始处理吗?" v-has="'payOrder:approval'" v-if="record.status==0" @confirm="() => handleApprovalLocal(record, 1)">
                   <a>接单</a>
           </a-popconfirm>
-          <a-popconfirm title="确定已打款吗?" v-has="'payOrder:approval'" v-if="record.status==1" @confirm="() => handleApproval({id: record.id, status: '2'})">
+          <a-popconfirm title="确定已打款吗?" v-has="'payOrder:approval'" v-if="record.status==1" @confirm="() => handleApprovalLocal(record, 2)">
                   <a>已打款</a> <a-divider type="vertical"/>
           </a-popconfirm>
-          <a-popconfirm title="确定拒绝代付申请吗?" v-has="'payOrder:approval'" v-if="record.status==1" @confirm="() => handleApproval({id: record.id, status: '3'})">
+          <a-popconfirm title="确定拒绝代付申请吗?" v-has="'payOrder:approval'" v-if="record.status==1" @confirm="() => handleApprovalLocal(record, 3)">
                   <a>拒绝</a>
           </a-popconfirm>
           <a-popconfirm title="确定手动回调吗?" v-has="'payOrder:approval'" v-if="(record.status==2) || (record.status==3) && (record.callbackUrl!=null)" @confirm="() => manualCallback({id: record.id})">
@@ -403,13 +403,24 @@
           }
         });
       },
-      handleApprovalLocal(record){
-        this.handleApproval({id: record.id, status: '1'});
-        if (record.status === '0'){
-          this.$refs.detail.edit(record);
-          this.$refs.detail.title = "订单详情";
-          // this.$refs.detail.disableSubmit = true;
-        }
+      handleApprovalLocal(record, status){
+        // this.handleApproval({id: record.id, status: status, version: record.version});
+        let params = {id: record.id, status: status, version: record.version};
+        var that = this;
+        putAction(that.url.approval, params).then((res) => {
+          if (res.success) {
+            that.$message.success(res.message);
+            if (record.status === '0'){
+              this.$refs.detail.edit(record);
+              this.$refs.detail.title = "订单详情";
+              // this.$refs.detail.disableSubmit = true;
+            }
+            that.loadData();
+          } else {
+            that.$message.error(res.message,6);
+            that.loadData();
+          }
+        });
       },
       onChose(checked) {
         let param = { status: checked? 1:0 }

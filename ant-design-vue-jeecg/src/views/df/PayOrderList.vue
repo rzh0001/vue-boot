@@ -301,6 +301,11 @@
             width: 80
           },
           {
+            title: '操作员',
+            align: 'center',
+            dataIndex: 'operatorUsername'
+          },
+          {
             title: '创建时间',
             align: 'center',
             dataIndex: 'createTime'
@@ -330,11 +335,7 @@
           //   align: 'center',
           //   dataIndex: 'salesmanId'
           // },
-          // {
-          //   title: '介绍人帐号',
-          //   align: 'center',
-          //   dataIndex: 'salesmanUsername'
-          // },
+
           // {
           //   title: '介绍人姓名',
           //   align: 'center',
@@ -349,7 +350,8 @@
             title: '操作',
             dataIndex: 'action',
             align: 'center',
-            scopedSlots: { customRender: 'action' }
+            scopedSlots: { customRender: 'action' },
+            // fixed: 'right'
           }
         ],
         url: {
