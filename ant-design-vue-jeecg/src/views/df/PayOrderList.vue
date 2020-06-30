@@ -418,7 +418,7 @@
             that.loadData();
           }
         });
-      }
+      },
     }
   }
 </script>

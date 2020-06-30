@@ -88,7 +88,7 @@
 </template>
 
 <script>
-  import { httpAction,getAction } from '@/api/manage'
+  import { httpAction, putAction } from '@/api/manage'
   import pick from 'lodash.pick'
 
   export default {
@@ -116,7 +116,7 @@
           cardNumber:{rules: [{ required: true, message: '请输入卡号或支付宝帐号!' }]},
         },
         url: {
-
+          approval: '/df/payOrder/approval',
         },
       }
     },
@@ -140,19 +140,26 @@
         this.visible = false;
       },
       handleOk () {
-        // this.$emit("handleApproval", {id: this.model.id, status: '2'})
-
-        console.log(this.model)
-        // this.$parent.handleApproval({id: this.model.id, status: '2'})
-        this.$emit("handleApproval", {id: this.model.id, status: '2'})
-        this.close()
+        this.handleApprovalLocal(this.model, 2)
       },
       handleCancel () {
         this.close()
       },
       onCopy: function(e) {
         this.$message.info('复制成功');
-      }
+      },
+      handleApprovalLocal(record, status){
+        let params = {id: record.id, status: status, version: record.version+1};
+        var that = this;
+        putAction(that.url.approval, params).then((res) => {
+          if (res.success) {
+            that.$message.success(res.message,3);
+          } else {
+            that.$message.error(res.message,6);
+          }
+          this.close()
+        });
+      },
 
 
     }

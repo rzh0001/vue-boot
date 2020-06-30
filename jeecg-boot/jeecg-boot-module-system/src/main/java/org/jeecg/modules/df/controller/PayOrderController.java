@@ -181,6 +181,9 @@ public class PayOrderController {
 	@PutMapping(value = "/approval")
 	@Transactional(rollbackFor = Exception.class)
 	public Result<Object> approval(@RequestBody JSONObject jsonObject) {
+		if (jsonObject.getString("version").isEmpty()) {
+			return Result.error("未传递版本号，请刷新后再试");
+		}
 
 		QueryWrapper<PayOrder> qw = new QueryWrapper<>();
 		qw.lambda().eq(PayOrder::getId, jsonObject.getString("id")).eq(PayOrder::getVersion, jsonObject.getString("version"));
