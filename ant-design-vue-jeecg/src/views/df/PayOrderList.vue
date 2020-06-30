@@ -138,7 +138,7 @@
 
     <!-- 表单区域 -->
     <payOrder-modal ref="modalForm" @ok="modalFormOk"></payOrder-modal>
-    <payOrderDetail-modal ref="detail" @ok="modalFormOk" @handleApproval="handleApproval" ></payOrderDetail-modal>
+    <payOrderDetail-modal ref="detail" @ok="modalFormOk" @paid="paid" ></payOrderDetail-modal>
   </a-card>
 </template>
 
@@ -221,25 +221,25 @@
           //   align: 'center',
           //   dataIndex: 'orderFee'
           // },
-          {
-            title: '通道',
-            align: 'center',
-            dataIndex: 'channel'
-          },
-          {
-            title: '账户类型',
-            align: 'center',
-            dataIndex: 'accountType',
-            customRender: function(text) {
-              if (text == 1) {
-                return '对私'
-              }else if (text == 2) {
-                return '对公'
-              } else {
-                return text
-              }
-            }
-          },
+          // {
+          //   title: '通道',
+          //   align: 'center',
+          //   dataIndex: 'channel'
+          // },
+          // {
+          //   title: '账户类型',
+          //   align: 'center',
+          //   dataIndex: 'accountType',
+          //   customRender: function(text) {
+          //     if (text == 1) {
+          //       return '对私'
+          //     }else if (text == 2) {
+          //       return '对公'
+          //     } else {
+          //       return text
+          //     }
+          //   }
+          // },
           {
             title: '账户名',
             align: 'center',
@@ -407,18 +407,22 @@
         putAction(that.url.approval, params).then((res) => {
           if (res.success) {
             that.$message.success(res.message);
-            if (record.status === '0'){
+            if (record.status === '0' && record.version === 1){
               this.$refs.detail.edit(record);
               this.$refs.detail.title = "订单详情";
               // this.$refs.detail.disableSubmit = true;
             }
-            that.loadData();
+            that.searchQueryLocal();
           } else {
             that.$message.error(res.message,6);
-            that.loadData();
+            that.searchQueryLocal();
           }
         });
       },
+      paid(record){
+        record.version = record.version + 1 ;
+        this.handleApprovalLocal(record, 2)
+      }
     }
   }
 </script>

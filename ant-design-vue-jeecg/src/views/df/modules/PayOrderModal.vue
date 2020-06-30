@@ -104,7 +104,7 @@
         form: this.$form.createForm(this),
         validatorRules:{
           amount:{rules: [{ required: true, message: '请输入金额!' }]},
-          channel:{rules: [{ required: true, message: '请选择通道!' }]},
+          channel:{rules: [{ required: true, message: '请选择通道!'}],  initialValue:'bank'},
           accountName:{rules: [{ required: true, message: '请输入账户名!' }]},
           cardNumber:{rules: [{ required: true, message: '请输入卡号或支付宝帐号!' }]},
         },

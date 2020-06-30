@@ -140,7 +140,8 @@
         this.visible = false;
       },
       handleOk () {
-        this.handleApprovalLocal(this.model, 2)
+        this.$emit("paid", this.model)
+        this.close()
       },
       handleCancel () {
         this.close()
@@ -158,6 +159,7 @@
             that.$message.error(res.message,6);
           }
           this.close()
+          this.$emit("searchQueryLocal")
         });
       },
 
