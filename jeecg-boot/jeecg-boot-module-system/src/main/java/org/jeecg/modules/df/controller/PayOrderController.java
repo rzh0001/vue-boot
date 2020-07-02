@@ -181,6 +181,8 @@ public class PayOrderController {
 	@PutMapping(value = "/approval")
 	@Transactional(rollbackFor = Exception.class)
 	public Result<Object> approval(@RequestBody JSONObject jsonObject) {
+		LoginUser opUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+
 		if (jsonObject.getString("version").isEmpty()) {
 			return Result.error("未传递版本号，请刷新后再试");
 		}
@@ -203,6 +205,8 @@ public class PayOrderController {
 		}
 		order.setStatus(status);
 		order.setSuccessTime(new Date());
+		order.setUpdateTime(new Date());
+		order.setUpdateBy(opUser.getUsername());
 		payOrderService.updateById(order);
 
 		if (DfConstant.PAY_STATUS_PAID.equals(status)) {

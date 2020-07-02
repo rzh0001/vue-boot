@@ -5,7 +5,10 @@
     <select id="selectPageVo" resultType="org.jeecg.modules.df.entity.UserBankcardVo">
         SELECT *
         FROM df_user_bankcard b
-                 left join (select bankcard_id, sum(amount) as todayAmount from df_recharge_order where to_days(update_time) = to_days(now()) and status = 2 group by bankcard_id) t
+                 left join (select bankcard_id, sum(amount) as todayAmount
+                            from df_recharge_order
+                            where to_days(success_time) = to_days(now()) and status = 2
+                            group by bankcard_id) t
                            on b.id = t.bankcard_id ${ew.customSqlSegment}
     </select>
     <select id="getRandomBankcard" parameterType="Map" resultType="org.jeecg.modules.df.entity.UserBankcardConfigDO">

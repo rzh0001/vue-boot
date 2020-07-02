@@ -205,6 +205,7 @@ public class RechargeOrderController {
 	@PutMapping(value = "/approval")
 	@Transactional(rollbackFor = Exception.class)
 	public Result<Object> approval(@RequestBody JSONObject jsonObject) {
+		LoginUser opUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
 
 		log.info("充值订单-审核:" + jsonObject.toJSONString());
 		String key = "CZ-" + jsonObject.getString("id") + "-" + jsonObject.getString("status");
@@ -224,7 +225,11 @@ public class RechargeOrderController {
 		}
 
 		order.setStatus(jsonObject.getString("status"));
-		order.setSuccessTime(new Date());
+		order.setUpdateTime(new Date());
+		order.setUpdateBy(opUser.getUsername());
+		if (order.getStatus().equals(DfConstant.PAY_STATUS_PAID) || order.getStatus().equals(DfConstant.PAY_STATUS_REJECTED)) {
+			order.setSuccessTime(new Date());
+		}
 		rechargeOrderService.updateById(order);
 
 		// 审核通过增加余额
