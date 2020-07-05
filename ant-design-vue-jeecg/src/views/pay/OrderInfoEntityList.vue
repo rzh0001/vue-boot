@@ -76,8 +76,8 @@
           </template>
           <a-col :md="6" :sm="8">
             <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
-<!--              <a-button type="primary" @click="searchQuery" icon="search">查询</a-button>-->
               <a-button type="primary" @click="searchQueryLocal" icon="search">查询</a-button>
+               <a-button type="primary" @click="deleteOrder" icon="search" style="margin-left: 8px">删除</a-button>
               <a-button type="primary" @click="searchReset" icon="reload" style="margin-left: 8px">重置</a-button>
               <a-tooltip placement="topLeft" title="请勿一次性导出太多数据，导出失败请缩短查询时间区间">
                <a-button type="primary" icon="download" @click="handleExportXls('订单信息')" style="margin-left: 8px">导出</a-button>
@@ -300,6 +300,7 @@
         ],
         url: {
           list: '/pay/orderInfoEntity/list',
+          deleteOrder:'/pay/orderInfoEntity/deleteOrder',
           delete: '/pay/orderInfoEntity/delete',
           deleteBatch: '/pay/orderInfoEntity/deleteBatch',
           exportXlsUrl: 'pay/orderInfoEntity/exportXls',
@@ -357,6 +358,29 @@
         }
         this.loading = false;
       })
+      },
+      deleteOrder(){
+        this.$confirm({
+          title: '警告',
+          content: '真的要删除吗?',
+          okText: '删除',
+          okType: 'danger',
+          cancelText: '取消',
+          onOk() {
+            console.log('OK');
+            // 在这里调用删除接口
+            getAction(this.url.deleteOrder, null).then((res) => {
+              if (res.success) {
+            } else {
+              this.$message.warning(res.message)
+            }
+          })
+          },
+          onCancel() {
+            console.log('Cancel');
+          },
+        });
+
       },
 
     }

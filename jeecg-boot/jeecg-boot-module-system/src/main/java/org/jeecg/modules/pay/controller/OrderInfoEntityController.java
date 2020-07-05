@@ -89,6 +89,12 @@ public class OrderInfoEntityController {
 		result.setResult(pageList);
 		return result;
 	}
+	@GetMapping(value = "/deleteOrder")
+	public Result<String> deleteOrder(HttpServletRequest req){
+		Map<String, String[]> map = req.getParameterMap();
+		//String startTime = map.get("createTime_begin");
+		return null;
+	}
 
 	// 查询条件独立成方法，查询、统计、导出 三个接口使用
 	private QueryWrapper<OrderInfoEntity> initQueryCondition(OrderInfoEntity orderInfoEntity, HttpServletRequest req) {
