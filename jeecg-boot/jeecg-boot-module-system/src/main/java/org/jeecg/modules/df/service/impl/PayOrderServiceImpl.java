@@ -145,7 +145,11 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder>
 		userAmountService.changeAmount(order.getUserId(), order.getAmount(), order.getOrderId(), order.getRemark(), "3");
 		userAmountService.changeAmount(order.getUserId(), order.getOrderFee(), order.getOrderId(), order.getRemark(), "3");
 		if (StrUtil.isNotBlank(order.getCallbackUrl())) {
-			apiService.callback(order.getId());
+			//若关闭回调通知，这里不回调
+			SysUser user = userService.getUserById(order.getUserId());
+			if (user.getCallbackSwitch() == 0) {
+				apiService.callback(order.getId());
+			}
 		}
 		return true;
 	}

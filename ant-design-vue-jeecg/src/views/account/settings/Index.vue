@@ -37,7 +37,7 @@
 <!--            </a-menu-item>-->
             <a-menu-item key="/account/settings/apiKey">
               <router-link :to="{ name: 'account-settings-apiKey' }">
-                系统密钥
+                对接服务器配置
               </router-link>
             </a-menu-item>
           </a-menu>

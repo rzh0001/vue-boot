@@ -1021,9 +1021,8 @@ public class SysUserController {
 	}
 
 
-	@GetMapping(value = "/getApiKey")
-	public Result<String> getApiKey(HttpServletRequest req, HttpServletResponse res) {
-		Result<String> result = new Result<>();
+	@GetMapping(value = "/getUserServerConfig")
+	public Result getUserServerConfig(HttpServletRequest req, HttpServletResponse res) {
 		LoginUser optUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
 
 		SysUser user = sysUserService.getOne(
@@ -1031,10 +1030,12 @@ public class SysUserController {
 						.lambda()
 						.eq(SysUser::getId, optUser.getId()));
 
-		result.setResult(user.getApiKey());
-		result.setSuccess(true);
+		Map data = new HashMap();
+		data.put("apiKey", user.getApiKey());
+		data.put("serverIp", user.getServerIp());
+		data.put("callbackSwitch", user.getCallbackSwitch());
 
-		return result;
+		return Result.ok(data);
 	}
 
 	@PutMapping(value = "/resetApiKey")
@@ -1051,6 +1052,28 @@ public class SysUserController {
 
 		result.setSuccess(true);
 		return result;
+	}
+
+	@PutMapping(value = "/configServerIp")
+	public Result configServerIp(@RequestBody JSONObject jsonObject) {
+		LoginUser opUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+
+		SysUser user = sysUserService.getUserById(opUser.getId());
+		user.setServerIp(jsonObject.getString("serverIp"));
+		sysUserService.saveOrUpdate(user);
+
+		return Result.ok();
+	}
+
+	@PutMapping(value = "/configCallbackSwitch")
+	public Result configCallbackSwitch(@RequestBody JSONObject jsonObject) {
+		LoginUser opUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
+
+		SysUser user = sysUserService.getUserById(opUser.getId());
+		user.setCallbackSwitch(jsonObject.getInteger("callbackSwitch"));
+		sysUserService.saveOrUpdate(user);
+
+		return Result.ok();
 	}
 
 	@RequestMapping(value = "/cleanGoogle", method = RequestMethod.GET)

@@ -227,4 +227,6 @@ public class SysUser {
 	private java.math.BigDecimal transactionFeeRate;
 
 	private int bizOnline;
+	private String serverIp;
+	private int callbackSwitch;
 }

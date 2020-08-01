@@ -7,19 +7,24 @@ import cn.hutool.json.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.jeecg.common.constant.CommonConstant;
 import org.jeecg.modules.api.entity.*;
-import org.jeecg.modules.df.entity.*;
-import org.jeecg.modules.api.service.IDfApiService;
-import org.jeecg.modules.df.service.IPayOrderService;
 import org.jeecg.modules.api.exception.AccountAbnormalException;
 import org.jeecg.modules.api.exception.ApiException;
-import org.jeecg.modules.exception.RRException;
 import org.jeecg.modules.api.exception.SignatureException;
+import org.jeecg.modules.api.service.IDfApiService;
+import org.jeecg.modules.df.entity.PayOrder;
+import org.jeecg.modules.df.service.IPayOrderService;
+import org.jeecg.modules.exception.RRException;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.service.ISysUserService;
 import org.jeecg.modules.system.service.IUserAmountEntityService;
+import org.jeecg.modules.system.util.IPUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author ruanzh
@@ -41,9 +46,18 @@ public class DfApiServiceImpl implements IDfApiService {
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public ApiResponseBody<PayOrderResult> createOrder(ApiRequestBody req) {
+		SysUser user = userService.getUserByName(req.getUsername());
+
+		ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+		HttpServletRequest request = servletRequestAttributes.getRequest();
+		String ipAddr = IPUtils.getIpAddr(request);
+		if (!user.getServerIp().contains(ipAddr)) {
+			log.error("=======>调用订单创建接口：IP非法");
+			throw new ApiException("IP非法");
+		}
+
 		log.info("\n=======>调用订单创建接口：检查参数");
 		// 检查商户状态
-		SysUser user = userService.getUserByName(req.getUsername());
 		if (BeanUtil.isEmpty(user)) {
 			log.error("\n=======>调用订单创建接口：商户不存在，请检查参数");
 			throw new AccountAbnormalException("商户不存在，请检查参数");
