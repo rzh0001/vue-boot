@@ -78,7 +78,8 @@ public class PayOrderController {
 					queryWrapper.lambda().eq(PayOrder::getUserId, opUser.getId());
 					break;
 				case PayConstant.MEMBER_TYPE_OPERATOR:
-					queryWrapper.lambda().isNull(PayOrder::getOperatorId).eq(PayOrder::getStatus, DfConstant.STATUS_SAVE);
+					queryWrapper.lambda().eq(PayOrder::getAgentId, opUser.getAgentId()).
+							isNull(PayOrder::getOperatorId).eq(PayOrder::getStatus, DfConstant.STATUS_SAVE);
 					break;
 				default:
 			}
