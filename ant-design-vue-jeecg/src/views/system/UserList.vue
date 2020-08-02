@@ -213,10 +213,6 @@
     <user-amount-modal ref="userAmountModal" @ok="modalFormOk"></user-amount-modal>
 
     <sys-user-agent-modal ref="sysUserAgentModal"></sys-user-agent-modal>
-    <user-channel-modal ref="userChannelModal"></user-channel-modal>
-    <user-business-modal ref="userBusinessModal"></user-business-modal>
-    <user-rate-modal ref="userRateModal"></user-rate-modal>
-    <active-business-modal ref="activeBusinessModal"></active-business-modal>
   </a-card>
 </template>
 
@@ -232,9 +228,6 @@
   import { frozenBatch } from '@/api/api'
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
   import SysUserAgentModal from './modules/SysUserAgentModal'
-  import UserChannelModal from './modules/UserChannelModal'
-  import UserBusinessModal from './modules/UserBusinessModal'
-  import UserRateModal from './modules/UserRateModal'
   import ActiveBusinessModal from './modules/ActiveBusinessModal'
   import {getAction,httpAction} from '@/api/manage'
 
@@ -249,9 +242,6 @@
       UserMemberModal,
       UserOperatorModal,
       PasswordModal,
-      UserChannelModal,
-      UserBusinessModal,
-      UserRateModal,
       UserAmountModal,
       ActiveBusinessModal
     },
@@ -357,43 +347,6 @@
       }
     },
     methods: {
-      rateDeatil:function(record){
-        this.$refs.userRateModal.title='已添加费率详情';
-        this.$refs.userRateModal.detail(record);
-      },
-      addRate: function(record){
-        this.$refs.userRateModal.title='添加费率';
-        this.$refs.userRateModal.addRate(record);
-      },
-      businessDeatil:function(record){
-        if(record.memberType != "1"){
-          alert("会员类型不是代理，无挂马信息");
-          return;
-        }
-        this.$refs.userBusinessModal.title='已添加挂马详情';
-        this.$refs.userBusinessModal.detail(record);
-      },
-      addBusiness:function(record){
-        if(record.memberType != "1"){
-          alert("无操作权限");
-          return;
-        }
-        this.$refs.userBusinessModal.title='添加挂马信息';
-        this.$refs.userBusinessModal.addUserBusiness(record);
-      },
-      channelDetail: function(record){
-        this.$refs.userChannelModal.detail(record);
-      },
-      addChannel: function(record){
-        this.$refs.userChannelModal.addChannel(record);
-      },
-      activeBusiness: function(record){
-        if(record.memberType != "1"){
-          alert("无操作权限");
-          return;
-        }
-        this.$refs.activeBusinessModal.activeBusiness(record);
-      },
       rechargeAmount: function(record){
         if(record.memberType != "1"){
           alert("无操作权限");
