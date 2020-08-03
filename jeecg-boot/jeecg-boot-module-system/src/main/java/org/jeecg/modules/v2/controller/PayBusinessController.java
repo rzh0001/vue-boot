@@ -10,6 +10,8 @@ import java.net.URLDecoder;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import cn.hutool.core.util.StrUtil;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.aspect.annotation.AutoLog;
@@ -100,6 +102,7 @@ public class PayBusinessController {
                 businesses.get(i).setKey(i + 1);
             }
         }
+        businesses.stream().forEach(b->b.setBusinessApiKey(StrUtil.subWithLength(b.getBusinessApiKey(),0,10)));
         Result result = new Result();
         result.setResult(businesses);
         return result;

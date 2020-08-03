@@ -602,7 +602,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         String rate = apiService.getRate(userChannel);
 
         String gateWay = apiService.getGateWayUrl(userChannel);
-        // 保存订单信息
+        // 保存订单信息OrderInfoEntityServiceImpl
         OrderInfoEntity order = this.saveOrder(submitAmount, outerOrderId, userChannel, business, rate, user, callbackUrl, remark, ip);
         // 请求挂马平台
         return requestPayUrl.requestPayUrl(order, userName, gateWay, key, innerCallBackUrl, business);

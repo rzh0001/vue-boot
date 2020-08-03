@@ -17,7 +17,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface ProductChannelMapper extends BaseMapper<ProductChannel> {
 
-    @Select("select channel_code from pay_product_channel where product_code=#{productCode}")
+    @Select("select channel_code from pay_v2_product_channel where product_code=#{productCode}")
     List<String> getProductChannelByProductCode(@Param("productCode") String productCode);
 
     @Delete("delete from pay_product_channel where product_code=#{productCode}")

@@ -9,7 +9,7 @@
           and del_flag!=1
     </select>
     <select id="queryUserChannel" resultType="java.lang.String" parameterType="java.lang.String">
-        select channel_code from sys_user_channel where user_name=#{userName} and channel_code in
+        select channel_code from pay_v2_user_channel where user_name=#{userName} and channel_code in
         <foreach collection="channelCodes" item="code" index="index" open="(" close=")" separator=",">
             #{code}
         </foreach>

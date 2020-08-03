@@ -26,7 +26,7 @@ public interface UserChannelEntityMapper extends BaseMapper<UserChannelEntity> {
 
 	List<String> queryUserChannel(@Param("channelCodes") List<String> channelCodes, @Param("userName") String userName);
 
-	@Update("update sys_user_channel set update_time=now() where user_name=#{userName} and channel_code=#{channelCode}")
+	@Update("update pay_v2_user_channel set update_time=now() where user_name=#{userName} and channel_code=#{channelCode}")
 	void updateUseTime(@Param("channelCode") String channelCode, @Param("userName") String userName);
 
 	@Select("select channel_code from sys_user_channel where user_name=#{userName}")
@@ -39,7 +39,7 @@ public interface UserChannelEntityMapper extends BaseMapper<UserChannelEntity> {
 
 	void deleteProductChannle(@Param("productCode") String product, @Param("channels") List<String> channels);
 
-	@Select("select DISTINCT product_code from sys_user_channel where user_name=#{agentName}")
+	@Select("select DISTINCT product_code from pay_v2_user_product where user_name=#{agentName}")
 	List<String> getRelationProducts(@Param("agentName") String agentName);
 
 	@Select("select * from sys_user_channel where user_name=#{loginName} and product_code=#{productCode}")
