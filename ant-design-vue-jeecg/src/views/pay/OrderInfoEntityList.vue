@@ -365,6 +365,7 @@
         // 在这里调用删除接口
         getAction(this.url.deleteOrder,  { lastTime: deleteTime }).then((res) => {
           if (res.success) {
+          this.$message.message (res.result) ;
         } else {
           this.$message.warning(res.message)
         }

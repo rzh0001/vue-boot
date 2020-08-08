@@ -99,7 +99,7 @@ public class OrderInfoEntityController {
 		//删除订单数据
 		orderInfoEntityService.deleteOrder(lastTime);
 		result.setResult("删除成功");
-		return null;
+		return result;
 	}
 
 	// 查询条件独立成方法，查询、统计、导出 三个接口使用
