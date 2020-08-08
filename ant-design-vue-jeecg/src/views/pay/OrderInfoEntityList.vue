@@ -360,26 +360,15 @@
       })
       },
       deleteOrder(){
-        this.$confirm({
-          title: '警告',
-          content: '真的要删除吗?',
-          okText: '删除',
-          okType: 'danger',
-          cancelText: '取消',
-          onOk() {
-            console.log('OK');
-            // 在这里调用删除接口
-            getAction(this.url.deleteOrder, null).then((res) => {
-              if (res.success) {
-            } else {
-              this.$message.warning(res.message)
-            }
-          })
-          },
-          onCancel() {
-            console.log('Cancel');
-          },
-        });
+        var params = this.getQueryParams();
+        var deleteTime =params.createTime_end;
+        // 在这里调用删除接口
+        getAction(this.url.deleteOrder,  { lastTime: deleteTime }).then((res) => {
+          if (res.success) {
+        } else {
+          this.$message.warning(res.message)
+        }
+      })
 
       },
 

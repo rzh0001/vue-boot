@@ -1,6 +1,7 @@
 package org.jeecg.modules.pay.controller;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -90,9 +91,14 @@ public class OrderInfoEntityController {
 		return result;
 	}
 	@GetMapping(value = "/deleteOrder")
-	public Result<String> deleteOrder(HttpServletRequest req){
-		Map<String, String[]> map = req.getParameterMap();
-		//String startTime = map.get("createTime_begin");
+	public Result<String> deleteOrder(String lastTime){
+		Result<String> result = new Result();
+		if(StringUtils.isEmpty(lastTime)){
+			return result;
+		}
+		//删除订单数据
+		orderInfoEntityService.deleteOrder(lastTime);
+		result.setResult("删除成功");
 		return null;
 	}
 

@@ -87,5 +87,5 @@ public interface IOrderInfoEntityService extends IService<OrderInfoEntity> {
 	 */
 	void updateCustomerIncomeAmount(String orderId, BigDecimal amount) throws Exception;
 
-
+	void deleteOrder(String lastTime);
 }

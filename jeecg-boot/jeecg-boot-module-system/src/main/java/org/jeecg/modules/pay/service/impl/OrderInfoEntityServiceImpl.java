@@ -3,6 +3,7 @@ package org.jeecg.modules.pay.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -1059,5 +1060,10 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     public void updateOrderStatusNoBackByOrderId(String orderId) {
         baseMapper.updateOrderStatusNoBackByOrderId(orderId);
     }
-
+    @Override
+    public void deleteOrder(String lastTime){
+        QueryWrapper<OrderInfoEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lt( "create_time",lastTime);
+        getBaseMapper().delete(queryWrapper);
+    }
 }
