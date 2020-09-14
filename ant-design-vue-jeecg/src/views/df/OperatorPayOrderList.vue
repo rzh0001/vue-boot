@@ -360,7 +360,7 @@
           deleteBatch: '/df/payOrder/deleteBatch',
           exportXlsUrl: 'df/payOrder/exportXls',
           importExcelUrl: 'df/payOrder/importExcel',
-          summaryUrl: '/df/payOrder/summary',
+          summaryUrl: '/df/operatorPayOrder/summary',
           manualCallback: '/df/payOrder/manualCallback',
           getStatus: '/df/operatorPayOrder/getBizOnlineStatus',
           changeStatus: '/df/operatorPayOrder/changeBizOnlineStatus',
