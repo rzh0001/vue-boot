@@ -1,0 +1,4 @@
+-- Flyway 数据库版本管理 https://flywaydb.org/documentation/migrations#overview
+-- V1.0.0 脚本不会被执行
+-- 创建脚本需严格按照命名格式命名
+-- 第一次运行会自动创建flyway_schema_history表、base line记录

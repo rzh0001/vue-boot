@@ -1,6 +1,8 @@
 spring:
   profiles:
     active: dev
+  flyway:
+    baseline-on-migrate: true
 swagger:
   production: false
   basic:
