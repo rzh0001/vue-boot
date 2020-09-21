@@ -13,8 +13,8 @@
         <a-form-item>
           <a-alert :message="'剩余代付额度：' + avaliableAmount" type="info" showIcon/>
         </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="订单号" v-show="false">
-          <a-input placeholder="请输入订单号" v-decorator="['orderId', validatorRules.orderId ]" />
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="订单号" v-show="true">
+          <a-input placeholder="请输入订单号" v-decorator="['orderId', validatorRules.orderId ]" disabled/>
         </a-form-item>
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="外部订单号" v-show="false">
           <a-input placeholder="请输入外部订单号" v-decorator="['outerOrderId', validatorRules.outerOrderId ]" />
@@ -26,7 +26,7 @@
 <!--          <a-input placeholder="请输入商户编号" v-decorator="['merchantId', validatorRules.merchantId ]" />-->
 <!--        </a-form-item>-->
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="订单金额">
-          <a-input-number v-decorator="[ 'amount', validatorRules.amount]"  min="0"/>
+          <a-input-number v-decorator="[ 'amount', validatorRules.amount]" />
         </a-form-item>
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="交易手续费"  v-show="false">
           <a-input-number v-decorator="[ 'transactionFee', {}]" />
@@ -83,6 +83,7 @@
   import { httpAction,getAction } from '@/api/manage'
   import pick from 'lodash.pick'
   import moment from "moment"
+  import random from "random-string"
 
   export default {
     name: "PayOrderModal",
@@ -114,6 +115,7 @@
           getMemberAvailableAmount: '/sys/userAmountEntity/getMemberAvailableAmount'
         },
         avaliableAmount: 0,
+        orderId: ''
       }
     },
     created () {
@@ -126,6 +128,7 @@
       edit (record) {
         this.form.resetFields();
         this.model = Object.assign({}, record);
+        this.model.orderId = 'DF' + moment(new Date).format("YYYYMMDDHHmmss") + random();
         this.visible = true;
         this.$nextTick(() => {
           this.form.setFieldsValue(pick(this.model,'orderId','outerOrderId','userId','userName','userRealname','merchantId','amount','transactionFee','fixedFee','orderFee','channel','accountType','accountName','cardNumber','bankName','branchName','status','remark','agentId','agentUsername','agentRealname','salesmanId','salesmanUsername','salesmanRealname','ip'))
@@ -157,7 +160,6 @@
             //时间格式化
             formData.successTime = formData.successTime?formData.successTime.format('YYYY-MM-DD HH:mm:ss'):null;
 
-            console.log(formData)
             httpAction(httpurl,formData,method).then((res)=>{
               if(res.success){
                 that.$message.success(res.message);

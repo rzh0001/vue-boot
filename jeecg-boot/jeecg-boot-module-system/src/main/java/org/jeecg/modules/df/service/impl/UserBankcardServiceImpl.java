@@ -50,6 +50,7 @@ public class UserBankcardServiceImpl extends ServiceImpl<UserBankcardMapper, Use
 		map.put("agent_id", agentId);
 		map.put("user_id", userId);
 		UserBankcardConfigDO randomBankcard = baseMapper.getRandomBankcard(map);
+		// 没有指定银行卡，就随机选一张
 		if (randomBankcard == null) {
 			map.remove("user_id");
 			randomBankcard = baseMapper.getRandomBankcard(map);

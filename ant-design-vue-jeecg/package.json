@@ -10,6 +10,7 @@
     "test:e2e": "vue-cli-service test:e2e"
   },
   "dependencies": {
+    "random-string": "^0.2.0",
     "64": "^0.2.0",
     "@antv/data-set": "^0.10.2",
     "@tinymce/tinymce-vue": "^2.0.0",

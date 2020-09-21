@@ -47,6 +47,13 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder>
 	public boolean create(PayOrder order) {
 		LoginUser ou = (LoginUser) SecurityUtils.getSubject().getPrincipal();
 
+		QueryWrapper<PayOrder> qw = new QueryWrapper<>();
+		qw.lambda().eq(PayOrder::getUserId, ou.getId()).eq(PayOrder::getOrderId, order.getOrderId());
+		Integer count = baseMapper.selectCount(qw);
+		if (count > 0) {
+			throw new RRException("订单号重复，订单可能已创建成功，请确认后再试！");
+		}
+
 		// 获取费率配置
 		SysUser user = userService.getById(ou.getId());
 		if (BeanUtil.isEmpty(user)
@@ -65,8 +72,9 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder>
 		order.setSalesmanUsername(user.getSalesmanUsername());
 		order.setSalesmanRealname(user.getSalesmanRealname());
 
+		// 订单号由前端生成 2020-09-21 22:15:30
 		// 生成订单号
-		order.setOrderId(IDUtil.genPayOrderId());
+//		order.setOrderId(IDUtil.genPayOrderId());
 		order.setStatus(DfConstant.STATUS_SAVE);
 
 		// 计算手续费

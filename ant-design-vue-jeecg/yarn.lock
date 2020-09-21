@@ -9172,6 +9172,11 @@ raf@^3.4.0:
   dependencies:
     performance-now "^2.1.0"
 
+random-string@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.npm.taobao.org/random-string/download/random-string-0.2.0.tgz#a46e4375352beda9a0d7b0d19ed6d321ecd1d82d"
+  integrity sha1-pG5DdTUr7amg17DRntbTIezR2C0=
+
 randombytes@^2.0.0, randombytes@^2.0.1, randombytes@^2.0.5:
   version "2.1.0"
   resolved "https://registry.npm.taobao.org/randombytes/download/randombytes-2.1.0.tgz#df6f84372f0270dc65cdf6291349ab7a473d4f2a"

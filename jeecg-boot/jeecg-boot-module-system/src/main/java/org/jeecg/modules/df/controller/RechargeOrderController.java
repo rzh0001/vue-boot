@@ -156,17 +156,14 @@ public class RechargeOrderController {
 	@AutoLog(value = "代付充值订单-添加")
 	@ApiOperation(value = "代付充值订单-添加", notes = "代付充值订单-添加")
 	@PostMapping(value = "/add")
-	public Result<RechargeOrder> add(@RequestBody RechargeOrder order) {
-		Result<RechargeOrder> result = new Result<RechargeOrder>();
+	public Result add(@RequestBody RechargeOrder order) {
 		try {
 			RechargeOrder data = rechargeOrderService.add(order);
-			result.setResult(data);
-			result.success("添加成功！");
+			return Result.ok(data);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
-			result.error500("操作失败");
+			return Result.error(e.getMessage());
 		}
-		return result;
 	}
 
 	/**
