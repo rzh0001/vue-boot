@@ -154,8 +154,8 @@
     <root level="INFO">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE"/>
-        <appender-ref ref="HTML"/>
-        <appender-ref ref="FILE_HTML"/>
+        <!--        <appender-ref ref="HTML"/>-->
+        <!--        <appender-ref ref="FILE_HTML"/>-->
         <appender-ref ref="Async_FileLog"/>
     </root>
 

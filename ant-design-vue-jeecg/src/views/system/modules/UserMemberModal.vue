@@ -43,68 +43,6 @@
           <a-input placeholder="请输入用户名称" v-decorator="[ 'realname', validatorRules.realname]"/>
         </a-form-item>
 
-        <!--        <a-form-item label="角色分配" :labelCol="labelCol" :wrapperCol="wrapperCol" v-show="!roleDisabled" >-->
-        <!--          <a-select-->
-        <!--            mode="multiple"-->
-        <!--            style="width: 100%"-->
-        <!--            placeholder="请选择用户角色"-->
-        <!--            v-model="selectedRole">-->
-        <!--            <a-select-option v-for="(role,roleindex) in roleList" :key="roleindex.toString()" :value="role.id">-->
-        <!--              {{ role.roleName }}-->
-        <!--            </a-select-option>-->
-        <!--          </a-select>-->
-        <!--        </a-form-item>-->
-
-        <!--部门分配-->
-        <!--        <a-form-item label="部门分配" :labelCol="labelCol" :wrapperCol="wrapperCol" v-show="!departDisabled">-->
-        <!--          <a-input-search-->
-        <!--            placeholder="点击右侧按钮选择部门"-->
-        <!--            v-model="checkedDepartNameString"-->
-        <!--            disabled-->
-        <!--            @search="onSearch">-->
-        <!--            <a-button slot="enterButton" icon="search">选择</a-button>-->
-        <!--          </a-input-search>-->
-        <!--        </a-form-item>-->
-        <!--        <a-form-item label="头像" :labelCol="labelCol" :wrapperCol="wrapperCol">-->
-        <!--          <a-upload-->
-        <!--            listType="picture-card"-->
-        <!--            class="avatar-uploader"-->
-        <!--            :showUploadList="false"-->
-        <!--            :action="uploadAction"-->
-        <!--            :data="{'isup':1}"-->
-        <!--            :headers="headers"-->
-        <!--            :beforeUpload="beforeUpload"-->
-        <!--            @change="handleChange"-->
-        <!--          >-->
-        <!--            <img v-if="picUrl" :src="getAvatarView()" alt="头像" style="height:104px;max-width:300px"/>-->
-        <!--            <div v-else>-->
-        <!--              <a-icon :type="uploadLoading ? 'loading' : 'plus'" />-->
-        <!--              <div class="ant-upload-text">上传</div>-->
-        <!--            </div>-->
-        <!--          </a-upload>-->
-        <!--        </a-form-item>-->
-
-        <!--        <a-form-item label="生日" :labelCol="labelCol" :wrapperCol="wrapperCol">-->
-        <!--          <a-date-picker-->
-        <!--            style="width: 100%"-->
-        <!--            placeholder="请选择生日"-->
-        <!--            v-decorator="['birthday', {initialValue:!model.birthday?null:moment(model.birthday,dateFormat)}]"/>-->
-        <!--        </a-form-item>-->
-
-        <!--        <a-form-item label="性别" :labelCol="labelCol" :wrapperCol="wrapperCol">-->
-        <!--          <a-select v-decorator="[ 'sex', {}]" placeholder="请选择性别">-->
-        <!--            <a-select-option :value="1">男</a-select-option>-->
-        <!--            <a-select-option :value="2">女</a-select-option>-->
-        <!--          </a-select>-->
-        <!--        </a-form-item>-->
-
-        <!--        <a-form-item label="邮箱" :labelCol="labelCol" :wrapperCol="wrapperCol">-->
-        <!--          <a-input placeholder="请输入邮箱" v-decorator="[ 'email', validatorRules.email]" />-->
-        <!--        </a-form-item>-->
-
-        <!--        <a-form-item label="手机号码" :labelCol="labelCol" :wrapperCol="wrapperCol">-->
-        <!--        <a-input placeholder="请输入手机号码" :disabled="isDisabledAuth('user:form:phone')" v-decorator="[ 'phone', validatorRules.phone]" />-->
-        <!--      </a-form-item>-->
 
         <a-form-item label="所属介绍人" :labelCol="labelCol" :wrapperCol="wrapperCol" v-show="!salesmanDisabled">
           <a-select
@@ -127,6 +65,16 @@
           <a-input-number placeholder="" :disabled="isDisabledAuth('user:form:transactionFeeRate')"
                           v-decorator="[ 'transactionFeeRate',validatorRules.transactionFeeRate]"
                           min="0.0001"/>
+        </a-form-item>
+        <a-form-item label="大额订单限制" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input-number placeholder="" :disabled="isDisabledAuth('user:form:orderFixedFee')"
+                          v-decorator="[ 'largeOrderLimit',validatorRules.largeOrderLimit]"
+                          min="0.01"/>
+        </a-form-item>
+        <a-form-item label="大额订单手续费" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input-number placeholder="" :disabled="isDisabledAuth('user:form:orderFixedFee')"
+                          v-decorator="[ 'largeOrderFee',validatorRules.largeOrderFee]"
+                          min="0.01"/>
         </a-form-item>
         
         <a-form-item label="工作流引擎" :labelCol="labelCol" :wrapperCol="wrapperCol" v-show="false">
@@ -208,6 +156,8 @@
           realname: { rules: [{ required: true, message: '请输入用户名称!' }] },
           orderFixedFee: { rules: [{ required: true, message: '请输入订单单笔手续费!' }] },
           transactionFeeRate: { rules: [{ required: true, message: '请输入交易手续费率!' }] },
+          largeOrderLimit: { rules: [{ required: true, message: '请输入大额订单限制!' }] },
+          largeOrderFee: { rules: [{ required: true, message: '请输入大额订单手续费!' }] },
           phone: { rules: [{ validator: this.validatePhone }] },
           email: {
             rules: [{
@@ -439,53 +389,6 @@
           callback()
         }
       },
-      validatePhone(rule, value, callback) {
-        if (!value) {
-          callback()
-        } else {
-          if (new RegExp(/^1[3|4|5|7|8][0-9]\d{8}$/).test(value)) {
-            var params = {
-              tableName: 'sys_user',
-              fieldName: 'phone',
-              fieldVal: value,
-              dataId: this.userId
-            }
-            duplicateCheck(params).then((res) => {
-              if (res.success) {
-                callback()
-              } else {
-                callback('手机号已存在!')
-              }
-            })
-          } else {
-            callback('请输入正确格式的手机号码!')
-          }
-        }
-      },
-      validateEmail(rule, value, callback) {
-        if (!value) {
-          callback()
-        } else {
-          if (new RegExp(/^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/).test(value)) {
-            var params = {
-              tableName: 'sys_user',
-              fieldName: 'email',
-              fieldVal: value,
-              dataId: this.userId
-            }
-            duplicateCheck(params).then((res) => {
-              console.log(res)
-              if (res.success) {
-                callback()
-              } else {
-                callback('邮箱已存在!')
-              }
-            })
-          } else {
-            callback('请输入正确格式的邮箱!')
-          }
-        }
-      },
       validateUsername(rule, value, callback) {
         var params = {
           tableName: 'sys_user',
@@ -513,14 +416,6 @@
         }
         return e && e.fileList
       },
-      beforeUpload: function(file) {
-        var fileType = file.type
-        if (fileType.indexOf('image') < 0) {
-          this.$message.warning('请上传图片')
-          return false
-        }
-        //TODO 验证文件大小
-      },
       handleChange(info) {
         this.picUrl = ''
         if (info.file.status === 'uploading') {
@@ -538,13 +433,6 @@
             this.$message.warning(response.message)
           }
         }
-      },
-      getAvatarView() {
-        return this.url.imgerver + '/' + this.model.avatar
-      },
-      // 搜索用户对应的部门API
-      onSearch() {
-        this.$refs.departWindow.add(this.checkedDepartKeys, this.userId)
       },
 
       // 获取用户对应部门弹出框提交给返回的数据

@@ -214,17 +214,22 @@ public class SysUser {
 	@ApiModelProperty(value = "IP白名单开关")
 	private java.lang.String ipSwitch;
 	/**
-	 * 订单单笔手续费
+	 * 单笔手续费
 	 */
-	@Excel(name = "订单单笔手续费", width = 15)
-	@ApiModelProperty(value = "订单单笔手续费")
 	private java.math.BigDecimal orderFixedFee;
 	/**
 	 * 交易手续费率
 	 */
-	@Excel(name = "交易手续费率", width = 15)
-	@ApiModelProperty(value = "交易手续费率")
 	private java.math.BigDecimal transactionFeeRate;
+
+	/**
+	 * 大额交易限额
+	 */
+	private java.math.BigDecimal largeOrderLimit;
+	/**
+	 * 大额交易手续费
+	 */
+	private java.math.BigDecimal largeOrderFee;
 
 	private int bizOnline;
 	private String serverIp;
