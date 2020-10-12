@@ -23,7 +23,7 @@ public class WalletRequestParam implements Serializable {
      * 币种
      */
     @NotNull(message = "coinType不能为空")
-    private Integer coinType;
+    private String coinType;
     /**
      * 回调地址
      */
