@@ -2,7 +2,11 @@ package org.jeecg.modules.wallet.controller;
 
 import com.baomidou.mybatisplus.extension.api.R;
 import lombok.extern.slf4j.Slf4j;
+import org.jeecg.modules.wallet.dto.WalletHttpCallbackParam;
+import org.jeecg.modules.wallet.service.WalletService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -10,9 +14,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/wallet")
 @Slf4j
 public class WalletController {
-
+    @Autowired
+    private WalletService walletService;
     @PostMapping("/create")
     public R<String> create(String json){
         return null;
+    }
+
+    @PostMapping("/callback")
+    public void callback(@RequestBody WalletHttpCallbackParam param){
+        walletService.callback(param);
     }
 }

@@ -1,6 +1,7 @@
 package org.jeecg.modules.wallet.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.jeecg.common.wallet.WalletStatus;
 import org.jeecg.modules.wallet.entity.PayWalletUrl;
 import org.jeecg.modules.wallet.mapper.PayWalletUrlMapper;
@@ -32,5 +33,29 @@ public class PayWalletUrlService extends ServiceImpl<PayWalletUrlMapper, PayWall
         walletUrl1.setWalletUrl(url);
         walletUrl1.setStatus(WalletStatus.FREE.getCode());
         getBaseMapper().insert(walletUrl1);
+    }
+
+    public void freeWallterUrl(String url){
+        QueryWrapper<PayWalletUrl> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("wallet_url",url);
+        PayWalletUrl update =PayWalletUrl.builder().status(WalletStatus.FREE.getCode()).build();
+        update(update,queryWrapper);
+    }
+
+
+    public PayWalletUrl findByUrl(String url){
+       return getOne(new LambdaQueryWrapper<PayWalletUrl>().eq(PayWalletUrl::getWalletUrl,url));
+    }
+
+    public boolean checkCallbackWalletUrlIsOk(String url){
+        PayWalletUrl walletUrl = this.findByUrl(url);
+        if(walletUrl == null){
+            return false;
+        }
+        WalletStatus status =  WalletStatus.codeBy(walletUrl.getStatus());
+        if(WalletStatus.FREE.equals(status)){
+            return false;
+        }
+        return true;
     }
 }

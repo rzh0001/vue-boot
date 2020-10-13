@@ -18,10 +18,10 @@ import java.util.List;
  */
 @Slf4j
 public class WalletHttpRequestUtils {
-    private static final String MERCHID = "301555";
-    private static final String KEY = "daf33649515f92c2b7d8f76d53055d08";
+    public static final String MERCHID = "301555";
+    public static final String KEY = "daf33649515f92c2b7d8f76d53055d08";
+    public static final String URL = "https://hk01-node.uduncloud.com/mch/address/create";
     public static String getWalletUrl(String coinType, String callBackUrl) throws Exception {
-
         WalletHttpRequestParam param = new WalletHttpRequestParam();
         param.setTimestamp(System.currentTimeMillis());
         param.setNonce(RandomUtil.randomLong(6));
@@ -31,22 +31,21 @@ public class WalletHttpRequestUtils {
         bodys.add(body);
         param.setBody(JSONObject.toJSONString(bodys));
         //sign=md5(body + key + nonce + timestamp)
-        String bodyJson = JSONObject.toJSONString(param.getBody());
-
+        String bodyJson = JSONObject.toJSONString(bodys);
         StringBuilder signStr = new StringBuilder();
         signStr.append(bodyJson).append(KEY).append(param.getNonce()).append(param.getTimestamp());
         String sign = DigestUtils.md5Hex(signStr.toString());
         log.info("签名字符串：{}，签名值：{}",signStr.toString(),sign);
         param.setSign(sign);
-
         String jsonParam = JSONObject.toJSONString(param);
-        HttpResult result = HttpUtils.doPostJson("https://hk01-node.uduncloud.com/mch/address/create",jsonParam);
+        HttpResult result = HttpUtils.doPostJson(URL,jsonParam);
         String resultJson = result.getBody();
-        WalletHttpResponse response = JSONObject.parseObject(resultJson,WalletHttpResponse.class);
-        return response.getData().getAddress();
+        log.info("请求钱包地址，返回code：{},body:{}",result.getCode(),resultJson);
+        WalletHttpResponse  response = JSONObject.parseObject(resultJson,WalletHttpResponse.class);
+        if(response.getCode() == 200){
+            return response.getData().getAddress();
+        }
+        return null;
     }
 
-    public static void main(String[] args) throws Exception {
-        WalletHttpRequestUtils.getWalletUrl("520","http://localhost:8080/callBack");
-    }
 }
