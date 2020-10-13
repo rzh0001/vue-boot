@@ -13,13 +13,13 @@ import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.aspect.annotation.AutoLog;
 import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.wallet.entity.PayWalletUrl;
-import org.jeecg.modules.wallet.service.IPayWalletUrlService;
-import java.util.Date;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 
+import org.jeecg.modules.wallet.service.impl.PayWalletUrlService;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -47,7 +47,7 @@ import io.swagger.annotations.ApiOperation;
 @RequestMapping("/wallet/payWalletUrl")
 public class PayWalletUrlController {
 	@Autowired
-	private IPayWalletUrlService payWalletUrlService;
+	private PayWalletUrlService payWalletUrlService;
 	
 	/**
 	 * 分页列表查询
