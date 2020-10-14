@@ -63,7 +63,7 @@ public class WalletService {
      */
     public String transformCoinByAmount(String coinType,String  amount){
         String rate = findCoinRate(coinType);
-        return new BigDecimal(amount).divide(new BigDecimal(rate)).toString();
+        return new BigDecimal(amount).divide(new BigDecimal(rate),2).setScale(2, BigDecimal.ROUND_HALF_UP).toString();
     }
 
     /**

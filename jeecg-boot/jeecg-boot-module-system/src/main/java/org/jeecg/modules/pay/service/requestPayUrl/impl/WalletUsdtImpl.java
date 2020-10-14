@@ -15,6 +15,7 @@ import org.jeecg.modules.v2.entity.PayBusiness;
 import org.jeecg.modules.wallet.service.WalletService;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -22,6 +23,7 @@ import java.util.List;
  * @Author: wangjianbin
  * @Date: 2020/10/14 15:05
  */
+@Service
 public class WalletUsdtImpl
     implements RequestPayUrl<OrderInfoEntity, String, String, String, String, PayBusiness, Object>, InitializingBean {
     @Autowired
@@ -43,7 +45,7 @@ public class WalletUsdtImpl
         //钱包地址
        String walletUrl = walletService.findFreeWalletUrl(CoinType.USDT.getCode());
        if(StringUtils.isBlank(walletUrl)){
-           walletUrl = walletService.createWalletUrl(url,key,userBusiness.getBusinessCode(),CoinType.USDT.getCode(),getDomain()+CALLBACK_URL);
+           walletUrl = walletService.createWalletUrl(url,userBusiness.getBusinessApiKey(),userBusiness.getBusinessCode(),CoinType.USDT.getCode(),getDomain()+CALLBACK_URL);
        }
        //币种数量
         String coinAmount = walletService.transformCoinByAmount(CoinType.USDT.getCode(),order.getSubmitAmount().toString());
