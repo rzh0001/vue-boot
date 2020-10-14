@@ -65,13 +65,13 @@ public class WalletHttpCallbackBody implements Serializable {
      * 实际金额
      * @return
      */
-    public String getActualAmount(){
+    public BigDecimal getActualAmount(){
         double pow = Math.pow(10,Integer.parseInt(this.decimals));
-        return new BigDecimal(this.amount).divide(new BigDecimal(Double.toString(pow))).toString();
+        return new BigDecimal(this.amount).divide(new BigDecimal(Double.toString(pow)));
     }
 
-    public String getActualFee(){
+    public BigDecimal getActualFee(){
         double pow = Math.pow(10,Integer.parseInt(this.decimals));
-        return new BigDecimal(this.fee).divide(new BigDecimal(Double.toString(pow))).toString();
+        return new BigDecimal(this.fee).divide(new BigDecimal(Double.toString(pow)));
     }
 }

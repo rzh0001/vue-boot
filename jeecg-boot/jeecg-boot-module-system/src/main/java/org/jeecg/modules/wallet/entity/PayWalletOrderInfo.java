@@ -1,6 +1,7 @@
 package org.jeecg.modules.wallet.entity;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -26,7 +27,7 @@ import org.jeecgframework.poi.excel.annotation.Excel;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value="pay_wallet_order_info对象", description="钱包订单信息")
-public class payWalletOrderInfo {
+public class PayWalletOrderInfo {
     
 	/**主键id*/
 	@TableId(type = IdType.UUID)
@@ -64,6 +65,10 @@ public class payWalletOrderInfo {
 	@Excel(name = "币种数量", width = 15)
     @ApiModelProperty(value = "币种数量")
 	private java.math.BigDecimal coinQuantity;
+	/**
+	 * 矿工费
+	 */
+	private BigDecimal coinFee;
 	/**回调地址*/
 	@Excel(name = "回调地址", width = 15)
     @ApiModelProperty(value = "回调地址")

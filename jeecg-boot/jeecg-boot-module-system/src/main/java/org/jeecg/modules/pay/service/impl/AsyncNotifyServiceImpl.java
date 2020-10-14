@@ -34,4 +34,8 @@ public class AsyncNotifyServiceImpl {
         orderInfoEntityService.notifyCustomer(order, user, payType);
         log.info("==>异步通知商户信息成功");
     }
+
+    public void walletAsyncNotify(String orderNo){
+
+    }
 }

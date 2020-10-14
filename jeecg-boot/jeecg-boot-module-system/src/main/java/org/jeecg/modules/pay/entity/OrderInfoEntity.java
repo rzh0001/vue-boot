@@ -39,6 +39,10 @@ public class OrderInfoEntity {
 	@Excel(name = "外部订单号", width = 15)
     @ApiModelProperty(value = "外部订单号")
 	private java.lang.String outerOrderId;
+
+	@Excel(name = "钱包地址", width = 15)
+	@ApiModelProperty(value = "钱包地址")
+	private String walletUrl;
 	/**用户id*/
 	@Excel(name = "用户id", width = 15)
     @ApiModelProperty(value = "用户id")

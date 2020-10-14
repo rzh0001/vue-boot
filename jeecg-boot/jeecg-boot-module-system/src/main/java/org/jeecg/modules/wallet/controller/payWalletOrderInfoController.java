@@ -12,14 +12,14 @@ import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.aspect.annotation.AutoLog;
 import org.jeecg.common.util.oConvertUtils;
-import org.jeecg.modules.wallet.entity.payWalletOrderInfo;
-import org.jeecg.modules.wallet.service.IpayWalletOrderInfoService;
-import java.util.Date;
+import org.jeecg.modules.wallet.entity.PayWalletOrderInfo;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 
+import org.jeecg.modules.wallet.service.impl.PayWalletOrderInfoServiceImpl;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -47,7 +47,7 @@ import io.swagger.annotations.ApiOperation;
 @RequestMapping("/wallet/payWalletOrderInfo")
 public class payWalletOrderInfoController {
 	@Autowired
-	private IpayWalletOrderInfoService payWalletOrderInfoService;
+	private PayWalletOrderInfoServiceImpl payWalletOrderInfoService;
 	
 	/**
 	 * 分页列表查询
@@ -60,14 +60,14 @@ public class payWalletOrderInfoController {
 	@AutoLog(value = "钱包订单信息-分页列表查询")
 	@ApiOperation(value="钱包订单信息-分页列表查询", notes="钱包订单信息-分页列表查询")
 	@GetMapping(value = "/list")
-	public Result<IPage<payWalletOrderInfo>> queryPageList(payWalletOrderInfo payWalletOrderInfo,
+	public Result<IPage<PayWalletOrderInfo>> queryPageList(PayWalletOrderInfo payWalletOrderInfo,
 									  @RequestParam(name="pageNo", defaultValue="1") Integer pageNo,
 									  @RequestParam(name="pageSize", defaultValue="10") Integer pageSize,
 									  HttpServletRequest req) {
-		Result<IPage<payWalletOrderInfo>> result = new Result<IPage<payWalletOrderInfo>>();
-		QueryWrapper<payWalletOrderInfo> queryWrapper = QueryGenerator.initQueryWrapper(payWalletOrderInfo, req.getParameterMap());
-		Page<payWalletOrderInfo> page = new Page<payWalletOrderInfo>(pageNo, pageSize);
-		IPage<payWalletOrderInfo> pageList = payWalletOrderInfoService.page(page, queryWrapper);
+		Result<IPage<PayWalletOrderInfo>> result = new Result<IPage<PayWalletOrderInfo>>();
+		QueryWrapper<PayWalletOrderInfo> queryWrapper = QueryGenerator.initQueryWrapper(payWalletOrderInfo, req.getParameterMap());
+		Page<PayWalletOrderInfo> page = new Page<PayWalletOrderInfo>(pageNo, pageSize);
+		IPage<PayWalletOrderInfo> pageList = payWalletOrderInfoService.page(page, queryWrapper);
 		result.setSuccess(true);
 		result.setResult(pageList);
 		return result;
@@ -81,8 +81,8 @@ public class payWalletOrderInfoController {
 	@AutoLog(value = "钱包订单信息-添加")
 	@ApiOperation(value="钱包订单信息-添加", notes="钱包订单信息-添加")
 	@PostMapping(value = "/add")
-	public Result<payWalletOrderInfo> add(@RequestBody payWalletOrderInfo payWalletOrderInfo) {
-		Result<payWalletOrderInfo> result = new Result<payWalletOrderInfo>();
+	public Result<PayWalletOrderInfo> add(@RequestBody PayWalletOrderInfo payWalletOrderInfo) {
+		Result<PayWalletOrderInfo> result = new Result<PayWalletOrderInfo>();
 		try {
 			payWalletOrderInfoService.save(payWalletOrderInfo);
 			result.success("添加成功！");
@@ -101,9 +101,9 @@ public class payWalletOrderInfoController {
 	@AutoLog(value = "钱包订单信息-编辑")
 	@ApiOperation(value="钱包订单信息-编辑", notes="钱包订单信息-编辑")
 	@PutMapping(value = "/edit")
-	public Result<payWalletOrderInfo> edit(@RequestBody payWalletOrderInfo payWalletOrderInfo) {
-		Result<payWalletOrderInfo> result = new Result<payWalletOrderInfo>();
-		payWalletOrderInfo payWalletOrderInfoEntity = payWalletOrderInfoService.getById(payWalletOrderInfo.getId());
+	public Result<PayWalletOrderInfo> edit(@RequestBody PayWalletOrderInfo payWalletOrderInfo) {
+		Result<PayWalletOrderInfo> result = new Result<PayWalletOrderInfo>();
+		PayWalletOrderInfo payWalletOrderInfoEntity = payWalletOrderInfoService.getById(payWalletOrderInfo.getId());
 		if(payWalletOrderInfoEntity==null) {
 			result.error500("未找到对应实体");
 		}else {
@@ -143,8 +143,8 @@ public class payWalletOrderInfoController {
 	@AutoLog(value = "钱包订单信息-批量删除")
 	@ApiOperation(value="钱包订单信息-批量删除", notes="钱包订单信息-批量删除")
 	@DeleteMapping(value = "/deleteBatch")
-	public Result<payWalletOrderInfo> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
-		Result<payWalletOrderInfo> result = new Result<payWalletOrderInfo>();
+	public Result<PayWalletOrderInfo> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
+		Result<PayWalletOrderInfo> result = new Result<PayWalletOrderInfo>();
 		if(ids==null || "".equals(ids.trim())) {
 			result.error500("参数不识别！");
 		}else {
@@ -162,9 +162,9 @@ public class payWalletOrderInfoController {
 	@AutoLog(value = "钱包订单信息-通过id查询")
 	@ApiOperation(value="钱包订单信息-通过id查询", notes="钱包订单信息-通过id查询")
 	@GetMapping(value = "/queryById")
-	public Result<payWalletOrderInfo> queryById(@RequestParam(name="id",required=true) String id) {
-		Result<payWalletOrderInfo> result = new Result<payWalletOrderInfo>();
-		payWalletOrderInfo payWalletOrderInfo = payWalletOrderInfoService.getById(id);
+	public Result<PayWalletOrderInfo> queryById(@RequestParam(name="id",required=true) String id) {
+		Result<PayWalletOrderInfo> result = new Result<PayWalletOrderInfo>();
+		PayWalletOrderInfo payWalletOrderInfo = payWalletOrderInfoService.getById(id);
 		if(payWalletOrderInfo==null) {
 			result.error500("未找到对应实体");
 		}else {
@@ -183,12 +183,12 @@ public class payWalletOrderInfoController {
   @RequestMapping(value = "/exportXls")
   public ModelAndView exportXls(HttpServletRequest request, HttpServletResponse response) {
       // Step.1 组装查询条件
-      QueryWrapper<payWalletOrderInfo> queryWrapper = null;
+      QueryWrapper<PayWalletOrderInfo> queryWrapper = null;
       try {
           String paramsStr = request.getParameter("paramsStr");
           if (oConvertUtils.isNotEmpty(paramsStr)) {
               String deString = URLDecoder.decode(paramsStr, "UTF-8");
-              payWalletOrderInfo payWalletOrderInfo = JSON.parseObject(deString, payWalletOrderInfo.class);
+              PayWalletOrderInfo payWalletOrderInfo = JSON.parseObject(deString, PayWalletOrderInfo.class);
               queryWrapper = QueryGenerator.initQueryWrapper(payWalletOrderInfo, request.getParameterMap());
           }
       } catch (UnsupportedEncodingException e) {
@@ -197,10 +197,10 @@ public class payWalletOrderInfoController {
 
       //Step.2 AutoPoi 导出Excel
       ModelAndView mv = new ModelAndView(new JeecgEntityExcelView());
-      List<payWalletOrderInfo> pageList = payWalletOrderInfoService.list(queryWrapper);
+      List<PayWalletOrderInfo> pageList = payWalletOrderInfoService.list(queryWrapper);
       //导出文件名称
       mv.addObject(NormalExcelConstants.FILE_NAME, "钱包订单信息列表");
-      mv.addObject(NormalExcelConstants.CLASS, payWalletOrderInfo.class);
+      mv.addObject(NormalExcelConstants.CLASS, PayWalletOrderInfo.class);
       mv.addObject(NormalExcelConstants.PARAMS, new ExportParams("钱包订单信息列表数据", "导出人:Jeecg", "导出信息"));
       mv.addObject(NormalExcelConstants.DATA_LIST, pageList);
       return mv;
@@ -224,7 +224,7 @@ public class payWalletOrderInfoController {
           params.setHeadRows(1);
           params.setNeedSave(true);
           try {
-              List<payWalletOrderInfo> listpayWalletOrderInfos = ExcelImportUtil.importExcel(file.getInputStream(), payWalletOrderInfo.class, params);
+              List<PayWalletOrderInfo> listpayWalletOrderInfos = ExcelImportUtil.importExcel(file.getInputStream(), PayWalletOrderInfo.class, params);
               payWalletOrderInfoService.saveBatch(listpayWalletOrderInfos);
               return Result.ok("文件导入成功！数据行数:" + listpayWalletOrderInfos.size());
           } catch (Exception e) {

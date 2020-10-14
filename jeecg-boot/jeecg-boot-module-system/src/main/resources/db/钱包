@@ -8,6 +8,7 @@ CREATE TABLE `pay_wallet_order_info` (
   `amount` BIGINT(10) DEFAULT NULL  COMMENT '申请金额，单位为分',
   `coin_type` varchar(3) DEFAULT NULL COMMENT '币种类型',
 	`coin_quantity` DECIMAL(10,2) DEFAULT NULL COMMENT '币种数量',
+	`coin_fee` DECIMAL(10,2) DEFAULT NULL COMMENT '矿工费',
   `callback_url` varchar(360) NOT NULL COMMENT '回调地址',
   `end_time` datetime DEFAULT NULL,
 	`status` int(2) NOT NULL COMMENT '状态：-1:无效  0:未支付 1:成功，未返回 2:成功，已返回',

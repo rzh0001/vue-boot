@@ -1,9 +1,6 @@
 package org.jeecg.modules.wallet.mapper;
 
-import java.util.List;
-
-import org.apache.ibatis.annotations.Param;
-import org.jeecg.modules.wallet.entity.payWalletOrderInfo;
+import org.jeecg.modules.wallet.entity.PayWalletOrderInfo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
@@ -12,6 +9,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @Date:   2020-10-12
  * @Version: V1.0
  */
-public interface payWalletOrderInfoMapper extends BaseMapper<payWalletOrderInfo> {
+public interface payWalletOrderInfoMapper extends BaseMapper<PayWalletOrderInfo> {
 
 }

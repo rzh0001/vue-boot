@@ -62,6 +62,9 @@ public class BaseConstant {
     public static final String QUERY_ORDER_STATUS_URL = "queryOrderStatusUrl";
     public static final String NOTIFY_ORDER_FINISH_URL = "notifyOrderFinishUrl";
     public static final String DOMAIN = "domain";
+    public static final String GUAMA_DOMAIN= "guamaDomain";
+    public static final String WALLET_COIN_RATE = "wallet";
+    public static final String WALLET_COIN_USDT = "USDT";
     //回调ip白名单
     public static final String CALLBACK_IP_WHITE="callBackIpWhite";
     //支付通道
@@ -113,6 +116,8 @@ public class BaseConstant {
     public static final String REQUEST_YITONG_ALIPAY = "yitongAlipay";
 
     public static final String REQUEST_ONLINE_BANK_PAY="onlineBankPay";
+    //钱包-usdt
+    public static final String REQUEST_WALLET_USDT = "walletUsdt";
     //四方回调挂马平台的返回码
     public static final int SUCCESS = 200;
     //流水类型 流水类型 1-手续费收入 2-提现 3-冲正

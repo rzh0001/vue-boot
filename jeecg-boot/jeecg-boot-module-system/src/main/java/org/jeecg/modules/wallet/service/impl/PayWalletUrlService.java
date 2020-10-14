@@ -31,7 +31,8 @@ public class PayWalletUrlService extends ServiceImpl<PayWalletUrlMapper, PayWall
         PayWalletUrl walletUrl1 = new PayWalletUrl();
         walletUrl1.setCoinType(coinType);
         walletUrl1.setWalletUrl(url);
-        walletUrl1.setStatus(WalletStatus.FREE.getCode());
+        //创建只有在没有钱包地址的情况下才会创建，所以，首次必然使用了该地址
+        walletUrl1.setStatus(WalletStatus.BUSY.getCode());
         getBaseMapper().insert(walletUrl1);
     }
 
