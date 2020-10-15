@@ -1,33 +1,6 @@
-CREATE TABLE `pay_wallet_order_info` (
-  `id` varchar(32) NOT NULL COMMENT '主键id',
-  `order_id` varchar(32) NOT NULL COMMENT '四方系统订单号',
-  `wallet_url` varchar(32) NOT NULL COMMENT '钱包地址',
-  `user_name` varchar(32) DEFAULT NULL,
-  `agent_name` varchar(32) NOT NULL COMMENT '代理',
-    `salesman_username` varchar(100) DEFAULT NULL COMMENT '介绍人帐号',
-  `amount` BIGINT(10) DEFAULT NULL  COMMENT '申请金额，单位为分',
-  `coin_type` varchar(3) DEFAULT NULL COMMENT '币种类型',
-	`coin_quantity` DECIMAL(10,2) DEFAULT NULL COMMENT '币种数量',
-	`coin_fee` DECIMAL(10,2) DEFAULT NULL COMMENT '矿工费',
-  `callback_url` varchar(360) NOT NULL COMMENT '回调地址',
-  `end_time` datetime DEFAULT NULL,
-	`status` int(2) NOT NULL COMMENT '状态：-1:无效  0:未支付 1:成功，未返回 2:成功，已返回',
-	`reissue` varchar(2) NOT NULL DEFAULT '2' COMMENT '是否补单 1:是 2：否',
-  `ip` varchar(32) DEFAULT NULL,
-  `remark` varchar(128) DEFAULT NULL COMMENT '订单备注',
-  `create_by` varchar(32) DEFAULT NULL COMMENT '创建人',
-  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
-  `update_by` varchar(32) DEFAULT NULL COMMENT '更新人',
-  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `order_id` (`order_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='钱包订单信息';
-
-
-
 CREATE TABLE `pay_wallet_url` (
   `id` varchar(32) NOT NULL COMMENT '主键id',
-  `wallet_url` varchar(32) NOT NULL COMMENT '钱包地址',
+  `wallet_url` varchar(64) NOT NULL COMMENT '钱包地址',
   `coin_type` varchar(3) DEFAULT NULL COMMENT '币种类型',
   `status` int(2) NOT NULL COMMENT '状态：0：空闲，1：使用中',
   `create_by` varchar(32) DEFAULT NULL COMMENT '创建人',
@@ -36,4 +9,8 @@ CREATE TABLE `pay_wallet_url` (
   `update_time` datetime DEFAULT NULL COMMENT '更新时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='钱包地址';
+
+
+ALTER TABLE pay_order_info ADD wallet_url varchar(32) DEFAULT null COMMENT '钱包地址' AFTER outer_order_id;
+
 

@@ -4,7 +4,11 @@ import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.jeecg.common.system.vo.DictModel;
+import org.jeecg.common.wallet.OrderStatusEnum;
 import org.jeecg.common.wallet.WalletCallbackType;
+import org.jeecg.modules.pay.entity.OrderInfoEntity;
+import org.jeecg.modules.pay.service.IOrderInfoEntityService;
+import org.jeecg.modules.pay.service.impl.AsyncNotifyServiceImpl;
 import org.jeecg.modules.system.service.ISysDictService;
 import org.jeecg.modules.util.BaseConstant;
 import org.jeecg.modules.util.WalletHttpRequestUtils;
@@ -27,9 +31,11 @@ public class WalletService {
     @Autowired
     private PayWalletUrlService walletUrlService;
     @Autowired
-    private PayWalletOrderInfoServiceImpl orderInfoService;
+    private IOrderInfoEntityService orderInfoService;
     @Autowired
     public ISysDictService dictService;
+    @Autowired
+    private AsyncNotifyServiceImpl asyncNotify;
     /**
      *获取可用的钱包地址
      * @param coinType 币种类型
@@ -91,7 +97,7 @@ public class WalletService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void callback(WalletHttpCallbackParam param){
+    public void callback(WalletHttpCallbackParam param) throws Exception {
         log.info("接收钱包回调请求，请求入参:{}", JSONObject.toJSONString(param));
         if(!checkSignSuccess(param)){
             return;
@@ -108,17 +114,17 @@ public class WalletService {
             return;
         }
         //todo 更新四方订单信息；释放链接；统计；异步通知下游
-        PayWalletOrderInfo orderInfo = orderInfoService.findCurrentCallbackWalletOrder(callbackBody.getAddress());
+        OrderInfoEntity orderInfo = orderInfoService.findByWalletUrl(callbackBody.getAddress());
         if(orderInfo == null){
             log.info("接收钱包回调请求，四方未发现匹配的订单信息，钱包地址为：[{}]，忽略请求...",callbackBody.getAddress());
             return;
         }
-        //矿工费
-        orderInfo.setCoinFee(callbackBody.getActualFee());
         //实际支付的币种数量
-        orderInfo.setCoinQuantity(callbackBody.getActualAmount());
+        orderInfo.setStatus(OrderStatusEnum.NO_BACK.getCode());
         orderInfoService.updateById(orderInfo);
         freeWalletUrl(callbackBody.getAddress());
+        //异步通知客户
+        asyncNotify.asyncNotify(orderInfo.getOrderId(),BaseConstant.REQUEST_WALLET_USDT);
     }
 
     private boolean checkSignSuccess(WalletHttpCallbackParam param){

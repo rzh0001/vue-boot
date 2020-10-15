@@ -5,6 +5,7 @@ import org.jeecg.common.system.vo.DictModel;
 import org.jeecg.common.util.RedisUtil;
 import org.jeecg.common.wallet.CoinType;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
+import org.jeecg.modules.pay.service.IOrderInfoEntityService;
 import org.jeecg.modules.pay.service.factory.PayServiceFactory;
 import org.jeecg.modules.pay.service.requestPayUrl.RequestPayUrl;
 import org.jeecg.modules.system.service.ISysDictService;
@@ -32,7 +33,8 @@ public class WalletUsdtImpl
     private RequestUrlUtils utils;
     @Autowired
     public ISysDictService dictService;
-
+    @Autowired
+    private IOrderInfoEntityService orderInfoEntityService;
     @Autowired
     public WalletService walletService;
 
@@ -47,6 +49,8 @@ public class WalletUsdtImpl
        if(StringUtils.isBlank(walletUrl)){
            walletUrl = walletService.createWalletUrl(url,userBusiness.getBusinessApiKey(),userBusiness.getBusinessCode(),CoinType.USDT.getCode(),getDomain()+CALLBACK_URL);
        }
+        order.setWalletUrl(walletUrl);
+        orderInfoEntityService.updateById(order);
        //币种数量
         String coinAmount = walletService.transformCoinByAmount(CoinType.USDT.getCode(),order.getSubmitAmount().toString());
         redisUtil.del(order.getOuterOrderId());

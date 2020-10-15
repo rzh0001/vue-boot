@@ -45,7 +45,7 @@ public interface IOrderInfoEntityService extends IService<OrderInfoEntity> {
 	Map<String, Object> isInternalSystem(Map<String, Object> param);
 
 	OrderInfoEntity queryOrderInfoByOrderId(String orderId);
-
+	OrderInfoEntity findByWalletUrl(String walletUrl);
 	/**
 	 * 更新订单状态为支付已返回
 	 *
