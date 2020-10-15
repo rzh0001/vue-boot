@@ -22,7 +22,7 @@ public class WalletController {
     }
 
     @PostMapping("/callback")
-    public void callback(@RequestBody WalletHttpCallbackParam param){
+    public void callback(@RequestBody WalletHttpCallbackParam param) throws Exception {
         walletService.callback(param);
     }
 }

@@ -11,6 +11,6 @@ CREATE TABLE `pay_wallet_url` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='钱包地址';
 
 
-ALTER TABLE pay_order_info ADD wallet_url varchar(32) DEFAULT null COMMENT '钱包地址' AFTER outer_order_id;
+ALTER TABLE pay_order_info ADD wallet_url varchar(64) DEFAULT null COMMENT '钱包地址' AFTER outer_order_id;
 
 
