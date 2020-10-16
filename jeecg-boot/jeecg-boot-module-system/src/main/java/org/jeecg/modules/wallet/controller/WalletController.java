@@ -21,8 +21,8 @@ public class WalletController {
         return null;
     }
 
-    @PostMapping("/callback")
-    public void callback(@RequestBody WalletHttpCallbackParam param) throws Exception {
+    @PostMapping(value ="/callback", produces="application/x-www-form-urlencoded;charset=UTF-8" )
+    public void callback( WalletHttpCallbackParam param) throws Exception {
         walletService.callback(param);
     }
 }

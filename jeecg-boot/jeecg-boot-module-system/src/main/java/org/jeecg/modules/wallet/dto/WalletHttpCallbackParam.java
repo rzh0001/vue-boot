@@ -6,8 +6,8 @@ import java.io.Serializable;
 
 @Data
 public class WalletHttpCallbackParam implements Serializable {
-    private Long timestamp;
-    private Long nonce;
+    private String timestamp;
+    private String nonce;
     private String sign;
     private String body;
 }
