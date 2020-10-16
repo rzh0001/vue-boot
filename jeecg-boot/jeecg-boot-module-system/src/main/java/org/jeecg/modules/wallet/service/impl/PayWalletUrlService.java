@@ -22,6 +22,8 @@ public class PayWalletUrlService extends ServiceImpl<PayWalletUrlMapper, PayWall
         PayWalletUrl walletUrl =  getOne(new LambdaQueryWrapper<PayWalletUrl>().eq(PayWalletUrl::getCoinType,coinType).eq(PayWalletUrl::getStatus,
             WalletStatus.FREE.getCode()));
         if(walletUrl != null){
+            walletUrl.setStatus(WalletStatus.BUSY.getCode());
+           updateById(walletUrl);
             return walletUrl.getWalletUrl();
         }
         return null;
