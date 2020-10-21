@@ -61,17 +61,19 @@ public class WalletHttpCallbackBody implements Serializable {
      */
     private String memo;
 
+
     /**
      * 实际金额
      * @return
      */
     public BigDecimal getActualAmount(){
         double pow = Math.pow(10,Integer.parseInt(this.decimals));
-        return new BigDecimal(this.amount).divide(new BigDecimal(Double.toString(pow)));
+        return new BigDecimal(this.amount).divide(new BigDecimal(Double.toString(pow)),2,BigDecimal.ROUND_HALF_UP);
     }
 
     public BigDecimal getActualFee(){
         double pow = Math.pow(10,Integer.parseInt(this.decimals));
-        return new BigDecimal(this.fee).divide(new BigDecimal(Double.toString(pow)));
+        return new BigDecimal(this.fee).divide(new BigDecimal(Double.toString(pow)),2,BigDecimal.ROUND_HALF_UP);
     }
+
 }

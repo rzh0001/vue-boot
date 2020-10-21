@@ -149,7 +149,7 @@ public class OrderToolsServiceImpl implements IOrderToolsService {
 		// 通知商户
 
 		try {
-			asyncNotify.asyncNotify(orderInfo.getOrderId(), orderInfo.getPayType());
+			asyncNotify.asyncNotify(orderInfo, orderInfo.getPayType());
 		} catch (Exception e) {
 			log.error("订单[{}]异步通知客户失败", orderInfo.getOrderId());
 			e.printStackTrace();

@@ -66,7 +66,7 @@ public abstract class AbstractPayChannelStrategy implements ICallbackService{
 			return "fail";
 		}
 		//异步通知客户
-		asyncNotify.asyncNotify(orderId,payType);
+		asyncNotify.asyncNotify(order,payType);
 		//回复三方
 		return reply();
 	}

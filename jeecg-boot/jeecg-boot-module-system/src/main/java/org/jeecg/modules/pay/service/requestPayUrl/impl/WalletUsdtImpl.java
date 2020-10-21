@@ -18,6 +18,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -50,9 +51,14 @@ public class WalletUsdtImpl
            walletUrl = walletService.createWalletUrl(url,userBusiness.getBusinessApiKey(),userBusiness.getBusinessCode(),CoinType.USDT.getCode(),getDomain()+CALLBACK_URL);
        }
         order.setWalletUrl(walletUrl);
-        orderInfoEntityService.updateById(order);
        //币种数量
         String coinAmount = walletService.transformCoinByAmount(CoinType.USDT.getCode(),order.getSubmitAmount().toString());
+        order.setWalletAmount(coinAmount);
+        String rate = order.getPoundageRate();
+        BigDecimal poundage = new BigDecimal(coinAmount).multiply(new BigDecimal(rate)).setScale(BigDecimal.ROUND_HALF_UP);
+        //手续费
+        order.setPoundage(poundage);
+        orderInfoEntityService.updateById(order);
         redisUtil.del(order.getOuterOrderId());
         return R.ok().put("url", getGuamaDomain()+PAY_URL+walletUrl+"/"+coinAmount);
     }

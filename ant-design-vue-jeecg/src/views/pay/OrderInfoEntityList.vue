@@ -180,11 +180,6 @@
             align: 'center',
             dataIndex: 'userName'
           },
-          /*{
-            title: '代理',
-            align: 'center',
-            dataIndex: 'parentUser'
-          },*/
           {
             title: '商户编号',
             align: 'center',

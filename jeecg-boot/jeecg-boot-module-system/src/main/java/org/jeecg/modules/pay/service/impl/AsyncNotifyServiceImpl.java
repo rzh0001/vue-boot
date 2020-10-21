@@ -22,11 +22,10 @@ public class AsyncNotifyServiceImpl {
     @Autowired
     private ISysUserService userService;
     @Async("taskExecutor")
-    public void asyncNotify(String orderNo, String payType) throws Exception {
-        log.info("==>异步通知商户信息，订单号：{}，通道类型：{}",orderNo,payType);
-        OrderInfoEntity order = orderInfoEntityService.queryOrderInfoByOrderId(orderNo);
+    public void asyncNotify(OrderInfoEntity order, String payType) throws Exception {
+        log.info("==>异步通知商户信息，订单号：{}，通道类型：{}",order.getOrderId(),payType);
         if (order == null || order.getStatus() == 2) {
-            log.info("==>异步通知商户信息,无订单信息，订单号为：{}",orderNo);
+            log.info("==>异步通知商户信息,无订单信息，订单号为：{}",order.getOrderId());
             return;
         }
         order.setStatus(BaseConstant.ORDER_STATUS_SUCCESS_NOT_RETURN);

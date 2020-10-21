@@ -63,7 +63,7 @@ public abstract class AbstractCallBack implements CallBackService{
             return "fail";
         }
         //异步通知客户
-        asyncNotify.asyncNotify(orderNo,payType);
+        asyncNotify.asyncNotify(order,payType);
         //回复三方
         return reply();
     }

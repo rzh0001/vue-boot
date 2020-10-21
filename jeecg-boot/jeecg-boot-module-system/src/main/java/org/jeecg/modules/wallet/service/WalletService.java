@@ -119,12 +119,22 @@ public class WalletService {
             log.info("接收钱包回调请求，四方未发现匹配的订单信息，钱包地址为：[{}]，忽略请求...",callbackBody.getAddress());
             return;
         }
+        if(!callbackBody.getActualAmount().equals(orderInfo.getWalletAmount())){
+            log.info("回调的币数：[{}]，和申请提交的币数:[{}],不一致，忽略请求...",callbackBody.getActualAmount(),orderInfo.getActualAmount());
+            return;
+        }
         //实际支付的币种数量
+        orderInfo.setActualAmount(callbackBody.getActualAmount());
+        //矿工费
+        orderInfo.setWalletFee(callbackBody.getActualFee().toString());
         orderInfo.setStatus(OrderStatusEnum.NO_BACK.getCode());
         orderInfoService.updateById(orderInfo);
+
+        //统计的时候是统计币种，所以，这里将submitAmount 修改为支付的币种数量
+        orderInfo.setSubmitAmount(callbackBody.getActualAmount());
         freeWalletUrl(callbackBody.getAddress());
         //异步通知客户
-        asyncNotify.asyncNotify(orderInfo.getOrderId(),BaseConstant.REQUEST_WALLET_USDT);
+        asyncNotify.asyncNotify(orderInfo,BaseConstant.REQUEST_WALLET_USDT);
     }
 
     private boolean checkSignSuccess(WalletHttpCallbackParam param){

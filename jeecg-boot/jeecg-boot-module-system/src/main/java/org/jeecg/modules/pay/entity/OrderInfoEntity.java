@@ -43,6 +43,14 @@ public class OrderInfoEntity {
 	@Excel(name = "钱包地址", width = 15)
 	@ApiModelProperty(value = "钱包地址")
 	private String walletUrl;
+	/**
+	 * 实际充值钱币的总数
+	 */
+	private String walletAmount;
+	/**
+	 * 矿工费
+	 */
+	private String walletFee;
 	/**用户id*/
 	@Excel(name = "用户id", width = 15)
     @ApiModelProperty(value = "用户id")
@@ -71,6 +79,10 @@ public class OrderInfoEntity {
 	@Excel(name = "手续费", width = 15)
     @ApiModelProperty(value = "手续费")
 	private java.math.BigDecimal poundage;
+	/**
+	 * 手续费利率
+	 */
+	private String poundageRate;
 	/**实际金额*/
 	@Excel(name = "实际金额", width = 15)
     @ApiModelProperty(value = "实际金额")

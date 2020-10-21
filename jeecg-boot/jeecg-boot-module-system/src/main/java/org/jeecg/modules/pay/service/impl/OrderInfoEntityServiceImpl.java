@@ -264,7 +264,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
 
     @Override
     public R notifyCustomer(OrderInfoEntity order, SysUser user, String payType) throws Exception {
-        order.setStatus(1);
+        order.setStatus(BaseConstant.ORDER_STATUS_SUCCESS_NOT_RETURN);
         JSONObject callobj = encryptAESData(order, user.getApiKey());
         StringBuilder msg = new StringBuilder();
         log.info("===>回调商户，url:{},param:{}", order.getSuccessCallbackUrl(), callobj.toJSONString());
@@ -692,6 +692,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         BigDecimal amount = new BigDecimal(submitAmount);
         BigDecimal poundage = amount.multiply(new BigDecimal(rate)).setScale(2, BigDecimal.ROUND_HALF_UP);
         order.setPoundage(poundage);
+        order.setPoundageRate(rate);
         order.setActualAmount(amount.subtract(poundage).setScale(2, BigDecimal.ROUND_HALF_UP));
         String orderId = generateOrderId();
         order.setOrderId(orderId);

@@ -13,4 +13,8 @@ CREATE TABLE `pay_wallet_url` (
 
 ALTER TABLE pay_order_info ADD wallet_url varchar(64) DEFAULT null COMMENT '钱包地址' AFTER outer_order_id;
 
+ALTER TABLE pay_order_info ADD wallet_amount varchar(8) DEFAULT null COMMENT '实际充值钱币的总数' AFTER wallet_url;
 
+ALTER TABLE pay_order_info ADD wallet_fee varchar(8) DEFAULT null COMMENT '矿工费' AFTER wallet_amount;
+
+ALTER TABLE pay_order_info ADD poundage_rate varchar(8) DEFAULT null COMMENT '手续费利率' AFTER poundage;
