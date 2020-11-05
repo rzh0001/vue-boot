@@ -204,21 +204,22 @@ public class RechargeOrderController {
 	public Result<Object> approval(@RequestBody JSONObject jsonObject) {
 		LoginUser opUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
 
-		log.info("充值订单-审核:" + jsonObject.toJSONString());
-		String key = "CZ-" + jsonObject.getString("id") + "-" + jsonObject.getString("status");
-		if (redis.hasKey(key)) {
-			log.info("充值订单-审核:缓存已存在{}", key);
-			return Result.error("数据已过期，请刷新后再试");
-		} else {
-			log.info("充值订单-审核:插入缓存{}", key);
-			redis.set(key, 1, 600);
-		}
 
 		QueryWrapper<RechargeOrder> qw = new QueryWrapper<>();
 		qw.lambda().eq(RechargeOrder::getId, jsonObject.getString("id")).eq(RechargeOrder::getVersion, jsonObject.getString("version"));
 		RechargeOrder order = rechargeOrderService.getOne(qw);
 		if (order == null) {
 			return Result.error("数据已过期，请刷新后再试");
+		}
+
+		log.info("充值订单[{}]-审核:", order.getOrderId());
+		String key = order.getUserName() + '-' + order.getOrderId() + "-" + jsonObject.getString("status");
+		if (redis.hasKey(key)) {
+			log.info("充值订单[{}]-审核:缓存已存在{}", order.getOrderId(), key);
+			return Result.error("数据已过期，请刷新后再试");
+		} else {
+			log.info("充值订单[{}]-审核:插入缓存{}", order.getOrderId(), key);
+			redis.set(key, 1, 600);
 		}
 
 		order.setStatus(jsonObject.getString("status"));

@@ -173,6 +173,8 @@ public class DfApiServiceImpl implements IDfApiService {
 			log.info("\n=======>订单[{}][{}]：异步回调返回报文解析成功，更新回调状态", order.getOrderId(), order.getOuterOrderId());
 			order.setCallbackStatus("2");
 			payOrderService.updateById(order);
+		} else {
+			throw new RRException("异步回调失败，错误信息:" + post);
 		}
 
 		return true;

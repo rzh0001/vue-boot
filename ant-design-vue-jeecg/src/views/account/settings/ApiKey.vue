@@ -45,8 +45,8 @@
         <a-form layout="inline">
           <a-form-item label="开关">
             <a-select v-model="callbackSwitch" style="width: 200px" placeholder="">
-              <a-select-option value="0">关闭</a-select-option>
-              <a-select-option value="1">开启</a-select-option>
+              <a-select-option value="0">开启</a-select-option>
+              <a-select-option value="1">关闭</a-select-option>
             </a-select>
           </a-form-item>
           <a-form-item>
