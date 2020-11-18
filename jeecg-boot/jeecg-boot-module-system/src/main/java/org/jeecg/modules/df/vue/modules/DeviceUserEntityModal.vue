@@ -11,30 +11,12 @@
     <a-spin :spinning="confirmLoading">
       <a-form :form="form">
       
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="设备名称">
-          <a-input placeholder="请输入设备名称" v-decorator="['deviceName', validatorRules.deviceName ]" />
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="设备id">
+          <a-input placeholder="请输入设备id" v-decorator="['deviceId', validatorRules.deviceId ]" />
         </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="设备编码">
-          <a-input placeholder="请输入设备编码" v-decorator="['deviceCode', validatorRules.deviceCode ]" />
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="商户id">
+          <a-input placeholder="请输入商户id" v-decorator="['userId', validatorRules.userId ]" />
         </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="秘钥">
-          <a-input placeholder="请输入秘钥" v-decorator="['apiKey', validatorRules.key ]" />
-        </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="限额">
-          <a-input placeholder="请输入限额" v-decorator="['limitMoney', {}]" />
-        </a-form-item>
-       <!-- <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="分组编码">
-          <a-input placeholder="请输入分组编码" v-decorator="['groupingCode', {}]" />
-        </a-form-item>-->
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="状态">
-          <select v-decorator="[ 'status', validatorRules.status]">
-            <option value="1">开启</option>
-            <option value="2">禁用</option>
-          </select>
-        </a-form-item>
-      <!--  <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="清零时间">
-          <a-date-picker showTime format='YYYY-MM-DD HH:mm:ss' v-decorator="[ 'clearedTime', {}]" />
-        </a-form-item>-->
 		
       </a-form>
     </a-spin>
@@ -47,7 +29,7 @@
   import moment from "moment"
 
   export default {
-    name: "DeviceInfoEntityModal",
+    name: "DeviceUserEntityModal",
     data () {
       return {
         title:"操作",
@@ -65,14 +47,12 @@
         confirmLoading: false,
         form: this.$form.createForm(this),
         validatorRules:{
-        deviceName:{rules: [{ required: true, message: '请输入设备名称!' }]},
-        deviceCode:{rules: [{ required: true, message: '请输入设备编码!' }]},
-          apiKey:{rules: [{ required: true, message: '请输入秘钥!' }]},
-        status:{rules: [{ required: true, message: '请输入状态：1：正常；2：禁用!' }]},
+        deviceId:{rules: [{ required: true, message: '请输入设备id!' }]},
+        userId:{rules: [{ required: true, message: '请输入商户id!' }]},
         },
         url: {
-          add: "/df/deviceInfoEntity/add",
-          edit: "/df/deviceInfoEntity/edit",
+          add: "/df/deviceUserEntity/add",
+          edit: "/df/deviceUserEntity/edit",
         },
       }
     },
@@ -87,9 +67,8 @@
         this.model = Object.assign({}, record);
         this.visible = true;
         this.$nextTick(() => {
-          this.form.setFieldsValue(pick(this.model,'deviceName','deviceCode','apiKey','limitMoney','balance','groupingCode','status'))
+          this.form.setFieldsValue(pick(this.model,'deviceId','userId'))
 		  //时间格式化
-          this.form.setFieldsValue({clearedTime:this.model.clearedTime?moment(this.model.clearedTime):null})
         });
 
       },
@@ -114,7 +93,6 @@
             }
             let formData = Object.assign(this.model, values);
             //时间格式化
-            formData.clearedTime = formData.clearedTime?formData.clearedTime.format('YYYY-MM-DD HH:mm:ss'):null;
             
             console.log(formData)
             httpAction(httpurl,formData,method).then((res)=>{

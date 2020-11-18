@@ -7,19 +7,24 @@
         <a-row :gutter="24">
 
           <a-col :md="6" :sm="8">
-            <a-form-item label="设备名称">
-              <a-input placeholder="请输入设备名称" v-model="queryParam.deviceName"></a-input>
+            <a-form-item label="设备id">
+              <a-input placeholder="请输入设备id" v-model="queryParam.deviceId"></a-input>
             </a-form-item>
           </a-col>
           <a-col :md="6" :sm="8">
-            <a-form-item label="设备编码">
-              <a-input placeholder="请输入设备编码" v-model="queryParam.deviceCode"></a-input>
+            <a-form-item label="商户id">
+              <a-input placeholder="请输入商户id" v-model="queryParam.userId"></a-input>
             </a-form-item>
           </a-col>
+          </template>
           <a-col :md="6" :sm="8" >
             <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
               <a-button type="primary" @click="searchQuery" icon="search">查询</a-button>
               <a-button type="primary" @click="searchReset" icon="reload" style="margin-left: 8px">重置</a-button>
+              <a @click="handleToggleSearch" style="margin-left: 8px">
+                {{ toggleSearchStatus ? '收起' : '展开' }}
+                <a-icon :type="toggleSearchStatus ? 'up' : 'down'"/>
+              </a>
             </span>
           </a-col>
 
@@ -30,10 +35,10 @@
     <!-- 操作按钮区域 -->
     <div class="table-operator">
       <a-button @click="handleAdd" type="primary" icon="plus">新增</a-button>
-     <!-- <a-button type="primary" icon="download" @click="handleExportXls('设备信息')">导出</a-button>
+      <a-button type="primary" icon="download" @click="handleExportXls('商户关联设备')">导出</a-button>
       <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl" @change="handleImportExcel">
         <a-button type="primary" icon="import">导入</a-button>
-      </a-upload>-->
+      </a-upload>
       <a-dropdown v-if="selectedRowKeys.length > 0">
         <a-menu slot="overlay">
           <a-menu-item key="1" @click="batchDel"><a-icon type="delete"/>删除</a-menu-item>
@@ -65,7 +70,16 @@
           <a @click="handleEdit(record)">编辑</a>
 
           <a-divider type="vertical" />
-          <a @click="relationUser(record)">关联商户</a>
+          <a-dropdown>
+            <a class="ant-dropdown-link">更多 <a-icon type="down" /></a>
+            <a-menu slot="overlay">
+              <a-menu-item>
+                <a-popconfirm title="确定删除吗?" @confirm="() => handleDelete(record.id)">
+                  <a>删除</a>
+                </a-popconfirm>
+              </a-menu-item>
+            </a-menu>
+          </a-dropdown>
         </span>
 
       </a-table>
@@ -73,26 +87,23 @@
     <!-- table区域-end -->
 
     <!-- 表单区域 -->
-    <deviceInfoEntity-modal ref="modalForm" @ok="modalFormOk"></deviceInfoEntity-modal>
-    <device-user-entity-modal ref="deviceUserForm"></device-user-entity-modal>
+    <deviceUserEntity-modal ref="modalForm" @ok="modalFormOk"></deviceUserEntity-modal>
   </a-card>
 </template>
 
 <script>
-  import DeviceInfoEntityModal from './modules/DeviceInfoEntityModal'
+  import DeviceUserEntityModal from './modules/DeviceUserEntityModal'
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
-  import DeviceUserEntityModal from "@views/df/modules/DeviceUserEntityModal";
 
   export default {
-    name: "DeviceInfoEntityList",
+    name: "DeviceUserEntityList",
     mixins:[JeecgListMixin],
     components: {
-      DeviceUserEntityModal,
-      DeviceInfoEntityModal
+      DeviceUserEntityModal
     },
     data () {
       return {
-        description: '设备信息管理页面',
+        description: '商户关联设备管理页面',
         // 表头
         columns: [
           {
@@ -106,53 +117,14 @@
             }
            },
 		   {
-            title: '设备名称',
+            title: '设备id',
             align:"center",
-            dataIndex: 'deviceName'
+            dataIndex: 'deviceId'
            },
 		   {
-            title: '设备编码',
+            title: '商户id',
             align:"center",
-            dataIndex: 'deviceCode'
-           },
-		   {
-            title: '秘钥',
-            align:"center",
-            dataIndex: 'apiKey'
-           },
-		   {
-            title: '限额',
-            align:"center",
-            dataIndex: 'limitMoney'
-           },
-		   {
-            title: '余额',
-            align:"center",
-            dataIndex: 'balance'
-           },
-		   {
-            title: '分组编码',
-            align:"center",
-            dataIndex: 'groupingCode'
-           },
-		   {
-            title: '状态',
-            align:"center",
-            dataIndex: 'status',
-         customRender: function(text) {
-           if (text == 1) {
-             return '正常'
-           }else if (text == 2) {
-             return '禁用'
-           } else {
-             return text
-           }
-         }
-           },
-		   {
-            title: '清零时间',
-            align:"center",
-            dataIndex: 'clearedTime'
+            dataIndex: 'userId'
            },
           {
             title: '操作',
@@ -162,11 +134,11 @@
           }
         ],
 		url: {
-          list: "/df/deviceInfoEntity/list",
-          delete: "/df/deviceInfoEntity/delete",
-          deleteBatch: "/df/deviceInfoEntity/deleteBatch",
-          exportXlsUrl: "df/deviceInfoEntity/exportXls",
-          importExcelUrl: "df/deviceInfoEntity/importExcel",
+          list: "/df/deviceUserEntity/list",
+          delete: "/df/deviceUserEntity/delete",
+          deleteBatch: "/df/deviceUserEntity/deleteBatch",
+          exportXlsUrl: "df/deviceUserEntity/exportXls",
+          importExcelUrl: "df/deviceUserEntity/importExcel",
        },
     }
   },
@@ -176,9 +148,7 @@
     }
   },
     methods: {
-      relationUser(){
-
-      }
+     
     }
   }
 </script>
