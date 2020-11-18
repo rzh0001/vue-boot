@@ -22,7 +22,7 @@
     props:{
       modalWidth:{
         type:Number,
-        default:1250,
+        default:1100,
         required:false
       },
       value:{

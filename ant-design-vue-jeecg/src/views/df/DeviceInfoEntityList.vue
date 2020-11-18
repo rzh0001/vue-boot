@@ -176,8 +176,8 @@
     }
   },
     methods: {
-      relationUser(){
-
+      relationUser(record){
+        this.$refs.deviceUserForm.relationUser(record);
       }
     }
   }

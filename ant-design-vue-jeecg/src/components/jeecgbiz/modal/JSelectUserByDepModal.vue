@@ -10,19 +10,6 @@
     wrapClassName="ant-modal-cust-warp"
   >
     <a-row :gutter="10" style="background-color: #ececec; padding: 10px; margin: -10px">
-      <a-col :md="6" :sm="24">
-        <a-card :bordered="false">
-          <!--组织机构-->
-          <a-directory-tree
-            selectable
-            :selectedKeys="selectedKeys"
-            :checkStrictly="true"
-            @select="this.onSelect"
-            :dropdownStyle="{maxHeight:'200px',overflow:'auto'}"
-            :treeData="departTree"
-          />
-        </a-card>
-      </a-col>
       <a-col :md="18" :sm="24">
         <a-card :bordered="false">
           用户账号:
@@ -75,33 +62,18 @@
             dataIndex: 'realname'
           },
           {
-            title: '角色名称',
+            title: '状态',
             align: 'center',
-            dataIndex: 'roleName'
-          },
-          {
-            title: '性别',
-            align: 'center',
-            dataIndex: 'sex',
+            dataIndex: 'status',
             customRender: function(text) {
               if (text === 1) {
-                return '男'
+                return '正常'
               } else if (text === 2) {
-                return '女'
+                return '冻结'
               } else {
                 return text
               }
             }
-          },
-          {
-            title: '手机号码',
-            align: 'center',
-            dataIndex: 'phone'
-          },
-          {
-            title: '邮箱',
-            align: 'center',
-            dataIndex: 'email'
           }
         ],
         scrollTrigger: {},
@@ -110,7 +82,7 @@
         userNameArr: [],
         departName: '',
         userRolesMap: {},
-        title: '根据部门选择用户',
+        title: '选择用户',
         ipagination: {
           current: 1,
           pageSize: 10,
@@ -225,7 +197,7 @@
         let dataSource = this.dataSource;
         for (let i = 0, len = dataSource.length; i < len; i++) {
           if (rowId === dataSource[i].id) {
-            this.userNameArr.push(dataSource[i].realname);
+            this.userNameArr.push(dataSource[i].username);
           }
         }
       },

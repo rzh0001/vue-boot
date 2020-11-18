@@ -11,11 +11,11 @@
     <a-spin :spinning="confirmLoading">
       <a-form :form="form">
       
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="设备id">
-          <a-input placeholder="请输入设备id" v-decorator="['deviceId', validatorRules.deviceId ]" />
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="设备名称" >
+          <a-input placeholder="设备名称"  disabled="disabled" v-model="this.deviceName"/>
         </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="商户id">
-          <a-input placeholder="请输入商户id" v-decorator="['userId', validatorRules.userId ]" />
+        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="商户名称">
+          <j-select-user-by-dep v-model="userName"></j-select-user-by-dep>
         </a-form-item>
 		
       </a-form>
@@ -25,14 +25,18 @@
 
 <script>
   import { httpAction } from '@/api/manage'
+  import JSelectUserByDep from '@/components/jeecgbiz/JSelectUserByDep'
   import pick from 'lodash.pick'
   import moment from "moment"
 
   export default {
     name: "DeviceUserEntityModal",
+    components:{JSelectUserByDep},
     data () {
       return {
         title:"操作",
+        deviceName:"",
+        userName:"",
         visible: false,
         model: {},
         labelCol: {
@@ -47,8 +51,7 @@
         confirmLoading: false,
         form: this.$form.createForm(this),
         validatorRules:{
-        deviceId:{rules: [{ required: true, message: '请输入设备id!' }]},
-        userId:{rules: [{ required: true, message: '请输入商户id!' }]},
+        userId:{rules: [{ required: true, message: '请输入商户名称!' }]},
         },
         url: {
           add: "/df/deviceUserEntity/add",
@@ -59,6 +62,13 @@
     created () {
     },
     methods: {
+
+      relationUser(record){
+        this.visible = true;
+        console.log(record);
+        this.deviceName = record.deviceName;
+      },
+
       add () {
         this.edit({});
       },
