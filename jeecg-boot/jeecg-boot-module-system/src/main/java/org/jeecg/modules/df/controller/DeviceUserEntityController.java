@@ -6,20 +6,25 @@ import java.util.Map;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.google.common.collect.Lists;
+import org.apache.commons.lang3.StringUtils;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.aspect.annotation.AutoLog;
 import org.jeecg.common.util.oConvertUtils;
+import org.jeecg.modules.df.dto.DeviceUserParam;
 import org.jeecg.modules.df.entity.DeviceUserEntity;
-import org.jeecg.modules.df.service.IDeviceUserEntityService;
-import java.util.Date;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 
+import org.jeecg.modules.df.service.impl.DeviceUserEntityServiceImpl;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -27,6 +32,7 @@ import org.jeecgframework.poi.excel.entity.ImportParams;
 import org.jeecgframework.poi.excel.view.JeecgEntityExcelView;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -47,7 +53,7 @@ import io.swagger.annotations.ApiOperation;
 @RequestMapping("/df/deviceUserEntity")
 public class DeviceUserEntityController {
 	@Autowired
-	private IDeviceUserEntityService deviceUserEntityService;
+	private DeviceUserEntityServiceImpl deviceUserEntityService;
 	
 	/**
 	 * 分页列表查询
@@ -92,7 +98,34 @@ public class DeviceUserEntityController {
 		}
 		return result;
 	}
-	
+
+	 /**
+	  * 保存设备和商户的关联关系
+	  * @param param
+	  * @return
+	  */
+	 @PostMapping(value = "/addRelation")
+	public Result<String> saveUserRelation(@RequestBody DeviceUserParam param){
+		 Result<String> result = new Result<String>();
+		 result.success("success");
+		if(StringUtils.isEmpty(param.getUserName())){
+			return result;
+		}
+		List<String> userNames = Arrays.stream(param.getUserName().split(",")).collect(Collectors.toList());
+		 List<DeviceUserEntity> exists = deviceUserEntityService.findByCode(param.getDeviceCode());
+		 //去重
+		if(!CollectionUtils.isEmpty(exists)){
+			List<String> existNames = exists.stream().map(key->key.getUserName()).collect(Collectors.toList());
+			userNames.removeAll(existNames);
+		}
+		//保存
+		 if(CollectionUtils.isEmpty(userNames)){
+			 return result;
+		 }
+		 deviceUserEntityService.batchSave(param.getDeviceCode(),userNames);
+		 return result;
+	}
+
 	/**
 	 *  编辑
 	 * @param deviceUserEntity
@@ -134,7 +167,7 @@ public class DeviceUserEntityController {
 		}
 		return Result.ok("删除成功!");
 	}
-	
+
 	/**
 	 *  批量删除
 	 * @param ids

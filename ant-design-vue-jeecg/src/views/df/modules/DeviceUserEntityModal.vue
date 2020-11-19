@@ -4,7 +4,7 @@
     :width="800"
     :visible="visible"
     :confirmLoading="confirmLoading"
-    @ok="handleOk"
+    @ok="saveRelationUser"
     @cancel="handleCancel"
     cancelText="关闭">
     
@@ -36,6 +36,7 @@
       return {
         title:"操作",
         deviceName:"",
+        deviceCode:"",
         userName:"",
         visible: false,
         model: {},
@@ -54,7 +55,7 @@
         userId:{rules: [{ required: true, message: '请输入商户名称!' }]},
         },
         url: {
-          add: "/df/deviceUserEntity/add",
+          add: "/df/deviceUserEntity/addRelation",
           edit: "/df/deviceUserEntity/edit",
         },
       }
@@ -67,8 +68,26 @@
         this.visible = true;
         console.log(record);
         this.deviceName = record.deviceName;
+        this.deviceCode = record.deviceCode;
       },
 
+      saveRelationUser(){
+        const that = this;
+        let formData = {deviceCode:this.deviceCode,userName:this.userName};
+        console.log(formData)
+        httpAction(this.url.add,formData,"post").then((res)=>{
+          if(res.success){
+            that.$message.success(res.message);
+            that.$emit('ok');
+          }else{
+            that.$message.warning(res.message);
+          }
+        }).finally(() => {
+          that.confirmLoading = false;
+          that.userName = "";
+          that.close();
+        })
+      },
       add () {
         this.edit({});
       },

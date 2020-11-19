@@ -10,7 +10,7 @@
     wrapClassName="ant-modal-cust-warp"
   >
     <a-row :gutter="10" style="background-color: #ececec; padding: 10px; margin: -10px">
-      <a-col :md="18" :sm="24">
+      <a-col>
         <a-card :bordered="false">
           用户账号:
           <a-input-search

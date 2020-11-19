@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -25,6 +26,7 @@ import org.jeecgframework.poi.excel.annotation.Excel;
 @TableName("df_device_user")
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
+@Builder
 @ApiModel(value="df_device_user对象", description="商户关联设备")
 public class DeviceUserEntity {
     
@@ -35,11 +37,11 @@ public class DeviceUserEntity {
 	/**设备id*/
 	@Excel(name = "设备id", width = 15)
     @ApiModelProperty(value = "设备id")
-	private java.lang.String deviceId;
+	private java.lang.String deviceCode;
 	/**商户id*/
 	@Excel(name = "商户id", width = 15)
     @ApiModelProperty(value = "商户id")
-	private java.lang.String userId;
+	private java.lang.String userName;
 	/**创建人*/
 	@Excel(name = "创建人", width = 15)
     @ApiModelProperty(value = "创建人")
