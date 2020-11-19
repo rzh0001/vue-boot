@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.jeecg.modules.api.entity.ApiRequestBody;
 import org.jeecg.modules.api.entity.ApiResponseBody;
 import org.jeecg.modules.api.service.IDfApiService;
+import org.jeecg.modules.df.dto.AssignOrderParamDTO;
+import org.jeecg.modules.df.entity.PayOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,6 +37,15 @@ public class DfApiController {
         
         return apiService.queryOrder(req);
         
+    }
+
+    @PostMapping(value = "/order/assignOrder", produces = "application/json;charset=UTF-8")
+    @ResponseBody
+    public ApiResponseBody assignOrder(@Valid @RequestBody AssignOrderParamDTO dto){
+        PayOrder order = apiService.assignOrder(dto);
+        ApiResponseBody resp = ApiResponseBody.ok();
+        resp.setData(order);
+        return resp;
     }
     
     

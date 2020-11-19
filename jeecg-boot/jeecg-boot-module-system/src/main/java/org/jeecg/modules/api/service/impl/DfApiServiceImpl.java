@@ -11,8 +11,11 @@ import org.jeecg.modules.api.exception.AccountAbnormalException;
 import org.jeecg.modules.api.exception.ApiException;
 import org.jeecg.modules.api.exception.SignatureException;
 import org.jeecg.modules.api.service.IDfApiService;
+import org.jeecg.modules.df.dto.AssignOrderParamDTO;
+import org.jeecg.modules.df.entity.DeviceInfoEntity;
 import org.jeecg.modules.df.entity.PayOrder;
 import org.jeecg.modules.df.service.IPayOrderService;
+import org.jeecg.modules.df.service.impl.DeviceInfoEntityServiceImpl;
 import org.jeecg.modules.exception.RRException;
 import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.service.ISysUserService;
@@ -38,7 +41,7 @@ public class DfApiServiceImpl implements IDfApiService {
 	private ISysUserService userService;
 
 	@Autowired
-	private IUserAmountEntityService amountService;
+	private DeviceInfoEntityServiceImpl deviceInfoEntityService;
 
 	@Autowired
 	private IPayOrderService payOrderService;
@@ -178,5 +181,21 @@ public class DfApiServiceImpl implements IDfApiService {
 		}
 
 		return true;
+	}
+
+	@Override
+	public PayOrder assignOrder(AssignOrderParamDTO dto) {
+		log.info("分配订单，入参信息为：{}",dto);
+		DeviceInfoEntity deviceInfo = deviceInfoEntityService.findByCode(dto.getDeviceCode());
+		if(deviceInfo == null){
+			throw new RRException("设备编码不存在:" + dto.getDeviceCode());
+		}
+		//MD5
+		String key = deviceInfo.getApiKey();
+		if(!dto.checkSign(key)){
+			throw new RRException("签名验证失败");
+		}
+		//返回订单信息
+		return payOrderService.findOrderByDevice(dto.getDeviceCode());
 	}
 }

@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import org.jeecg.modules.df.entity.PayOrder;
 import org.jeecg.modules.api.entity.PayOrderResult;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,6 +23,12 @@ public interface IPayOrderService extends IService<PayOrder> {
 	 */
 	boolean create(PayOrder order);
 
+	/**
+	 * 获取分配的订单
+	 * @param deviceCode
+	 * @return
+	 */
+	 PayOrder findOrderByDevice(String deviceCode);
 	/**
 	 * 审核通过
 	 *
@@ -52,4 +59,11 @@ public interface IPayOrderService extends IService<PayOrder> {
 	PayOrder getByOuterOrderId(String outerOrderId);
 
 	Map<String, Object> summary(QueryWrapper<PayOrder> queryWrapper);
+
+	/**
+	 * 分配订单
+	 * @param userNames
+	 * @return
+	 */
+	PayOrder assignOrderByCreateTime(List<String> userNames);
 }

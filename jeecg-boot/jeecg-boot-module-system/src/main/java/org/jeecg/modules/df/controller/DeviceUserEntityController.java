@@ -16,6 +16,7 @@ import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.aspect.annotation.AutoLog;
 import org.jeecg.common.util.oConvertUtils;
+import org.jeecg.modules.df.dto.DeleteDeviceUserParam;
 import org.jeecg.modules.df.dto.DeviceUserParam;
 import org.jeecg.modules.df.entity.DeviceUserEntity;
 
@@ -137,6 +138,13 @@ public class DeviceUserEntityController {
 		Result<List<DeviceUserInfoVO>> result = new Result<>();
 		List<DeviceUserInfoVO> vo = deviceUserEntityService.findDeviceUserInfo(deviceCode);
 		result.setResult(vo);
+		return result;
+	}
+	@PostMapping("/deleteDeviceUser")
+	public Result<String> deleteDeviceUser(@RequestBody DeleteDeviceUserParam param){
+		Result<String> result = new Result<String>();
+		result.success("success");
+		deviceUserEntityService.deleteDeviceUser(param);
 		return result;
 	}
 	/**

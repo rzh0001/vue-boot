@@ -18,9 +18,9 @@
           <a-input placeholder="请输入设备编码" v-decorator="['deviceCode', validatorRules.deviceCode ]"
                    :readOnly="!!model.deviceCode"/>
         </a-form-item>
-        <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="秘钥">
+       <!-- <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="秘钥">
           <a-input placeholder="请输入秘钥" v-decorator="['apiKey', validatorRules.key ]" />
-        </a-form-item>
+        </a-form-item>-->
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="限额">
           <a-input placeholder="请输入限额" v-decorator="['limitMoney', {}]" />
         </a-form-item>

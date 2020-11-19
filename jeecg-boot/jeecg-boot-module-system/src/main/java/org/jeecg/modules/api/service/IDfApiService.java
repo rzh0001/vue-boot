@@ -2,6 +2,8 @@ package org.jeecg.modules.api.service;
 
 import org.jeecg.modules.api.entity.ApiRequestBody;
 import org.jeecg.modules.api.entity.ApiResponseBody;
+import org.jeecg.modules.df.dto.AssignOrderParamDTO;
+import org.jeecg.modules.df.entity.PayOrder;
 
 /**
  * @author ruanzh
@@ -19,6 +21,12 @@ public interface IDfApiService {
     ApiResponseBody queryOrder(ApiRequestBody req);
     
     boolean callback(String orderId);
-    
+
+    /**
+     * 分配订单
+     * @param dto
+     * @return
+     */
+    PayOrder assignOrder(AssignOrderParamDTO dto);
     
 }

@@ -2,12 +2,14 @@ package org.jeecg.modules.df.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
 import org.jeecg.common.system.vo.LoginUser;
 import org.jeecg.modules.df.constant.DfConstant;
+import org.jeecg.modules.df.entity.DeviceUserEntity;
 import org.jeecg.modules.df.entity.PayOrder;
 import org.jeecg.modules.api.entity.PayOrderResult;
 import org.jeecg.modules.df.mapper.PayOrderMapper;
@@ -23,9 +25,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -94,6 +100,23 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder>
 
 		return save(order);
 	}
+
+
+	@Autowired
+	private DeviceUserEntityServiceImpl deviceUserEntityService;
+
+	@Override
+	public PayOrder findOrderByDevice(String deviceCode){
+		List<DeviceUserEntity>  deviceUsers = deviceUserEntityService.findByCode(deviceCode);
+		if(CollectionUtils.isEmpty(deviceUsers)){
+			return null;
+		}
+		//分配订单
+		List<String> userNames = deviceUsers.stream().map(key->key.getUserName()).collect(Collectors.toList());
+		return this.assignOrderByCreateTime(userNames);
+	}
+
+
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
@@ -221,5 +244,18 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder>
 	@Override
 	public Map<String, Object> summary(QueryWrapper<PayOrder> queryWrapper) {
 		return baseMapper.summary(queryWrapper);
+	}
+
+	@Override
+	public PayOrder assignOrderByCreateTime(List<String> userNames) {
+		String limit = "limit 0,5";
+		List<PayOrder> list = getBaseMapper().selectList(new LambdaQueryWrapper<PayOrder>()
+		.in(PayOrder::getUserName,userNames)
+				.eq(PayOrder::getStatus,"0")
+				.orderByDesc(PayOrder::getCreateTime).last(limit));
+		if(CollectionUtils.isEmpty(list)){
+			return null;
+		}
+		return list.get(0);
 	}
 }

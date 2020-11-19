@@ -9,6 +9,9 @@ import java.net.URLDecoder;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
 import org.jeecg.common.api.vo.Result;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.aspect.annotation.AutoLog;
@@ -88,6 +91,7 @@ public class DeviceInfoEntityController {
 	public Result<DeviceInfoEntity> add(@RequestBody DeviceInfoEntity deviceInfoEntity) {
 		Result<DeviceInfoEntity> result = new Result<DeviceInfoEntity>();
 		try {
+			deviceInfoEntity.setApiKey(RandomUtil.randomString(16));
 			deviceInfoEntityService.save(deviceInfoEntity);
 			result.success("添加成功！");
 		} catch (Exception e) {

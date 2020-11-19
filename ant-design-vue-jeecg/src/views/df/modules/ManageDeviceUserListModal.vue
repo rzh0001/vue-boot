@@ -26,18 +26,11 @@
             <template v-else>{{ text }}</template>
           </template>
           <template slot="operation" slot-scope="text, record, index">
-            <template v-if="record.editable">
-              <span v-if="record.isNew">
-                <a @click="saveRow(record.key)">添加</a>
-                <a-divider type="vertical" />
-                <a-popconfirm title="是否要删除此行？" @confirm="remove(record.key)">
+            <template >
+              <span >
+                <a-popconfirm title="是否要删除此行？" @confirm="remove(record)">
                   <a>删除</a>
                 </a-popconfirm>
-              </span>
-              <span v-else>
-                <a @click="saveRow(record.key)">保存</a>
-                <a-divider type="vertical" />
-                <a @click="cancel(record.key)">取消</a>
               </span>
             </template>
           </template>
@@ -74,17 +67,17 @@ export default {
           title: '商户名称',
           dataIndex: 'userName',
           key: 'userName',
-          width: '5%',
+          width: '20%',
           scopedSlots: { customRender: 'userName' }
         },
         {
           title: '状态',
           dataIndex: 'status',
           key: 'status',
-          width: '5%',
+          width: '10%',
           customRender: function(text) {
-            if (text == '0') {
-              return <a-tag color="red">未启用</a-tag>
+            if (text == '2') {
+              return <a-tag color="red">禁用</a-tag>
             } else if (text == '1') {
               return  <a-tag color="cyan">已启动</a-tag>
             } else{
@@ -94,17 +87,17 @@ export default {
         },
         {
           title: '设备名称',
-          dataIndex: 'deviceCode',
-          key: 'deviceCode',
-          width: '10%',
-          scopedSlots: { customRender: 'deviceCode' }
+          dataIndex: 'deviceName',
+          key: 'deviceName',
+          width: '20%',
+          scopedSlots: { customRender: 'deviceName' }
         },
         {
           title: '设备编码',
-          dataIndex: 'deviceName',
-          key: 'deviceName',
-          width: '10%',
-          scopedSlots: { customRender: 'deviceName' }
+          dataIndex: 'deviceCode',
+          key: 'deviceCode',
+          width: '20%',
+          scopedSlots: { customRender: 'deviceCode' }
         },
         {
           title: '操作',
@@ -115,9 +108,7 @@ export default {
       data: [],
       url:{
         findDeviceUserInfo:"/df/deviceUserEntity/findDeviceUserInfo",
-        updateUserChannel:"/v2/payUserChannel/updateUserChannel",
-        activeUserChannel:"/v2/payUserChannel/activeUserChannel",
-        unActiveUserChannel:"/v2/payUserChannel/unActiveUserChannel"
+        deleteDeviceUser:"/df/deviceUserEntity/deleteDeviceUser",
       }
     }
   },
@@ -125,7 +116,6 @@ export default {
   },
   methods: {
     listManage(record){
-      console.log("==record=="+record);
       this.manage=true;
       this.deviceCode=record.deviceCode;
       this.findDeviceUserInfo();
@@ -153,11 +143,6 @@ export default {
     handleCancel() {
       this.close()
     },
-    manageChannel(record){
-      this.manage=true;
-      this.userName=record.username;
-      this.getUserChannels();
-    },
     handleSubmit (e) {
       e.preventDefault()
     },
@@ -171,15 +156,12 @@ export default {
         isNew: true
       })
     },
-    remove (key) {
-      const newData = this.data.filter(item => item.key !== key)
-      this.data = newData
-    },
-    active(key){
-      let target = this.data.filter(item => item.key === key)[0]
-      httpAction(this.url.activeUserChannel,target,"post").then((res)=>{
+    remove (record) {
+      let formData = {deviceCode:record.deviceCode,userName:record.userName};
+      httpAction(this.url.deleteDeviceUser,formData,"post").then((res)=>{
         if(res.success){
           this.$message.success(res.message);
+          this.manage=false;
           this.$emit('ok');
         }else{
           this.$message.warning(res.message);
@@ -188,38 +170,6 @@ export default {
         that.confirmLoading = false;
         that.close();
       })
-    },
-    unActive(key){
-      let target = this.data.filter(item => item.key === key)[0]
-      httpAction(this.url.unActiveUserChannel,target,"post").then((res)=>{
-        if(res.success){
-          this.$message.success(res.message);
-          this.$emit('ok');
-        }else{
-          this.$message.warning(res.message);
-        }
-      }).finally(() => {
-        that.confirmLoading = false;
-        that.close();
-      })
-    },
-    saveRow (key) {
-      let target = this.data.filter(item => item.key === key)[0]
-      console.log("update");
-      console.log(target)
-      httpAction(this.url.updateUserChannel,target,"post").then((res)=>{
-        if(res.success){
-          this.$message.success(res.message);
-          this.$emit('ok');
-        }else{
-          this.$message.warning(res.message);
-        }
-      }).finally(() => {
-        that.confirmLoading = false;
-        that.close();
-      })
-      //target.editable = false
-      //target.isNew = false
     },
     toggle (key) {
       let target = this.data.filter(item => item.key === key)[0]
