@@ -68,7 +68,7 @@
           <a @click="relationUser(record)">关联商户</a>
 
           <a-divider type="vertical" />
-          <a @click="relationUser(record)">已关联商户</a>
+          <a @click="listManage(record)">已关联商户</a>
         </span>
 
       </a-table>
@@ -78,6 +78,7 @@
     <!-- 表单区域 -->
     <deviceInfoEntity-modal ref="modalForm" @ok="modalFormOk"></deviceInfoEntity-modal>
     <device-user-entity-modal ref="deviceUserForm"></device-user-entity-modal>
+    <manage-device-user-list-modal ref="listForm"></manage-device-user-list-modal>
   </a-card>
 </template>
 
@@ -85,13 +86,14 @@
   import DeviceInfoEntityModal from './modules/DeviceInfoEntityModal'
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
   import DeviceUserEntityModal from "@views/df/modules/DeviceUserEntityModal";
-
+  import ManageDeviceUserListModal from "@views/df/modules/ManageDeviceUserListModal";
   export default {
     name: "DeviceInfoEntityList",
     mixins:[JeecgListMixin],
     components: {
       DeviceUserEntityModal,
-      DeviceInfoEntityModal
+      DeviceInfoEntityModal,
+      ManageDeviceUserListModal
     },
     data () {
       return {
@@ -181,7 +183,11 @@
     methods: {
       relationUser(record){
         this.$refs.deviceUserForm.relationUser(record);
+      },
+      listManage(record){
+        this.$refs.listForm.listManage(record);
       }
+
     }
   }
 </script>
