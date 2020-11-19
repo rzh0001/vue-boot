@@ -15,7 +15,8 @@
           <a-input placeholder="请输入设备名称" v-decorator="['deviceName', validatorRules.deviceName ]" />
         </a-form-item>
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="设备编码">
-          <a-input placeholder="请输入设备编码" v-decorator="['deviceCode', validatorRules.deviceCode ]" />
+          <a-input placeholder="请输入设备编码" v-decorator="['deviceCode', validatorRules.deviceCode ]"
+                   :readOnly="!!model.deviceCode"/>
         </a-form-item>
         <a-form-item :labelCol="labelCol" :wrapperCol="wrapperCol" label="秘钥">
           <a-input placeholder="请输入秘钥" v-decorator="['apiKey', validatorRules.key ]" />
@@ -45,6 +46,7 @@
   import { httpAction } from '@/api/manage'
   import pick from 'lodash.pick'
   import moment from "moment"
+  import {disabledAuthFilter} from "@/utils/authFilter";
 
   export default {
     name: "DeviceInfoEntityModal",
@@ -79,6 +81,9 @@
     created () {
     },
     methods: {
+      isDisabledAuth(code) {
+        return disabledAuthFilter(code)
+      },
       add () {
         this.edit({});
       },

@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
+import java.util.List;
+
 /**
  * @Description: 设备信息
  * @Author: jeecg-boot
@@ -20,5 +22,9 @@ public class DeviceInfoEntityServiceImpl extends ServiceImpl<DeviceInfoEntityMap
     public DeviceInfoEntity findByCode(String deviceCode) {
         return getBaseMapper().selectOne(new LambdaQueryWrapper<DeviceInfoEntity>().
                 eq(DeviceInfoEntity::getDeviceCode, deviceCode));
+    }
+
+    public List<DeviceInfoEntity> findByIds(List<String> ids){
+        return getBaseMapper().selectList(new LambdaQueryWrapper<DeviceInfoEntity>().in(DeviceInfoEntity::getId,ids));
     }
 }

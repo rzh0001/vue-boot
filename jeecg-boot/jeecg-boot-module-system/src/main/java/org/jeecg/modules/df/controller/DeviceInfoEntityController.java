@@ -6,6 +6,7 @@ import java.util.Map;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.jeecg.common.api.vo.Result;
@@ -20,6 +21,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 
 import org.jeecg.modules.df.service.impl.DeviceInfoEntityServiceImpl;
+import org.jeecg.modules.df.service.impl.DeviceUserEntityServiceImpl;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -27,6 +29,7 @@ import org.jeecgframework.poi.excel.entity.ImportParams;
 import org.jeecgframework.poi.excel.view.JeecgEntityExcelView;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -48,7 +51,8 @@ import io.swagger.annotations.ApiOperation;
 public class DeviceInfoEntityController {
 	@Autowired
 	private DeviceInfoEntityServiceImpl deviceInfoEntityService;
-	
+	 @Autowired
+	private DeviceUserEntityServiceImpl deviceUserEntityService;
 	/**
 	 * 分页列表查询
 	 * @param deviceInfoEntity
@@ -143,12 +147,17 @@ public class DeviceInfoEntityController {
 	@AutoLog(value = "设备信息-批量删除")
 	@ApiOperation(value="设备信息-批量删除", notes="设备信息-批量删除")
 	@DeleteMapping(value = "/deleteBatch")
+	@Transactional(rollbackFor = Exception.class)
 	public Result<DeviceInfoEntity> deleteBatch(@RequestParam(name="ids",required=true) String ids) {
 		Result<DeviceInfoEntity> result = new Result<DeviceInfoEntity>();
 		if(ids==null || "".equals(ids.trim())) {
 			result.error500("参数不识别！");
 		}else {
+			List<DeviceInfoEntity> deviceInfos = deviceInfoEntityService.findByIds(Arrays.asList(ids.split(",")));
+			List<String> deviceCodes = deviceInfos.stream().map(key->key.getDeviceCode()).collect(Collectors.toList());
 			this.deviceInfoEntityService.removeByIds(Arrays.asList(ids.split(",")));
+			//删除和用户的关联关系
+			deviceUserEntityService.batchDelete(deviceCodes);
 			result.success("删除成功!");
 		}
 		return result;

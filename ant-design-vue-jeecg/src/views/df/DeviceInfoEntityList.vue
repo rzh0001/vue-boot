@@ -66,6 +66,9 @@
 
           <a-divider type="vertical" />
           <a @click="relationUser(record)">关联商户</a>
+
+          <a-divider type="vertical" />
+          <a @click="relationUser(record)">已关联商户</a>
         </span>
 
       </a-table>

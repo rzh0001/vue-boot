@@ -33,4 +33,8 @@ public class DeviceUserEntityServiceImpl extends ServiceImpl<DeviceUserEntityMap
         }
         saveBatch(batch);
     }
+
+    public void batchDelete(List<String> deviceCodes){
+        getBaseMapper().delete(new LambdaQueryWrapper<DeviceUserEntity>().in(DeviceUserEntity::getDeviceCode,deviceCodes));
+    }
 }
