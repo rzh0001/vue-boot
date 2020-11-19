@@ -25,6 +25,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 
 import org.jeecg.modules.df.service.impl.DeviceUserEntityServiceImpl;
+import org.jeecg.modules.df.vo.DeviceUserInfoVO;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -126,6 +127,18 @@ public class DeviceUserEntityController {
 		 return result;
 	}
 
+	 /**
+	  * 查询设备管理的账号
+	  * @param deviceCode
+	  * @return
+	  */
+	@GetMapping("/findDeviceUserInfo")
+	public Result<List<DeviceUserInfoVO>> findDeviceUserInfo(String deviceCode){
+		Result<List<DeviceUserInfoVO>> result = new Result<>();
+		List<DeviceUserInfoVO> vo = deviceUserEntityService.findDeviceUserInfo(deviceCode);
+		result.setResult(vo);
+		return result;
+	}
 	/**
 	 *  编辑
 	 * @param deviceUserEntity

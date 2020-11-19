@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.google.common.collect.Lists;
 import org.jeecg.modules.df.entity.DeviceUserEntity;
 import org.jeecg.modules.df.mapper.DeviceUserEntityMapper;
+import org.jeecg.modules.df.vo.DeviceUserInfoVO;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -36,5 +37,9 @@ public class DeviceUserEntityServiceImpl extends ServiceImpl<DeviceUserEntityMap
 
     public void batchDelete(List<String> deviceCodes){
         getBaseMapper().delete(new LambdaQueryWrapper<DeviceUserEntity>().in(DeviceUserEntity::getDeviceCode,deviceCodes));
+    }
+
+    public List<DeviceUserInfoVO> findDeviceUserInfo(String deviceCode){
+       return getBaseMapper().findDeviceUserInfo(deviceCode);
     }
 }

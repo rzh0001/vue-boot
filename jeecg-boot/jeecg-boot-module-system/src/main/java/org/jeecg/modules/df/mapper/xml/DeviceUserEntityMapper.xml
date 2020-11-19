@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.jeecg.modules.df.mapper.DeviceUserEntityMapper">
-
+    <select id="findDeviceUserInfo" resultType="org.jeecg.modules.df.vo.DeviceUserInfoVO" parameterType="java.lang.String">
+        SELECT
+	u.username AS userName,
+	u.`status` AS STATUS,
+	d.device_code AS deviceCode,
+	i.device_name AS deviceName
+FROM
+	df_device_user d
+LEFT JOIN sys_user u ON d.user_name = u.username
+LEFT JOIN df_device_info i ON d.device_code = i.device_code
+WHERE
+	d.device_code = #{deviceCode}
+    </select>
 </mapper>

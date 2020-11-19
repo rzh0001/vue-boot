@@ -3,8 +3,10 @@ package org.jeecg.modules.df.mapper;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 import org.jeecg.modules.df.entity.DeviceUserEntity;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.jeecg.modules.df.vo.DeviceUserInfoVO;
 
 /**
  * @Description: 商户关联设备
@@ -13,5 +15,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @Version: V1.0
  */
 public interface DeviceUserEntityMapper extends BaseMapper<DeviceUserEntity> {
-
+    List<DeviceUserInfoVO> findDeviceUserInfo(@Param("deviceCode") String deviceCode);
 }

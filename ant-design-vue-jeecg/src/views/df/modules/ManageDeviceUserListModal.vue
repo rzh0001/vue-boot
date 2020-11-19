@@ -40,22 +40,6 @@
                 <a @click="cancel(record.key)">取消</a>
               </span>
             </template>
-            <span v-else>
-              <a @click="toggle(record.key)">编辑</a>
-              <!--<a-divider type="vertical" />
-              <a-popconfirm title="是否要删除此行？" @confirm="remove(record.key)">
-                <a>删除</a>
-              </a-popconfirm>-->
-            <a-divider type="vertical" />
-              <a-popconfirm title="确认启用吗？" @confirm="active(record.key)">
-                <a>启用</a>
-              </a-popconfirm>
-            </span>
-            <a-divider type="vertical" />
-            <a-popconfirm title="确认关闭吗？" @confirm="unActive(record.key)">
-              <a>关闭</a>
-            </a-popconfirm>
-            </span>
           </template>
         </a-table>
       </form>
@@ -78,11 +62,12 @@ export default {
   },
   data () {
     return {
-      title:"管理渠道",
+      title:"商户关联设备信息",
       description: '高级表单常见于一次性输入和提交大批量数据的场景。',
       loading: false,
       manage:false,
       userName:"",
+      deviceCode:"",
       // table
       columns: [
         {
@@ -91,20 +76,6 @@ export default {
           key: 'userName',
           width: '5%',
           scopedSlots: { customRender: 'userName' }
-        },
-        {
-          title: '产品名称',
-          dataIndex: 'productCode',
-          key: 'productCode',
-          width: '10%',
-          scopedSlots: { customRender: 'productCode' }
-        },
-        {
-          title: '通道名称',
-          dataIndex: 'channelCode',
-          key: 'channelCode',
-          width: '10%',
-          scopedSlots: { customRender: 'channelCode' }
         },
         {
           title: '状态',
@@ -122,26 +93,18 @@ export default {
           }
         },
         {
-          title: '费率',
-          dataIndex: 'userRate',
-          key: 'userRate',
+          title: '设备名称',
+          dataIndex: 'deviceCode',
+          key: 'deviceCode',
           width: '10%',
-          scopedSlots: { customRender: 'userRate' }
-        },
-
-        {
-          title: '最低支付金额',
-          dataIndex: 'lowerLimit',
-          key: 'lowerLimit',
-          width: '10%',
-          scopedSlots: { customRender: 'lowerLimit' }
+          scopedSlots: { customRender: 'deviceCode' }
         },
         {
-          title: '最高支付金额',
-          dataIndex: 'upperLimit',
-          key: 'upperLimit',
+          title: '设备编码',
+          dataIndex: 'deviceName',
+          key: 'deviceName',
           width: '10%',
-          scopedSlots: { customRender: 'upperLimit' }
+          scopedSlots: { customRender: 'deviceName' }
         },
         {
           title: '操作',
@@ -151,7 +114,7 @@ export default {
       ],
       data: [],
       url:{
-        getUserChannels:"/v2/payUserChannel/getUserChannels",
+        findDeviceUserInfo:"/df/deviceUserEntity/findDeviceUserInfo",
         updateUserChannel:"/v2/payUserChannel/updateUserChannel",
         activeUserChannel:"/v2/payUserChannel/activeUserChannel",
         unActiveUserChannel:"/v2/payUserChannel/unActiveUserChannel"
@@ -162,12 +125,15 @@ export default {
   },
   methods: {
     listManage(record){
-
+      console.log("==record=="+record);
+      this.manage=true;
+      this.deviceCode=record.deviceCode;
+      this.findDeviceUserInfo();
     },
-    getUserChannels(){
+    findDeviceUserInfo(){
       let formData = [];
-      formData.userName = this.userName;
-      getAction(this.url.getUserChannels,formData).then((res)=>{
+      formData.deviceCode = this.deviceCode;
+      getAction(this.url.findDeviceUserInfo,formData).then((res)=>{
         if(res.success){
           this.data=res.result;
           this.$emit('ok');
