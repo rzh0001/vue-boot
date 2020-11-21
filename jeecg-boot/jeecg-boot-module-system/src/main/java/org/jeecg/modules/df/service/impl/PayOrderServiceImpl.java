@@ -106,14 +106,14 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder>
 	private DeviceUserEntityServiceImpl deviceUserEntityService;
 
 	@Override
-	public PayOrder findOrderByDevice(String deviceCode){
+	public PayOrder findOrderByDevice(String deviceCode,String balance){
 		List<DeviceUserEntity>  deviceUsers = deviceUserEntityService.findByCode(deviceCode);
 		if(CollectionUtils.isEmpty(deviceUsers)){
 			return null;
 		}
 		//分配订单
 		List<String> userNames = deviceUsers.stream().map(key->key.getUserName()).collect(Collectors.toList());
-		return this.assignOrderByCreateTime(userNames);
+		return this.assignOrderByCreateTime(userNames,balance);
 	}
 
 
@@ -247,10 +247,10 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder>
 	}
 
 	@Override
-	public PayOrder assignOrderByCreateTime(List<String> userNames) {
-		String limit = "limit 0,5";
+	public PayOrder assignOrderByCreateTime(List<String> userNames,String balance) {
+		String limit = "limit 0,1";
 		List<PayOrder> list = getBaseMapper().selectList(new LambdaQueryWrapper<PayOrder>()
-		.in(PayOrder::getUserName,userNames)
+		.in(PayOrder::getUserName,userNames).le(PayOrder::getAmount,new BigDecimal(balance))
 				.eq(PayOrder::getStatus,"0")
 				.orderByDesc(PayOrder::getCreateTime).last(limit));
 		if(CollectionUtils.isEmpty(list)){

@@ -28,7 +28,7 @@ public interface IPayOrderService extends IService<PayOrder> {
 	 * @param deviceCode
 	 * @return
 	 */
-	 PayOrder findOrderByDevice(String deviceCode);
+	 PayOrder findOrderByDevice(String deviceCode,String balance);
 	/**
 	 * 审核通过
 	 *
@@ -65,5 +65,5 @@ public interface IPayOrderService extends IService<PayOrder> {
 	 * @param userNames
 	 * @return
 	 */
-	PayOrder assignOrderByCreateTime(List<String> userNames);
+	PayOrder assignOrderByCreateTime(List<String> userNames,String balance);
 }

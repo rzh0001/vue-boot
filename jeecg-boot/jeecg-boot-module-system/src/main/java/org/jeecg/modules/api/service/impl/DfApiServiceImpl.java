@@ -185,7 +185,6 @@ public class DfApiServiceImpl implements IDfApiService {
 
 	@Override
 	public PayOrder assignOrder(AssignOrderParamDTO dto) {
-		log.info("分配订单，入参信息为：{}",dto);
 		DeviceInfoEntity deviceInfo = deviceInfoEntityService.findByCode(dto.getDeviceCode());
 		if(deviceInfo == null){
 			throw new RRException("设备编码不存在:" + dto.getDeviceCode());
@@ -196,6 +195,6 @@ public class DfApiServiceImpl implements IDfApiService {
 			throw new RRException("签名验证失败");
 		}
 		//返回订单信息
-		return payOrderService.findOrderByDevice(dto.getDeviceCode());
+		return payOrderService.findOrderByDevice(dto.getDeviceCode(),dto.getBalance());
 	}
 }
