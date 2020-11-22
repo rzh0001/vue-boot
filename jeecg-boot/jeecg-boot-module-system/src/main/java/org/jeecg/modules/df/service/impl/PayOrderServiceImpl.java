@@ -251,7 +251,7 @@ public class PayOrderServiceImpl extends ServiceImpl<PayOrderMapper, PayOrder>
 		String limit = "limit 0,1";
 		List<PayOrder> list = getBaseMapper().selectList(new LambdaQueryWrapper<PayOrder>()
 		.in(PayOrder::getUserName,userNames).le(PayOrder::getAmount,new BigDecimal(balance))
-				.eq(PayOrder::getStatus,"0")
+				.eq(PayOrder::getStatus,"1")
 				.orderByDesc(PayOrder::getCreateTime).last(limit));
 		if(CollectionUtils.isEmpty(list)){
 			return null;

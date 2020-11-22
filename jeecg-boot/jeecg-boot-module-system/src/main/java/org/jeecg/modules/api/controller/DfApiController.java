@@ -52,9 +52,9 @@ public class DfApiController {
         resp.setData(order);
         return resp;
     }
-    @PostMapping(value = "/order/callback/{orderId}", produces = "application/json;charset=UTF-8")
+    @PostMapping(value = "/order/callback/{orderNo}", produces = "application/json;charset=UTF-8")
     @ResponseBody
-    public ApiResponseBody callback(@PathVariable("orderId")String orderId){
+    public ApiResponseBody callback(@PathVariable("orderNo")String orderId){
         log.info("接受回调请求，入参orderId:{}",orderId);
         Stopwatch stopwatch = Stopwatch.createStarted();
 
