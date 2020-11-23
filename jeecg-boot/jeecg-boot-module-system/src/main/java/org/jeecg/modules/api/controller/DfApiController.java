@@ -6,6 +6,7 @@ import org.jeecg.modules.api.entity.ApiRequestBody;
 import org.jeecg.modules.api.entity.ApiResponseBody;
 import org.jeecg.modules.api.service.IDfApiService;
 import org.jeecg.modules.df.dto.AssignOrderParamDTO;
+import org.jeecg.modules.df.dto.CallbackParamDTO;
 import org.jeecg.modules.df.entity.PayOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -52,16 +53,21 @@ public class DfApiController {
         resp.setData(order);
         return resp;
     }
-    @PostMapping(value = "/order/callback/{orderNo}", produces = "application/json;charset=UTF-8")
+    @PostMapping(value = "/order/callback", produces = "application/json;charset=UTF-8")
     @ResponseBody
-    public ApiResponseBody callback(@PathVariable("orderNo")String orderId){
-        log.info("接受回调请求，入参orderId:{}",orderId);
-        Stopwatch stopwatch = Stopwatch.createStarted();
-
-        stopwatch.stop();
-        log.info("回调处理完毕，耗时：{}",stopwatch);
-        ApiResponseBody resp = ApiResponseBody.ok();
-        return resp;
+    public ApiResponseBody callback(CallbackParamDTO paramDTO){
+        try{
+            log.info("接受回调请求，入参:{}",paramDTO);
+            Stopwatch stopwatch = Stopwatch.createStarted();
+            apiService.assignOrderCallback(paramDTO);
+            stopwatch.stop();
+            log.info("回调处理完毕，耗时：{}",stopwatch);
+            ApiResponseBody resp = ApiResponseBody.ok();
+            return resp;
+        }catch (Exception e){
+            ApiResponseBody resp = ApiResponseBody.error(500,e.getMessage());
+            return resp;
+        }
     }
     
 }

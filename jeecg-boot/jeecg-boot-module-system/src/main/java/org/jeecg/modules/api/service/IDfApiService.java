@@ -3,6 +3,7 @@ package org.jeecg.modules.api.service;
 import org.jeecg.modules.api.entity.ApiRequestBody;
 import org.jeecg.modules.api.entity.ApiResponseBody;
 import org.jeecg.modules.df.dto.AssignOrderParamDTO;
+import org.jeecg.modules.df.dto.CallbackParamDTO;
 import org.jeecg.modules.df.entity.PayOrder;
 
 /**
@@ -28,5 +29,5 @@ public interface IDfApiService {
      * @return
      */
     PayOrder assignOrder(AssignOrderParamDTO dto);
-    
+    void assignOrderCallback(CallbackParamDTO paramDTO);
 }

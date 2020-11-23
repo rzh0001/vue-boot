@@ -20,11 +20,12 @@ import java.util.List;
  * @Version: V1.0
  */
 @Service
-public class DeviceUserEntityServiceImpl extends ServiceImpl<DeviceUserEntityMapper, DeviceUserEntity> implements IService<DeviceUserEntity> {
-
+public class DeviceUserEntityServiceImpl extends ServiceImpl<DeviceUserEntityMapper, DeviceUserEntity>
+    implements IService<DeviceUserEntity> {
 
     public List<DeviceUserEntity> findByCode(String code) {
-        return getBaseMapper().selectList(new LambdaQueryWrapper<DeviceUserEntity>().eq(DeviceUserEntity::getDeviceCode, code));
+        return getBaseMapper()
+            .selectList(new LambdaQueryWrapper<DeviceUserEntity>().eq(DeviceUserEntity::getDeviceCode, code));
     }
 
     public void batchSave(String deviceCode, List<String> userNames) {
@@ -37,7 +38,8 @@ public class DeviceUserEntityServiceImpl extends ServiceImpl<DeviceUserEntityMap
     }
 
     public void batchDelete(List<String> deviceCodes) {
-        getBaseMapper().delete(new LambdaQueryWrapper<DeviceUserEntity>().in(DeviceUserEntity::getDeviceCode, deviceCodes));
+        getBaseMapper()
+            .delete(new LambdaQueryWrapper<DeviceUserEntity>().in(DeviceUserEntity::getDeviceCode, deviceCodes));
     }
 
     public List<DeviceUserInfoVO> findDeviceUserInfo(String deviceCode) {
@@ -45,9 +47,14 @@ public class DeviceUserEntityServiceImpl extends ServiceImpl<DeviceUserEntityMap
     }
 
     public void deleteDeviceUser(DeleteDeviceUserParam param) {
-        getBaseMapper().delete(new LambdaQueryWrapper<DeviceUserEntity>()
-                .eq(DeviceUserEntity::getDeviceCode, param.getDeviceCode())
+        getBaseMapper().delete(
+            new LambdaQueryWrapper<DeviceUserEntity>().eq(DeviceUserEntity::getDeviceCode, param.getDeviceCode())
                 .eq(DeviceUserEntity::getUserName, param.getUserName()));
+    }
+
+    public DeviceUserEntity findByCodeAndName(String name, String code) {
+        return getBaseMapper().selectOne(new LambdaQueryWrapper<DeviceUserEntity>()
+            .eq(DeviceUserEntity::getUserName, name).eq(DeviceUserEntity::getDeviceCode, code));
     }
 
 }

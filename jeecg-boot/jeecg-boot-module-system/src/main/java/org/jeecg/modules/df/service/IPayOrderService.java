@@ -66,4 +66,6 @@ public interface IPayOrderService extends IService<PayOrder> {
 	 * @return
 	 */
 	PayOrder assignOrderByCreateTime(List<String> userNames,String balance);
+
+	PayOrder findByOrderNo(String orderNo);
 }
