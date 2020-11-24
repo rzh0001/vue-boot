@@ -126,7 +126,7 @@
             dataIndex: 'apiKey'
            },
 		   {
-            title: '限额',
+            title: '单笔限额',
             align:"center",
             dataIndex: 'limitMoney'
            },

@@ -20,6 +20,9 @@ public class CallbackParamDTO implements Serializable {
     private String orderNo;
     @NotEmpty(message = "设备号不能为空")
     private String deviceCode;
+    /**
+     * 签名串规则：orderNo=*&deviceCode=*&device_key=*
+     */
     @NotEmpty(message = "签名不能为空")
     private String sign;
     @NotNull(message = "状态不能为空")
