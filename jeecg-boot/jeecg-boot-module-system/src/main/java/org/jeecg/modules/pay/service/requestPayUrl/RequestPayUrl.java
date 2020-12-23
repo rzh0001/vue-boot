@@ -2,10 +2,11 @@ package org.jeecg.modules.pay.service.requestPayUrl;
 
 import org.jeecg.modules.util.R;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-public interface RequestPayUrl<O, N, U, K, C, B,P> {
+public interface RequestPayUrl<O, N, U, K, C, B,P,HttpServletResponse> {
 
     /**
      * @param order        订单信息
@@ -17,7 +18,7 @@ public interface RequestPayUrl<O, N, U, K, C, B,P> {
      * @return
      * @throws Exception
      */
-    R requestPayUrl(O order, N userName, U url, K key, C callbackUrl, B userBusiness) throws Exception;
+    R requestPayUrl(O order, N userName, U url, K key, C callbackUrl, B userBusiness, HttpServletResponse response) throws Exception;
 
     /**
      * @param order 订单

@@ -33,6 +33,7 @@ import java.util.Map.Entry;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
@@ -60,7 +61,7 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class LeTianPayImpl implements RequestPayUrl<OrderInfoEntity, String, String, String, String, PayBusiness,
-    Object>, InitializingBean, ApplicationContextAware {
+    Object, HttpServletResponse>, InitializingBean, ApplicationContextAware {
     private static final String CALLBACK_URL = "/callBack/order/leTianAlipay/outTradeNo";
     @Autowired
     public ISysDictService dictService;
@@ -70,7 +71,7 @@ public class LeTianPayImpl implements RequestPayUrl<OrderInfoEntity, String, Str
     private RedisUtil redisUtil;
     @Override
     public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key, String callbackUrl,
-        PayBusiness userBusiness) throws Exception {
+        PayBusiness userBusiness,HttpServletResponse response) throws Exception {
         Map<String, Object> paraMap = new HashMap();
         paraMap.put("outTradeNo",order.getOrderId() );
         paraMap.put("totalAmount", order.getSubmitAmount().toString());

@@ -40,6 +40,7 @@ import org.springframework.util.CollectionUtils;
 import javax.annotation.PostConstruct;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
@@ -115,10 +116,10 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public R createOrder(JSONObject reqobj, HttpServletRequest req) throws Exception {
+    public R createOrder(JSONObject reqobj, HttpServletRequest req, HttpServletResponse response) throws Exception {
         R checkParam = checkParam(reqobj, true, false, false);
         if (BaseConstant.CHECK_PARAM_SUCCESS.equals(checkParam.get(BaseConstant.CODE).toString())) {
-            return addOrder(checkParam, req);
+            return addOrder(checkParam, req,response);
         } else {
             return checkParam;
         }
@@ -575,7 +576,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      *
      * @param checkParam
      */
-    private R addOrder(R checkParam, HttpServletRequest req) throws Exception {
+    private R addOrder(R checkParam, HttpServletRequest req,HttpServletResponse response) throws Exception {
         String ip = (String) checkParam.get(BaseConstant.IP);
         String outerOrderId = (String) checkParam.get(BaseConstant.OUTER_ORDER_ID);
         String userName = (String) checkParam.get(BaseConstant.USER_NAME);
@@ -606,7 +607,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         // 保存订单信息OrderInfoEntityServiceImpl
         OrderInfoEntity order = this.saveOrder(submitAmount, outerOrderId, userChannel, business, rate, user, callbackUrl, remark, ip);
         // 请求挂马平台
-        return requestPayUrl.requestPayUrl(order, userName, gateWay, key, innerCallBackUrl, business);
+        return requestPayUrl.requestPayUrl(order, userName, gateWay, key, innerCallBackUrl, business,response);
     }
 
 

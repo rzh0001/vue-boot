@@ -19,6 +19,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
@@ -30,7 +31,7 @@ import java.util.*;
 @Service
 @Slf4j
 public class YitongAlipayImpy implements
-        RequestPayUrl<OrderInfoEntity, String, String, String, String, PayBusiness, Object>, InitializingBean {
+        RequestPayUrl<OrderInfoEntity, String, String, String, String, PayBusiness, Object, HttpServletResponse>, InitializingBean {
     @Autowired
     private RedisUtil redisUtil;
     @Autowired
@@ -41,7 +42,7 @@ public class YitongAlipayImpy implements
 
     @Override
     public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key, String callbackUrl,
-        PayBusiness userBusiness) throws Exception {
+        PayBusiness userBusiness,HttpServletResponse response) throws Exception {
         YitongAlipayParam param = new YitongAlipayParam();
         param.setMch_id(userBusiness.getBusinessCode());
         param.setPtype("1");

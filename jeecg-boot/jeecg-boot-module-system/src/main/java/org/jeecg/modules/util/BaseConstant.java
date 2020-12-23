@@ -111,7 +111,8 @@ public class BaseConstant {
     public static final String REQUEST_GTPAI_ALIPAY = "gtpaiAlipay";
     //易通支付
     public static final String REQUEST_YITONG_ALIPAY = "yitongAlipay";
-
+    //收银台
+    public static final String REQUEST_CHECKOUT_COUNTER = "CheckoutCounter";
     public static final String REQUEST_ONLINE_BANK_PAY="onlineBankPay";
     //四方回调挂马平台的返回码
     public static final int SUCCESS = 200;

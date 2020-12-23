@@ -22,6 +22,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletResponse;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -34,7 +35,7 @@ import java.util.Map;
 @Service
 @Slf4j
 public class ChiChengAlipayImpl implements RequestPayUrl<OrderInfoEntity, String, String, String, String, PayBusiness,
-    Object>, InitializingBean{
+    Object, HttpServletResponse>, InitializingBean{
     @Autowired
     private IOrderInfoEntityService orderInfoEntityService;
     @Autowired
@@ -45,7 +46,7 @@ public class ChiChengAlipayImpl implements RequestPayUrl<OrderInfoEntity, String
     private RequestUrlUtils utils;
     @Override
     public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key, String callbackUrl,
-        PayBusiness userBusiness) throws Exception {
+        PayBusiness userBusiness,HttpServletResponse response) throws Exception {
         ChiChengAlipayParam param = new ChiChengAlipayParam();
         param.setPay_memberid(userBusiness.getBusinessCode());
         param.setPay_orderid(order.getOrderId());

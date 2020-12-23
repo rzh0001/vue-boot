@@ -76,7 +76,7 @@ public class PayTest {
         req.put(BaseConstant.DATA,dataEn);
         req.put(BaseConstant.USER_NAME,"www");
         System.out.println(req.toJSONString());
-        api.create(req);
+        api.create(req,null,null);
     }
 
     @Test

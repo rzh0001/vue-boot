@@ -78,7 +78,7 @@
         },
         url: {
           add: "/api/create",
-          channel: "/product/product/getAllProduct",
+          channel: "/v2/payProduct/getAllProducts",
           getCallbackUrl:"/pay/channelEntity/getCallbackUrl"
         },
       }

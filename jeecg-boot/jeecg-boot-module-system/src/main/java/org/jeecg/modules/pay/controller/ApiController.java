@@ -1,12 +1,19 @@
 package org.jeecg.modules.pay.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
+import org.jeecg.modules.pay.dto.RequestParamDTO;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
+import org.jeecg.modules.pay.externalUtils.antUtil.YitongUtil;
 import org.jeecg.modules.pay.service.IOrderInfoEntityService;
+import org.jeecg.modules.util.HttpResult;
+import org.jeecg.modules.util.HttpUtils;
 import org.jeecg.modules.util.R;
 import org.jeecg.modules.util.RequestHandleUtil;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -17,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * @title:
@@ -42,11 +50,11 @@ public class ApiController {
      * @param reqobj
      * @return
      */
-    @RequestMapping(value = "/create", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+    @RequestMapping(value = "/create", produces = "application/json;charset=UTF-8")
     @ResponseBody
-    public R create(@RequestBody JSONObject reqobj) {
+    public R create(@RequestBody JSONObject reqobj,HttpServletResponse response,HttpServletRequest req) {
         try {
-            return orderInfoService.createOrder(reqobj, ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest());
+            return orderInfoService.createOrder(reqobj, req,response);
         } catch (Exception e) {
             log.info("创建订单异常，异常信息为：", e);
             return R.error("创建订单异常，请联系管理员");
@@ -107,10 +115,49 @@ public class ApiController {
         result.put("msg", "success");
         return result.toJSONString();
     }
-    @PostMapping("/test")
+
+    private String pay_url = "http://payqqsh001.payto89.com/order/placeForIndex";
+
+    private String key = "428f88b71f834ba289202a036d93afea";
+    @GetMapping("/test")
     @ResponseBody
-    public void test(){
-        RequestHandleUtil.doPost(((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest());
+    public void test(HttpServletResponse response) throws Exception {
+//        RequestHandleUtil.doPost(((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest());
+        RequestParamDTO.RequestParamDTOBuilder request =
+                RequestParamDTO.builder().client_ip("127.0.0.1")
+                        .format("page").goods_desc("测试下单").mch_id("213504930")
+                        .money("100").notify_url("http://www.baidu.com")
+                        .order_sn("order123456789").time(String.valueOf(System.currentTimeMillis()));
+        TreeMap<String, Object> map =  new TreeMap<String,Object>();
+        map.put("mch_id","213504930");
+        map.put("order_sn","order123456789");
+        map.put("money","100");
+        map.put("goods_desc","测试下单");
+        map.put("client_ip","测试下单");
+        map.put("format","page");
+        map.put("notify_url","http://www.baidu.com");
+        map.put("time",String.valueOf(System.currentTimeMillis()));
+        String sign = YitongUtil.generateSignature(map,key);
+        request.sign(sign);
+
+
+        String paramString = JSON.toJSONString(request.build());
+        Map jsonObject = JSON.parseObject(paramString);
+        Map<String, Object> data = (Map<String,Object>)jsonObject;
+
+        HttpResult body =  HttpUtils.doPost(pay_url, data);
+
+        response.setContentType("text/html;charset=utf-8");
+        PrintWriter writer;
+        try {
+            writer = response.getWriter();
+        } catch (IOException e) {
+            writer = new PrintWriter(System.out);
+            log.error("IO异常:", e);
+        }
+        Document document = Jsoup.parse(body.getBody());
+        writer.println(document.outerHtml());
+        writer.close();
     }
 
 }

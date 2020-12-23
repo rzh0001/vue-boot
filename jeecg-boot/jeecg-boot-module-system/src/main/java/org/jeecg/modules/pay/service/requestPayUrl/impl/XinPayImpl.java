@@ -23,11 +23,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 @Service
 @Slf4j
-public class XinPayImpl implements RequestPayUrl<OrderInfoEntity, String, String, String,String, PayBusiness,Object>, InitializingBean {
+public class XinPayImpl implements RequestPayUrl<OrderInfoEntity, String, String, String,String, PayBusiness,Object, HttpServletResponse>, InitializingBean {
     private static final String MD5_KEY = "93a6c71e361c04b8ca275e32fbd52018";
     @Autowired
     private RedisUtil redisUtil;
@@ -36,7 +37,7 @@ public class XinPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
     @Autowired
     private ISysUserService userService;
     @Override
-    public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key, String callbackUrl, PayBusiness userBusiness) throws Exception {
+    public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key, String callbackUrl, PayBusiness userBusiness,HttpServletResponse response) throws Exception {
         XinPayParam payParam = new XinPayParam();
         payParam.setMerchantNum(userBusiness.getBusinessCode());
         payParam.setOrderNo(order.getOrderId());

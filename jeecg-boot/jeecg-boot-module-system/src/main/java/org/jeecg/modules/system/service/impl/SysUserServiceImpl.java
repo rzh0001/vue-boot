@@ -125,7 +125,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 	 * @return 角色集合
 	 */
 	@Override
-	@Cacheable(value = CacheConstant.LOGIN_USER_RULES_CACHE, key = "'Roles_'+#username")
+	//@Cacheable(value = CacheConstant.LOGIN_USER_RULES_CACHE, key = "'Roles_'+#username")
 	public Set<String> getUserRolesSet(String username) {
 		// 查询用户拥有的角色集合
 		List<String> roles = sysUserRoleMapper.getRoleByUserName(username);

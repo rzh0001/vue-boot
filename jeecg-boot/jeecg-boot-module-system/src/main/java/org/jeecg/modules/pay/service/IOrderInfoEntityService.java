@@ -9,6 +9,7 @@ import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.util.R;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -21,7 +22,7 @@ import java.util.Map;
  * @Version: V1.0
  */
 public interface IOrderInfoEntityService extends IService<OrderInfoEntity> {
-	R createOrder(JSONObject reqobj, HttpServletRequest req) throws Exception;
+	R createOrder(JSONObject reqobj, HttpServletRequest req, HttpServletResponse response) throws Exception;
 
 	/**
 	 * 查询订单信息

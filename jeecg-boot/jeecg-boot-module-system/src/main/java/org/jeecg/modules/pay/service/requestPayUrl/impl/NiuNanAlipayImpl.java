@@ -17,6 +17,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.security.MessageDigest;
 import java.util.List;
@@ -24,7 +25,7 @@ import java.util.List;
 @Slf4j
 @Service
 public class NiuNanAlipayImpl implements
-    RequestPayUrl<OrderInfoEntity, String, String, String, String, PayBusiness, Object>, InitializingBean {
+    RequestPayUrl<OrderInfoEntity, String, String, String, String, PayBusiness, Object, HttpServletResponse>, InitializingBean {
 
     private static final String CALLBACK_URL = "/callBack/order/niuNanAlipay/orderNo";
     @Autowired
@@ -33,7 +34,7 @@ public class NiuNanAlipayImpl implements
     private RequestUrlUtils utils;
     @Override
     public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key, String callbackUrl,
-        PayBusiness userBusiness) throws Exception {
+        PayBusiness userBusiness,HttpServletResponse response) throws Exception {
         NiuNanAlipayParam param = new NiuNanAlipayParam();
         param.setMerCode(userBusiness.getBusinessCode());
         param.setOrderNo(order.getOrderId());

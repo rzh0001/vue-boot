@@ -24,6 +24,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
@@ -37,7 +38,7 @@ import java.util.*;
 @Service
 @Slf4j
 public class AntAlipayImpy implements
-    RequestPayUrl<OrderInfoEntity, String, String, String, String, PayBusiness, Object>, InitializingBean {
+    RequestPayUrl<OrderInfoEntity, String, String, String, String, PayBusiness, Object, HttpServletResponse>, InitializingBean {
     @Autowired
     private RedisUtil redisUtil;
     @Autowired
@@ -47,7 +48,7 @@ public class AntAlipayImpy implements
     private static final String CALLBACK_URL="/callBack/order/antAlipay/out_trade_no";
     @Override
     public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key, String callbackUrl,
-                           PayBusiness userBusiness) throws Exception {
+                           PayBusiness userBusiness,HttpServletResponse response) throws Exception {
         AntAlipayParam param = new AntAlipayParam();
         param.setApp_id(userBusiness.getBusinessCode());
         param.setNonce_str(UUIDGenerator.generate());

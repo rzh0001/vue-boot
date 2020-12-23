@@ -25,6 +25,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 import java.util.Map;
 
@@ -36,7 +37,7 @@ import java.util.Map;
 @Slf4j
 @Service
 public class DianJinPayImpl implements RequestPayUrl<OrderInfoEntity, String, String, String, String, PayBusiness,
-    Object>, InitializingBean, ApplicationContextAware {
+    Object, HttpServletResponse>, InitializingBean, ApplicationContextAware {
     public static final String DOMAIN = "http://39.98.76.217";
     public static final String key = "44843f1629e8b1142636fd799fb2e373b1feb096eb79bdcbeba8be8b1a65e752a2d08b88e0e0732a3b6a5f5572b1f7464e11f769d140d2675c74f9cdc99cfd2f1d33ecb9d0ffdb45df2e1665678c788c1a6ce5b69e539fdfb6c1daef8703c1e2";
     @Autowired
@@ -59,7 +60,7 @@ public class DianJinPayImpl implements RequestPayUrl<OrderInfoEntity, String, St
      */
     @Override
     public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key, String callbackUrl,
-        PayBusiness userBusiness) throws Exception {
+        PayBusiness userBusiness,HttpServletResponse response) throws Exception {
         DianJinPayParam param = new DianJinPayParam();
         param.setUid("6");
         param.setMerchantTransNo(order.getOrderId());

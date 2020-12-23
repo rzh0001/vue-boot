@@ -19,11 +19,12 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
 
 @Service
 @Slf4j
-public class YsfPayImpl implements RequestPayUrl<OrderInfoEntity, String, String, String, String, PayBusiness, Object>, InitializingBean {
+public class YsfPayImpl implements RequestPayUrl<OrderInfoEntity, String, String, String, String, PayBusiness, Object, HttpServletResponse>, InitializingBean {
     @Autowired
     private IOrderInfoEntityService orderInfoEntityService;
     @Autowired
@@ -32,7 +33,7 @@ public class YsfPayImpl implements RequestPayUrl<OrderInfoEntity, String, String
     private RequestUrlUtils utils;
 
     @Override
-    public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key, String callbackUrl, PayBusiness PayBusiness) throws Exception {
+    public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key, String callbackUrl, PayBusiness PayBusiness,HttpServletResponse response) throws Exception {
         String ysfKey = PayBusiness.getBusinessApiKey();
         if (StringUtils.isBlank(ysfKey)) {
             log.info("云闪付通道未配置apikey");

@@ -19,6 +19,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -28,7 +29,7 @@ import java.util.List;
 @Service
 @Slf4j
 public class TengFeiFuImpl implements RequestPayUrl<OrderInfoEntity, String, String, String, String, PayBusiness,
-		Object>, InitializingBean {
+		Object, HttpServletResponse>, InitializingBean {
 	@Autowired
 	private RedisUtil redisUtil;
 	@Autowired
@@ -39,7 +40,7 @@ public class TengFeiFuImpl implements RequestPayUrl<OrderInfoEntity, String, Str
 
 	@Override
 	public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key, String callbackUrl,
-						   PayBusiness userBusiness) throws Exception {
+						   PayBusiness userBusiness,HttpServletResponse res) throws Exception {
 		TengFeiFuOrder o = new TengFeiFuOrder();
 		o.setOpenid(userBusiness.getBusinessCode());
 		o.setOrderNo(order.getOrderId());

@@ -19,6 +19,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletResponse;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.TreeMap;
@@ -30,7 +31,7 @@ import java.util.TreeMap;
 @Service
 @Slf4j
 public class OnlineBankPayImpl implements
-    RequestPayUrl<OrderInfoEntity, String, String, String, String, PayBusiness, Object>, InitializingBean {
+    RequestPayUrl<OrderInfoEntity, String, String, String, String, PayBusiness, Object, HttpServletResponse>, InitializingBean {
     @Autowired
     private RedisUtil redisUtil;
     @Autowired
@@ -39,7 +40,7 @@ public class OnlineBankPayImpl implements
     public ISysDictService dictService;
     @Override
     public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key, String callbackUrl,
-        PayBusiness userBusiness) throws Exception {
+        PayBusiness userBusiness,HttpServletResponse response) throws Exception {
         OnlineBankPayParam payParam = new OnlineBankPayParam();
         payParam.setPay_memberid(userBusiness.getBusinessCode());
         payParam.setPay_orderid(order.getOrderId());
