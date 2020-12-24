@@ -1,6 +1,7 @@
 package org.jeecg.pay;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.jeecg.common.util.MD5Util;
@@ -23,7 +24,7 @@ public class checkoutCounterTest {
                         ;
         StringBuilder sign = new StringBuilder();
         sign.append("userid=").append("123")
-                .append("&orderNo=").append("Order123456789")
+                .append("&orderNo=").append("Order1234567489331")
                 .append("&MsgUrl=").append("http://www.baidu.com")
                 .append("&return_url=").append("http://www.baidu.com")
                 .append("&mch_id=").append("1234567356")
@@ -39,7 +40,7 @@ public class checkoutCounterTest {
         Map<String, Object> data2 = new HashMap<>();
         data2.put("Amount","500000");
         data2.put("userid","123");
-        data2.put("orderNo","Order123456789");
+        data2.put("orderNo","Order1234567489331");
         data2.put("MsgUrl","http://www.baidu.com");
         data2.put("return_url","http://www.baidu.com");
         data2.put("mch_id","1234567356");
@@ -48,6 +49,10 @@ public class checkoutCounterTest {
 
         HttpResult body =  HttpUtils.doPost(pay_url, data2);
         log.info("请求返还结果：{}",body);
+        String result = body.getBody();
+        JSONObject json = JSON.parseObject(result);
+        JSONObject resultJson = (JSONObject) json.get("result");
+        String payUrl = (String)resultJson.get("payurl");
     }
 
 
