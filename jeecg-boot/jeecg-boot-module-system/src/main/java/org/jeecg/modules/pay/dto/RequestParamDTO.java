@@ -12,13 +12,14 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RequestParamDTO implements Serializable {
+    private String userid;
+    private String orderNo;
+    private String MsgUrl;
+    private String return_url;
     private String mch_id;
-    private String order_sn;
-    private String money;
-    private String goods_desc;
-    private String client_ip;
-    private String format;
-    private String notify_url;
-    private String time;
     private String sign;
+
+    private String channel;
+    private String Amount;
+
 }

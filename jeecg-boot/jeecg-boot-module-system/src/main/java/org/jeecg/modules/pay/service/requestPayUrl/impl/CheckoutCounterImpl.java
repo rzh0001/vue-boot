@@ -31,10 +31,7 @@ public class CheckoutCounterImpl  implements RequestPayUrl<OrderInfoEntity, Stri
     @Override
     public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key, String callbackUrl, PayBusiness userBusiness,HttpServletResponse response) throws Exception {
         RequestParamDTO.RequestParamDTOBuilder request =
-                RequestParamDTO.builder().client_ip("127.0.0.1")
-                        .format("page").goods_desc("下单").mch_id(userBusiness.getBusinessCode())
-                        .money(order.getSubmitAmount().toString()).notify_url("http://www.baidu.com")
-                        .order_sn(order.getOrderId()).time(String.valueOf(System.currentTimeMillis()));
+                RequestParamDTO.builder();
         TreeMap<String, Object> map =  new TreeMap<String,Object>();
         map.put("mch_id",userBusiness.getBusinessCode());
         map.put("order_sn",order.getOrderId());
