@@ -4,65 +4,55 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.jeecg.modules.pay.dto.RequestParamDTO;
+import org.jeecg.common.system.vo.DictModel;
 import org.jeecg.modules.pay.entity.OrderInfoEntity;
-import org.jeecg.modules.pay.externalUtils.antUtil.YitongUtil;
+import org.jeecg.modules.pay.externalUtils.abroad.AbroadUtils;
 import org.jeecg.modules.pay.service.factory.PayServiceFactory;
 import org.jeecg.modules.pay.service.requestPayUrl.RequestPayUrl;
-import org.jeecg.modules.system.util.IPUtils;
+import org.jeecg.modules.system.service.ISysDictService;
 import org.jeecg.modules.util.BaseConstant;
 import org.jeecg.modules.util.HttpResult;
 import org.jeecg.modules.util.HttpUtils;
 import org.jeecg.modules.util.R;
 import org.jeecg.modules.v2.entity.PayBusiness;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 @Service
 @Slf4j
-public class CheckoutCounterImpl  implements RequestPayUrl<OrderInfoEntity, String, String, String, String, PayBusiness,
+public class Abroad907Impl implements RequestPayUrl<OrderInfoEntity, String, String, String, String, PayBusiness,
         Object, HttpServletResponse>, InitializingBean {
+    @Autowired
+    public ISysDictService dictService;
+
     @Override
     public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key, String callbackUrl, PayBusiness userBusiness,HttpServletResponse response) throws Exception {
-        StringBuilder sign = new StringBuilder();
-        sign.append("userid=").append("123")
-                .append("&orderNo=").append("Order123456789")
-                .append("&MsgUrl=").append("http://www.baidu.com")
-                .append("&return_url=").append("http://www.baidu.com")
-                .append("&mch_id=").append("1234567356")
-                .append("&key=").append("abcfhosyFQRTV568");
-
-        String s = DigestUtils.md5Hex(sign.toString()).toUpperCase();
-        Map<String, Object> data2 = new HashMap<>();
-        data2.put("Amount","500000");
-        data2.put("userid","123");
-        data2.put("orderNo","Order123456789");
-        data2.put("MsgUrl","http://www.baidu.com");
-        data2.put("return_url","http://www.baidu.com");
-        data2.put("mch_id","1234567356");
-        data2.put("sign",s);
-        data2.put("channel","907");
-
-        HttpResult body =  HttpUtils.doPost(url, data2);
-        log.info("请求返还结果：{}",body);
-        log.info("请求返还结果：{}",body);
+        Map<String, Object> data = AbroadUtils.buildParamData(getDomain(),BaseConstant.REQUEST_ABROAD_907,userName,order,userBusiness,"907");
+        HttpResult body =  HttpUtils.doPost(url, data);
         String result = body.getBody();
+        log.info("请求返还结果：{}",result);
         JSONObject json = JSON.parseObject(result);
         JSONObject resultJson = (JSONObject) json.get("result");
         String payUrl = (String)resultJson.get("payurl");
         return R.ok().put("url", payUrl);
 
     }
-
+    private String getDomain(){
+        String domain = null;
+        List<DictModel> apiKey = dictService.queryDictItemsByCode(BaseConstant.DOMAIN);
+        for (DictModel k : apiKey) {
+            if (BaseConstant.DOMAIN.equals(k.getText())) {
+                domain = k.getValue();
+            }
+        }
+        return domain;
+    }
     @Override
     public boolean orderInfoOk(OrderInfoEntity order, String url, PayBusiness userBusiness) throws Exception {
         return false;
@@ -80,6 +70,6 @@ public class CheckoutCounterImpl  implements RequestPayUrl<OrderInfoEntity, Stri
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        PayServiceFactory.register(BaseConstant.REQUEST_CHECKOUT_COUNTER, this);
+        PayServiceFactory.register(BaseConstant.REQUEST_ABROAD_907, this);
     }
 }
