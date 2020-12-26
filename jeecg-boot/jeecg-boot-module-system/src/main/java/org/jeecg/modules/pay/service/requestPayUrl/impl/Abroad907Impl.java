@@ -34,6 +34,7 @@ public class Abroad907Impl implements RequestPayUrl<OrderInfoEntity, String, Str
     @Override
     public R requestPayUrl(OrderInfoEntity order, String userName, String url, String key, String callbackUrl, PayBusiness userBusiness,HttpServletResponse response) throws Exception {
         Map<String, Object> data = AbroadUtils.buildParamData(getDomain(),BaseConstant.REQUEST_ABROAD_907,userName,order,userBusiness,"907");
+        log.info("请求地址为：{}",url);
         HttpResult body =  HttpUtils.doPost(url, data);
         String result = body.getBody();
         log.info("请求返还结果：{}",result);

@@ -35,6 +35,7 @@ public class AbroadUtils {
                 .append("&return_url=").append(callBackUrl)
                 .append("&mch_id=").append(userBusiness.getBusinessCode())
                 .append("&key=").append(userBusiness.getBusinessApiKey());
+        log.info("签名字符串为：{}",sign.toString());
         String s = DigestUtils.md5Hex(sign.toString()).toUpperCase();
         Map<String, Object> data = new HashMap<>();
         data.put("Amount",order.getSubmitAmount().toString());

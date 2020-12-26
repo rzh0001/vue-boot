@@ -24,7 +24,7 @@ public class checkoutCounterTest {
                         ;
         StringBuilder sign = new StringBuilder();
         sign.append("userid=").append("123")
-                .append("&orderNo=").append("Order1234567489331")
+                .append("&orderNo=").append("20201225211253Xflsx")
                 .append("&MsgUrl=").append("http://www.baidu.com")
                 .append("&return_url=").append("http://www.baidu.com")
                 .append("&mch_id=").append("1234567356")
@@ -40,7 +40,7 @@ public class checkoutCounterTest {
         Map<String, Object> data2 = new HashMap<>();
         data2.put("Amount","500000");
         data2.put("userid","123");
-        data2.put("orderNo","Order1234567489331");
+        data2.put("orderNo","20201225211253Xflsx");
         data2.put("MsgUrl","http://www.baidu.com");
         data2.put("return_url","http://www.baidu.com");
         data2.put("mch_id","1234567356");

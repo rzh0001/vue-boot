@@ -21,6 +21,8 @@ import org.jeecg.modules.system.entity.SysUser;
 import org.jeecg.modules.system.service.ISysDictService;
 import org.jeecg.modules.system.service.ISysUserService;
 import org.jeecg.modules.util.*;
+import org.jeecg.modules.v2.entity.PayBusiness;
+import org.jeecg.modules.v2.service.impl.PayBusinessServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -43,17 +45,17 @@ public class CallBackServiceImpl implements ICallBackService {
 	@Autowired
 	private IOrderInfoEntityService orderInfoEntityService;
 	@Autowired
-	private IUserBusinessEntityService businessService;
+	private PayBusinessServiceImpl payBusinessService;
 	@Override
 	public String getApikey(String orderNo,String type)throws Exception{
 		OrderInfoEntity order = orderInfoEntityService.queryOrderInfoByOrderId(orderNo);
-		List<UserBusinessEntity> useBusinesses =
-			businessService.queryBusinessCodeByUserName(order.getAgentUsername(), type);
+		List<PayBusiness> useBusinesses = payBusinessService.getBusiness(order.getAgentUsername(),order.getPayType(),order.getProductCode());
+
 		if(CollectionUtils.isEmpty(useBusinesses)){
 			throw new BusinessException("查询挂马商户信息为空");
 		}
-		UserBusinessEntity business = useBusinesses.get(0);
-		return business.getApiKey();
+		PayBusiness business = useBusinesses.get(0);
+		return business.getBusinessApiKey();
 	}
 
 	@Override
