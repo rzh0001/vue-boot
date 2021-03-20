@@ -39,7 +39,7 @@ public class PayBusinessServiceImpl extends ServiceImpl<PayBusinessMapper, PayBu
             .eq("product_code", productCode)
             .eq("del_flag", DeleteFlagEnum.NOT_DELETE.getValue())
             .eq("business_active_status", BusinessActivStatusEnum.ACTIVE.getValue())
-            .orderByDesc("last_used_time");
+            .orderByAsc("last_used_time");
         return getBaseMapper().selectList(queryWrapper);
     }
     public List<PayBusiness> getBusinessNotDelete(String userName, String channelCode, String productCode) {
