@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,25 +33,22 @@ public class PayBusinessServiceImpl extends ServiceImpl<PayBusinessMapper, PayBu
     private PayProductServiceImpl productService;
     @Autowired
     private PayChannelServiceImpl channelService;
+
     public List<PayBusiness> getBusiness(String userName, String channelCode, String productCode) {
         QueryWrapper<PayBusiness> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_name", userName)
-            .eq("channel_code", channelCode)
-            .eq("product_code", productCode)
+        queryWrapper.eq("user_name", userName).eq("channel_code", channelCode).eq("product_code", productCode)
             .eq("del_flag", DeleteFlagEnum.NOT_DELETE.getValue())
-            .eq("business_active_status", BusinessActivStatusEnum.ACTIVE.getValue())
-            .orderByAsc("last_used_time");
+            .eq("business_active_status", BusinessActivStatusEnum.ACTIVE.getValue()).orderByAsc("last_used_time");
         return getBaseMapper().selectList(queryWrapper);
     }
+
     public List<PayBusiness> getBusinessNotDelete(String userName, String channelCode, String productCode) {
         QueryWrapper<PayBusiness> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_name", userName)
-            .eq("channel_code", channelCode)
-            .eq("product_code", productCode)
-            .eq("del_flag", DeleteFlagEnum.NOT_DELETE.getValue())
-            .orderByDesc("last_used_time");
+        queryWrapper.eq("user_name", userName).eq("channel_code", channelCode).eq("product_code", productCode)
+            .eq("del_flag", DeleteFlagEnum.NOT_DELETE.getValue()).orderByDesc("last_used_time");
         return getBaseMapper().selectList(queryWrapper);
     }
+
     public void updateUsedTime(PayBusiness business) {
         business.setLastUsedTime(new Date());
         getBaseMapper().updateById(business);
@@ -70,9 +68,8 @@ public class PayBusinessServiceImpl extends ServiceImpl<PayBusinessMapper, PayBu
 
     public List<PayBusiness> getBusinessByName(String userName) {
         QueryWrapper<PayBusiness> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_name", userName)
-            .eq("del_flag", DeleteFlagEnum.NOT_DELETE.getValue());
-//            .eq("business_active_status", BusinessActivStatusEnum.ACTIVE.getValue());
+        queryWrapper.eq("user_name", userName).eq("del_flag", DeleteFlagEnum.NOT_DELETE.getValue());
+        // .eq("business_active_status", BusinessActivStatusEnum.ACTIVE.getValue());
         return getBaseMapper().selectList(queryWrapper);
     }
 
@@ -91,12 +88,12 @@ public class PayBusinessServiceImpl extends ServiceImpl<PayBusinessMapper, PayBu
         return null;
     }
 
-
     public List<PayChannel> getBusinessRelatedChannel(String userName, String productCode) {
         QueryWrapper<PayBusiness> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_name", userName).eq("product_code", productCode).eq("del_flag",
-            DeleteFlagEnum.NOT_DELETE.getValue()).eq("business_active_status", BusinessActivStatusEnum.ACTIVE.getValue());
-        List<PayBusiness> businesses =getBaseMapper().selectList(queryWrapper);
+        queryWrapper.eq("user_name", userName).eq("product_code", productCode)
+            .eq("del_flag", DeleteFlagEnum.NOT_DELETE.getValue())
+            .eq("business_active_status", BusinessActivStatusEnum.ACTIVE.getValue());
+        List<PayBusiness> businesses = getBaseMapper().selectList(queryWrapper);
         if (!CollectionUtils.isEmpty(businesses)) {
             List<String> channels =
                 businesses.stream().map(business -> business.getChannelCode()).collect(Collectors.toList());
@@ -105,7 +102,12 @@ public class PayBusinessServiceImpl extends ServiceImpl<PayBusinessMapper, PayBu
         return null;
     }
 
-    public void updateBusinessAmount(ChargeBusinessParam param){
+    public void updateBusinessAmount(ChargeBusinessParam param) {
         getBaseMapper().updateBusinessAmount(param);
+    }
+
+    public void subtractAmount(BigDecimal amount, String userName, String channelCode, String productCode,
+        String businessCode) {
+        getBaseMapper().subtractAmount(amount, userName, channelCode, productCode, businessCode);
     }
 }

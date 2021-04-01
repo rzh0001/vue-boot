@@ -20,6 +20,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
+
 @Service
 @Slf4j
 public class CommonApiServiceImpl implements ICommonApiService {
@@ -31,6 +33,7 @@ public class CommonApiServiceImpl implements ICommonApiService {
     private PayChannelServiceImpl channelService;
     @Autowired
     private PayUserProductServiceImpl userProductService;
+
     @Override
     public String getRate(PayUserChannel userChannel) {
         if (userChannel.getUserRate() == null) {
@@ -40,11 +43,13 @@ public class CommonApiServiceImpl implements ICommonApiService {
         }
         return userChannel.getUserRate();
     }
+
     @Override
-    public String getGateWayUrl(PayUserChannel userChannel){
+    public String getGateWayUrl(PayUserChannel userChannel) {
         PayChannel channel = channelService.getChannelByChannelCode(userChannel.getChannelCode());
         return channel.getChannelGateway();
     }
+
     @Override
     public PayUserChannel findChannel(String userName, String productCode) {
         List<PayUserChannel> channels = userChannelService.getUserChannels(userName, productCode);
@@ -86,13 +91,24 @@ public class CommonApiServiceImpl implements ICommonApiService {
     }
 
     @Override
-    public void checkSalesmanRate(SysUser user,PayUserChannel userChannel) {
-        if(StringUtils.isNotBlank(user.getSalesmanUsername())){
-            PayUserChannel saleChannel = userChannelService.getUserChannel(user.getSalesmanUsername(),userChannel.getChannelCode(),userChannel.getProductCode());
-            if(saleChannel == null || StringUtils.isBlank(saleChannel.getUserRate())){
-                log.error("未对介绍人设置费率，介绍人：{}",user.getSalesmanUsername());
-                throw new BusinessException("未设置费率,请先在后台进行费率设置") ;
+    public void checkSalesmanRate(SysUser user, PayUserChannel userChannel) {
+        if (StringUtils.isNotBlank(user.getSalesmanUsername())) {
+            PayUserChannel saleChannel = userChannelService.getUserChannel(user.getSalesmanUsername(),
+                userChannel.getChannelCode(), userChannel.getProductCode());
+            if (saleChannel == null || StringUtils.isBlank(saleChannel.getUserRate())) {
+                log.error("未对介绍人设置费率，介绍人：{}", user.getSalesmanUsername());
+                throw new BusinessException("未设置费率,请先在后台进行费率设置");
             }
+        }
+    }
+
+    @Override
+    public void businessAmountIsLegal(PayBusiness business, BigDecimal amount) {
+        BigDecimal businessAmount =
+            Optional.ofNullable(business.getBusinessRechargeAmount()).orElse(new BigDecimal("0"));
+        //如果账号账户的金额小于申请金额，则不通过
+        if(businessAmount.compareTo(amount) == -1){
+            throw new BusinessException("挂马账户：["+business.getBusinessCode()+"]金额小于本次订单申请金额:"+amount.toString());
         }
     }
 }

@@ -29,4 +29,11 @@ public interface ICommonApiService {
     void checkProduct(String userName, String productCode);
 
     void checkSalesmanRate(SysUser user,PayUserChannel userChannel);
+
+    /**
+     * 挂马账户金额是否满足本次订单申请
+     * @param business
+     * @param amount
+     */
+    void businessAmountIsLegal(PayBusiness business,BigDecimal amount);
 }
