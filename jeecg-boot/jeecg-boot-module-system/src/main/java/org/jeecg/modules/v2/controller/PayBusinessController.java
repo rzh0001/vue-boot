@@ -69,16 +69,18 @@ public class PayBusinessController {
 
     @PostMapping("/activeBusinessStatus")
     public Result activeBusinessStatus(@RequestBody PayBusiness business) {
-        business.setBusinessActiveStatus(BusinessActivStatusEnum.ACTIVE.getValue());
-        payBusinessService.updateById(business);
+        PayBusiness db = payBusinessService.getById(business.getId());
+        db.setBusinessActiveStatus(BusinessActivStatusEnum.ACTIVE.getValue());
+        payBusinessService.updateById(db);
         Result result = new Result();
         result.setResult("激活成功");
         return result;
     }
     @PostMapping("/unActiveBusinessStatus")
     public Result unActiveBusinessStatus(@RequestBody PayBusiness business) {
-        business.setBusinessActiveStatus(BusinessActivStatusEnum.NOT_ACTIVE.getValue());
-        payBusinessService.updateById(business);
+        PayBusiness db = payBusinessService.getById(business.getId());
+        db.setBusinessActiveStatus(BusinessActivStatusEnum.NOT_ACTIVE.getValue());
+        payBusinessService.updateById(db);
         Result result = new Result();
         result.setResult("激活成功");
         return result;
