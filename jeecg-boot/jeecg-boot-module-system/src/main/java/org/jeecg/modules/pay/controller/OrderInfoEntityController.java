@@ -29,6 +29,7 @@ import org.jeecg.modules.util.BaseConstant;
 import org.jeecg.modules.util.HttpResult;
 import org.jeecg.modules.util.HttpUtils;
 import org.jeecg.modules.util.R;
+import org.jeecg.modules.v2.service.impl.PayBusinessServiceImpl;
 import org.jeecgframework.poi.excel.ExcelImportUtil;
 import org.jeecgframework.poi.excel.def.NormalExcelConstants;
 import org.jeecgframework.poi.excel.entity.ExportParams;
@@ -65,7 +66,8 @@ public class OrderInfoEntityController {
 	private ISysUserService userService;
 	@Autowired
 	public ISysDictService dictService;
-
+	@Autowired
+	private PayBusinessServiceImpl businessService;
 	/**
 	 * 分页列表查询
 	 *
@@ -423,6 +425,8 @@ public class OrderInfoEntityController {
 			JSONObject callBackResult = JSON.parseObject(result.getBody());
 			if ("200".equals(callBackResult.get("code").toString())) {
 				msg.append("通知商户成功");
+				//扣减挂马账户的金额
+				businessService.subtractAmount(order.getSubmitAmount(), order.getUserName(), order.getPayType(), order.getProductCode(), order.getBusinessCode());
 				orderInfoEntityService.updateOrderStatusSuccessByOrderId(id);
 				log.info("通知商户成功，并且商户返回成功,orderID:{}", id);
 				flag = true;

@@ -120,7 +120,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     public R createOrder(JSONObject reqobj, HttpServletRequest req, HttpServletResponse response) throws Exception {
         R checkParam = checkParam(reqobj, true, false, false);
         if (BaseConstant.CHECK_PARAM_SUCCESS.equals(checkParam.get(BaseConstant.CODE).toString())) {
-            return addOrder(checkParam, req,response);
+            return addOrder(checkParam, req, response);
         } else {
             return checkParam;
         }
@@ -196,6 +196,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
 
     @Autowired
     private PayBusinessServiceImpl businessService;
+
     /**
      * 挂马 --> 四方
      * <p>
@@ -236,13 +237,12 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             return R.error("该订单已经回调过了，不能重复回调");
         }
         //扣减挂马账户的金额
-        businessService.subtractAmount(order.getSubmitAmount(),order.getUserName(),order.getPayType(),order.getProductCode(),order.getBusinessCode());
+        businessService.subtractAmount(order.getSubmitAmount(), order.getUserName(), order.getPayType(), order.getProductCode(), order.getBusinessCode());
         SysUser user = userService.getUserByName(userName);
         order.setStatus(BaseConstant.ORDER_STATUS_SUCCESS_NOT_RETURN);
         updateById(order);
         return notifyCustomer(order, user, payType);
     }
-
 
 
     @Override
@@ -257,11 +257,13 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         log.info("===>请求商户返回状态码为：{},消息体为：{}", result.getCode(), body);
         JSONObject callBackResult = JSON.parseObject(result.getBody());
         if ("200".equals(callBackResult.get("code").toString())) {
+            //扣减挂马账户的金额
+            businessService.subtractAmount(order.getSubmitAmount(), order.getUserName(), order.getPayType(), order.getProductCode(), order.getBusinessCode());
             updateOrderStatusSuccessByOrderId(order.getOrderId());
             updateBusinessIncomeAmount(order);
             log.info("商户返回成功,orderID:{}", order.getOrderId());
             msg.append("通知商户成功");
-            countAmount(order.getOrderId(), user.getUsername(), order.getSubmitAmount().toString(), payType,order.getProductCode());
+            countAmount(order.getOrderId(), user.getUsername(), order.getSubmitAmount().toString(), payType, order.getProductCode());
             return R.ok(msg.toString());
         } else {
             log.info("通知商户失败,orderID:{}", order.getOrderId());
@@ -324,6 +326,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     private PayChannelServiceImpl channelService;
     @Autowired
     private PayUserChannelServiceImpl userChannelService;
+
     /**
      * 统计规则： 查看订单的商户是否存在介绍人： 存在介绍人： 介绍人收入=订单金额*（介绍人费率-代理费率） 代理收入 = 订单金额*代理费率 商户收入 = 订单金额 - 介绍人收入 不存在介绍人： 代理收入 = 订单金额 *
      * 商户费率 商户收入 = 订单金额 - 代理收入
@@ -335,13 +338,13 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      * @throws Exception
      */
     @Override
-    public void countAmount(String orderId, String userName, String submitAmount, String payType,String productCode) throws Exception {
+    public void countAmount(String orderId, String userName, String submitAmount, String payType, String productCode) throws Exception {
         SysUser user = userService.getUserByName(userName);
         BigDecimal submit = new BigDecimal(submitAmount);
         PayChannel channel = channelService.getChannelByChannelCode(payType);
-        PayUserChannel userChannel = userChannelService.getUserChannel(userName,payType,productCode);
+        PayUserChannel userChannel = userChannelService.getUserChannel(userName, payType, productCode);
         // 商户的费率
-        String rateString =userChannel.getUserRate();
+        String rateString = userChannel.getUserRate();
         // 介绍人为空
         if (org.springframework.util.StringUtils.isEmpty(user.getSalesmanUsername())) {
             BigDecimal rate = new BigDecimal(rateString == null ? channel.getChannelRate() : rateString);
@@ -357,7 +360,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
             // 介绍人不为空
             // 获取介绍人费率
             SysUser sale = userService.getUserByName(user.getSalesmanUsername());
-            PayUserChannel introducer = userChannelService.getUserChannel(user.getSalesmanUsername(),payType,productCode);
+            PayUserChannel introducer = userChannelService.getUserChannel(user.getSalesmanUsername(), payType, productCode);
             String introducerRate = introducer.getUserRate();
             // 代理对介绍人设置的费率
             // 介绍人的利率差 = 介绍人对商户设置的费率 - 代理对介绍人的费率
@@ -561,7 +564,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
      *
      * @param checkParam
      */
-    private R addOrder(R checkParam, HttpServletRequest req,HttpServletResponse response) throws Exception {
+    private R addOrder(R checkParam, HttpServletRequest req, HttpServletResponse response) throws Exception {
         String ip = (String) checkParam.get(BaseConstant.IP);
         String outerOrderId = (String) checkParam.get(BaseConstant.OUTER_ORDER_ID);
         String userName = (String) checkParam.get(BaseConstant.USER_NAME);
@@ -579,14 +582,14 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         //获取通道
         PayUserChannel userChannel = apiService.findChannel(userName, product);
         SysUser user = userService.getUserByName(userName);
-        apiService.checkSalesmanRate(user,userChannel);
+        apiService.checkSalesmanRate(user, userChannel);
         //校验金额合法性
         apiService.checkSubmitAmountLegal(new BigDecimal(submitAmount), userChannel);
         //获取子账号
         PayBusiness business =
                 apiService.findBusiness(agentName, userChannel.getChannelCode(), product);
         //校验挂马账户余额是否足够
-        apiService.businessAmountIsLegal(business,new BigDecimal(submitAmount));
+        apiService.businessAmountIsLegal(business, new BigDecimal(submitAmount));
         //获取通道费率
         String rate = apiService.getRate(userChannel);
 
@@ -594,9 +597,8 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         // 保存订单信息OrderInfoEntityServiceImpl
         OrderInfoEntity order = this.saveOrder(submitAmount, outerOrderId, userChannel, business, rate, user, callbackUrl, remark, ip);
         // 请求挂马平台
-        return requestPayUrl.requestPayUrl(order, userName, gateWay, key, innerCallBackUrl, business,response);
+        return requestPayUrl.requestPayUrl(order, userName, gateWay, key, innerCallBackUrl, business, response);
     }
-
 
 
     /**
@@ -1048,10 +1050,11 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
     public void updateOrderStatusNoBackByOrderId(String orderId) {
         baseMapper.updateOrderStatusNoBackByOrderId(orderId);
     }
+
     @Override
-    public void deleteOrder(String lastTime){
+    public void deleteOrder(String lastTime) {
         QueryWrapper<OrderInfoEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lt( "create_time",lastTime);
+        queryWrapper.lt("create_time", lastTime);
         getBaseMapper().delete(queryWrapper);
     }
 }
