@@ -236,8 +236,6 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         if (!redisUtil.setIfAbsent("callBack" + orderId, orderId, 30)) {
             return R.error("该订单已经回调过了，不能重复回调");
         }
-        //扣减挂马账户的金额
-        businessService.subtractAmount(order.getSubmitAmount(), order.getUserName(), order.getPayType(), order.getProductCode(), order.getBusinessCode());
         SysUser user = userService.getUserByName(userName);
         order.setStatus(BaseConstant.ORDER_STATUS_SUCCESS_NOT_RETURN);
         updateById(order);
