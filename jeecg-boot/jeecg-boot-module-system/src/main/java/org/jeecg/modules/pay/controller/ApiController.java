@@ -110,7 +110,6 @@ public class ApiController {
     @ResponseBody
     public String testCallBack() {
         JSONObject result = new JSONObject();
-        OrderInfoEntity o = orderInfoService.queryOrderInfoByOrderId("20191202222707GuEGZ");
         result.put("code", 200);
         result.put("msg", "success");
         return result.toJSONString();

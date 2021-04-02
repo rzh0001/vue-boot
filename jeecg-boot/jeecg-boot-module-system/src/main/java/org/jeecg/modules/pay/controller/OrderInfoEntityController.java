@@ -426,7 +426,7 @@ public class OrderInfoEntityController {
 			if ("200".equals(callBackResult.get("code").toString())) {
 				msg.append("通知商户成功");
 				//扣减挂马账户的金额
-				businessService.subtractAmount(order.getSubmitAmount(), order.getUserName(), order.getPayType(), order.getProductCode(), order.getBusinessCode());
+				businessService.subtractAmount(order.getSubmitAmount(), order.getParentUser(), order.getPayType(), order.getProductCode(), order.getBusinessCode());
 				orderInfoEntityService.updateOrderStatusSuccessByOrderId(id);
 				log.info("通知商户成功，并且商户返回成功,orderID:{}", id);
 				flag = true;

@@ -256,7 +256,7 @@ public class OrderInfoEntityServiceImpl extends ServiceImpl<OrderInfoEntityMappe
         JSONObject callBackResult = JSON.parseObject(result.getBody());
         if ("200".equals(callBackResult.get("code").toString())) {
             //扣减挂马账户的金额
-            businessService.subtractAmount(order.getSubmitAmount(), order.getUserName(), order.getPayType(), order.getProductCode(), order.getBusinessCode());
+            businessService.subtractAmount(order.getSubmitAmount(), order.getParentUser(), order.getPayType(), order.getProductCode(), order.getBusinessCode());
             updateOrderStatusSuccessByOrderId(order.getOrderId());
             updateBusinessIncomeAmount(order);
             log.info("商户返回成功,orderID:{}", order.getOrderId());
