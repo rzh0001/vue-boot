@@ -126,7 +126,7 @@
       chargeBusiness: function (record) {
         this.userName = record.username;
         this.memberType = record.memberType;
-        if (this.memberType != "1") {
+        if (this.memberType == "2" || this.memberType == "3") {
           alert("无权限")
           return
         }

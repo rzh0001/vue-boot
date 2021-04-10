@@ -99,27 +99,22 @@ public class SysUserController {
 	public Result<IPage<SysUserPage>> queryPageList(SysUser user, @RequestParam(name = "pageNo", defaultValue = "1") Integer pageNo,
 													@RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize, HttpServletRequest req) {
 		Result<IPage<SysUserPage>> result = new Result<IPage<SysUserPage>>();
-		Map<String, Object> map = BeanUtil.beanToMap(user);
 		QueryWrapper<SysUser> queryWrapper = QueryGenerator.initQueryWrapper(user,
 				req.getParameterMap());
-//		queryWrapper.
 		LoginUser opUser = (LoginUser) SecurityUtils.getSubject().getPrincipal();
 		if (opUser.getMemberType() != null) {
 			switch (opUser.getMemberType()) {
 				case PayConstant.MEMBER_TYPE_AGENT:
-					queryWrapper.lambda().eq(SysUser::getAgentId, opUser.getId());
+					queryWrapper.lambda().eq(SysUser::getAgentId, opUser.getId()).or().eq(SysUser::getUsername,opUser.getUsername());
 					break;
 				case PayConstant.MEMBER_TYPE_SALESMAN:
 					queryWrapper.lambda().eq(SysUser::getSalesmanId, opUser.getId());
-					map.put("salesmanId", opUser.getId());
 					break;
 				default:
 			}
 		}
 		Page<SysUserPage> page = new Page<SysUserPage>(pageNo, pageSize);
 		IPage<SysUserPage> pageList = sysUserService.pageUserWithPaymentInfo(page, queryWrapper);
-//        Page<List<Map<String, Object>>> page = new Page<List<Map<String, Object>>>(pageNo, pageSize);
-//        IPage<List<Map<String, Object>>> pageList = sysUserService.pageUserWithPaymentInfo(page, queryWrapper);
 		result.setSuccess(true);
 		result.setResult(pageList);
 		return result;
